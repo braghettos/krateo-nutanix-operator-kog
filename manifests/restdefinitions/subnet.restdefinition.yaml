@@ -1,0 +1,39 @@
+apiVersion: ogen.krateo.io/v1alpha1
+kind: RestDefinition
+metadata:
+  name: nutanix-subnet
+  namespace: nutanix-system
+spec:
+  oasPath: configmap://nutanix-system/nutanix-subnet-oas/subnet.yaml
+  resourceGroup: networking.nutanix.krateo.io
+  resource:
+    kind: Subnet
+    identifiers:
+      - name
+    additionalStatusFields:
+      - extId
+    verbsDescription:
+      - action: findby
+        method: GET
+        path: /networking/v4.0/config/subnets
+      - action: create
+        method: POST
+        path: /networking/v4.0/config/subnets
+      - action: get
+        method: GET
+        path: /networking/v4.0/config/subnets/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId
+      - action: update
+        method: PUT
+        path: /networking/v4.0/config/subnets/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId
+      - action: delete
+        method: DELETE
+        path: /networking/v4.0/config/subnets/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId

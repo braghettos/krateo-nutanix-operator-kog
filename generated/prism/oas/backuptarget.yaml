@@ -1,0 +1,1552 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Prism APIs
+  description: Manage Tasks, Category Associations and Submit Batch Operations.
+  version: '4.0'
+  x-logo:
+    altText: Prism Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/prism/images/prism-logo-img.svg
+  x-repo-name: prism
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets:
+    get:
+      tags:
+      - DomainManager
+      summary: 'List backup targets
+
+        '
+      description: 'Lists backup targets (cluster or object store) configured for a given domain manager.
+
+        '
+      operationId: listBackupTargets
+      parameters:
+      - name: domainManagerExtId
+        in: path
+        description: 'A unique identifier for the domain manager.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 6acb6cbd-4574-4b8e-b2d8-04019bf52549
+      responses:
+        '200':
+          description: 'Returns a list of backup clusters/object store backing up the domain manager.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    maxItems: 4
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/prism.v4.0.management.BackupTarget'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Domain Manager Backup Target
+        roleList:
+        - Super Admin
+        - Prism Admin
+        - Prism Viewer
+        - Domain Manager Admin
+        - Domain Manager Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '7.0'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.pri.java.client.ApiClient;\nimport com.nutanix.pri.java.client.api.DomainManagerBackupsApi;\n\
+          import com.nutanix.dp1.pri.prism.v4.management.ListBackupTargetsApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        DomainManagerBackupsApi domainManagerBackupsApi\
+          \ = new DomainManagerBackupsApi(apiClient);\n\n        \n        String domainManagerExtId = \"FE2D4df0-c77b-6CfB-0BcE-eDBB24EDc0E5\"\
+          ;\n\n        try {\n            ListBackupTargetsApiResponse listBackupTargetsApiResponse = domainManagerBackupsApi.listBackupTargets(domainManagerExtId);\n\
+          \            System.out.println(listBackupTargetsApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DomainManagerBackupsApi } from \"@nutanix-api/prism-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet domainManagerBackupsApi = new DomainManagerBackupsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let domainManagerExtId = \"6eA5bced-9E01-1aDb-c2DF-D95CdBbcbaD2\";\n\n\n\n\n\n\
+          \    domainManagerBackupsApi.listBackupTargets(domainManagerExtId).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_prism_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_prism_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_prism_py_client.ApiClient(configuration=config)\n\
+          \    domain_manager_backups_api = ntnx_prism_py_client.DomainManagerBackupsApi(api_client=client)\n    \n    domain_manager_ext_id\
+          \ = \"fc2aD0cE-cFAF-7B3C-eff9-1B4620Cb288a\"\n\n\n    try:\n        api_response = domain_manager_backups_api.list_backup_targets(domainManagerExtId=domain_manager_ext_id)\n\
+          \        print(api_response)\n    except ntnx_prism_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/models/prism/v4/management\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    DomainManagerBackupsApiInstance *api.DomainManagerBackupsApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    DomainManagerBackupsApiInstance = api.NewDomainManagerBackupsApi(ApiClientInstance)\n\n    \n\
+          \    domainManagerExtId := \"CFfE7e4a-FFdA-8Ed9-7CEf-F2984dcb8E00\"\n\n\n    response, error := DomainManagerBackupsApiInstance.ListBackupTargets(&domainManagerExtId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.BackupTarget)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/F3dADf1A-0dEc-fae5-fEeA-1DAafF1f5F76/backup-targets\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/87a4FBBF-cFB1-5Eb5-B5F2-6AeDcbCe4DDb/backup-targets\"\
+          \n"
+    post:
+      tags:
+      - DomainManager
+      summary: 'Create backup target
+
+        '
+      description: "Creates a cluster or object store as the backup target. For a given Prism Central,\nthere can be up to\
+        \ 3 clusters as backup targets \nand 1 object store as backup target. If any cluster or object store is not eligible\
+        \ for backup or \nlacks appropriate permissions, the API request will fail. \nFor object store backup targets, specifying\
+        \ backup policy is mandatory along \nwith the location of the object store.\n"
+      operationId: createBackupTarget
+      parameters:
+      - name: domainManagerExtId
+        in: path
+        description: 'A unique identifier for the domain manager.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: eab17485-f237-4711-8c6d-f2fa40e46389
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 3436319d-a869-4221-9ee8-6d69776ab5f1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/prism.v4.0.management.BackupTarget'
+        required: true
+      responses:
+        '202':
+          description: 'Returns the task ID corresponding to the create backup target request.
+
+            '
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create Domain Manager Backup Target
+        roleList:
+        - Super Admin
+        - Prism Admin
+        - Domain Manager Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 3
+        timeUnit: seconds
+      - type: small
+        count: 3
+        timeUnit: seconds
+      - type: large
+        count: 3
+        timeUnit: seconds
+      - type: xlarge
+        count: 3
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.pri.java.client.ApiClient;\nimport com.nutanix.pri.java.client.api.DomainManagerBackupsApi;\n\
+          import com.nutanix.dp1.pri.prism.v4.management.BackupTarget;\nimport com.nutanix.dp1.pri.prism.v4.management.CreateBackupTargetApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        DomainManagerBackupsApi domainManagerBackupsApi = new DomainManagerBackupsApi(apiClient);\n\
+          \n        BackupTarget backupTarget = new BackupTarget();\n\n        // BackupTarget object initializations here...\n\
+          \        \n        String domainManagerExtId = \"51BF28C1-D9AA-8CD3-1FEa-cda96E11d3c8\";\n\n        try {\n    \
+          \        CreateBackupTargetApiResponse createBackupTargetApiResponse = domainManagerBackupsApi.createBackupTarget(domainManagerExtId,\
+          \ backupTarget);\n            System.out.println(createBackupTargetApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DomainManagerBackupsApi, BackupTarget } from \"@nutanix-api/prism-js-client\";\n\n\
+          // Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet domainManagerBackupsApi = new DomainManagerBackupsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let backupTarget = new BackupTarget();\n\n    // BackupTarget object initializations\
+          \ here...\n\n    \n    let domainManagerExtId = \"AC2FABae-BeFb-2Dc0-9fAA-aaBeC5E3769D\";\n\n\n\n\n\n    domainManagerBackupsApi.createBackupTarget(domainManagerExtId,\
+          \ backupTarget).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_prism_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_prism_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_prism_py_client.ApiClient(configuration=config)\n\
+          \    domain_manager_backups_api = ntnx_prism_py_client.DomainManagerBackupsApi(api_client=client)\n    backupTarget\
+          \ = ntnx_prism_py_client.BackupTarget()\n\n    # BackupTarget object initializations here...\n    \n    domain_manager_ext_id\
+          \ = \"a4fdbbCb-Bcf9-Ed40-b6aa-AF2B13D7DA61\"\n\n\n    try:\n        api_response = domain_manager_backups_api.create_backup_target(domainManagerExtId=domain_manager_ext_id,\
+          \ body=backupTarget)\n        print(api_response)\n    except ntnx_prism_py_client.rest.ApiException as e:\n   \
+          \     print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/models/prism/v4/management\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    DomainManagerBackupsApiInstance *api.DomainManagerBackupsApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    DomainManagerBackupsApiInstance = api.NewDomainManagerBackupsApi(ApiClientInstance)\n\n    backupTarget\
+          \ := import1.NewBackupTarget()\n\n    // BackupTarget object initializations here...\n\n    \n    domainManagerExtId\
+          \ := \"bbB5D8B2-5f97-B34C-d435-BdaB6F5DbB4B\"\n\n\n    response, error := DomainManagerBackupsApiInstance.CreateBackupTarget(&domainManagerExtId,\
+          \ backupTarget)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/eD3c21b3-Ec47-dbCb-ee35-e1CEa0df00A6/backup-targets\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"location\":{\"config\":{\"extId\"\
+          :\"string\",\"name\":\"string\",\"$objectType\":\"prism.v4.management.ClusterReference\"},\"$objectType\":\"prism.v4.management.ClusterLocation\"\
+          },\"lastSyncTime\":\"2015-07-20T15:49:04-07:00\",\"isBackupPaused\":true,\"backupPauseReason\":\"Thebackupispausedduetoupgradeinprogress.Itwillbeautomaticallyun-pausedafterupgradehasfinished\"\
+          ,\"$objectType\":\"prism.v4.management.BackupTarget\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          location\":{\"config\":{\"extId\":\"string\",\"name\":\"string\",\"$objectType\":\"prism.v4.management.ClusterReference\"\
+          },\"$objectType\":\"prism.v4.management.ClusterLocation\"},\"lastSyncTime\":\"2015-07-20T15:49:04-07:00\",\"isBackupPaused\"\
+          :true,\"backupPauseReason\":\"Thebackupispausedduetoupgradeinprogress.Itwillbeautomaticallyun-pausedafterupgradehasfinished\"\
+          ,\"$objectType\":\"prism.v4.management.BackupTarget\"} \\\n- \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/6B8bBDEB-eBF1-5dAf-2AFC-D6dA7EfEFcbD/backup-targets\"\
+          \n"
+  /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}:
+    get:
+      tags:
+      - DomainManager
+      summary: 'Fetch backup target
+
+        '
+      description: 'Retrieves the backup targets (cluster or object store) from a domain manager and returns the
+
+        backup configuration and lastSyncTimestamp parameter to the user.
+
+        '
+      operationId: getBackupTargetById
+      parameters:
+      - name: extId
+        in: path
+        description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 142d4d54-62dc-44c1-abe2-f75498964142
+      - name: domainManagerExtId
+        in: path
+        description: 'A unique identifier for the domain manager.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 8f7c6648-41c1-451d-9bff-af644ad6d517
+      responses:
+        '200':
+          description: 'Returns the backup target details corresponding to the cluster/object store configuration.
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.management.BackupTarget'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Domain Manager Backup Target
+        roleList:
+        - Super Admin
+        - Prism Admin
+        - Prism Viewer
+        - Domain Manager Admin
+        - Domain Manager Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '7.0'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.pri.java.client.ApiClient;\nimport com.nutanix.pri.java.client.api.DomainManagerBackupsApi;\n\
+          import com.nutanix.dp1.pri.prism.v4.management.GetBackupTargetApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        DomainManagerBackupsApi domainManagerBackupsApi\
+          \ = new DomainManagerBackupsApi(apiClient);\n\n        \n        String extId = \"d6d7F222-a24A-Da9C-5dB1-40A5a38A6DD5\"\
+          ;\n        \n        String domainManagerExtId = \"BccDE1ad-1a9C-c3eB-9A6B-c4bF9aDAEe5d\";\n\n        try {\n  \
+          \          GetBackupTargetApiResponse getBackupTargetApiResponse = domainManagerBackupsApi.getBackupTargetById(extId,\
+          \ domainManagerExtId);\n            System.out.println(getBackupTargetApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DomainManagerBackupsApi } from \"@nutanix-api/prism-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet domainManagerBackupsApi = new DomainManagerBackupsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"3D32c20a-cEaA-daaF-dF7A-cc69c1Fb6d26\";\n    \n    let domainManagerExtId\
+          \ = \"2bf1Cbf8-aE57-A6ee-c7Ce-aE4dbbC1B2BB\";\n\n\n\n\n\n    domainManagerBackupsApi.getBackupTargetById(extId,\
+          \ domainManagerExtId).then(({data, response}) => {\n        console.log(`API returned the following status code:\
+          \ ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_prism_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_prism_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_prism_py_client.ApiClient(configuration=config)\n\
+          \    domain_manager_backups_api = ntnx_prism_py_client.DomainManagerBackupsApi(api_client=client)\n    \n    ext_id\
+          \ = \"bd2ecDcb-E9E4-1e6D-Fd1e-2fe81Fa8ab2e\"\n    \n    domain_manager_ext_id = \"a2E4d0db-331A-3ADf-e83f-BEA1e6ff036A\"\
+          \n\n\n    try:\n        api_response = domain_manager_backups_api.get_backup_target_by_id(extId=ext_id, domainManagerExtId=domain_manager_ext_id)\n\
+          \        print(api_response)\n    except ntnx_prism_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/models/prism/v4/management\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    DomainManagerBackupsApiInstance *api.DomainManagerBackupsApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    DomainManagerBackupsApiInstance = api.NewDomainManagerBackupsApi(ApiClientInstance)\n\n    \n\
+          \    extId := \"bbc21bCe-23f0-e85e-3cAd-8576e02DADe6\"\n    \n    domainManagerExtId := \"EF5Ea44F-10B6-0361-8eAD-EED7D0b38B2e\"\
+          \n\n\n    response, error := DomainManagerBackupsApiInstance.GetBackupTargetById(&extId, &domainManagerExtId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.BackupTarget)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/Ae262aCa-Cc3A-8cBe-d387-3Dcd4759De6F/backup-targets/Ac86D9f7-ebee-Bcf5-AD37-BDe66572913D\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/1fAaEdAc-24FE-0BCe-Bd6A-aFc0ABB5AeAF/backup-targets/5d9cedd5-2Ed8-8ca6-0cb2-2e3FdcF0d29f\"\
+          \n"
+    put:
+      tags:
+      - DomainManager
+      summary: 'Update backup target
+
+        '
+      description: 'Updates the credentials and/or RPO of the given object store.
+
+        '
+      operationId: updateBackupTargetById
+      parameters:
+      - name: domainManagerExtId
+        in: path
+        description: 'A unique identifier for the domain manager.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: a4cf3a8f-eee9-43bb-8f82-283d058176c9
+      - name: extId
+        in: path
+        description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 7287aa8f-504a-4ec2-878c-3dfd5da01dec
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 4777f3a5-3ece-4503-b0f2-978b535f49c5
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/prism.v4.0.management.BackupTarget'
+        required: true
+      responses:
+        '202':
+          description: 'Returns the task ID corresponding to the update backup target request.
+
+            '
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Update Domain Manager Backup Target
+        roleList:
+        - Super Admin
+        - Prism Admin
+        - Domain Manager Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 3
+        timeUnit: seconds
+      - type: small
+        count: 3
+        timeUnit: seconds
+      - type: large
+        count: 3
+        timeUnit: seconds
+      - type: xlarge
+        count: 3
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.pri.java.client.ApiClient;\nimport com.nutanix.pri.java.client.api.DomainManagerBackupsApi;\n\
+          import com.nutanix.dp1.pri.prism.v4.management.BackupTarget;\nimport com.nutanix.dp1.pri.prism.v4.management.GetBackupTargetApiResponse;\n\
+          import com.nutanix.dp1.pri.prism.v4.management.UpdateBackupTargetApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        DomainManagerBackupsApi domainManagerBackupsApi = new DomainManagerBackupsApi(apiClient);\n\
+          \n        BackupTarget backupTarget = new BackupTarget();\n\n        // BackupTarget object initializations here...\n\
+          \        \n        String domainManagerExtId = \"7Ff9ef42-BE34-cCB4-fE4e-657eE9caaf9b\";\n        \n        String\
+          \ extId = \"9E6bfabe-18bf-315E-f8DF-Caf0af6F2ad0\";\n\n        // perform GET call\n        GetBackupTargetApiResponse\
+          \ getResponse = null;\n        try {\n            getResponse = domainManagerBackupsApi.getBackupTargetById(domainManagerExtId,\
+          \ extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n       \
+          \ }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdateBackupTargetApiResponse updateBackupTargetApiResponse = domainManagerBackupsApi.updateBackupTargetById(domainManagerExtId,\
+          \ extId, backupTarget, opts);\n            System.out.println(updateBackupTargetApiResponse.toString());\n\n   \
+          \     } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DomainManagerBackupsApi, BackupTarget, GetBackupTargetApiResponse } from \"@nutanix-api/prism-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet domainManagerBackupsApi = new DomainManagerBackupsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let backupTarget = new BackupTarget();\n\n    // BackupTarget object initializations\
+          \ here...\n\n    \n    let domainManagerExtId = \"CB46bca6-Ab90-aaF5-De29-5f0bDbbd7A8b\";\n    \n    let extId =\
+          \ \"fCaE7Fba-C97D-EA12-c4CC-7BE9E189feAC\";\n\n\n    // Perform Get call\n    domainManagerBackupsApi.getBackupTargetById(domainManagerExtId,\
+          \ extId).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        // Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        domainManagerBackupsApi.updateBackupTargetById(domainManagerExtId,\
+          \ extId, backupTarget, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned\
+          \ the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_prism_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_prism_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_prism_py_client.ApiClient(configuration=config)\n\
+          \    domain_manager_backups_api = ntnx_prism_py_client.DomainManagerBackupsApi(api_client=client)\n    backupTarget\
+          \ = ntnx_prism_py_client.BackupTarget()\n\n    # BackupTarget object initializations here...\n    \n    domain_manager_ext_id\
+          \ = \"4Bc4bCFe-acdD-DD2f-09Aa-2A6aa8bcEfDB\"\n    \n    ext_id = \"aefd2dd7-Fd6E-3eeE-3FBd-e23Aa4eABAbe\"\n\n  \
+          \  try:\n        api_response = domain_manager_backups_api.get_backup_target_by_id(domainManagerExtId=domain_manager_ext_id,\
+          \ extId=ext_id)\n    except ntnx_prism_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag\
+          \ Header\n    etag_value = ntnx_prism_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response\
+          \ = domain_manager_backups_api.update_backup_target_by_id(domainManagerExtId=domain_manager_ext_id, extId=ext_id,\
+          \ body=backupTarget, if_match=etag_value)\n        print(api_response)\n    except ntnx_prism_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/models/prism/v4/management\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    DomainManagerBackupsApiInstance *api.DomainManagerBackupsApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    DomainManagerBackupsApiInstance = api.NewDomainManagerBackupsApi(ApiClientInstance)\n\n    backupTarget\
+          \ := import1.NewBackupTarget()\n\n    // BackupTarget object initializations here...\n\n    \n    domainManagerExtId\
+          \ := \"f0DbbDCB-7Ac9-7d92-15BD-89EAD49cf1Ac\"\n    \n    extId := \"39A8F3eE-6BBe-11DE-beBB-164DEe6BBfce\"\n\n \
+          \   getResponse, err := DomainManagerBackupsApiInstance.GetBackupTargetById(&domainManagerExtId, &extId)\n    if\
+          \ err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue :=\
+          \ ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"If-Match\"] =\
+          \ etagValue\n\n    response, error := DomainManagerBackupsApiInstance.UpdateBackupTargetById(&domainManagerExtId,\
+          \ &extId, backupTarget, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data,\
+          \ _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/9abacBa6-dB57-3Af9-0eBB-dcEDACF17caB/backup-targets/0cdAbBAB-fff1-BF3D-4Ba5-11ddafA9aEed\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"location\":{\"config\":{\"extId\":\"string\",\"name\":\"string\",\"$objectType\":\"prism.v4.management.ClusterReference\"\
+          },\"$objectType\":\"prism.v4.management.ClusterLocation\"},\"lastSyncTime\":\"2015-07-20T15:49:04-07:00\",\"isBackupPaused\"\
+          :true,\"backupPauseReason\":\"Thebackupispausedduetoupgradeinprogress.Itwillbeautomaticallyun-pausedafterupgradehasfinished\"\
+          ,\"$objectType\":\"prism.v4.management.BackupTarget\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"location\":{\"config\":{\"extId\":\"string\",\"name\":\"string\",\"$objectType\"\
+          :\"prism.v4.management.ClusterReference\"},\"$objectType\":\"prism.v4.management.ClusterLocation\"},\"lastSyncTime\"\
+          :\"2015-07-20T15:49:04-07:00\",\"isBackupPaused\":true,\"backupPauseReason\":\"Thebackupispausedduetoupgradeinprogress.Itwillbeautomaticallyun-pausedafterupgradehasfinished\"\
+          ,\"$objectType\":\"prism.v4.management.BackupTarget\"} \\\n- \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/DeDdDb7f-bECB-5e1f-cdBA-Cae85eeef0f5/backup-targets/Ca0F5CCc-AaD2-507f-1D99-EbeCcDaCCE4e\"\
+          \n"
+    delete:
+      tags:
+      - DomainManager
+      summary: 'Delete backup target
+
+        '
+      description: "Removes cluster/object store from the backup targets. This will stop the cluster/object store \nfrom backing\
+        \ up Prism Central data.\n"
+      operationId: deleteBackupTargetById
+      parameters:
+      - name: domainManagerExtId
+        in: path
+        description: 'A unique identifier for the domain manager.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 3207f853-aa28-4c69-95c4-3673a11fe17b
+      - name: extId
+        in: path
+        description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 47588c26-bbab-4298-bf0c-22069b7637e5
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 8a3b29d9-63c4-488a-8662-b5ceaad526d4
+      responses:
+        '202':
+          description: 'Returns the task ID corresponding to the delete backup target request.
+
+            '
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /prism/v4.0/management/domain-managers/{domainManagerExtId}/backup-targets/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete Domain Manager Backup Target
+        roleList:
+        - Super Admin
+        - Prism Admin
+        - Domain Manager Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 3
+        timeUnit: seconds
+      - type: small
+        count: 3
+        timeUnit: seconds
+      - type: large
+        count: 3
+        timeUnit: seconds
+      - type: xlarge
+        count: 3
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.pri.java.client.ApiClient;\nimport com.nutanix.pri.java.client.api.DomainManagerBackupsApi;\n\
+          import com.nutanix.dp1.pri.prism.v4.management.GetBackupTargetApiResponse;\nimport com.nutanix.dp1.pri.prism.v4.management.DeleteBackupTargetApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        DomainManagerBackupsApi domainManagerBackupsApi\
+          \ = new DomainManagerBackupsApi(apiClient);\n\n        \n        String domainManagerExtId = \"c4cf7E6b-5f2f-9BAf-a4FA-BBf5E9ed3aAb\"\
+          ;\n        \n        String extId = \"AEDaedBd-a0B9-FBf3-7dCE-5EEeB794cd8f\";\n\n        // perform GET call\n \
+          \       GetBackupTargetApiResponse getResponse = null;\n        try {\n            getResponse = domainManagerBackupsApi.getBackupTargetById(domainManagerExtId,\
+          \ extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n       \
+          \ }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            DeleteBackupTargetApiResponse deleteBackupTargetApiResponse = domainManagerBackupsApi.deleteBackupTargetById(domainManagerExtId,\
+          \ extId, opts);\n            System.out.println(deleteBackupTargetApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DomainManagerBackupsApi, GetBackupTargetApiResponse } from \"@nutanix-api/prism-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet domainManagerBackupsApi = new DomainManagerBackupsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let domainManagerExtId = \"6bDBDbBD-a5c6-ffce-718e-E4CEaECFeccD\";\n    \n  \
+          \  let extId = \"eCbB2bce-fdb5-FB1F-eabC-AfBCFdB8A0fa\";\n\n\n    // Perform Get call\n    domainManagerBackupsApi.getBackupTargetById(domainManagerExtId,\
+          \ extId).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        // Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        domainManagerBackupsApi.deleteBackupTargetById(domainManagerExtId,\
+          \ extId, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the following\
+          \ status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error) => {\n\
+          \            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_prism_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_prism_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_prism_py_client.ApiClient(configuration=config)\n\
+          \    domain_manager_backups_api = ntnx_prism_py_client.DomainManagerBackupsApi(api_client=client)\n    \n    domain_manager_ext_id\
+          \ = \"4FBb28cD-Bc3a-aefc-Db05-Cec31CD4e163\"\n    \n    ext_id = \"964AFBd0-eAed-E8F8-eAbA-E0F6bFAdDc57\"\n\n  \
+          \  try:\n        api_response = domain_manager_backups_api.get_backup_target_by_id(domainManagerExtId=domain_manager_ext_id,\
+          \ extId=ext_id)\n    except ntnx_prism_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag\
+          \ Header\n    etag_value = ntnx_prism_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response\
+          \ = domain_manager_backups_api.delete_backup_target_by_id(domainManagerExtId=domain_manager_ext_id, extId=ext_id,\
+          \ if_match=etag_value)\n        print(api_response)\n    except ntnx_prism_py_client.rest.ApiException as e:\n \
+          \       print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    DomainManagerBackupsApiInstance *api.DomainManagerBackupsApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    DomainManagerBackupsApiInstance = api.NewDomainManagerBackupsApi(ApiClientInstance)\n\n    \n\
+          \    domainManagerExtId := \"E4f683AA-9CaB-A1E8-eeA4-0e6a5cFDf2D4\"\n    \n    extId := \"Aaa23d7c-6ff3-dAAB-8EBA-ED89cadbC9cD\"\
+          \n\n    getResponse, err := DomainManagerBackupsApiInstance.GetBackupTargetById(&domainManagerExtId, &extId)\n \
+          \   if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue\
+          \ := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"If-Match\"\
+          ] = etagValue\n\n    response, error := DomainManagerBackupsApiInstance.DeleteBackupTargetById(&domainManagerExtId,\
+          \ &extId, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/3c714eDc-b5fb-d87e-DbEF-35411C6eFaBA/backup-targets/B0dbC2EA-0Cbc-b4ba-2ecc-70b6cAeaD0F1\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'If-Match: string_sample_data' \\\n  \
+          \            --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\
+          \n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/prism/v4.0/management/domain-managers/Ac6F5DE8-fda3-CaAf-ca36-dAFADFAAFbcD/backup-targets/F0CA3aF4-6DB8-c9ea-AE2b-DFee48cEd0BC\"\
+          \n"
+components:
+  schemas:
+    prism.v4.0.management.S3Config:
+      required:
+      - bucketName
+      type: object
+      properties:
+        bucketName:
+          maxLength: 63
+          minLength: 3
+          type: string
+          description: 'The bucket name of the object store endpoint where backup data of domain manager
+
+            is to be stored.
+
+            '
+          example: pc-bucket-name
+        region:
+          maxLength: 63
+          type: string
+          description: 'The region name of the object store endpoint where backup data of domain manager
+
+            is stored.
+
+            '
+          default: us-east-1
+      additionalProperties: false
+      description: 'The endpoint of the object store s3 where domain manager is backed up.
+
+        '
+    prism.v4.0.management.ClusterLocation:
+      required:
+      - config
+      type: object
+      properties:
+        config:
+          $ref: '#/components/schemas/prism.v4.0.management.ClusterReference'
+      additionalProperties: false
+      description: 'Model which contains the information of backup cluster.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d568ff06-a6dc-480f-868c-b85b52f447ba
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    prism.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    prism.v4.0.management.ClusterReference:
+      required:
+      - extId
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Cluster UUID of a remote cluster.
+          example: 5f9c6fef-a851-439c-a150-58f8b76e074c
+        name:
+          maxLength: 80
+          minLength: 1
+          type: string
+          description: Name of the cluster.
+          readOnly: true
+      additionalProperties: false
+      description: Cluster reference of the remote cluster to be connected.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 0562e12d-543d-4030-9271-20ba8e72fcb2
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    prism.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 3
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 3
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    prism.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 41
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    prism.v4.0.management.AWSS3Config:
+      description: 'The base model of S3 object store endpoint where domain manager is backed up.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/prism.v4.0.management.S3Config'
+      - type: object
+        properties:
+          credentials:
+            $ref: '#/components/schemas/prism.v4.0.management.AccessKeyCredentials'
+        additionalProperties: false
+    prism.v4.0.management.ObjectStoreLocation:
+      required:
+      - providerConfig
+      type: object
+      properties:
+        providerConfig:
+          $ref: '#/components/schemas/prism.v4.0.management.AWSS3Config'
+        backupPolicy:
+          $ref: '#/components/schemas/prism.v4.0.management.BackupPolicy'
+      additionalProperties: false
+      description: "Model which contains the information of the object store endpoint where \nbackup is present. It contains\
+        \ information like objectstore \nendpoint address, endpoint flavour and last sync timestamp.\n"
+    prism.v4.0.management.BackupTarget:
+      required:
+      - location
+      description: 'The backup target for the domain manager, which can be either a cluster or an object store.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          location:
+            required:
+            - $objectType
+            type: object
+            properties:
+              $objectType:
+                type: string
+                example: prism.v4.management.ClusterLocation
+            description: 'Location of the backup target. For example, a cluster or an object store endpoint, such as AWS s3.
+
+              '
+            oneOf:
+            - $ref: '#/components/schemas/prism.v4.0.management.ClusterLocation'
+            - $ref: '#/components/schemas/prism.v4.0.management.ObjectStoreLocation'
+          lastSyncTime:
+            type: string
+            description: "Represents the time when the domain manager was last synchronized or copied its \nconfiguration\
+              \ data to the backup target. This field is updated every 30 minutes.\n"
+            format: date-time
+            readOnly: true
+            example: 2009-09-23 14:30:00-07:00
+          isBackupPaused:
+            type: boolean
+            description: 'Whether the backup is paused on the given cluster or not.
+
+              '
+            readOnly: true
+            example: true
+          backupPauseReason:
+            type: string
+            description: 'Specifies a reason why the backup might have paused. This will be empty if the isBackupPaused field
+              is false.
+
+              '
+            readOnly: true
+            example: The backup is paused due to upgrade in progress. It will be automatically un-paused after upgrade has
+              finished
+        additionalProperties: false
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:09d280be-8aed-4ed0-b8a9-99d064663278
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    prism.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 36
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    prism.v4.0.management.BackupPolicy:
+      required:
+      - rpoInMinutes
+      type: object
+      properties:
+        rpoInMinutes:
+          maximum: 1440
+          minimum: 60
+          type: integer
+          description: 'RPO interval in minutes at which the backup will be taken
+
+            '
+          format: int32
+          example: 86
+      additionalProperties: false
+      description: Backup policy for the object store provided.
+    prism.v4.0.management.AccessKeyCredentials:
+      required:
+      - accessKeyId
+      - secretAccessKey
+      type: object
+      properties:
+        accessKeyId:
+          maxLength: 128
+          minLength: 16
+          type: string
+          description: Access key Id for the object store provided for backup target.
+          example: AKIAZ26UIJS6DRKHPPF4
+        secretAccessKey:
+          maxLength: 1024
+          type: string
+          description: 'Secret access key for the object store provided for backup target.
+
+            '
+          format: password
+          example: L1feKeOuNErB0SCULU1XrGKS5gWAGb1RQp/Lxc3y
+      additionalProperties: false
+      description: Secret credentials model for the object store containing access key ID and secret access key.
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

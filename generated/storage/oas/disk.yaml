@@ -1,0 +1,968 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Storage APIs
+  description: Manage storage configuration and operations.
+  version: 4.0.1-alpha-3
+  x-repo-name: storage
+  x-logo:
+    altText: Storage Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/storage/images/storage-logo-img.svg
+  x-minimum-negotiation-version: v4.2
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+paths:
+  /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/disks:
+    get:
+      tags:
+      - VolumeGroup
+      summary: Get a list of all the Volume Disks.
+      description: Query the list of disks corresponding to a Volume Group identified by {volumeGroupExtId}.
+      operationId: getVolumeDisks
+      parameters:
+      - name: volumeGroupExtId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 6c3e5633-f227-46a3-b108-67bcd1bafe73
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource.  Any number out of this range will
+          be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number greater
+          than the total available pages would be set to the last page.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource.  Any number out of this range
+            will be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number
+            greater than the total available pages would be set to the last page.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number of
+          records, which is 100.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number
+            of records, which is 100.
+
+            '
+          format: int32
+          default: 50
+      responses:
+        '200':
+          description: Paginated list of disks corresponding to a Volume Group identified by {volumeGroupExtId}.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeDisksApiResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeDisksApiResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeDisksApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.GetVolumeDisksApiResponse;\n\
+          \npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\
+          \tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\"\
+          );\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\
+          \n\t\tString volumeGroupExtId = \"^D3ACEc0a-12ca-4fDa-3d1B-cf7DeEBb8E7e$\";\n\t\tint $page = 0;\n\t\tint $limit\
+          \ = 50;\n\t\tGetVolumeDisksApiResponse getVolumeDisksApiResponse = volumeGroupApi.getVolumeDisks(volumeGroupExtId,\
+          \ $page, $limit);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\"\
+          ;\nimport GetVolumeDisksApiResponse from \"../src/models/storage/v4/config/GetVolumeDisksApiResponse\";\n\nvar apiClientInstance\
+          \ = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath\
+          \ = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample()\
+          \ {\n    let volumeGroupExtId = \"^B8C4fcFE-C95f-FBA6-7cFA-472C87D39089$\";\n    let $page = 0;\n    let $limit\
+          \ = 50;\n\n    volumeGroupApi.getVolumeDisks(volumeGroupExtId, $page, $limit).then(({data, response}) =>\n     \
+          \   console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error) =>\
+          \ {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n\
+          \    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1,\
+          \ retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeGroupExtId\
+          \ = \"^90b22Aff-DfFA-BbCB-bcD3-138FD7eb514D$\"\n    $page = 0\n    $limit = 50\n    api_response = volumeGroupApi.get_volume_disks(volumeGroupExtId,\
+          \ $page, $limit)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\n\
+          func main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n\
+          \    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation\
+          \ = true\n\n    volumeGroupExtId := \"^F661b14a-B2Ae-b2f0-561f-7ebA0eacA0eA$\"\n    $page := 0\n    $limit := 50\n\
+          \n    response, _ := VolumeGroupApiInstance.GetVolumeDisks(volumeGroupExtId, $page, $limit)\n    fmt.Println(response)\n\
+          }\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^b2bf8Da5-FcF7-95a6-7Fb4-2EEeF8B1DADc$/disks?$limit=50&$page=0\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^FE6bEfCc-ecEc-F9b9-b5Fa-061b4CabfDE7$/disks?$limit=50&$page=0\"\
+          \n"
+    post:
+      tags:
+      - VolumeGroup
+      summary: Create a new Volume Disk.
+      description: Create a new Volume Disk.
+      operationId: createVolumeDisk
+      parameters:
+      - name: volumeGroupExtId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: cfe9ebea-a129-4e89-81d1-9dcc1069b94c
+      requestBody:
+        description: A model that represents a Volume Disk associated with a Volume Group, and is supported by backing file
+          on DSF.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeDisk'
+        required: true
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Disk create operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeDiskApiResponse'
+        default:
+          description: Task Id corresponding to the Volume Disk create operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeDiskApiResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeDiskApiResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeDiskApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.VolumeDisk;\n\
+          import dp1.sto.storage.v4.config.CreateVolumeDiskApiResponse;\n\npublic class JavaSdkSample {\n\tprivate static\
+          \ final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\tpublic static void main(String[] args) {\n\t\t\
+          volumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\");\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\
+          \t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\n\t\tVolumeDisk volumeDisk = new VolumeDisk();\n\n\t\
+          \t// VolumeDisk object initializations here...\n\n\t\tString volumeGroupExtId = \"^eaE818db-EAb1-A7bc-DbbF-Aca7eaA72ACE$\"\
+          ;\n\t\tCreateVolumeDiskApiResponse createVolumeDiskApiResponse = volumeGroupApi.createVolumeDisk(volumeDisk, volumeGroupExtId);\n\
+          \t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\"\
+          ;\nimport VolumeDisk from \"../src/models/storage/v4/config/VolumeDisk\";\nimport CreateVolumeDiskApiResponse from\
+          \ \"../src/models/storage/v4/config/CreateVolumeDiskApiResponse\";\n\nvar apiClientInstance = new ApiClient();\n\
+          apiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath = \"\
+          https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample() {\n\
+          \    let volumeDisk = new VolumeDisk();\n\n    // VolumeDisk object initializations here...\n\n    let volumeGroupExtId\
+          \ = \"^dA8d30Aa-3CeF-1BDb-Cc8b-3fD3e9bfBeA7$\";\n\n    volumeGroupApi.createVolumeDisk(volumeDisk, volumeGroupExtId).then(({data,\
+          \ response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n\
+          \    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n\
+          \    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1,\
+          \ retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeDisk = swagger_client.VolumeDisk()\n\
+          \n    # VolumeDisk object initializations here...\n\n    volumeGroupExtId = \"^CAb5F5FB-CFCD-b58C-85B8-dCABa44ecA7B$\"\
+          \n    api_response = volumeGroupApi.create_volume_disk(volumeDisk, volumeGroupExtId)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    import1 \"storage_go_sdk/models/storage/v1/defaultapi\"\n  \
+          \  \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\nfunc main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n\
+          \    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\
+          \n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation = true\n\n    volumeDisk := import1.newVolumeDisk()\n\
+          \n    // VolumeDisk object initializations here...\n\n    volumeGroupExtId := \"^474DdDaB-ecaF-7E06-4Bab-EFAb7cb58cd7$\"\
+          \n\n    response, _ := VolumeGroupApiInstance.CreateVolumeDisk(volumeDisk, volumeGroupExtId)\n    fmt.Println(response)\n\
+          }\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^D8Bec2CD-ab5F-Fcec-5Bd6-158DADfa6Eae$/disks\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"index\":0,\"diskSizeBytes\":0,\"storageContainerId\":\"string\",\"description\"\
+          :\"string\",\"diskDataSourceReference\":{\"extId\":\"string\",\"name\":\"string\",\"uris\":[\"string\"],\"entityType\"\
+          :\"$UNKNOWN\",\"$objectType\":\"common.v1.config.EntityReference\"},\"diskStorageFeatures\":{\"flashMode\":{\"isEnabled\"\
+          :true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.DiskStorageFeatures\"\
+          },\"$objectType\":\"storage.v4.config.VolumeDisk\"} \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type:\
+          \ application/json' \\\n     --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\"\
+          ,\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"index\":0,\"diskSizeBytes\":0,\"storageContainerId\"\
+          :\"string\",\"description\":\"string\",\"diskDataSourceReference\":{\"extId\":\"string\",\"name\":\"string\",\"\
+          uris\":[\"string\"],\"entityType\":\"$UNKNOWN\",\"$objectType\":\"common.v1.config.EntityReference\"},\"diskStorageFeatures\"\
+          :{\"flashMode\":{\"isEnabled\":true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.DiskStorageFeatures\"\
+          },\"$objectType\":\"storage.v4.config.VolumeDisk\"} \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^6ace470E-3EDe-7fbB-b3Ba-DdaFc445CBFd$/disks\"\
+          \n"
+  /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/disks/{diskExtId}:
+    get:
+      tags:
+      - VolumeGroup
+      summary: Get a Volume Disk identified by {diskExtId}.
+      description: Query the Volume Disk identified by {diskExtId}.
+      operationId: getVolumeDiskById
+      parameters:
+      - name: volumeGroupExtId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 4906fda5-8784-4123-8a94-1fa7f7a26120
+      - name: diskExtId
+        in: path
+        description: The external identifier of the Volume Disk.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 590c1a26-fb75-4a77-a32b-ee74ebdf0ac5
+      responses:
+        '200':
+          description: Details of the queried Volume Disk.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeDiskApiResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeDiskApiResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeDiskApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.GetVolumeDiskApiResponse;\n\
+          \npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\
+          \tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\"\
+          );\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\
+          \n\t\tString volumeGroupExtId = \"^7cAeADfA-855E-e1f3-BFfB-fd8CFa21FbFe$\";\n\t\tString diskExtId = \"^fBAD8Aee-7BEA-C51d-847e-41a7ceF78beF$\"\
+          ;\n\t\tGetVolumeDiskApiResponse getVolumeDiskApiResponse = volumeGroupApi.getVolumeDiskById(volumeGroupExtId, diskExtId);\n\
+          \t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\"\
+          ;\nimport GetVolumeDiskApiResponse from \"../src/models/storage/v4/config/GetVolumeDiskApiResponse\";\n\nvar apiClientInstance\
+          \ = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath\
+          \ = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample()\
+          \ {\n    let volumeGroupExtId = \"^E3aA8b71-2ecd-C18B-9DEb-6DaECc8E0bFD$\";\n    let diskExtId = \"^9e9CFdDE-bfb3-4260-Af3A-3Bd13B9Beee7$\"\
+          ;\n\n    volumeGroupApi.getVolumeDiskById(volumeGroupExtId, diskExtId).then(({data, response}) =>\n        console.log(response.status);\n\
+          \        console.log(data.getData());\n        done();\n    }).catch((error) => {\n        console.log(error);\n\
+          \        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n\
+          \    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1,\
+          \ retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeGroupExtId\
+          \ = \"^2CF3be9f-DFeB-da1D-647B-fafbaD31DbDD$\"\n    diskExtId = \"^cCfcBe39-1CeA-efe2-f929-AfbeDBDBCF1c$\"\n   \
+          \ api_response = volumeGroupApi.get_volume_disk_by_id(volumeGroupExtId, diskExtId)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\n\
+          func main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n\
+          \    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation\
+          \ = true\n\n    volumeGroupExtId := \"^faCdc6a3-fddc-7a9F-aCeb-Bca5BFeea9ea$\"\n    diskExtId := \"^aA5CAa5D-ACbA-8fcC-bEFC-D9ceAC2Bcc51$\"\
+          \n\n    response, _ := VolumeGroupApiInstance.GetVolumeDiskById(volumeGroupExtId, diskExtId)\n    fmt.Println(response)\n\
+          }\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^4d5bbf46-eCFA-dA52-FF9e-EcC9C08DEDce$/disks/^2bf2EB4b-04dA-6CAC-4dBc-4EED3B2aeAc7$\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^abCaaFFf-Acbf-F7CC-cDd4-d5ffe0fcec19$/disks/^dfc12D1b-Febe-FeEB-c16c-FCCAECb3f32c$\"\
+          \n"
+    delete:
+      tags:
+      - VolumeGroup
+      summary: Delete a Volume Disk identified by {diskExtId}.
+      description: Delete a Volume Disk identified by {diskExtId}.
+      operationId: deleteVolumeDisk
+      parameters:
+      - name: volumeGroupExtId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: ad686357-0019-4825-ba83-aa9c34c89f3f
+      - name: diskExtId
+        in: path
+        description: The external identifier of the Volume Disk.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b8ae03b8-fda2-458b-88f5-d449881b7204
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Disk delete operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeDiskApiResponse'
+        default:
+          description: Task Id corresponding to the Volume Disk delete operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeDiskApiResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeDiskApiResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeDiskApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.DeleteVolumeDiskApiResponse;\n\
+          \npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\
+          \tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\"\
+          );\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\
+          \n\t\tString volumeGroupExtId = \"^EB7bC83D-2afB-1Ac1-a71b-a9aeDFFFbaa3$\";\n\t\tString diskExtId = \"^aF6edEd7-e8fc-fbEF-efFf-c8f4Ccb01dd8$\"\
+          ;\n\t\tDeleteVolumeDiskApiResponse deleteVolumeDiskApiResponse = volumeGroupApi.deleteVolumeDisk(volumeGroupExtId,\
+          \ diskExtId);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\"\
+          ;\nimport DeleteVolumeDiskApiResponse from \"../src/models/storage/v4/config/DeleteVolumeDiskApiResponse\";\n\n\
+          var apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod\
+          \ = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let volumeGroupExtId = \"^EBe5415B-c5Be-Ea9C-f4FA-F3BeBCDb3748$\";\n    let diskExtId\
+          \ = \"^75046Fc3-Aab1-CF9b-eA60-a77e4c9E4dFF$\";\n\n    volumeGroupApi.deleteVolumeDisk(volumeGroupExtId, diskExtId).then(({data,\
+          \ response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n\
+          \    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n\
+          \    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1,\
+          \ retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeGroupExtId\
+          \ = \"^8b1dd366-A785-0dE5-c5C4-eB98f3fCcA5d$\"\n    diskExtId = \"^f58Eb2eE-DAcD-c8aa-D133-cBb6A3fadbaE$\"\n   \
+          \ api_response = volumeGroupApi.delete_volume_disk(volumeGroupExtId, diskExtId)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\n\
+          func main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n\
+          \    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation\
+          \ = true\n\n    volumeGroupExtId := \"^F5AbBD36-39b6-9Cac-deA4-DAcaEF5cA36b$\"\n    diskExtId := \"^dCEE8BCD-FF0d-8FBF-feEf-DC9b7514A68A$\"\
+          \n\n    response, _ := VolumeGroupApiInstance.DeleteVolumeDisk(volumeGroupExtId, diskExtId)\n    fmt.Println(response)\n\
+          }\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^c8EdD31C-aF3F-fB21-CBeB-dcdE46C83175$/disks/^82BaEc0F-Ae6B-3A87-0BE4-30aceBf6ff7B$\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^cE61eafe-Ebee-5cA9-6cdd-d8FBecda1cED$/disks/^8fA4d95C-Daeb-Aaeb-61CB-E2E945ebbEbF$\"\
+          \n"
+    patch:
+      tags:
+      - VolumeGroup
+      summary: Update a specified Volume Disk identified by {diskExtId}.
+      description: Update a specified Volume Disk identified by {diskExtId}.
+      operationId: updateVolumeDisk
+      parameters:
+      - name: volumeGroupExtId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 9fb74e4f-5021-4cb3-b886-2a3dc026d10d
+      - name: diskExtId
+        in: path
+        description: The external identifier of the Volume Disk.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: f352ba1b-207a-4d38-b6fb-ea434b2b5469
+      requestBody:
+        description: A model that represents a Volume Disk associated with a Volume Group, and is supported by backing file
+          on DSF.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeDisk'
+        required: true
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Disk update operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeDiskApiResponse'
+        default:
+          description: Task Id corresponding to the Volume Disk update operation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeDiskApiResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeDiskApiResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeDiskApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.VolumeDisk;\n\
+          import dp1.sto.storage.v4.config.UpdateVolumeDiskApiResponse;\n\npublic class JavaSdkSample {\n\tprivate static\
+          \ final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\tpublic static void main(String[] args) {\n\t\t\
+          volumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\");\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\
+          \t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\n\t\tVolumeDisk volumeDisk = new VolumeDisk();\n\n\t\
+          \t// VolumeDisk object initializations here...\n\n\t\tString volumeGroupExtId = \"^E0A5BDAd-23Fa-f5C5-CFc6-Cd27DA69af48$\"\
+          ;\n\t\tString diskExtId = \"^096EaD9D-2E7F-AEE5-ebBe-3bd1e32F71bC$\";\n\t\tUpdateVolumeDiskApiResponse updateVolumeDiskApiResponse\
+          \ = volumeGroupApi.updateVolumeDisk(volumeDisk, volumeGroupExtId, diskExtId);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\"\
+          ;\nimport VolumeDisk from \"../src/models/storage/v4/config/VolumeDisk\";\nimport UpdateVolumeDiskApiResponse from\
+          \ \"../src/models/storage/v4/config/UpdateVolumeDiskApiResponse\";\n\nvar apiClientInstance = new ApiClient();\n\
+          apiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath = \"\
+          https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample() {\n\
+          \    let volumeDisk = new VolumeDisk();\n\n    // VolumeDisk object initializations here...\n\n    let volumeGroupExtId\
+          \ = \"^05E2A1b7-AECb-d7ef-7852-Fa9BeFee1ed1$\";\n    let diskExtId = \"^458aDb5a-75E3-a0EB-1AFa-2bbbDECec9C5$\"\
+          ;\n\n    volumeGroupApi.updateVolumeDisk(volumeDisk, volumeGroupExtId, diskExtId).then(({data, response}) =>\n \
+          \       console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error)\
+          \ => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n\
+          \    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1,\
+          \ retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeDisk = swagger_client.VolumeDisk()\n\
+          \n    # VolumeDisk object initializations here...\n\n    volumeGroupExtId = \"^60D3c5c1-A10E-b8bC-EAb0-a9e0e2C52EDc$\"\
+          \n    diskExtId = \"^fecafbbE-AacF-0eB4-CAFc-e49C5fa1bEff$\"\n    api_response = volumeGroupApi.update_volume_disk(volumeDisk,\
+          \ volumeGroupExtId, diskExtId)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    import1 \"storage_go_sdk/models/storage/v1/defaultapi\"\n  \
+          \  \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\nfunc main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n\
+          \    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\
+          \n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation = true\n\n    volumeDisk := import1.newVolumeDisk()\n\
+          \n    // VolumeDisk object initializations here...\n\n    volumeGroupExtId := \"^d67b90c6-fedE-E5a0-Fd9e-D6F9deFAFCFA$\"\
+          \n    diskExtId := \"^FFCFC5C4-7EDE-d7AC-DFEe-fb7DD8cfBdb4$\"\n\n    response, _ := VolumeGroupApiInstance.UpdateVolumeDisk(volumeDisk,\
+          \ volumeGroupExtId, diskExtId)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PATCH \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^7B5fCffd-b510-FA3D-CEe6-cCA48bdcF2b8$/disks/^1acAa5CB-Ead7-dDDF-2EFF-f9807292Cb2f$\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"index\":0,\"diskSizeBytes\":0,\"storageContainerId\":\"string\",\"description\"\
+          :\"string\",\"diskDataSourceReference\":{\"extId\":\"string\",\"name\":\"string\",\"uris\":[\"string\"],\"entityType\"\
+          :\"$UNKNOWN\",\"$objectType\":\"common.v1.config.EntityReference\"},\"diskStorageFeatures\":{\"flashMode\":{\"isEnabled\"\
+          :true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.DiskStorageFeatures\"\
+          },\"$objectType\":\"storage.v4.config.VolumeDisk\"} \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method PATCH \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type:\
+          \ application/json' \\\n     --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\"\
+          ,\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"index\":0,\"diskSizeBytes\":0,\"storageContainerId\"\
+          :\"string\",\"description\":\"string\",\"diskDataSourceReference\":{\"extId\":\"string\",\"name\":\"string\",\"\
+          uris\":[\"string\"],\"entityType\":\"$UNKNOWN\",\"$objectType\":\"common.v1.config.EntityReference\"},\"diskStorageFeatures\"\
+          :{\"flashMode\":{\"isEnabled\":true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.DiskStorageFeatures\"\
+          },\"$objectType\":\"storage.v4.config.VolumeDisk\"} \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^7Fcd35B6-bcc2-C668-Ac4e-aC905adcfCfd$/disks/^2Bf5DAfB-eBeA-F3eb-ad76-EF469caCaCC8$\"\
+          \n"
+components:
+  schemas:
+    common.v1.r0.a3.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+      additionalProperties: false
+    storage.v4.r0.a3.config.VolumeDisk:
+      title: Volume Disk object
+      description: A model that represents a Volume Disk associated with a Volume Group, and is supported by backing file
+        on DSF.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          index:
+            maximum: 16383
+            minimum: 0
+            type: integer
+            description: Index of the disk in a Volume Group. This field is immutable.
+            example: 75
+          diskSizeBytes:
+            minimum: 524288
+            type: integer
+            description: Size of the disk in bytes.
+            format: int64
+            example: 5966731838967097344
+          storageContainerId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Storage container on which the disk must be created.
+            readOnly: true
+            example: 51863b26-e30a-4485-ba4b-a10d7419a068
+          description:
+            maxLength: 1000
+            type: string
+            description: Volume Disk description.
+            example: string
+          diskDataSourceReference:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.EntityReference'
+          diskStorageFeatures:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.DiskStorageFeatures'
+        additionalProperties: false
+    storage.v4.r0.a3.config.UpdateVolumeDiskApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/disks/{diskExtId}
+        Patch operation
+    storage.v4.r0.a3.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.error.AppMessage'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
+      additionalProperties: false
+      description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
+    storage.v4.r0.a3.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+        code:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: The locale for the message description.
+          default: en_US
+        errorGroup:
+          type: string
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+      description: This schema is generated from AppMessage.java
+    storage.v4.r0.a3.config.FlashMode:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+          example: false
+      additionalProperties: false
+      description: Once configured, this field will avoid down migration of data from the hot tier unless the overrides field
+        is specified for the virtual disks.
+    common.v1.r0.a3.config.EntityType:
+      type: string
+      enum:
+      - CLUSTER
+      - VM
+      - STORAGE_CONTAINER
+      - VOLUME_GROUP
+      - TASK
+      - IMAGE
+      - CATEGORY
+      - NODE
+      - VPC
+      - SUBNET
+      - ROUTING_POLICY
+      - FLOATING_IP
+      - VPN_GATEWAY
+      - VPN_CONNECTION
+      - DIRECT_CONNECT
+      - DIRECT_CONNECT_VIF
+      - VIRTUAL_NIC
+      - VIRTUAL_SWITCH
+      - VM_DISK
+      - VOLUME_DISK
+      - DISK_RECOVERY_POINT
+      - VTEP_GATEWAY
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and therefore extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            example: ac7be6a0-e497-4e10-8744-ab55a2f96402
+          links:
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        additionalProperties: false
+    storage.v4.r0.a3.config.DeleteVolumeDiskApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/disks/{diskExtId}
+        Delete operation
+    common.v1.r0.a3.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Flag'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          format: int32
+          example: 50
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+        extraInfo:
+          type: array
+          description: An array of entity specific metadata
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. Always present and minimally contains the self link for
+        the API request that produced this response.  Also contains pagination data for paginated requests.
+
+        '
+    common.v1.r0.a3.config.Flag:
+      type: object
+      properties:
+        name:
+          type: string
+          example: string
+        value:
+          type: boolean
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          example: string
+        message:
+          type: string
+          example: string
+        attributePath:
+          type: string
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+    storage.v4.r0.a3.config.GetVolumeDiskApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeDisk'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/disks/{diskExtId}
+        Get operation
+    common.v1.r0.a3.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by this link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
+            special value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    storage.v4.r0.a3.config.DiskStorageFeatures:
+      type: object
+      properties:
+        flashMode:
+          $ref: '#/components/schemas/storage.v4.r0.a3.config.FlashMode'
+      additionalProperties: false
+      description: Storage features for the Volume Disks.
+    common.v1.r0.a3.config.EntityReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 748b06b3-b3a0-45c1-8c81-6b5b019cecde
+        name:
+          type: string
+          example: string
+        uris:
+          type: array
+          items:
+            type: string
+            example: string
+        entityType:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.EntityType'
+      additionalProperties: false
+    storage.v4.r0.a3.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: string
+        statusCode:
+          type: integer
+          example: 25
+        error:
+          type: string
+          example: string
+        path:
+          type: string
+          example: string
+        validationErrorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+    common.v1.r0.a3.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity.  It is automatically
+            assigned by the system and is immutable from an API consumer perspective (some use cases may cause this Id to
+            change - for instance a use case may require the transfer of ownership of the entity, but these cases are handled
+            automatically on the server).
+
+            '
+          readOnly: true
+          example: 69d77424-8db5-4a6a-878a-c2ef281783df
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    storage.v4.r0.a3.config.GetVolumeDisksApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeDisk'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/disks
+        Get operation
+    storage.v4.r0.a3.config.CreateVolumeDiskApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/disks
+        Post operation
+    common.v1.r0.a3.config.KVPair:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The key of this key value pair
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            example: string
+          - type: integer
+            example: 6
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    prism.v4.r0.a1.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: Globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:e783b480-4d55-4fd7-b760-10291f7ba4ca
+      additionalProperties: false
+      description: Reference to a task tracking the async operation.
+    storage.v4.r0.a3.config.Task:
+      title: Task object
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the task.
+          example: f4ef6b76-9e80-4ce5-ac90-fda128b72f4c
+      additionalProperties: false
+      description: An object encapsulating Task Id return value.
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

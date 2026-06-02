@@ -1,0 +1,1206 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Volumes APIs
+  description: Configure volumes.
+  version: '4.0'
+  x-logo:
+    altText: Volumes Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/storage/images/storage-logo-img.svg
+  x-namespace-backward-compatibility:
+  - redirect: storage
+    to: volumes
+  x-repo-name: volumes
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /volumes/v4.0/config/iscsi-clients:
+    get:
+      tags:
+      - IscsiClients
+      summary: List all the iSCSI clients
+      description: Fetches the list of iSCSI clients.
+      operationId: listIscsiClients
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - clusterReference
+
+          - extId
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - clusterReference
+
+          - extId
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $expand
+        in: query
+        description: 'A URL query parameter that allows clients to request related resources when a resource that satisfies
+          a particular request is retrieved. Each expanded item is evaluated relative to the entity containing the property
+          being expanded. Other query options can be applied to an expanded property by appending a semicolon-separated list
+          of query options, enclosed in parentheses, to the property name. Permissible system query options are $filter, $select
+          and $orderby. The following expansion keys are supported.
+
+          - cluster
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - clusterReference
+
+          - extId
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated list of iSCSI clients.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/volumes.v4.0.config.IscsiClient'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View External ISCSI Client
+        roleList:
+        - CSI System
+        - Kubernetes Data Services System
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Storage Admin
+        - Storage Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 25
+        timeUnit: seconds
+      - type: large
+        count: 25
+        timeUnit: seconds
+      - type: xlarge
+        count: 25
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.IscsiClientsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.ListIscsiClientsApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        IscsiClientsApi iscsiClientsApi = new\
+          \ IscsiClientsApi(apiClient);\n\n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try\
+          \ {\n            ListIscsiClientsApiResponse listIscsiClientsApiResponse = iscsiClientsApi.listIscsiClients(page,\
+          \ limit, null, null, null, null);\n            System.out.println(listIscsiClientsApiResponse.toString());\n\n \
+          \       } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, IscsiClientsApi } from \"@nutanix-api/volumes-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet iscsiClientsApi = new IscsiClientsApi(apiClientInstance);\n\nfunction sample() {\n\n\n  \
+          \  // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n\
+          \    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"\
+          $expand\"] = \"string_sample_data\";\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    iscsiClientsApi.listIscsiClients(opts).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    iscsi_clients_api = ntnx_volumes_py_client.IscsiClientsApi(api_client=client)\n\
+          \    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = iscsi_clients_api.list_iscsi_clients(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_volumes_py_client.rest.ApiException as e:\n      \
+          \  print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/volumes/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    IscsiClientsApiInstance *api.IscsiClientsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    IscsiClientsApiInstance = api.NewIscsiClientsApi(ApiClientInstance)\n\n    \n    page_ := 0\n\
+          \    \n    limit_ := 50\n\n\n    response, error := IscsiClientsApiInstance.ListIscsiClients(&page_, &limit_, nil,\
+          \ nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.IscsiClient)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/iscsi-clients?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/volumes/v4.0/config/iscsi-clients?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+  /volumes/v4.0/config/iscsi-clients/{extId}:
+    get:
+      tags:
+      - IscsiClients
+      summary: Fetch an iSCSI client details
+      description: Fetches the iSCSI client details identified by {extId}.
+      operationId: getIscsiClientById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of an iSCSI client.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: be0e4630-23da-4b9c-a76b-f24fd64b46b6
+      responses:
+        '200':
+          description: Details of the queried iSCSI client.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.config.IscsiClient'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients/{extId} Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients/{extId} Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients/{extId} Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View External ISCSI Client
+        roleList:
+        - CSI System
+        - Kubernetes Data Services System
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Storage Admin
+        - Storage Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 25
+        timeUnit: seconds
+      - type: large
+        count: 25
+        timeUnit: seconds
+      - type: xlarge
+        count: 25
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.IscsiClientsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.GetIscsiClientApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        IscsiClientsApi iscsiClientsApi = new\
+          \ IscsiClientsApi(apiClient);\n\n        \n        String extId = \"64AD2D2A-a21d-DBF6-AbD3-F5B77eb7bCBd\";\n\n\
+          \        try {\n            GetIscsiClientApiResponse getIscsiClientApiResponse = iscsiClientsApi.getIscsiClientById(extId);\n\
+          \            System.out.println(getIscsiClientApiResponse.toString());\n\n        } catch (RestClientException ex)\
+          \ {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, IscsiClientsApi } from \"@nutanix-api/volumes-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet iscsiClientsApi = new IscsiClientsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n\
+          \    let extId = \"f4EfDfab-Ffb1-bcED-1967-CceACb60f5eb\";\n\n\n\n\n\n    iscsiClientsApi.getIscsiClientById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    iscsi_clients_api = ntnx_volumes_py_client.IscsiClientsApi(api_client=client)\n\
+          \    \n    ext_id = \"7EfF6Bbe-c9f2-71bE-5ddC-aaf4eDC1Edf0\"\n\n\n    try:\n        api_response = iscsi_clients_api.get_iscsi_client_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_volumes_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/volumes/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    IscsiClientsApiInstance *api.IscsiClientsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    IscsiClientsApiInstance = api.NewIscsiClientsApi(ApiClientInstance)\n\n    \n    extId := \"6FaaBbeB-EeD3-CDCF-DAf1-ecA69eebfbF6\"\
+          \n\n\n    response, error := IscsiClientsApiInstance.GetIscsiClientById(&extId)\n    if error != nil {\n       \
+          \ fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.IscsiClient)\n    fmt.Println(data)\n\
+          \n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/iscsi-clients/eF5ECeDA-6BCc-cf01-CD8c-FfB0B3CCEE1c\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/volumes/v4.0/config/iscsi-clients/AB6beA09-3dfD-6BD0-07Dd-3EdfDBE6CBff\"\
+          \n"
+    put:
+      tags:
+      - IscsiClients
+      summary: Update an iSCSI client
+      description: Modifies the details of an existing iSCSI client configuration identified by {extId}.
+      operationId: updateIscsiClientById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of an iSCSI client.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 6ac8e14f-f0ca-432e-9c59-5099b634d992
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: fcdfa6ab-d3ec-496f-a303-6ee6127c2a49
+      requestBody:
+        description: A model that represents an iSCSI client that can be associated with a Volume Group as an external attachment.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/volumes.v4.0.config.IscsiClient'
+        required: true
+      responses:
+        '202':
+          description: iSCSI client after the update operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients/{extId} Put
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients/{extId} Put
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/iscsi-clients/{extId} Put
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Update External ISCSI Client
+        roleList:
+        - Prism Admin
+        - Super Admin
+        - Self-Service Admin
+        - Storage Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 15
+        timeUnit: seconds
+      - type: small
+        count: 15
+        timeUnit: seconds
+      - type: large
+        count: 15
+        timeUnit: seconds
+      - type: xlarge
+        count: 15
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.IscsiClientsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.IscsiClient;\nimport com.nutanix.dp1.vol.volumes.v4.config.GetIscsiClientApiResponse;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.UpdateIscsiClientApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        IscsiClientsApi iscsiClientsApi = new IscsiClientsApi(apiClient);\n\n   \
+          \     IscsiClient iscsiClient = new IscsiClient();\n\n        // IscsiClient object initializations here...\n  \
+          \      \n        String extId = \"dAdAEafB-D7DF-eB98-E7BC-9e5a8834F9AA\";\n\n        // perform GET call\n     \
+          \   GetIscsiClientApiResponse getResponse = null;\n        try {\n            getResponse = iscsiClientsApi.getIscsiClientById(extId);\n\
+          \        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n      \
+          \  // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdateIscsiClientApiResponse updateIscsiClientApiResponse = iscsiClientsApi.updateIscsiClientById(extId,\
+          \ iscsiClient, opts);\n            System.out.println(updateIscsiClientApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, IscsiClientsApi, IscsiClient, GetIscsiClientApiResponse } from \"@nutanix-api/volumes-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet iscsiClientsApi = new IscsiClientsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let iscsiClient = new IscsiClient();\n\n    // IscsiClient object initializations here...\n\
+          \n    \n    let extId = \"cef8E7af-CE6C-81b0-259A-7BC04AD44A3b\";\n\n\n    // Perform Get call\n    iscsiClientsApi.getIscsiClientById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        iscsiClientsApi.updateIscsiClientById(extId,\
+          \ iscsiClient, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the\
+          \ following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    iscsi_clients_api = ntnx_volumes_py_client.IscsiClientsApi(api_client=client)\n\
+          \    iscsiClient = ntnx_volumes_py_client.IscsiClient()\n\n    # IscsiClient object initializations here...\n  \
+          \  \n    ext_id = \"C5ECCccC-DdbF-eCbf-8d9D-dB5e0Acaa51f\"\n\n    try:\n        api_response = iscsi_clients_api.get_iscsi_client_by_id(extId=ext_id)\n\
+          \    except ntnx_volumes_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value\
+          \ = ntnx_volumes_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response = iscsi_clients_api.update_iscsi_client_by_id(extId=ext_id,\
+          \ body=iscsiClient, if_match=etag_value)\n        print(api_response)\n    except ntnx_volumes_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/volumes/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/prism/v4/config\"\n)\n\n\
+          var (\n    ApiClientInstance *client.ApiClient\n    IscsiClientsApiInstance *api.IscsiClientsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    IscsiClientsApiInstance\
+          \ = api.NewIscsiClientsApi(ApiClientInstance)\n\n    iscsiClient := import1.NewIscsiClient()\n\n    // IscsiClient\
+          \ object initializations here...\n\n    \n    extId := \"9ebDCbBd-8D8B-DEAe-E4eF-CeED08B3ae07\"\n\n    getResponse,\
+          \ err := IscsiClientsApiInstance.GetIscsiClientById(&extId)\n    if err != nil {\n        fmt.Println(err)\n   \
+          \     return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\n\
+          \    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := IscsiClientsApiInstance.UpdateIscsiClientById(&extId,\
+          \ iscsiClient, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/iscsi-clients/9b5cBFC0-eC8e-aBE4-f9b4-3CD4089FcbDa\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"iscsiInitiatorName\":\"string\",\"iscsiInitiatorNetworkId\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"\
+          $objectType\":\"common.v1.config.IPAddressOrFQDN\"},\"clientSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\"\
+          ,\"attachedTargets\":[{\"numVirtualTargets\":0,\"iscsiTargetName\":\"string\",\"$objectType\":\"volumes.v4.config.TargetParam\"\
+          }],\"numVirtualTargets\":0,\"clusterReference\":\"string\",\"attachmentSite\":\"$UNKNOWN\",\"$objectType\":\"volumes.v4.config.IscsiClient\"\
+          } \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"iscsiInitiatorName\":\"string\",\"iscsiInitiatorNetworkId\":{\"ipv4\":{\"value\"\
+          :\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\"\
+          :\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"},\"clientSecret\":\"string\",\"\
+          enabledAuthentications\":\"$UNKNOWN\",\"attachedTargets\":[{\"numVirtualTargets\":0,\"iscsiTargetName\":\"string\"\
+          ,\"$objectType\":\"volumes.v4.config.TargetParam\"}],\"numVirtualTargets\":0,\"clusterReference\":\"string\",\"\
+          attachmentSite\":\"$UNKNOWN\",\"$objectType\":\"volumes.v4.config.IscsiClient\"} \\\n- \"https://{pc-ip}:9440/api/volumes/v4.0/config/iscsi-clients/dEc4fD6b-Eef5-B0D5-07F8-26e8aca28baB\"\
+          \n"
+components:
+  schemas:
+    volumes.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.FQDN:
+      type: object
+      properties:
+        value:
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
+          type: string
+          description: 'The fully qualified domain name of the host.
+
+            '
+          example: www.example-corp.com
+      additionalProperties: false
+      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
+        System.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    volumes.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/volumes.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d92bfbe7-1b58-4493-ba79-3cf2a204bdca
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    volumes.v4.0.config.AuthenticationType:
+      title: Supported types of authentication
+      type: string
+      description: The authentication type enabled for the Volume Group. This is an optional field. If omitted, the authentication
+        is not configured for the Volume Group. If this is set to CHAP, the target/client secret must be provided.
+      enum:
+      - CHAP
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CHAP: Access to the Volume Group requires CHAP authentication.
+        NONE: Access to the Volume Group doesn't require any authentication.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    volumes.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 73
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    volumes.v4.0.config.TargetParam:
+      title: Parameters associated with each iSCSI target corresponding to the iSCSI client
+      type: object
+      properties:
+        numVirtualTargets:
+          maximum: 32
+          minimum: 1
+          type: integer
+          description: Number of virtual targets generated for the iSCSI target. This field is immutable.
+          format: int32
+          readOnly: true
+          example: 32
+        iscsiTargetName:
+          maxLength: 512
+          type: string
+          description: Name of the iSCSI target that the iSCSI client is connected to. This is a read-only field.
+          readOnly: true
+      additionalProperties: false
+      description: List of iSCSI target parameters that will be visible and accessible to the iSCSI client.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: d4e34a80-abc5-46ca-8fcd-af3f00f2930a
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    volumes.v4.0.config.IscsiClient:
+      title: iSCSI client object
+      description: A model that represents an iSCSI client that can be associated with a Volume Group as an external attachment.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          iscsiInitiatorName:
+            maxLength: 64
+            type: string
+            description: iSCSI initiator name. Exactly one of iscsiInitiatorName and iscsiInitiatorNetworkId must be specified
+              during the attach operation. This field is immutable.
+          iscsiInitiatorNetworkId:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+          clientSecret:
+            maxLength: 16
+            minLength: 12
+            type: string
+            description: iSCSI initiator client secret in case of CHAP authentication. This field should not be provided if
+              the authentication type is not set to CHAP.
+            format: password
+            writeOnly: true
+            example: '***************'
+          enabledAuthentications:
+            $ref: '#/components/schemas/volumes.v4.0.config.AuthenticationType'
+          attachedTargets:
+            maxItems: 128
+            minItems: 0
+            type: array
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/volumes.v4.0.config.TargetParam'
+          numVirtualTargets:
+            type: integer
+            description: Number of virtual targets generated for the iSCSI target. This field is immutable.
+            format: int32
+            writeOnly: true
+            example: 3
+          clusterReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The UUID of the cluster that will host the iSCSI client. This field is read-only.
+            readOnly: true
+            example: e5827a56-63e5-4ced-9078-747a6506d177
+          attachmentSite:
+            $ref: '#/components/schemas/volumes.v4.0.config.VolumeGroupAttachmentSite'
+        additionalProperties: false
+    volumes.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 92
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 52
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+          example: 7d9a:64df:8ddf:d839:c6c4:eae3:5c0b:a4ea
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 17
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.0.config.FQDN'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:2eb25ec6-5070-4b62-a03e-4717e1ffec5a
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+          example: 254.180.178.15
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    volumes.v4.0.config.VolumeGroupAttachmentSite:
+      title: Supported Volume Group attachment sites
+      type: string
+      description: The site where the Volume Group attach operation should be processed. This is an optional field. This field
+        may only be set if Metro DR has been configured for this Volume Group.
+      enum:
+      - PRIMARY
+      - SECONDARY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SECONDARY: Attach to the Volume Group on the stretch secondary site.
+        PRIMARY: Attach to the Volume Group on the stretch primary site.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

@@ -1,0 +1,45 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Applies the namespace, the OAS ConfigMaps, and all RestDefinitions in one go:
+#   kubectl apply -k .
+#
+# Lives at the repo root so configMapGenerator can read the oas/ slices
+# (kustomize forbids reading files above the kustomization directory).
+#
+# Secret + Configuration + example CRs are intentionally NOT included here:
+#   * secret.example.yaml / *-configuration.example.yaml are templates to edit
+#   * example CR instances depend on the generated CRDs existing first
+# Apply those by hand once the RestDefinitions have reconciled.
+
+namespace: nutanix-system
+
+resources:
+  - manifests/00-namespace.yaml
+  - manifests/restdefinitions/vm.restdefinition.yaml
+  - manifests/restdefinitions/subnet.restdefinition.yaml
+  - manifests/restdefinitions/image.restdefinition.yaml
+  - manifests/restdefinitions/cluster.restdefinition.yaml
+  - manifests/restdefinitions/category.restdefinition.yaml
+
+# Build the OAS ConfigMaps from the slices. Names MUST match each
+# RestDefinition's spec.oasPath, so the hash suffix is disabled.
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: nutanix-vm-oas
+    files:
+      - vm.yaml=oas/vmm/vm.yaml
+  - name: nutanix-image-oas
+    files:
+      - image.yaml=oas/vmm/image.yaml
+  - name: nutanix-subnet-oas
+    files:
+      - subnet.yaml=oas/networking/subnet.yaml
+  - name: nutanix-cluster-oas
+    files:
+      - cluster.yaml=oas/clustermgmt/cluster.yaml
+  - name: nutanix-category-oas
+    files:
+      - category.yaml=oas/prism/category.yaml

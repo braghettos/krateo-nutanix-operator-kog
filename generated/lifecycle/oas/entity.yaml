@@ -1,0 +1,1073 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Lifecycle Management APIs
+  description: Manage Infrastructure, Software and Firmware Upgrades.
+  version: '4.0'
+  x-logo:
+    altText: Lifecycle Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/lifecycle/images/lifecycle-logo-img.svg
+  x-repo-name: lifecycle
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /lifecycle/v4.0/resources/entities:
+    get:
+      tags:
+      - Entities
+      summary: Get details about all LCM entities.
+      description: Query list of LCM entities.
+      operationId: listEntities
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - clusterExtId
+
+          - entityClass
+
+          - entityModel
+
+          - entityType
+
+          - hardwareVendor
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - entityClass
+
+          - entityModel
+
+          - entityType
+
+          - entityVersion
+
+          - hardwareVendor
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - entityClass
+
+          - entityModel
+
+          - entityType
+
+          - hardwareVendor
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated list of LCM entities.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/lifecycle.v4.0.resources.Entity'
+                additionalProperties: false
+                description: REST response for all response codes in API path /lifecycle/v4.0/resources/entities Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/lifecycle.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /lifecycle/v4.0/resources/entities Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/lifecycle.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /lifecycle/v4.0/resources/entities Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View LCM Entity
+        roleList:
+        - Super Admin
+        - Prism Admin
+        - Cluster Admin
+        - Prism Viewer
+        - Cluster Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: Small
+        count: 5
+        timeUnit: seconds
+      - type: Large
+        count: 5
+        timeUnit: seconds
+      - type: XLarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.lif.java.client.ApiClient;\nimport com.nutanix.lif.java.client.api.EntitiesApi;\n\
+          import com.nutanix.dp1.lif.lifecycle.v4.resources.ListEntitiesApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        EntitiesApi entitiesApi = new EntitiesApi(apiClient);\n\
+          \n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListEntitiesApiResponse\
+          \ listEntitiesApiResponse = entitiesApi.listEntities(page, limit, null, null, null);\n            System.out.println(listEntitiesApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, EntitiesApi } from \"@nutanix-api/lifecycle-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet entitiesApi = new EntitiesApi(apiClientInstance);\n\nfunction sample() {\n\n\n    // Construct\
+          \ Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n    opts[\"$filter\"\
+          ] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"$select\"] = \"string_sample_data\"\
+          ;\n\n\n\n\n    entitiesApi.listEntities(opts).then(({data, response}) => {\n        console.log(`API returned the\
+          \ following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n\
+          \        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_lifecycle_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_lifecycle_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_lifecycle_py_client.ApiClient(configuration=config)\n    entities_api = ntnx_lifecycle_py_client.EntitiesApi(api_client=client)\n\
+          \    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = entities_api.list_entities(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_lifecycle_py_client.rest.ApiException as e:\n    \
+          \    print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/lifecycle-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/lifecycle-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/lifecycle-go-client/v4/models/lifecycle/v4/resources\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    EntitiesApiInstance *api.EntitiesApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    EntitiesApiInstance\
+          \ = api.NewEntitiesApi(ApiClientInstance)\n\n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error\
+          \ := EntitiesApiInstance.ListEntities(&page_, &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().([]import1.Entity)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/lifecycle/v4.0/resources/entities?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/lifecycle/v4.0/resources/entities?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+  /lifecycle/v4.0/resources/entities/{extId}:
+    get:
+      tags:
+      - Entities
+      summary: Get details about an LCM entity.
+      description: Get details about an LCM entity.
+      operationId: getEntityById
+      parameters:
+      - name: extId
+        in: path
+        description: ExtId of the LCM entity.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 7cd5d1d2-701e-4b4a-aded-343afdaadb21
+      responses:
+        '200':
+          description: Details of the queried LCM entity.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/lifecycle.v4.0.resources.Entity'
+                additionalProperties: false
+                description: REST response for all response codes in API path /lifecycle/v4.0/resources/entities/{extId} Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/lifecycle.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /lifecycle/v4.0/resources/entities/{extId} Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/lifecycle.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /lifecycle/v4.0/resources/entities/{extId} Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View LCM Entity
+        roleList:
+        - Super Admin
+        - Prism Admin
+        - Cluster Admin
+        - Prism Viewer
+        - Cluster Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: Small
+        count: 10
+        timeUnit: seconds
+      - type: Large
+        count: 10
+        timeUnit: seconds
+      - type: XLarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.lif.java.client.ApiClient;\nimport com.nutanix.lif.java.client.api.EntitiesApi;\n\
+          import com.nutanix.dp1.lif.lifecycle.v4.resources.GetEntityByIdApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        EntitiesApi entitiesApi = new EntitiesApi(apiClient);\n\
+          \n        \n        String extId = \"ff4A238b-a23F-dcfa-4e22-554a8c7AadD8\";\n\n        try {\n            GetEntityByIdApiResponse\
+          \ getEntityByIdApiResponse = entitiesApi.getEntityById(extId);\n            System.out.println(getEntityByIdApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, EntitiesApi } from \"@nutanix-api/lifecycle-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet entitiesApi = new EntitiesApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ extId = \"7cB6cf8b-Bffb-324E-fcBb-5dCbFe5cad3b\";\n\n\n\n\n\n    entitiesApi.getEntityById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_lifecycle_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_lifecycle_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_lifecycle_py_client.ApiClient(configuration=config)\n    entities_api = ntnx_lifecycle_py_client.EntitiesApi(api_client=client)\n\
+          \    \n    ext_id = \"FbCA9aFc-CBBB-cbD6-3adC-Eef3b3e9bC0D\"\n\n\n    try:\n        api_response = entities_api.get_entity_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_lifecycle_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/lifecycle-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/lifecycle-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/lifecycle-go-client/v4/models/lifecycle/v4/resources\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    EntitiesApiInstance *api.EntitiesApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    EntitiesApiInstance\
+          \ = api.NewEntitiesApi(ApiClientInstance)\n\n    \n    extId := \"ff3bC18f-EF3F-3d7B-Ecdf-938A8AbEd70F\"\n\n\n \
+          \   response, error := EntitiesApiInstance.GetEntityById(&extId)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().(import1.Entity)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/lifecycle/v4.0/resources/entities/60AEAdFd-EeeB-F3fF-6CFF-dFdEaEBD60EB\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/lifecycle/v4.0/resources/entities/b7be0Ff0-bC5c-D4fF-6A8c-66A8EFDcaE3C\"\
+          \n"
+components:
+  schemas:
+    lifecycle.v4.0.resources.DependentEntity:
+      title: LCM available version dependency.
+      description: Dependency of an LCM entity available version.
+      allOf:
+      - $ref: '#/components/schemas/lifecycle.v4.0.common.EntityBaseModel'
+      - type: object
+        properties:
+          dependentVersions:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Information of the dependent entity versions for this available entity.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.KVPair'
+        additionalProperties: false
+    lifecycle.v4.0.common.EntityType:
+      title: LCM entity type.
+      type: string
+      description: Type of an LCM entity.
+      enum:
+      - SOFTWARE
+      - FIRMWARE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        FIRMWARE: LCM entity type firmware.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SOFTWARE: LCM entity type software.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    lifecycle.v4.0.common.EntityBaseModel:
+      title: LCM Entity base model.
+      description: The list of properties that can be expanded on the LCM entity.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          entityClass:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: LCM entity class.
+            example: Core Cluster
+          entityModel:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: LCM entity model.
+            example: AOS
+          entityType:
+            $ref: '#/components/schemas/lifecycle.v4.0.common.EntityType'
+          entityVersion:
+            maxLength: 128
+            minLength: 1
+            type: string
+            description: Current version of an LCM entity.
+            example: 5.20.0
+          hardwareFamily:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: A hardware family for a LCM entity.
+            example: dell_gen_12
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 12ce1b92-1a2a-48ba-b86b-b68a6aa69dc1
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    lifecycle.v4.0.common.LocationInfo:
+      title: Details about the location of an entity.
+      type: object
+      properties:
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Location UUID of the resource.
+          readOnly: true
+          example: e941136d-776d-48ec-a30b-7d1e93616404
+        locationType:
+          $ref: '#/components/schemas/lifecycle.v4.0.common.LocationType'
+      additionalProperties: false
+      description: Location info corresponds to a tuple of location type (either node/cluster) and ExtID
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    lifecycle.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    lifecycle.v4.0.resources.Entity:
+      title: LCM entity.
+      description: Details of an LCM entity.
+      allOf:
+      - $ref: '#/components/schemas/lifecycle.v4.0.common.EntityBaseModel'
+      - type: object
+        properties:
+          entityDescription:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: Description of an LCM entity.
+            readOnly: true
+            example: Entity Description
+          locationInfo:
+            $ref: '#/components/schemas/lifecycle.v4.0.common.LocationInfo'
+          targetVersion:
+            maxLength: 128
+            minLength: 1
+            type: string
+            description: The requested update version of an LCM entity.
+            readOnly: true
+            example: '7.0'
+          lastUpdatedTime:
+            type: string
+            description: UTC date and time in RFC-3339 format when the task was last updated.
+            format: date-time
+            readOnly: true
+            example: 2009-09-23 14:30:00-07:00
+          deviceId:
+            maxLength: 128
+            minLength: 1
+            type: string
+            description: Unique identifier of an LCM entity e.g. "HDD serial number".
+            readOnly: true
+            example: '123456'
+          groupUuid:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: UUID of the group that this LCM entity is part of.
+            readOnly: true
+            example: d96e4fef-b121-4b69-b509-19c0b2dcc9b8
+          entityDetails:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Detailed information for the LCM entity. For example, firmware entities contain additional information
+              about NIC and so on.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.KVPair'
+          childEntities:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Component information for the payload based entity.
+            readOnly: true
+            items:
+              maxLength: 1024
+              minLength: 1
+              type: string
+          availableVersions:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: List of available versions for an LCM entity to update.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/lifecycle.v4.0.resources.AvailableVersion'
+          subEntities:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: A list of sub-entities applicable to the entity.
+            items:
+              $ref: '#/components/schemas/lifecycle.v4.0.common.EntityBaseModel'
+          clusterExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Cluster uuid on which the resource is present or operation is being performed.
+            example: 66d7ddf0-3be5-44aa-8f42-437c8ea705c0
+          hardwareVendor:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: Hardware vendor information.
+            example: Dell
+        additionalProperties: false
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    lifecycle.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: d95188be-5a20-4b56-a35f-c4fc189a3738
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 72
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 60
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    lifecycle.v4.0.common.AvailableVersionStatus:
+      title: Available version status.
+      type: string
+      description: Available version types.
+      enum:
+      - RECOMMENDED
+      - CRITICAL
+      - LATEST
+      - DEPRECATED
+      - EMERGENCY
+      - AVAILABLE
+      - LTS
+      - STS
+      - ESTS
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        AVAILABLE: Available version.
+        EMERGENCY: Emergency version.
+        RECOMMENDED: Recommended version.
+        STS: Short-term supported version.
+        LTS: Long-term supported version.
+        LATEST: Latest version.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DEPRECATED: Deprecated version.
+        ESTS: Extended short-term supported version
+        CRITICAL: Critical version.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 71
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    lifecycle.v4.0.common.LocationType:
+      title: Location type of an entity represented in LCM.
+      type: string
+      description: Scope of entity represented in LCM. This could be either Node or cluster type.
+      enum:
+      - NODE
+      - CLUSTER
+      - PC
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PC: Entity for which the scope is Prism Central wide.
+        NODE: Entity that belongs to a node in the cluster.
+        CLUSTER: Entity for which the scope is cluster wide.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    lifecycle.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 84
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    lifecycle.v4.0.resources.AvailableVersion:
+      title: LCM available version.
+      type: object
+      properties:
+        version:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: LCM framework version present in the LCM URL.
+          example: '7.0'
+        status:
+          $ref: '#/components/schemas/lifecycle.v4.0.common.AvailableVersionStatus'
+        isEnabled:
+          type: boolean
+          description: Indicates if the available update is enabled.
+          default: true
+        availableVersionUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Available version UUID.
+          example: b25db722-7b0b-4926-9229-5e16b4bbe533
+        order:
+          maximum: 10000
+          minimum: 1
+          type: integer
+          description: Order of this available version (1 being the lowest and 6 being the highest) when multiple versions
+            are present with different status.
+          format: int64
+          example: 50
+        disablementReason:
+          maxLength: 512
+          minLength: 1
+          type: string
+          description: Reason for disabling the available version.
+          example: This version is disabled because cluster does not meet the requirements
+        releaseNotes:
+          maxLength: 1024
+          minLength: 1
+          type: string
+          description: Release notes corresponding to the update.
+          example: This is a release note
+        releaseDate:
+          type: string
+          description: Release date for the entities that need this information.
+          format: date
+          example: 2009-09-23
+        customMessage:
+          maxLength: 512
+          minLength: 1
+          type: string
+          description: Update custom messages other than release notes to the user about this available version.
+          example: This version is custom version
+        childEntities:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Component information for the payload based entity.
+          readOnly: true
+          items:
+            maxLength: 1024
+            minLength: 1
+            type: string
+        groupUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the group that this LCM entity is part of.
+          example: 56e9b813-c5af-4674-a8fd-eff3cc1e4f98
+        dependencies:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: List of dependencies for the available version.
+          items:
+            $ref: '#/components/schemas/lifecycle.v4.0.resources.DependentEntity'
+      additionalProperties: false
+      description: LCM framework version present in the LCM URL.
+    lifecycle.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/lifecycle.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

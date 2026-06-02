@@ -1,0 +1,1415 @@
+openapi: 3.0.1
+info:
+  title: Nutanix IAM Versioned APIs
+  description: Nutanix APIs for managing users, user-groups, directory services, identity providers, roles and authorization
+    policies.
+  version: '4.0'
+  x-repo-name: iam
+  x-logo:
+    altText: Iam Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/iam/images/iam-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /iam/v4.0/authn/saml-identity-providers:
+    get:
+      tags:
+      - SAMLIdentityProviders
+      summary: List SAML identity providers
+      description: Lists all SAML identity providers configured in the system.
+      operationId: listSamlIdentityProviders
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - createdBy
+
+          - extId
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - createdTime
+
+          - lastUpdatedTime
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - createdBy
+
+          - createdTime
+
+          - customAttributes
+
+          - emailAttribute
+
+          - entityIssuer
+
+          - extId
+
+          - groupsAttribute
+
+          - groupsDelim
+
+          - idpMetadata
+
+          - isSignedAuthnReqEnabled
+
+          - lastUpdatedTime
+
+          - links
+
+          - name
+
+          - tenantId
+
+          - usernameAttribute
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns SAML identity providers list.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/iam.v4.0.authn.SamlIdentityProvider'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Saml Identity Provider
+        roleList:
+        - Project Admin
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: Small
+        count: 10
+        timeUnit: seconds
+      - type: Large
+        count: 15
+        timeUnit: seconds
+      - type: XLarge
+        count: 15
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.iam.java.client.ApiClient;\nimport com.nutanix.iam.java.client.api.SAMLIdentityProvidersApi;\n\
+          import com.nutanix.dp1.iam.iam.v4.authn.ListSamlIdentityProvidersApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SAMLIdentityProvidersApi sAMLIdentityProvidersApi\
+          \ = new SAMLIdentityProvidersApi(apiClient);\n\n        \n        int page = 0;\n        \n        int limit = 50;\n\
+          \n        try {\n            ListSamlIdentityProvidersApiResponse listSamlIdentityProvidersApiResponse = sAMLIdentityProvidersApi.listSamlIdentityProviders(page,\
+          \ limit, null, null, null);\n            System.out.println(listSamlIdentityProvidersApiResponse.toString());\n\n\
+          \        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SAMLIdentityProvidersApi } from \"@nutanix-api/iam-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet sAMLIdentityProvidersApi = new SAMLIdentityProvidersApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n\
+          \    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\"\
+          ;\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    sAMLIdentityProvidersApi.listSamlIdentityProviders(opts).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_iam_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_iam_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_iam_py_client.ApiClient(configuration=config)\n\
+          \    s_aml_identity_providers_api = ntnx_iam_py_client.SAMLIdentityProvidersApi(api_client=client)\n    \n    page\
+          \ = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = s_aml_identity_providers_api.list_saml_identity_providers(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_iam_py_client.rest.ApiException as e:\n        print(e)\n\
+          \n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/models/iam/v4/authn\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SAMLIdentityProvidersApiInstance *api.SAMLIdentityProvidersApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    SAMLIdentityProvidersApiInstance = api.NewSAMLIdentityProvidersApi(ApiClientInstance)\n\n    \n\
+          \    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error := SAMLIdentityProvidersApiInstance.ListSamlIdentityProviders(&page_,\
+          \ &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _\
+          \ := response.GetData().([]import1.SamlIdentityProvider)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - SAMLIdentityProviders
+      summary: Create SAML identity provider
+      description: Create a SAML identity provider from the given request payload.
+      operationId: createSamlIdentityProvider
+      requestBody:
+        description: Information for the create SAML identity provider request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/iam.v4.0.authn.SamlIdentityProvider'
+        required: true
+      responses:
+        '201':
+          description: SAML identity provider created.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.authn.SamlIdentityProvider'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers Post
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers Post
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers Post
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create Saml Identity Provider
+        roleList:
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: Small
+        count: 5
+        timeUnit: seconds
+      - type: Large
+        count: 10
+        timeUnit: seconds
+      - type: XLarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.iam.java.client.ApiClient;\nimport com.nutanix.iam.java.client.api.SAMLIdentityProvidersApi;\n\
+          import com.nutanix.dp1.iam.iam.v4.authn.SamlIdentityProvider;\nimport com.nutanix.dp1.iam.iam.v4.authn.CreateSamlIdentityProviderApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        SAMLIdentityProvidersApi sAMLIdentityProvidersApi = new SAMLIdentityProvidersApi(apiClient);\n\
+          \n        SamlIdentityProvider samlIdentityProvider = new SamlIdentityProvider();\n\n        // SamlIdentityProvider\
+          \ object initializations here...\n\n        try {\n            CreateSamlIdentityProviderApiResponse createSamlIdentityProviderApiResponse\
+          \ = sAMLIdentityProvidersApi.createSamlIdentityProvider(samlIdentityProvider);\n            System.out.println(createSamlIdentityProviderApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SAMLIdentityProvidersApi, SamlIdentityProvider } from \"@nutanix-api/iam-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet sAMLIdentityProvidersApi = new SAMLIdentityProvidersApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let samlIdentityProvider = new SamlIdentityProvider();\n\n    // SamlIdentityProvider\
+          \ object initializations here...\n\n\n\n\n\n\n    sAMLIdentityProvidersApi.createSamlIdentityProvider(samlIdentityProvider).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_iam_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_iam_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_iam_py_client.ApiClient(configuration=config)\n\
+          \    s_aml_identity_providers_api = ntnx_iam_py_client.SAMLIdentityProvidersApi(api_client=client)\n    samlIdentityProvider\
+          \ = ntnx_iam_py_client.SamlIdentityProvider()\n\n    # SamlIdentityProvider object initializations here...\n\n\n\
+          \    try:\n        api_response = s_aml_identity_providers_api.create_saml_identity_provider(body=samlIdentityProvider)\n\
+          \        print(api_response)\n    except ntnx_iam_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/models/iam/v4/authn\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SAMLIdentityProvidersApiInstance *api.SAMLIdentityProvidersApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    SAMLIdentityProvidersApiInstance = api.NewSAMLIdentityProvidersApi(ApiClientInstance)\n\n    samlIdentityProvider\
+          \ := import1.NewSamlIdentityProvider()\n\n    // SamlIdentityProvider object initializations here...\n\n\n\n   \
+          \ response, error := SAMLIdentityProvidersApiInstance.CreateSamlIdentityProvider(samlIdentityProvider)\n    if error\
+          \ != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.SamlIdentityProvider)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          idpMetadataUrl\":\"http://{{idp_host}}/idp_metadata\",\"idpMetadataXml\":\"string\",\"idpMetadata\":{\"entityId\"\
+          :\"http://{{idp_host}}/entity\",\"loginUrl\":\"http://{{idp_host}}/loginUrl\",\"logoutUrl\":\"http://{{idp_host}}/logoutUrl\"\
+          ,\"errorUrl\":\"http://{{idp_host}}/errorUrl\",\"certificate\":\"string\",\"nameIdPolicyFormat\":\"$UNKNOWN\",\"\
+          $objectType\":\"iam.v4.authn.IdpMetadata\"},\"name\":\"saml1\",\"usernameAttribute\":\"name\",\"emailAttribute\"\
+          :\"email\",\"groupsAttribute\":\"grpAttribute1\",\"groupsDelim\":\"string\",\"customAttributes\":[\"Attribute1\"\
+          ],\"entityIssuer\":\"issuer1\",\"isSignedAuthnReqEnabled\":true,\"createdTime\":\"2015-07-20T15:49:04-07:00\",\"\
+          lastUpdatedTime\":\"2015-07-20T15:49:04-07:00\",\"createdBy\":\"390b7801-7a80-5c94-8a07-8de63651b27b\",\"$objectType\"\
+          :\"iam.v4.authn.SamlIdentityProvider\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"idpMetadataUrl\":\"http://{{idp_host}}/idp_metadata\",\"idpMetadataXml\":\"\
+          string\",\"idpMetadata\":{\"entityId\":\"http://{{idp_host}}/entity\",\"loginUrl\":\"http://{{idp_host}}/loginUrl\"\
+          ,\"logoutUrl\":\"http://{{idp_host}}/logoutUrl\",\"errorUrl\":\"http://{{idp_host}}/errorUrl\",\"certificate\":\"\
+          string\",\"nameIdPolicyFormat\":\"$UNKNOWN\",\"$objectType\":\"iam.v4.authn.IdpMetadata\"},\"name\":\"saml1\",\"\
+          usernameAttribute\":\"name\",\"emailAttribute\":\"email\",\"groupsAttribute\":\"grpAttribute1\",\"groupsDelim\"\
+          :\"string\",\"customAttributes\":[\"Attribute1\"],\"entityIssuer\":\"issuer1\",\"isSignedAuthnReqEnabled\":true,\"\
+          createdTime\":\"2015-07-20T15:49:04-07:00\",\"lastUpdatedTime\":\"2015-07-20T15:49:04-07:00\",\"createdBy\":\"390b7801-7a80-5c94-8a07-8de63651b27b\"\
+          ,\"$objectType\":\"iam.v4.authn.SamlIdentityProvider\"} \\\n- \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers\"\
+          \n"
+  /iam/v4.0/authn/saml-identity-providers/{extId}:
+    get:
+      tags:
+      - SAMLIdentityProviders
+      summary: Get SAML identity provider
+      description: Fetches a SAML identity provider based on its external identifier.
+      operationId: getSamlIdentityProviderById
+      parameters:
+      - name: extId
+        in: path
+        description: External identifier of the SAML identity provider.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: a2a8650a-358a-4791-90c9-7a8b6e2989d6
+      responses:
+        '200':
+          description: Returns SAML identity provider.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.authn.SamlIdentityProvider'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Saml Identity Provider
+        roleList:
+        - Project Admin
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: Small
+        count: 10
+        timeUnit: seconds
+      - type: Large
+        count: 15
+        timeUnit: seconds
+      - type: XLarge
+        count: 15
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.iam.java.client.ApiClient;\nimport com.nutanix.iam.java.client.api.SAMLIdentityProvidersApi;\n\
+          import com.nutanix.dp1.iam.iam.v4.authn.GetSamlIdentityProviderApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SAMLIdentityProvidersApi sAMLIdentityProvidersApi\
+          \ = new SAMLIdentityProvidersApi(apiClient);\n\n        \n        String extId = \"ce5e5c6D-eddc-9Dac-DEF4-C5cAb2B6BDfe\"\
+          ;\n\n        try {\n            GetSamlIdentityProviderApiResponse getSamlIdentityProviderApiResponse = sAMLIdentityProvidersApi.getSamlIdentityProviderById(extId);\n\
+          \            System.out.println(getSamlIdentityProviderApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SAMLIdentityProvidersApi } from \"@nutanix-api/iam-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet sAMLIdentityProvidersApi = new SAMLIdentityProvidersApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"f5b1DBbC-fBec-0f0F-Eccd-cF2CdACB0dFE\";\n\n\n\n\n\n    sAMLIdentityProvidersApi.getSamlIdentityProviderById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_iam_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_iam_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_iam_py_client.ApiClient(configuration=config)\n\
+          \    s_aml_identity_providers_api = ntnx_iam_py_client.SAMLIdentityProvidersApi(api_client=client)\n    \n    ext_id\
+          \ = \"eeE5eCC4-Dfb2-E2dB-CAcA-7B5bf673eAAC\"\n\n\n    try:\n        api_response = s_aml_identity_providers_api.get_saml_identity_provider_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_iam_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/models/iam/v4/authn\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SAMLIdentityProvidersApiInstance *api.SAMLIdentityProvidersApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    SAMLIdentityProvidersApiInstance = api.NewSAMLIdentityProvidersApi(ApiClientInstance)\n\n    \n\
+          \    extId := \"Dfe9AfDc-2d3F-00c6-fCfA-eCCebEcDdD3E\"\n\n\n    response, error := SAMLIdentityProvidersApiInstance.GetSamlIdentityProviderById(&extId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.SamlIdentityProvider)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers/e3aAfFDf-Fab4-BffD-EFD6-Fa7c8a6DCF7e\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers/aBcFC6fa-eFCb-EA8E-BbcD-afeCdfEA5fc7\"\
+          \n"
+    put:
+      tags:
+      - SAMLIdentityProviders
+      summary: Update SAML identity provider
+      description: Updates a SAML identity provider based on its external identifier.
+      operationId: updateSamlIdentityProviderById
+      parameters:
+      - name: extId
+        in: path
+        description: External identifier of the SAML identity provider.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 6399d7e9-abdc-4c35-a35b-df73010165d6
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Information for the update SAML identity provider request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/iam.v4.0.authn.SamlIdentityProvider'
+        required: true
+      responses:
+        '200':
+          description: Requested SAML identity provider updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.authn.SamlIdentityProvider'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Update Saml Identity Provider
+        roleList:
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: Small
+        count: 5
+        timeUnit: seconds
+      - type: Large
+        count: 10
+        timeUnit: seconds
+      - type: XLarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.iam.java.client.ApiClient;\nimport com.nutanix.iam.java.client.api.SAMLIdentityProvidersApi;\n\
+          import com.nutanix.dp1.iam.iam.v4.authn.SamlIdentityProvider;\nimport com.nutanix.dp1.iam.iam.v4.authn.GetSamlIdentityProviderApiResponse;\n\
+          import com.nutanix.dp1.iam.iam.v4.authn.UpdateSamlIdentityProviderApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        SAMLIdentityProvidersApi sAMLIdentityProvidersApi = new SAMLIdentityProvidersApi(apiClient);\n\
+          \n        SamlIdentityProvider samlIdentityProvider = new SamlIdentityProvider();\n\n        // SamlIdentityProvider\
+          \ object initializations here...\n        \n        String extId = \"6C2aAa86-075e-b39f-Db3E-5ee5AADeB5b8\";\n\n\
+          \        // perform GET call\n        GetSamlIdentityProviderApiResponse getResponse = null;\n        try {\n  \
+          \          getResponse = sAMLIdentityProvidersApi.getSamlIdentityProviderById(extId);\n        } catch(RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n        // Extract E-Tag Header\n        String\
+          \ eTag = ApiClient.getEtag(getResponse);\n        // initialize/change parameters for update\n        HashMap<String,\
+          \ Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH, eTag);\n        try {\n            UpdateSamlIdentityProviderApiResponse\
+          \ updateSamlIdentityProviderApiResponse = sAMLIdentityProvidersApi.updateSamlIdentityProviderById(extId, samlIdentityProvider,\
+          \ opts);\n            System.out.println(updateSamlIdentityProviderApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SAMLIdentityProvidersApi, SamlIdentityProvider, GetSamlIdentityProviderApiResponse\
+          \ } from \"@nutanix-api/iam-js-client\";\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n\
+          // IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port to which to connect\
+          \ to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts\
+          \ = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to\
+          \ connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password\
+          \ = 'password';\n// Please add authorization information here if needed.\nlet sAMLIdentityProvidersApi = new SAMLIdentityProvidersApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let samlIdentityProvider = new SamlIdentityProvider();\n\n    // SamlIdentityProvider\
+          \ object initializations here...\n\n    \n    let extId = \"ABAdd219-0AcB-f1B4-A13B-bEfdcAcAd9ad\";\n\n\n    //\
+          \ Perform Get call\n    sAMLIdentityProvidersApi.getSamlIdentityProviderById(extId).then(({data, response}) => {\n\
+          \        console.log(`API returned the following status code: ${response.status}`);\n        // Extract E-Tag Header\n\
+          \        let etagValue = ApiClient.getEtag(data);\n\n        sAMLIdentityProvidersApi.updateSamlIdentityProviderById(extId,\
+          \ samlIdentityProvider, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned\
+          \ the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_iam_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_iam_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_iam_py_client.ApiClient(configuration=config)\n\
+          \    s_aml_identity_providers_api = ntnx_iam_py_client.SAMLIdentityProvidersApi(api_client=client)\n    samlIdentityProvider\
+          \ = ntnx_iam_py_client.SamlIdentityProvider()\n\n    # SamlIdentityProvider object initializations here...\n   \
+          \ \n    ext_id = \"cbC23820-3fd4-2F4F-a81F-5dcce4b2052A\"\n\n    try:\n        api_response = s_aml_identity_providers_api.get_saml_identity_provider_by_id(extId=ext_id)\n\
+          \    except ntnx_iam_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value\
+          \ = ntnx_iam_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response = s_aml_identity_providers_api.update_saml_identity_provider_by_id(extId=ext_id,\
+          \ body=samlIdentityProvider, if_match=etag_value)\n        print(api_response)\n    except ntnx_iam_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/iam-go-client/v4/models/iam/v4/authn\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SAMLIdentityProvidersApiInstance *api.SAMLIdentityProvidersApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    SAMLIdentityProvidersApiInstance = api.NewSAMLIdentityProvidersApi(ApiClientInstance)\n\n    samlIdentityProvider\
+          \ := import1.NewSamlIdentityProvider()\n\n    // SamlIdentityProvider object initializations here...\n\n    \n \
+          \   extId := \"FEABE75B-F9a6-73B2-7FdF-e4cfFBf9ffB3\"\n\n    getResponse, err := SAMLIdentityProvidersApiInstance.GetSamlIdentityProviderById(&extId)\n\
+          \    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue\
+          \ := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"If-Match\"\
+          ] = etagValue\n\n    response, error := SAMLIdentityProvidersApiInstance.UpdateSamlIdentityProviderById(&extId,\
+          \ samlIdentityProvider, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data,\
+          \ _ := response.GetData().(import1.SamlIdentityProvider)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers/AEEb7fCd-6ccB-E0dC-dA6A-22bda3Ca8921\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN'\
+          \ \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\"\
+          :\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"idpMetadataUrl\":\"http://{{idp_host}}/idp_metadata\"\
+          ,\"idpMetadataXml\":\"string\",\"idpMetadata\":{\"entityId\":\"http://{{idp_host}}/entity\",\"loginUrl\":\"http://{{idp_host}}/loginUrl\"\
+          ,\"logoutUrl\":\"http://{{idp_host}}/logoutUrl\",\"errorUrl\":\"http://{{idp_host}}/errorUrl\",\"certificate\":\"\
+          string\",\"nameIdPolicyFormat\":\"$UNKNOWN\",\"$objectType\":\"iam.v4.authn.IdpMetadata\"},\"name\":\"saml1\",\"\
+          usernameAttribute\":\"name\",\"emailAttribute\":\"email\",\"groupsAttribute\":\"grpAttribute1\",\"groupsDelim\"\
+          :\"string\",\"customAttributes\":[\"Attribute1\"],\"entityIssuer\":\"issuer1\",\"isSignedAuthnReqEnabled\":true,\"\
+          createdTime\":\"2015-07-20T15:49:04-07:00\",\"lastUpdatedTime\":\"2015-07-20T15:49:04-07:00\",\"createdBy\":\"390b7801-7a80-5c94-8a07-8de63651b27b\"\
+          ,\"$objectType\":\"iam.v4.authn.SamlIdentityProvider\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"idpMetadataUrl\":\"http://{{idp_host}}/idp_metadata\"\
+          ,\"idpMetadataXml\":\"string\",\"idpMetadata\":{\"entityId\":\"http://{{idp_host}}/entity\",\"loginUrl\":\"http://{{idp_host}}/loginUrl\"\
+          ,\"logoutUrl\":\"http://{{idp_host}}/logoutUrl\",\"errorUrl\":\"http://{{idp_host}}/errorUrl\",\"certificate\":\"\
+          string\",\"nameIdPolicyFormat\":\"$UNKNOWN\",\"$objectType\":\"iam.v4.authn.IdpMetadata\"},\"name\":\"saml1\",\"\
+          usernameAttribute\":\"name\",\"emailAttribute\":\"email\",\"groupsAttribute\":\"grpAttribute1\",\"groupsDelim\"\
+          :\"string\",\"customAttributes\":[\"Attribute1\"],\"entityIssuer\":\"issuer1\",\"isSignedAuthnReqEnabled\":true,\"\
+          createdTime\":\"2015-07-20T15:49:04-07:00\",\"lastUpdatedTime\":\"2015-07-20T15:49:04-07:00\",\"createdBy\":\"390b7801-7a80-5c94-8a07-8de63651b27b\"\
+          ,\"$objectType\":\"iam.v4.authn.SamlIdentityProvider\"} \\\n- \"https://{pc-ip}:9440/api/iam/v4.0/authn/saml-identity-providers/af7edaeB-ffbB-a8D8-fA5E-F4fBcDaac7ED\"\
+          \n"
+    delete:
+      tags:
+      - SAMLIdentityProviders
+      summary: Delete SAML identity provider
+      description: Deletes a SAML identity provider based on its external identifier.
+      operationId: deleteSamlIdentityProviderById
+      parameters:
+      - name: extId
+        in: path
+        description: External identifier of the SAML identity provider.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: cf18fbde-18f0-4b34-af40-ff411c5afad3
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Requested SAML identity provider deleted.
+          content:
+            application/json: {}
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/iam.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /iam/v4.0/authn/saml-identity-providers/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete Saml Identity Provider
+        roleList:
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: Small
+        count: 5
+        timeUnit: seconds
+      - type: Large
+        count: 10
+        timeUnit: seconds
+      - type: XLarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+components:
+  schemas:
+    iam.v4.0.authn.IdpMetadata:
+      required:
+      - certificate
+      - entityId
+      - loginUrl
+      type: object
+      properties:
+        entityId:
+          maxLength: 2000
+          minLength: 3
+          type: string
+          description: Entity identifier of identity provider.
+          example: http://{{idp_host}}/entity
+        loginUrl:
+          maxLength: 2000
+          minLength: 3
+          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+          type: string
+          description: Login URL of the identity provider.
+          example: http://{{idp_host}}/loginUrl
+        logoutUrl:
+          maxLength: 2000
+          minLength: 3
+          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+          type: string
+          description: Logout URL of the identity provider.
+          example: http://{{idp_host}}/logoutUrl
+        errorUrl:
+          maxLength: 2000
+          minLength: 3
+          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+          type: string
+          description: Error URL of the identity provider.
+          example: http://{{idp_host}}/errorUrl
+        certificate:
+          minLength: 64
+          type: string
+          description: Certificate for verification.
+        nameIdPolicyFormat:
+          $ref: '#/components/schemas/iam.v4.0.authn.NameIdPolicyFormat'
+      additionalProperties: false
+      description: Information of the IDP.
+    iam.v4.0.authn.NameIdPolicyFormat:
+      type: string
+      description: Name ID Policy format.
+      enum:
+      - emailAddress
+      - unspecified
+      - X509SubjectName
+      - WindowsDomainQualifiedName
+      - encrypted
+      - entity
+      - kerberos
+      - persistent
+      - transient
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        emailAddress: Uses email address as the NameID format.
+        encrypted: Uses encrypted as the NameID format.
+        unspecified: NameID format is left to the individual implementations.
+        transient: Uses identifier with transient semantics as the NameID format.
+        WindowsDomainQualifiedName: Uses Windows domain qualified name as the NameID format.
+        X509SubjectName: Uses X509SubjectName as the NameID format.
+        kerberos: Uses kerberos principal name as the NameID format.
+        persistent: Uses persistent name identifier as the NameID format.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        entity: Uses identitfier of an entity as the NameID format.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: afa17ed1-36c0-4cc0-9fec-c15178ad9aab
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    iam.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 89fb8492-86d4-43cb-ac1a-bc51ae0dff45
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    iam.v4.0.authn.SamlIdentityProvider:
+      required:
+      - name
+      description: Information of SAML IDP.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          idpMetadataUrl:
+            maxLength: 2000
+            minLength: 3
+            pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+            type: string
+            description: Metadata URL that provides IDP details.
+            writeOnly: true
+            example: http://{{idp_host}}/idp_metadata
+          idpMetadataXml:
+            minLength: 3
+            type: string
+            description: Base64 encoded metadata in XML format with IDP details.
+            writeOnly: true
+          idpMetadata:
+            $ref: '#/components/schemas/iam.v4.0.authn.IdpMetadata'
+          name:
+            maxLength: 255
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: Unique name of the IDP.
+            example: saml1
+          usernameAttribute:
+            maxLength: 256
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: SAML assertion username attribute element.
+            default: name
+          emailAttribute:
+            maxLength: 256
+            minLength: 3
+            type: string
+            description: SAML assertion email attribute element.
+            default: email
+          groupsAttribute:
+            maxLength: 256
+            minLength: 3
+            type: string
+            description: SAML assertion groups attribute element.
+            example: grpAttribute1
+          groupsDelim:
+            maxLength: 3
+            minLength: 1
+            type: string
+            description: Delimiter is used to split the value of an attribute into multiple groups.
+          customAttributes:
+            maxItems: 25
+            minItems: 0
+            type: array
+            description: SAML assertions for a list of custom attribute elements.
+            items:
+              maxLength: 16
+              type: string
+              example: Attribute1
+          entityIssuer:
+            maxLength: 2000
+            minLength: 3
+            type: string
+            description: It will be used as an issuer in SAML authnRequest.
+            example: issuer1
+          isSignedAuthnReqEnabled:
+            type: boolean
+            description: Flag indicating signing of SAML authnRequests.
+            example: true
+          createdTime:
+            type: string
+            description: Creation time of the SAML identity provider.
+            format: date-time
+            readOnly: true
+            example: 2009-09-23 14:30:00-07:00
+          lastUpdatedTime:
+            type: string
+            description: Last updated time of the SAML identity provider.
+            format: date-time
+            readOnly: true
+            example: 2009-09-23 14:30:00-07:00
+          createdBy:
+            type: string
+            description: User or service who created the SAML identity provider.
+            readOnly: true
+            example: 390b7801-7a80-5c94-8a07-8de63651b27b
+        additionalProperties: false
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 52
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 28
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    iam.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    iam.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 72
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    iam.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/iam.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 60
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

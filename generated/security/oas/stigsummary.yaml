@@ -1,0 +1,682 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Security APIs
+  description: Manage security features, such as encryption, certificates, or platform hardening.
+  version: 4.0.1
+  x-repo-name: security
+  x-logo:
+    altText: Security Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/security/images/security-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /security/v4.0/report/stig-summaries:
+    get:
+      tags:
+      - STIGs
+      summary: Fetch the aggregate report of STIG scan
+      description: Fetch the current number of issues found by STIG for each cluster.
+      operationId: listStigSummaries
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+        x-odata-fields:
+        - name: clusterExtId
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$filter=clusterExtId eq 'b20db579-3992-40a3-87b9-23e29bff8199'
+      - name: $orderby
+        in: query
+        description: A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, '$orderby=templateName desc' would get
+          all templates sorted by templateName in descending order.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+        x-odata-fields:
+        - name: clusterExtId
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$orderby=clusterExtId
+        - name: failedCount
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$orderby=failedCount
+        - name: notApplicableCount
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$orderby=notApplicableCount
+        - name: passedCount
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$orderby=passedCount
+      - name: $expand
+        in: query
+        description: A URL query parameter that allows clients to request related resources when a resource that satisfies
+          a particular request is retrieved. Each expanded item is evaluated relative to the entity containing the property
+          being expanded. Other query options can be applied to an expanded property by appending a semicolon-separated list
+          of query options, enclosed in parentheses, to the property name. Permissible system query options are $filter, $select
+          and $orderby.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+        x-odata-fields:
+        - name: cluster
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$expand=cluster
+      - name: $select
+        in: query
+        description: A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+        x-odata-fields:
+        - name: clusterExtId
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$select=clusterExtId
+        - name: extId
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$select=extId
+        - name: failedCount
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$select=failedCount
+        - name: links
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$select=links
+        - name: notApplicableCount
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$select=notApplicableCount
+        - name: passedCount
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$select=passedCount
+        - name: tenantId
+          example: https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$select=tenantId
+      responses:
+        '200':
+          description: Returns the requested aggregate report of the STIG scan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/security.v4.0.report.StigSummary'
+                additionalProperties: false
+                description: REST response for all response codes in API path /security/v4.0/report/stig-summaries Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/security.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /security/v4.0/report/stig-summaries Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/security.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /security/v4.0/report/stig-summaries Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Stig Summary
+        roleList:
+        - name: Security Dashboard Admin
+        - name: Security Dashboard Viewer
+        - name: Prism Admin
+        - name: Super Admin
+        - name: Prism Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 3
+        timeUnit: seconds
+      - type: small
+        count: 3
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '7.0'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.sec.java.client.ApiClient;\nimport com.nutanix.sec.java.client.api.STIGsApi;\n\
+          import com.nutanix.dp1.sec.security.v4.report.ListStigSummariesApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        STIGsApi sTIGsApi = new STIGsApi(apiClient);\n\
+          \n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListStigSummariesApiResponse\
+          \ listStigSummariesApiResponse = sTIGsApi.listStigSummaries(page, limit, null, null, null, null);\n            System.out.println(listStigSummariesApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, STIGsApi } from \"@nutanix-api/security-js-client\";\n\n// Configure the client\nlet\
+          \ apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n\
+          // Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a\
+          \ loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet sTIGsApi = new STIGsApi(apiClientInstance);\n\nfunction sample() {\n\n\n    // Construct\
+          \ Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n    opts[\"$filter\"\
+          ] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"$expand\"] = \"string_sample_data\"\
+          ;\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    sTIGsApi.listStigSummaries(opts).then(({data, response})\
+          \ => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_security_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_security_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"\
+          localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_security_py_client.ApiClient(configuration=config)\n    s_ti_gs_api = ntnx_security_py_client.STIGsApi(api_client=client)\n\
+          \    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = s_ti_gs_api.list_stig_summaries(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_security_py_client.rest.ApiException as e:\n     \
+          \   print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/security-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/security-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/security-go-client/v4/models/security/v4/report\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    STIGsApiInstance *api.STIGsApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    STIGsApiInstance\
+          \ = api.NewSTIGsApi(ApiClientInstance)\n\n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error\
+          \ := STIGsApiInstance.ListStigSummaries(&page_, &limit_, nil, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().([]import1.StigSummary)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/security/v4.0/report/stig-summaries?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+components:
+  schemas:
+    security.v4.0.report.StigSummary:
+      title: Cluster STIG summary.
+      description: Cluster STIG summary.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          clusterExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: UUID of the cluster.
+            readOnly: true
+            example: b20db579-3992-40a3-87b9-23e29bff8199
+          passedCount:
+            type: integer
+            description: Count of total resources in the cluster.
+            readOnly: true
+            example: 288
+          failedCount:
+            type: integer
+            description: Count of resources with failed STIG tests.
+            readOnly: true
+            example: 41
+          notApplicableCount:
+            type: integer
+            description: Count of resources with STIG test not applicable.
+            readOnly: true
+            example: 46
+        additionalProperties: false
+    security.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
+            the endpoint belongs. For example: VMM-40000'
+          example: string
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 4e971540-9c96-4497-ba84-b83019ab22cd
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    security.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 28
+        error:
+          type: string
+          description: The generic error message for the response.
+          example: string
+        path:
+          type: string
+          description: API path on which the request was made.
+          example: string
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/security.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this ID to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: de3ab332-95ac-46e8-96d9-6dc4424441f4
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+          example: string
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+            example: string
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 99
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+              example: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 36
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    security.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/security.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/security.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    security.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+          example: string
+        message:
+          type: string
+          description: The detailed message for the validation error.
+          example: string
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 31
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

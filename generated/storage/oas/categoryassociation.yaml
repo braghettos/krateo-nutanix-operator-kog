@@ -1,0 +1,389 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Storage APIs
+  description: Manage storage configuration and operations.
+  version: 4.0.1-alpha-3
+  x-repo-name: storage
+  x-logo:
+    altText: Storage Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/storage/images/storage-logo-img.svg
+  x-minimum-negotiation-version: v4.2
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+paths:
+  /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/category-associations:
+    get:
+      tags:
+      - VolumeGroup
+      summary: Get a list of all category details that are associated with the Volume Group identified by {volumeGroupExtId}.
+      description: Query the category details that are associated with the Volume Group identified by {volumeGroupExtId}.
+      operationId: getCategoryAssociations
+      parameters:
+      - name: volumeGroupExtId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 183040b6-2e77-4067-9e71-d82198eb50fd
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource.  Any number out of this range will
+          be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number greater
+          than the total available pages would be set to the last page.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource.  Any number out of this range
+            will be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number
+            greater than the total available pages would be set to the last page.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number of
+          records, which is 100.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number
+            of records, which is 100.
+
+            '
+          format: int32
+          default: 50
+      responses:
+        '200':
+          description: Paginated list of category details associated with the Volume Group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetCategoryAssociationsApiResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetCategoryAssociationsApiResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetCategoryAssociationsApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.GetCategoryAssociationsApiResponse;\n\
+          \npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\
+          \tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\"\
+          );\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\
+          \n\t\tString volumeGroupExtId = \"^B6FEdBE9-b003-DEAb-DCAb-B1BcDE7F9c62$\";\n\t\tint $page = 0;\n\t\tint $limit\
+          \ = 50;\n\t\tGetCategoryAssociationsApiResponse getCategoryAssociationsApiResponse = volumeGroupApi.getCategoryAssociations(volumeGroupExtId,\
+          \ $page, $limit);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\"\
+          ;\nimport GetCategoryAssociationsApiResponse from \"../src/models/storage/v4/config/GetCategoryAssociationsApiResponse\"\
+          ;\n\nvar apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod\
+          \ = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let volumeGroupExtId = \"^C4EEabFf-5dc2-B46e-d8Fd-dAdBe64cC9ef$\";\n    let $page = 0;\n\
+          \    let $limit = 50;\n\n    volumeGroupApi.getCategoryAssociations(volumeGroupExtId, $page, $limit).then(({data,\
+          \ response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n\
+          \    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n\
+          \    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1,\
+          \ retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeGroupExtId\
+          \ = \"^BeFDBF5f-Bbc6-c3D6-Fc7E-8A89edb7A2fC$\"\n    $page = 0\n    $limit = 50\n    api_response = volumeGroupApi.get_category_associations(volumeGroupExtId,\
+          \ $page, $limit)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\n\
+          func main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n\
+          \    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation\
+          \ = true\n\n    volumeGroupExtId := \"^1cC71dAF-04fc-C09A-fFF5-CeCFf2DDa4bf$\"\n    $page := 0\n    $limit := 50\n\
+          \n    response, _ := VolumeGroupApiInstance.GetCategoryAssociations(volumeGroupExtId, $page, $limit)\n    fmt.Println(response)\n\
+          }\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^b5bbAB59-FCBD-eCB5-0f8C-d2DeAB23AbcE$/category-associations?$limit=50&$page=0\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^5dfAbedb-3850-57A2-F13f-cdD057cCC5aE$/category-associations?$limit=50&$page=0\"\
+          \n"
+components:
+  schemas:
+    storage.v4.r0.a3.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+        code:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: The locale for the message description.
+          default: en_US
+        errorGroup:
+          type: string
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+      description: This schema is generated from AppMessage.java
+    common.v1.r0.a3.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.KVPair:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The key of this key value pair
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            example: string
+          - type: integer
+            example: 6
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.r0.a3.config.EntityType:
+      type: string
+      enum:
+      - CLUSTER
+      - VM
+      - STORAGE_CONTAINER
+      - VOLUME_GROUP
+      - TASK
+      - IMAGE
+      - CATEGORY
+      - NODE
+      - VPC
+      - SUBNET
+      - ROUTING_POLICY
+      - FLOATING_IP
+      - VPN_GATEWAY
+      - VPN_CONNECTION
+      - DIRECT_CONNECT
+      - DIRECT_CONNECT_VIF
+      - VIRTUAL_NIC
+      - VIRTUAL_SWITCH
+      - VM_DISK
+      - VOLUME_DISK
+      - DISK_RECOVERY_POINT
+      - VTEP_GATEWAY
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.EntityReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 748b06b3-b3a0-45c1-8c81-6b5b019cecde
+        name:
+          type: string
+          example: string
+        uris:
+          type: array
+          items:
+            type: string
+            example: string
+        entityType:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.EntityType'
+      additionalProperties: false
+    common.v1.r0.a3.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+      additionalProperties: false
+    storage.v4.r0.a3.config.GetCategoryAssociationsApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.CategoryDetails'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/category-associations
+        Get operation
+    common.v1.r0.a3.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by this link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
+            special value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    storage.v4.r0.a3.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.error.AppMessage'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
+      additionalProperties: false
+      description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
+    storage.v4.r0.a3.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: string
+        statusCode:
+          type: integer
+          example: 25
+        error:
+          type: string
+          example: string
+        path:
+          type: string
+          example: string
+        validationErrorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+    common.v1.r0.a3.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Flag'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          format: int32
+          example: 50
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+        extraInfo:
+          type: array
+          description: An array of entity specific metadata
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. Always present and minimally contains the self link for
+        the API request that produced this response.  Also contains pagination data for paginated requests.
+
+        '
+    storage.v4.r0.a3.config.CategoryDetails:
+      description: An existing category detail associated with the Volume Group.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.config.EntityReference'
+    common.v1.r0.a3.config.Flag:
+      type: object
+      properties:
+        name:
+          type: string
+          example: string
+        value:
+          type: boolean
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          example: string
+        message:
+          type: string
+          example: string
+        attributePath:
+          type: string
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

@@ -1,0 +1,2361 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Files APIs
+  description: Manage virtual file servers, create and configure shares for client access, protect them using DR and sync
+    policies, provision storage space and administer security controls.
+  version: '4.0'
+  x-repo-name: files
+  x-logo:
+    altText: Files Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/files/images/files-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets:
+    get:
+      tags:
+      - MountTargets
+      summary: List mount targets
+      description: Get a paginated list of mount targets.
+      operationId: listMountTargets
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b86797fe-8a63-4b6b-ad6c-5cbdce0651af
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - blockedFileExtensions
+
+          - connectedMountTargetPath
+
+          - description
+
+          - isCompressionEnabled
+
+          - isLongNameEnabled
+
+          - isPreviousVersionEnabled
+
+          - isSnapshotPaused
+
+          - maxSizeGB
+
+          - multiProtocolProperties/isCaseSensitiveNamespaceEnabled
+
+          - multiProtocolProperties/isSimultaneousAccessEnabled
+
+          - multiProtocolProperties/isSymlinkCreationEnabled
+
+          - name
+
+          - nfsProperties/accessType
+
+          - nfsProperties/anonymousIdentifier/gid
+
+          - nfsProperties/anonymousIdentifier/uid
+
+          - nfsProperties/authenticationType
+
+          - nfsProperties/squashType
+
+          - parentMountTargetExtId
+
+          - path
+
+          - protocol
+
+          - secondaryProtocol
+
+          - smbProperties/isAccessBasedEnumerationEnabled
+
+          - state
+
+          - statusType
+
+          - type
+
+          - wormSpec/cooloffIntervalSeconds
+
+          - wormSpec/isComplianceEnabled
+
+          - wormSpec/isLegalHoldEnabled
+
+          - wormSpec/retentionPeriodSeconds
+
+          - wormSpec/wormType
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - connectedMountTargetPath
+
+          - description
+
+          - isCompressionEnabled
+
+          - isLongNameEnabled
+
+          - isPreviousVersionEnabled
+
+          - isSnapshotPaused
+
+          - maxSizeGB
+
+          - multiProtocolProperties/isCaseSensitiveNamespaceEnabled
+
+          - multiProtocolProperties/isSimultaneousAccessEnabled
+
+          - multiProtocolProperties/isSymlinkCreationEnabled
+
+          - name
+
+          - nfsProperties/anonymousIdentifier/gid
+
+          - nfsProperties/anonymousIdentifier/uid
+
+          - parentMountTargetExtId
+
+          - path
+
+          - smbProperties/isAccessBasedEnumerationEnabled
+
+          - wormSpec/cooloffIntervalSeconds
+
+          - wormSpec/isComplianceEnabled
+
+          - wormSpec/isLegalHoldEnabled
+
+          - wormSpec/retentionPeriodSeconds
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - blockedFileExtensions
+
+          - connectedMountTargetPath
+
+          - description
+
+          - isCompressionEnabled
+
+          - isLongNameEnabled
+
+          - isPreviousVersionEnabled
+
+          - isSnapshotPaused
+
+          - maxSizeGB
+
+          - name
+
+          - parentMountTargetExtId
+
+          - path
+
+          - protocol
+
+          - secondaryProtocol
+
+          - state
+
+          - statusType
+
+          - type
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated list of mount targets.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/files.v4.0.config.MountTarget'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Share
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - File Server Share Admin
+        - File Server Security Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.MountTargetsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ListMountTargetsApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        MountTargetsApi mountTargetsApi = new\
+          \ MountTargetsApi(apiClient);\n\n        \n        String fileServerExtId = \"B6aa5884-5aE8-CAf9-d714-1ac6ECc3883F\"\
+          ;\n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListMountTargetsApiResponse\
+          \ listMountTargetsApiResponse = mountTargetsApi.listMountTargets(fileServerExtId, page, limit, null, null, null);\n\
+          \            System.out.println(listMountTargetsApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, MountTargetsApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet mountTargetsApi = new MountTargetsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n\
+          \    let fileServerExtId = \"cA4fD4Ff-cBeE-3AFa-d4Ea-a9d9ABcB02d6\";\n\n    // Construct Optional Parameters\n \
+          \   var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\"\
+          ;\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n \
+          \   mountTargetsApi.listMountTargets(fileServerExtId, opts).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    mount_targets_api = ntnx_files_py_client.MountTargetsApi(api_client=client)\n    \n    file_server_ext_id =\
+          \ \"E3cEd5Ec-9dbb-86E7-7Fb5-2c3cECADE94a\"\n    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response\
+          \ = mount_targets_api.list_mount_targets(fileServerExtId=file_server_ext_id, _page=page, _limit=limit)\n       \
+          \ print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    MountTargetsApiInstance *api.MountTargetsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  MountTargetsApiInstance = api.NewMountTargetsApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"BfdAbbad-AAbC-70f2-37Fc-bDaE3d5FB50F\"\
+          \n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error := MountTargetsApiInstance.ListMountTargets(&fileServerExtId,\
+          \ &page_, &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n  \
+          \  data, _ := response.GetData().([]import1.MountTarget)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/C6FdDdBe-dAcC-DBBB-BDeb-FDEB6b2AD548/mount-targets?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/7c9c9BcE-4A4D-6D32-a649-C0DfBDFd0364/mount-targets?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - MountTargets
+      summary: Create mount target
+      description: 'Create a mount target by using the provided request body.
+
+
+        Specify `name` and  `type` of the mount target which needs to be created.
+
+        User can also specify `maxSizeGiByte`, `path`, `secondaryProtocol`, `state` etc of the mount target.
+
+
+        Use dry-run workflow with same payload to validate the request. Normal workflow won''t validate values like `userOrGroupName`
+        in share ACLs before task creation.
+
+        '
+      operationId: createMountTarget
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: cfcf05ab-7aed-44fd-b4d7-d65ad8a32ad0
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 258e7953-8c6b-4ada-b725-8a0afd8a677d
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: true
+      requestBody:
+        description: Mount target model
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.MountTarget'
+        required: true
+      responses:
+        '202':
+          description: Task ID returned for the create mount target request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Create File Server Share
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - File Server Share Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.MountTargetsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.MountTarget;\nimport com.nutanix.dp1.fil.files.v4.config.CreateMountTargetApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        MountTargetsApi mountTargetsApi = new MountTargetsApi(apiClient);\n\n   \
+          \     MountTarget mountTarget = new MountTarget();\n\n        // MountTarget object initializations here...\n  \
+          \      mountTarget.setName(\"string_sample_data\");  // required field\n        \n        String fileServerExtId\
+          \ = \"Cd16c1fc-aDDF-eDDb-3Aee-44A8f79BdDaC\";\n        \n        boolean dryrun = true;\n\n        try {\n     \
+          \       CreateMountTargetApiResponse createMountTargetApiResponse = mountTargetsApi.createMountTarget(fileServerExtId,\
+          \ dryrun, mountTarget);\n            System.out.println(createMountTargetApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, MountTargetsApi, MountTarget } from \"@nutanix-api/files-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet mountTargetsApi = new MountTargetsApi(apiClientInstance);\n\nfunction\
+          \ sample() {\n    let mountTarget = new MountTarget();\n\n    // MountTarget object initializations here...\n  \
+          \  mountTarget.setName(\"string_sample_data\");  // required field\n\n    \n    let fileServerExtId = \"fE96FcC4-Bc2e-EAfB-BCCC-d8BeeEd8fDab\"\
+          ;\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$dryrun\"] = true;\n\n\n\n\n    mountTargetsApi.createMountTarget(fileServerExtId,\
+          \ mountTarget, opts).then(({data, response}) => {\n        console.log(`API returned the following status code:\
+          \ ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    mount_targets_api = ntnx_files_py_client.MountTargetsApi(api_client=client)\n    mountTarget = ntnx_files_py_client.MountTarget()\n\
+          \n    # MountTarget object initializations here...\n    mountTarget.name = \"string_sample_data\"  # required field\n\
+          \    \n    file_server_ext_id = \"7bFdaea5-d09a-BBbB-ccF5-C07FdBAc37B2\"\n    \n    dryrun = True\n\n\n    try:\n\
+          \        api_response = mount_targets_api.create_mount_target(fileServerExtId=file_server_ext_id, _dryrun=dryrun,\
+          \ body=mountTarget)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n    \
+          \    print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    MountTargetsApiInstance *api.MountTargetsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    MountTargetsApiInstance = api.NewMountTargetsApi(ApiClientInstance)\n\
+          \n    mountTarget := import1.NewMountTarget()\n\n    // MountTarget object initializations here...\n\n    \n   \
+          \ fileServerExtId := \"DEeeb69f-afea-FbA4-e9b6-bDDeceFeCFB2\"\n    \n    dryrun_ := true\n\n\n    response, error\
+          \ := MountTargetsApiInstance.CreateMountTarget(&fileServerExtId, &dryrun_, mountTarget)\n    if error != nil {\n\
+          \        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/bcaa1EC7-aD8f-9BEd-aBEF-aEedbfCd84Cd/mount-targets?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\"\
+          :\"string\",\"maxSizeGB\":0,\"type\":\"$UNKNOWN\",\"path\":\"string\",\"connectedMountTargetPath\":\"string\",\"\
+          isCompressionEnabled\":true,\"blockedFileExtensions\":[\"string\"],\"protocol\":\"$UNKNOWN\",\"secondaryProtocol\"\
+          :[\"$UNKNOWN\"],\"isPreviousVersionEnabled\":false,\"smbProperties\":{\"isAccessBasedEnumerationEnabled\":false,\"\
+          isSmb3EncryptionEnabled\":false,\"isCaEnabled\":false,\"shareACL\":[{\"userOrGroupName\":\"string\",\"permissionType\"\
+          :\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"sid\":\"string\",\"$objectType\":\"files.v4.config.SMBShareACE\"}],\"\
+          $objectType\":\"files.v4.config.SmbProtocolProperties\"},\"nfsProperties\":{\"authenticationType\":\"$UNKNOWN\"\
+          ,\"anonymousIdentifier\":{\"uid\":0,\"gid\":0,\"$objectType\":\"files.v4.config.AnonymousIdentifier\"},\"squashType\"\
+          :\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"clientExceptions\":[{\"accessType\":\"$UNKNOWN\",\"squashType\":\"$UNKNOWN\"\
+          ,\"clients\":\"string\",\"$objectType\":\"files.v4.config.ClientException\"}],\"$objectType\":\"files.v4.config.NfsProtocolProperties\"\
+          },\"multiProtocolProperties\":{\"isCaseSensitiveNamespaceEnabled\":false,\"isSymlinkCreationEnabled\":false,\"isSimultaneousAccessEnabled\"\
+          :false,\"$objectType\":\"files.v4.config.MultiProtocolProperties\"},\"blockedClients\":{\"roAccessFilters\":[{\"\
+          vendorName\":\"string\",\"ipList\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"noAccessFilters\":[{\"vendorName\":\"string\",\"ipList\"\
+          :[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"rwAccessFilters\":[{\"vendorName\":\"string\",\"ipList\"\
+          :[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"$objectType\":\"files.v4.config.BlockedClient\"},\"isLongNameEnabled\"\
+          :false,\"wormSpec\":{\"wormType\":\"$UNKNOWN\",\"cooloffIntervalSeconds\":600,\"retentionPeriodSeconds\":31449600,\"\
+          isComplianceEnabled\":false,\"isLegalHoldEnabled\":false,\"$objectType\":\"files.v4.config.WormSpec\"},\"workloadType\"\
+          :\"$UNKNOWN\",\"isSnapshotPaused\":true,\"parentMountTargetExtId\":\"string\",\"statusType\":\"$UNKNOWN\",\"state\"\
+          :\"$UNKNOWN\",\"$objectType\":\"files.v4.config.MountTarget\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          name\":\"string\",\"description\":\"string\",\"maxSizeGB\":0,\"type\":\"$UNKNOWN\",\"path\":\"string\",\"connectedMountTargetPath\"\
+          :\"string\",\"isCompressionEnabled\":true,\"blockedFileExtensions\":[\"string\"],\"protocol\":\"$UNKNOWN\",\"secondaryProtocol\"\
+          :[\"$UNKNOWN\"],\"isPreviousVersionEnabled\":false,\"smbProperties\":{\"isAccessBasedEnumerationEnabled\":false,\"\
+          isSmb3EncryptionEnabled\":false,\"isCaEnabled\":false,\"shareACL\":[{\"userOrGroupName\":\"string\",\"permissionType\"\
+          :\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"sid\":\"string\",\"$objectType\":\"files.v4.config.SMBShareACE\"}],\"\
+          $objectType\":\"files.v4.config.SmbProtocolProperties\"},\"nfsProperties\":{\"authenticationType\":\"$UNKNOWN\"\
+          ,\"anonymousIdentifier\":{\"uid\":0,\"gid\":0,\"$objectType\":\"files.v4.config.AnonymousIdentifier\"},\"squashType\"\
+          :\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"clientExceptions\":[{\"accessType\":\"$UNKNOWN\",\"squashType\":\"$UNKNOWN\"\
+          ,\"clients\":\"string\",\"$objectType\":\"files.v4.config.ClientException\"}],\"$objectType\":\"files.v4.config.NfsProtocolProperties\"\
+          },\"multiProtocolProperties\":{\"isCaseSensitiveNamespaceEnabled\":false,\"isSymlinkCreationEnabled\":false,\"isSimultaneousAccessEnabled\"\
+          :false,\"$objectType\":\"files.v4.config.MultiProtocolProperties\"},\"blockedClients\":{\"roAccessFilters\":[{\"\
+          vendorName\":\"string\",\"ipList\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"noAccessFilters\":[{\"vendorName\":\"string\",\"ipList\"\
+          :[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"rwAccessFilters\":[{\"vendorName\":\"string\",\"ipList\"\
+          :[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"$objectType\":\"files.v4.config.BlockedClient\"},\"isLongNameEnabled\"\
+          :false,\"wormSpec\":{\"wormType\":\"$UNKNOWN\",\"cooloffIntervalSeconds\":600,\"retentionPeriodSeconds\":31449600,\"\
+          isComplianceEnabled\":false,\"isLegalHoldEnabled\":false,\"$objectType\":\"files.v4.config.WormSpec\"},\"workloadType\"\
+          :\"$UNKNOWN\",\"isSnapshotPaused\":true,\"parentMountTargetExtId\":\"string\",\"statusType\":\"$UNKNOWN\",\"state\"\
+          :\"$UNKNOWN\",\"$objectType\":\"files.v4.config.MountTarget\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/06Cb6FCB-DF9d-5bBB-DaD3-5296D888dBe7/mount-targets?$dryrun=true\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2022.6
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+  /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}:
+    get:
+      tags:
+      - MountTargets
+      summary: Get mount target
+      description: "Fetches the mount target details with the given external identifier.\n\nSpecify a valid identifier of\
+        \ the file server (`fileServerExtId`) and \nof the mount target (`extId`).\n"
+      operationId: getMountTargetById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 654ac0dc-f84f-4862-bcbd-aad2c9312560
+      - name: extId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: d6989387-a010-4ae9-8831-0eb9670fa15f
+      responses:
+        '200':
+          description: Details of the requested mount target.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.config.MountTarget'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Share
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - File Server Share Admin
+        - File Server Security Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.MountTargetsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetMountTargetApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        MountTargetsApi mountTargetsApi = new\
+          \ MountTargetsApi(apiClient);\n\n        \n        String fileServerExtId = \"fcAB0FbE-DBea-DfEe-e28C-8FF4ce510D4d\"\
+          ;\n        \n        String extId = \"4BF0e090-6DBE-f220-EbEb-CEdcaCEAeC4F\";\n\n        try {\n            GetMountTargetApiResponse\
+          \ getMountTargetApiResponse = mountTargetsApi.getMountTargetById(fileServerExtId, extId);\n            System.out.println(getMountTargetApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, MountTargetsApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet mountTargetsApi = new MountTargetsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n\
+          \    let fileServerExtId = \"dD8b869F-BA8d-FdBA-fC5C-72eeEc5ca2E1\";\n    \n    let extId = \"eAdaFECe-3E79-E9Cb-ef5D-c26af86BCf3F\"\
+          ;\n\n\n\n\n\n    mountTargetsApi.getMountTargetById(fileServerExtId, extId).then(({data, response}) => {\n     \
+          \   console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    mount_targets_api = ntnx_files_py_client.MountTargetsApi(api_client=client)\n    \n    file_server_ext_id =\
+          \ \"aDbcaDcA-bAED-6e90-1bdf-faDEacE7fC9A\"\n    \n    ext_id = \"CeFAcd6A-2c0b-eDdf-bE1e-D9db6CdF0CF3\"\n\n\n  \
+          \  try:\n        api_response = mount_targets_api.get_mount_target_by_id(fileServerExtId=file_server_ext_id, extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    MountTargetsApiInstance *api.MountTargetsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  MountTargetsApiInstance = api.NewMountTargetsApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"cBAFa7ed-b4F8-B9ed-6D9f-eAdDFFbBbeBb\"\
+          \n    \n    extId := \"EebCb0bA-aeBc-E13f-2fBD-aFBEBf6dEABD\"\n\n\n    response, error := MountTargetsApiInstance.GetMountTargetById(&fileServerExtId,\
+          \ &extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.MountTarget)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/1C1DD94D-6ABB-dcf2-CC3e-dbbfcE661BF4/mount-targets/AF3d4eE2-FFbC-c1AF-f55e-c7DAff8DBCBD\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/BFaca5aA-d13e-EBb6-ebb8-eeBEa7eC10C2/mount-targets/dDeCFdcC-edeD-b5ff-c3cf-d0FCa3e0bbEe\"\
+          \n"
+    put:
+      tags:
+      - MountTargets
+      summary: Update mount target
+      description: "Update a mount target with the given external identifier by using the provided request body.\n\nSpecify\
+        \ a valid identifier of the file server (`fileServerExtId`) and \nof the mount target (`extId`).\n\nIt is always recommended\
+        \ to perform a GET request on a resource before requesting an UPDATE call.\n\nUse dry-run workflow with same payload\
+        \ to validate the request. Normal workflow won't validate values like `userOrGroupName` in share ACLs before task\
+        \ creation.\n"
+      operationId: updateMountTargetById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 5f1db498-90bd-4e1e-a9b4-98a3b4a46919
+      - name: extId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: be83641e-6738-4911-963d-b145d07e9aaf
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 27d3f23c-0186-4cf0-bece-f4eaae14da27
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: false
+      requestBody:
+        description: Mount target model
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.MountTarget'
+        required: true
+      responses:
+        '202':
+          description: Task ID returned for the update mount target request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Update File Server Share
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - File Server Share Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.MountTargetsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.MountTarget;\nimport com.nutanix.dp1.fil.files.v4.config.GetMountTargetApiResponse;\n\
+          import com.nutanix.dp1.fil.files.v4.config.UpdateMountTargetApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        MountTargetsApi mountTargetsApi = new MountTargetsApi(apiClient);\n\n   \
+          \     MountTarget mountTarget = new MountTarget();\n\n        // MountTarget object initializations here...\n  \
+          \      mountTarget.setName(\"string_sample_data\");  // required field\n        \n        String fileServerExtId\
+          \ = \"1cEb9d50-ef4f-ca61-c5B6-3dfe93A7C4D7\";\n        \n        String extId = \"fB9bF8a3-4deF-A8fa-CcA9-2A9dcfE1FEEc\"\
+          ;\n        \n        boolean dryrun = true;\n\n        // perform GET call\n        GetMountTargetApiResponse getResponse\
+          \ = null;\n        try {\n            getResponse = mountTargetsApi.getMountTargetById(fileServerExtId, extId);\n\
+          \        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n      \
+          \  // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdateMountTargetApiResponse updateMountTargetApiResponse = mountTargetsApi.updateMountTargetById(fileServerExtId,\
+          \ extId, dryrun, mountTarget, opts);\n            System.out.println(updateMountTargetApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, MountTargetsApi, MountTarget, GetMountTargetApiResponse } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet mountTargetsApi = new MountTargetsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let mountTarget = new MountTarget();\n\n    // MountTarget object initializations here...\n\
+          \    mountTarget.setName(\"string_sample_data\");  // required field\n\n    \n    let fileServerExtId = \"D2DD8BFF-5fEc-aebA-c6a2-C7DB2D252Ac2\"\
+          ;\n    \n    let extId = \"c6FDaBCb-eAFa-cCc3-3e1d-16c9baFDAc25\";\n\n    // Construct Optional Parameters\n   \
+          \ var opts = {};\n    opts[\"$dryrun\"] = true;\n\n    // Perform Get call\n    mountTargetsApi.getMountTargetById(fileServerExtId,\
+          \ extId).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        // Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        mountTargetsApi.updateMountTargetById(fileServerExtId,\
+          \ extId, mountTarget, opts, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API\
+          \ returned the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    mount_targets_api = ntnx_files_py_client.MountTargetsApi(api_client=client)\n    mountTarget = ntnx_files_py_client.MountTarget()\n\
+          \n    # MountTarget object initializations here...\n    mountTarget.name = \"string_sample_data\"  # required field\n\
+          \    \n    file_server_ext_id = \"Ea8bEcd4-2F0f-EbFb-CcFA-078F69eBA3e9\"\n    \n    ext_id = \"f8cdbfce-AD8e-5D04-ACCf-cCA3Eb1DE6cF\"\
+          \n    \n    dryrun = True\n\n    try:\n        api_response = mount_targets_api.get_mount_target_by_id(fileServerExtId=file_server_ext_id,\
+          \ extId=ext_id)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag\
+          \ Header\n    etag_value = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response\
+          \ = mount_targets_api.update_mount_target_by_id(fileServerExtId=file_server_ext_id, extId=ext_id, _dryrun=dryrun,\
+          \ body=mountTarget, if_match=etag_value)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    MountTargetsApiInstance *api.MountTargetsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    MountTargetsApiInstance = api.NewMountTargetsApi(ApiClientInstance)\n\
+          \n    mountTarget := import1.NewMountTarget()\n\n    // MountTarget object initializations here...\n\n    \n   \
+          \ fileServerExtId := \"BCAF9EdF-b3FB-ceC7-C4aE-2ab60fBCBE6a\"\n    \n    extId := \"eAEef161-18ae-6d1d-7A8e-1EDB27feE7dc\"\
+          \n    \n    dryrun_ := true\n\n    getResponse, err := MountTargetsApiInstance.GetMountTargetById(&fileServerExtId,\
+          \ &extId)\n    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n\
+          \    etagValue := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"\
+          If-Match\"] = etagValue\n\n    response, error := MountTargetsApiInstance.UpdateMountTargetById(&fileServerExtId,\
+          \ &extId, &dryrun_, mountTarget, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n\
+          \    data, _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/7e02EBbd-FAcb-9CA1-B1dF-d6A5AEfb93EA/mount-targets/700bCFdD-2Fb1-FDeD-C2dB-A4f93afdA4AA?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"name\":\"string\",\"description\":\"string\",\"maxSizeGB\":0,\"type\":\"$UNKNOWN\",\"path\":\"string\",\"connectedMountTargetPath\"\
+          :\"string\",\"isCompressionEnabled\":true,\"blockedFileExtensions\":[\"string\"],\"protocol\":\"$UNKNOWN\",\"secondaryProtocol\"\
+          :[\"$UNKNOWN\"],\"isPreviousVersionEnabled\":false,\"smbProperties\":{\"isAccessBasedEnumerationEnabled\":false,\"\
+          isSmb3EncryptionEnabled\":false,\"isCaEnabled\":false,\"shareACL\":[{\"userOrGroupName\":\"string\",\"permissionType\"\
+          :\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"sid\":\"string\",\"$objectType\":\"files.v4.config.SMBShareACE\"}],\"\
+          $objectType\":\"files.v4.config.SmbProtocolProperties\"},\"nfsProperties\":{\"authenticationType\":\"$UNKNOWN\"\
+          ,\"anonymousIdentifier\":{\"uid\":0,\"gid\":0,\"$objectType\":\"files.v4.config.AnonymousIdentifier\"},\"squashType\"\
+          :\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"clientExceptions\":[{\"accessType\":\"$UNKNOWN\",\"squashType\":\"$UNKNOWN\"\
+          ,\"clients\":\"string\",\"$objectType\":\"files.v4.config.ClientException\"}],\"$objectType\":\"files.v4.config.NfsProtocolProperties\"\
+          },\"multiProtocolProperties\":{\"isCaseSensitiveNamespaceEnabled\":false,\"isSymlinkCreationEnabled\":false,\"isSimultaneousAccessEnabled\"\
+          :false,\"$objectType\":\"files.v4.config.MultiProtocolProperties\"},\"blockedClients\":{\"roAccessFilters\":[{\"\
+          vendorName\":\"string\",\"ipList\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"noAccessFilters\":[{\"vendorName\":\"string\",\"ipList\"\
+          :[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"rwAccessFilters\":[{\"vendorName\":\"string\",\"ipList\"\
+          :[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"\
+          $objectType\":\"files.v4.config.ClientBlockingFilter\"}],\"$objectType\":\"files.v4.config.BlockedClient\"},\"isLongNameEnabled\"\
+          :false,\"wormSpec\":{\"wormType\":\"$UNKNOWN\",\"cooloffIntervalSeconds\":600,\"retentionPeriodSeconds\":31449600,\"\
+          isComplianceEnabled\":false,\"isLegalHoldEnabled\":false,\"$objectType\":\"files.v4.config.WormSpec\"},\"workloadType\"\
+          :\"$UNKNOWN\",\"isSnapshotPaused\":true,\"parentMountTargetExtId\":\"string\",\"statusType\":\"$UNKNOWN\",\"state\"\
+          :\"$UNKNOWN\",\"$objectType\":\"files.v4.config.MountTarget\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\":\"string\",\"maxSizeGB\":0,\"type\":\"$UNKNOWN\"\
+          ,\"path\":\"string\",\"connectedMountTargetPath\":\"string\",\"isCompressionEnabled\":true,\"blockedFileExtensions\"\
+          :[\"string\"],\"protocol\":\"$UNKNOWN\",\"secondaryProtocol\":[\"$UNKNOWN\"],\"isPreviousVersionEnabled\":false,\"\
+          smbProperties\":{\"isAccessBasedEnumerationEnabled\":false,\"isSmb3EncryptionEnabled\":false,\"isCaEnabled\":false,\"\
+          shareACL\":[{\"userOrGroupName\":\"string\",\"permissionType\":\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"sid\"\
+          :\"string\",\"$objectType\":\"files.v4.config.SMBShareACE\"}],\"$objectType\":\"files.v4.config.SmbProtocolProperties\"\
+          },\"nfsProperties\":{\"authenticationType\":\"$UNKNOWN\",\"anonymousIdentifier\":{\"uid\":0,\"gid\":0,\"$objectType\"\
+          :\"files.v4.config.AnonymousIdentifier\"},\"squashType\":\"$UNKNOWN\",\"accessType\":\"$UNKNOWN\",\"clientExceptions\"\
+          :[{\"accessType\":\"$UNKNOWN\",\"squashType\":\"$UNKNOWN\",\"clients\":\"string\",\"$objectType\":\"files.v4.config.ClientException\"\
+          }],\"$objectType\":\"files.v4.config.NfsProtocolProperties\"},\"multiProtocolProperties\":{\"isCaseSensitiveNamespaceEnabled\"\
+          :false,\"isSymlinkCreationEnabled\":false,\"isSimultaneousAccessEnabled\":false,\"$objectType\":\"files.v4.config.MultiProtocolProperties\"\
+          },\"blockedClients\":{\"roAccessFilters\":[{\"vendorName\":\"string\",\"ipList\":[{\"ipv4\":{\"value\":\"string\"\
+          ,\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\"\
+          :128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"}],\"sidList\"\
+          :[\"string\"],\"uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"$objectType\":\"files.v4.config.ClientBlockingFilter\"\
+          }],\"noAccessFilters\":[{\"vendorName\":\"string\",\"ipList\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"\
+          uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"$objectType\":\"files.v4.config.ClientBlockingFilter\"\
+          }],\"rwAccessFilters\":[{\"vendorName\":\"string\",\"ipList\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"}],\"sidList\":[\"string\"],\"\
+          uidList\":[0],\"gidList\":[0],\"isAllIpsBlocked\":false,\"$objectType\":\"files.v4.config.ClientBlockingFilter\"\
+          }],\"$objectType\":\"files.v4.config.BlockedClient\"},\"isLongNameEnabled\":false,\"wormSpec\":{\"wormType\":\"\
+          $UNKNOWN\",\"cooloffIntervalSeconds\":600,\"retentionPeriodSeconds\":31449600,\"isComplianceEnabled\":false,\"isLegalHoldEnabled\"\
+          :false,\"$objectType\":\"files.v4.config.WormSpec\"},\"workloadType\":\"$UNKNOWN\",\"isSnapshotPaused\":true,\"\
+          parentMountTargetExtId\":\"string\",\"statusType\":\"$UNKNOWN\",\"state\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.MountTarget\"\
+          } \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/5eBBe5cd-eA32-30BE-c2c0-Ee7C6f79CBB2/mount-targets/cFFC553b-db3e-9F8D-Ff0e-AaaE5a2Cbbe0?$dryrun=true\"\
+          \n"
+    delete:
+      tags:
+      - MountTargets
+      summary: Delete mount target
+      description: 'Deletes a mount target with the given external identifier.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and
+
+        of the mount target (`extId`). Users can also specify the `force`
+
+        flag to delete the mount target forcefully.
+
+        '
+      operationId: deleteMountTargetById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: e54154cc-8d1e-402d-8d89-527a20e4fd64
+      - name: extId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: ae676589-93c6-4708-8c79-63e11d02817c
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: e1a741e8-5b60-4893-b619-362ffe75107b
+      responses:
+        '202':
+          description: Task ID returned for the delete mount target request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Delete File Server Share
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.MountTargetsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetMountTargetApiResponse;\nimport com.nutanix.dp1.fil.files.v4.config.DeleteMountTargetApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        MountTargetsApi mountTargetsApi = new\
+          \ MountTargetsApi(apiClient);\n\n        \n        String fileServerExtId = \"cAd0e3E7-FfaC-fCD8-F5df-30f1C3bA6829\"\
+          ;\n        \n        String extId = \"4586BD0d-12fC-bdCA-Ef96-dc55Dddfe7Ec\";\n\n        // perform GET call\n \
+          \       GetMountTargetApiResponse getResponse = null;\n        try {\n            getResponse = mountTargetsApi.getMountTargetById(fileServerExtId,\
+          \ extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n       \
+          \ }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            DeleteMountTargetApiResponse deleteMountTargetApiResponse = mountTargetsApi.deleteMountTargetById(fileServerExtId,\
+          \ extId, opts);\n            System.out.println(deleteMountTargetApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, MountTargetsApi, GetMountTargetApiResponse } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet mountTargetsApi = new MountTargetsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let fileServerExtId = \"A8d6Cca2-aB3a-CedD-910a-ce6da1F8dD25\";\n    \n    let\
+          \ extId = \"B42afbDd-eBaC-Fc2d-e2a5-DbfEFfCeCbEF\";\n\n\n    // Perform Get call\n    mountTargetsApi.getMountTargetById(fileServerExtId,\
+          \ extId).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        // Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        mountTargetsApi.deleteMountTargetById(fileServerExtId,\
+          \ extId, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the following\
+          \ status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error) => {\n\
+          \            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    mount_targets_api = ntnx_files_py_client.MountTargetsApi(api_client=client)\n    \n    file_server_ext_id =\
+          \ \"fdB12453-965F-bCd5-c63B-01ED44D4D3Ff\"\n    \n    ext_id = \"Ce18CFCe-84fb-A9bb-B4fE-A1adBD6EfFcF\"\n\n    try:\n\
+          \        api_response = mount_targets_api.get_mount_target_by_id(fileServerExtId=file_server_ext_id, extId=ext_id)\n\
+          \    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value\
+          \ = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response = mount_targets_api.delete_mount_target_by_id(fileServerExtId=file_server_ext_id,\
+          \ extId=ext_id, if_match=etag_value)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    MountTargetsApiInstance *api.MountTargetsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  MountTargetsApiInstance = api.NewMountTargetsApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"c31E6Bbf-7df7-80EF-B5Da-ac2bE5Ac84ae\"\
+          \n    \n    extId := \"E4AF6C8d-1F00-F06b-EeDF-aae6A00fd24d\"\n\n    getResponse, err := MountTargetsApiInstance.GetMountTargetById(&fileServerExtId,\
+          \ &extId)\n    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n\
+          \    etagValue := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"\
+          If-Match\"] = etagValue\n\n    response, error := MountTargetsApiInstance.DeleteMountTargetById(&fileServerExtId,\
+          \ &extId, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/13Aa8045-dFd0-C24a-A8FB-89fc0144Acd6/mount-targets/aEFFaAE6-3cA7-97cF-D50a-B9A0BC34d3cb\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'If-Match: string_sample_data' \\\n  \
+          \            --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\
+          \n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/Ae7Ac1ED-5d2C-16ea-7FAc-0e1BfFe2c9De/mount-targets/CBEC71fD-dE91-8dAC-FEaE-e9f6aCd22fBc\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2022.6
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+components:
+  schemas:
+    files.v4.0.config.WormSpec:
+      title: WORM (write once and read many) share object.
+      type: object
+      properties:
+        wormType:
+          $ref: '#/components/schemas/files.v4.0.config.WormType'
+        cooloffIntervalSeconds:
+          type: integer
+          description: Cooloff interval in seconds for WORM share.
+          format: int64
+          default: 600
+        retentionPeriodSeconds:
+          type: integer
+          description: Retention period in seconds for WORM share.
+          format: int64
+          default: 31449600
+        isComplianceEnabled:
+          type: boolean
+          description: WORM compliance for share. This is a read-only field.
+          readOnly: true
+          default: false
+        isLegalHoldEnabled:
+          type: boolean
+          description: Legal hold for WORM share. This is a read-only field.
+          readOnly: true
+          default: false
+      additionalProperties: false
+      description: WORM share details.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.config.IPAddress:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    files.v4.0.config.MultiProtocolProperties:
+      title: Multi protocol object.
+      type: object
+      properties:
+        isCaseSensitiveNamespaceEnabled:
+          type: boolean
+          description: Flag to enable case sensitive namespace.
+          default: false
+        isSymlinkCreationEnabled:
+          type: boolean
+          description: Flag to enable symlink creation.
+          default: false
+        isSimultaneousAccessEnabled:
+          type: boolean
+          description: Flag to enable simultaneous access to same files across protocols.
+          default: false
+      additionalProperties: false
+      description: Properties for multiprotocol supported mount target.
+    files.v4.0.config.FilesAuthenticationType:
+      title: Authentication type of the mount target.
+      type: string
+      description: Authentication type of the mount target.
+      enum:
+      - KERBEROS5
+      - NONE
+      - SYSTEM
+      - KERBEROS5P
+      - KERBEROS5I
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SYSTEM: System authentication type for mount target.
+        KERBEROS5: Kerberos5 authentication type for mount target.
+        KERBEROS5I: Kerberos5I authentication type for mount target.
+        NONE: None authentication type for mount target.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        KERBEROS5P: Kerberos5P authentication type for mount target.
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.SmbProtocolProperties:
+      title: SMB protocol object.
+      type: object
+      properties:
+        isAccessBasedEnumerationEnabled:
+          type: boolean
+          description: Flag to enable access based enumeration.
+          default: false
+        isSmb3EncryptionEnabled:
+          type: boolean
+          description: Flag to enable SMB3 encryption.
+          default: false
+        isCaEnabled:
+          type: boolean
+          description: Flag to enable continuous availability feature for SMB mount targets.
+          default: false
+        shareACL:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Access control list(ACL) for SMB share.
+          items:
+            $ref: '#/components/schemas/files.v4.0.config.SMBShareACE'
+      additionalProperties: false
+      description: SMB protocol properties for mount target.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    files.v4.0.config.PermissionType:
+      title: Permission type
+      type: string
+      description: Permission type for SMB share access control entry(ACE).
+      enum:
+      - ALLOW
+      - DENY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DENY: Deny permission type for a Mount Target
+        $UNKNOWN: 'Unknown value.
+
+          '
+        ALLOW: Allow permission type for a Mount Target
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.WormType:
+      title: WORM type for share.
+      type: string
+      description: WORM type for share.
+      enum:
+      - SHARE_LEVEL
+      - DISABLED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DISABLED: Disabled level WORM type for share.
+        SHARE_LEVEL: Share level WORM type for share.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.SMBAccessType:
+      title: Access type for SMB share access control entry(ACE)
+      type: string
+      description: Access type of the mount target.
+      enum:
+      - READ
+      - CHANGE
+      - FULL_CONTROL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        READ: Read access type for SMB share access control entry(ACE).
+        CHANGE: Change access type for SMB share access control entry(ACE).
+        $UNKNOWN: 'Unknown value.
+
+          '
+        FULL_CONTROL: Full control access type for SMB share access control entry(ACE).
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    files.v4.0.config.ClientException:
+      title: Client exceptions.
+      type: object
+      properties:
+        accessType:
+          $ref: '#/components/schemas/files.v4.0.config.AccessType'
+        squashType:
+          $ref: '#/components/schemas/files.v4.0.config.SquashType'
+        clients:
+          maxLength: 4095
+          type: string
+          description: Comma-separated client list
+      additionalProperties: false
+      description: Access exception client of the mount target.
+    files.v4.0.config.NfsProtocolProperties:
+      title: NFS protocol object.
+      type: object
+      properties:
+        authenticationType:
+          $ref: '#/components/schemas/files.v4.0.config.FilesAuthenticationType'
+        anonymousIdentifier:
+          $ref: '#/components/schemas/files.v4.0.config.AnonymousIdentifier'
+        squashType:
+          $ref: '#/components/schemas/files.v4.0.config.SquashType'
+        accessType:
+          $ref: '#/components/schemas/files.v4.0.config.AccessType'
+        clientExceptions:
+          maxItems: 200
+          minItems: 0
+          type: array
+          description: Access exception client list of the mount target.
+          items:
+            $ref: '#/components/schemas/files.v4.0.config.ClientException'
+      additionalProperties: false
+      description: NFS protocol properties for mount target.
+    files.v4.0.config.AnonymousIdentifier:
+      title: Anonymous identifier.
+      type: object
+      properties:
+        uid:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          description: User identifier. Default value of the user identifier is -2.
+          format: int64
+          example: 27
+        gid:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          description: Group identifier. Default value of the group identifier is -2.
+          format: int64
+          example: 63
+      additionalProperties: false
+      description: Anonymous identifier of the mount target.
+    files.v4.0.config.MountTargetState:
+      title: Mount target state. This is a read-only field.
+      type: string
+      description: State of the mount target.
+      enum:
+      - ONLINE
+      - OFFLINE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        ONLINE: Online state of mount target.
+        OFFLINE: Offline state of mount target.
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.MountTarget:
+      title: Mount target object.
+      description: Mount target object.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - name
+        type: object
+        properties:
+          name:
+            maxLength: 80
+            minLength: 1
+            type: string
+            description: Mount target name.
+            nullable: false
+          description:
+            maxLength: 180
+            type: string
+            description: Mount target description.
+          maxSizeGB:
+            minimum: 0
+            type: integer
+            description: Maximum size of mount target in GiB.
+            format: int64
+            example: 71
+          type:
+            $ref: '#/components/schemas/files.v4.0.config.MountTargetType'
+          path:
+            maxLength: 4095
+            type: string
+            description: Path of the nested mount target.
+          connectedMountTargetPath:
+            maxLength: 4095
+            type: string
+            description: The Connected Shares feature allows you to connect an empty folder, called a junction folder, in
+              one share to another share. This allows you to share content from any part of a share's directory. For example,
+              when creating a connected share, the connectedMountTargetPath is the path of the junction folder.
+          isCompressionEnabled:
+            type: boolean
+            description: Flag to enable compression.
+            default: true
+          blockedFileExtensions:
+            maxItems: 500
+            minItems: 0
+            type: array
+            description: Comma-separated list of blocked file extensions.
+            items:
+              maxLength: 256
+              type: string
+          protocol:
+            $ref: '#/components/schemas/files.v4.0.config.MountTargetProtocolType'
+          secondaryProtocol:
+            maxItems: 3
+            minItems: 0
+            type: array
+            description: List of secondary protocol types for the mount target.
+            items:
+              $ref: '#/components/schemas/files.v4.0.config.MountTargetProtocolType'
+          isPreviousVersionEnabled:
+            type: boolean
+            description: Flag to enable windows previous version.
+            default: false
+          smbProperties:
+            $ref: '#/components/schemas/files.v4.0.config.SmbProtocolProperties'
+          nfsProperties:
+            $ref: '#/components/schemas/files.v4.0.config.NfsProtocolProperties'
+          multiProtocolProperties:
+            $ref: '#/components/schemas/files.v4.0.config.MultiProtocolProperties'
+          blockedClients:
+            $ref: '#/components/schemas/files.v4.0.config.BlockedClient'
+          isLongNameEnabled:
+            type: boolean
+            description: Enable long name support.
+            default: false
+          wormSpec:
+            $ref: '#/components/schemas/files.v4.0.config.WormSpec'
+          workloadType:
+            $ref: '#/components/schemas/files.v4.0.config.MountTargetWorkloadType'
+          isSnapshotPaused:
+            type: boolean
+            description: Pause snapshot operations on share.
+            example: true
+          parentMountTargetExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: external identifier of the parent mount target. This is a read-only field.
+            readOnly: true
+            example: 158f00fd-b55e-46a1-bba0-ad969b4835ee
+          statusType:
+            $ref: '#/components/schemas/files.v4.0.config.StatusType'
+          state:
+            $ref: '#/components/schemas/files.v4.0.config.MountTargetState'
+        additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    files.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 13
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    files.v4.0.config.MountTargetWorkloadType:
+      title: Supported mount target workload types.
+      type: string
+      description: Supported mount target workload types.
+      enum:
+      - UNDEFINED
+      - RANDOM
+      - DEFAULT
+      - SEQUENTIAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        RANDOM: Random workload type for a mount target.
+        UNDEFINED: Undefined workload type for a mount target.
+        SEQUENTIAL: Sequential workload type for a mount target.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DEFAULT: Default workload type for a mount target.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 41
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+          example: 3611:a7d9:a64d:f8dd:fd83:9c6c:4eae:35c0
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 3
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    files.v4.0.config.AccessType:
+      title: Access type of the mount target.
+      type: string
+      description: Access type of the mount target.
+      enum:
+      - READ_WRITE
+      - READ_ONLY
+      - NO_ACCESS
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NO_ACCESS: No access type for mount target.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        READ_ONLY: Read-only access type for mount target.
+        $REDACTED: 'Redacted value.
+
+          '
+        READ_WRITE: Read-write access type for mount target.
+    files.v4.0.config.ClientBlockingFilter:
+      title: Blocked clients filter
+      type: object
+      properties:
+        vendorName:
+          maxLength: 256
+          type: string
+          description: Vendor name of the partner server. For partner type ANTIVIRUS, vendor name denotes the icapServiceName.
+        ipList:
+          maxItems: 30
+          minItems: 0
+          type: array
+          description: IP address list.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        sidList:
+          maxItems: 30
+          minItems: 0
+          type: array
+          description: List of SIDs(Security Identifier).
+          items:
+            pattern: S-[0-9]-[0-9]-[0-9]{2}(-[0-9]+){4}
+            type: string
+        uidList:
+          maxItems: 30
+          minItems: 0
+          type: array
+          description: List of UIDs(User Identifier).
+          items:
+            maximum: 2147483647
+            minimum: -2147483648
+            type: integer
+            format: int64
+            example: 73
+        gidList:
+          maxItems: 30
+          minItems: 0
+          type: array
+          description: List of GIDs(Group Identifier).
+          items:
+            maximum: 2147483647
+            minimum: -2147483648
+            type: integer
+            format: int64
+            example: 90
+        isAllIpsBlocked:
+          type: boolean
+          description: Block all IP addresses.
+          default: false
+      additionalProperties: false
+      description: Blocked clients filter
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:d5a5af10-1466-4d38-8d66-465c1e19d1b2
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    files.v4.0.config.MountTargetType:
+      title: Supported mount target types.
+      type: string
+      description: Supported mount target types.
+      enum:
+      - HOMES
+      - GENERAL
+      - DISTRIBUTED
+      - STANDARD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        GENERAL: General type of mount target
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DISTRIBUTED: Distributed type of mount target
+        STANDARD: Standard type of mount target
+        $REDACTED: 'Redacted value.
+
+          '
+        HOMES: Home type of mount target
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+          example: 55.140.252.240
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    files.v4.0.config.SMBShareACE:
+      title: Access control entry(ACE) for SMB share.
+      required:
+      - accessType
+      - permissionType
+      - userOrGroupName
+      type: object
+      properties:
+        userOrGroupName:
+          maxLength: 256
+          type: string
+          description: User or group name for share permission.
+        permissionType:
+          $ref: '#/components/schemas/files.v4.0.config.PermissionType'
+        accessType:
+          $ref: '#/components/schemas/files.v4.0.config.SMBAccessType'
+        sid:
+          type: string
+          description: SID of user or group name. This is a read-only field.
+          readOnly: true
+      additionalProperties: false
+      description: Access control entry(ACE) for SMB share.
+    files.v4.0.config.MountTargetProtocolType:
+      title: Protocol type of the mount target.
+      type: string
+      description: Protocol type of the mount target.
+      enum:
+      - SMB
+      - NFS
+      - NONE
+      - INCOMPATIBLE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SMB: SMB protocol type
+        NFS: NFS protocol type
+        NONE: NONE protocol type
+        $UNKNOWN: 'Unknown value.
+
+          '
+        INCOMPATIBLE: INCOMPATIBLE protocol type
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.StatusType:
+      title: Status type
+      type: string
+      description: Status type.
+      enum:
+      - AVAILABLE
+      - UNAVAILABLE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        AVAILABLE: Available status type of mount target.
+        UNAVAILABLE: Unavailable status type of mount target.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    files.v4.0.config.BlockedClient:
+      title: Blocked clients
+      type: object
+      properties:
+        roAccessFilters:
+          maxItems: 200
+          minItems: 0
+          type: array
+          description: List of clients with read only access.
+          items:
+            $ref: '#/components/schemas/files.v4.0.config.ClientBlockingFilter'
+        noAccessFilters:
+          maxItems: 200
+          minItems: 0
+          type: array
+          description: List of clients with no access.
+          items:
+            $ref: '#/components/schemas/files.v4.0.config.ClientBlockingFilter'
+        rwAccessFilters:
+          maxItems: 200
+          minItems: 0
+          type: array
+          description: List of clients with read-write access This filter is only applicable for mount target.
+          items:
+            $ref: '#/components/schemas/files.v4.0.config.ClientBlockingFilter'
+      additionalProperties: false
+      description: Blocked clients due to read-only, no access or read-write access.
+    files.v4.0.config.SquashType:
+      title: Squash type of the mount target.
+      type: string
+      description: Squash type of the mount target.
+      enum:
+      - ROOT_SQUASH
+      - ALL_SQUASH
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ALL_SQUASH: All squash type for mount target.
+        ROOT_SQUASH: Root squash type for mount target.
+        NONE: None squash type for mount target.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

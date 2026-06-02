@@ -1,0 +1,1868 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Networking APIs
+  description: Manage networking configuration on Nutanix clusters, including AHV and advanced networking.
+  version: '4.0'
+  x-logo:
+    altText: Networking Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/networking/images/networking-logo-img.svg
+  x-repo-name: networking
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /networking/v4.0/config/vpn-connections:
+    get:
+      tags:
+      - VpnConnections
+      summary: List the VPN connections
+      description: List the VPN connections.
+      operationId: listVpnConnections
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - dynamicRoutePriority
+
+          - localGatewayReference
+
+          - name
+
+          - remoteGatewayReference
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - dynamicRoutePriority
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of all VPN connections
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/networking.v4.0.config.VpnConnection'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Vpn Connection
+        roleList:
+        - Super Admin
+        - Account Owner
+        - Administrator
+        - User
+        - Prism Admin
+        - Prism Viewer
+        - Network Infra Admin
+        - VPC Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.networking.java.client.ApiClient;\nimport com.nutanix.networking.java.client.api.VpnConnectionsApi;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.ListVpnConnectionsApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VpnConnectionsApi vpnConnectionsApi =\
+          \ new VpnConnectionsApi(apiClient);\n\n        \n        int page = 0;\n        \n        int limit = 50;\n\n  \
+          \      try {\n            ListVpnConnectionsApiResponse listVpnConnectionsApiResponse = vpnConnectionsApi.listVpnConnections(page,\
+          \ limit, null, null);\n            System.out.println(listVpnConnectionsApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VpnConnectionsApi } from \"@nutanix-api/networking-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet vpnConnectionsApi = new VpnConnectionsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n\
+          \    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\"\
+          ;\n\n\n\n\n    vpnConnectionsApi.listVpnConnections(opts).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_networking_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_networking_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_networking_py_client.ApiClient(configuration=config)\n    vpn_connections_api\
+          \ = ntnx_networking_py_client.VpnConnectionsApi(api_client=client)\n    \n    page = 0\n    \n    limit = 50\n\n\
+          \n    try:\n        api_response = vpn_connections_api.list_vpn_connections(_page=page, _limit=limit)\n        print(api_response)\n\
+          \    except ntnx_networking_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/models/networking/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VpnConnectionsApiInstance *api.VpnConnectionsApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VpnConnectionsApiInstance = api.NewVpnConnectionsApi(ApiClientInstance)\n\n    \n    page_ :=\
+          \ 0\n    \n    limit_ := 50\n\n\n    response, error := VpnConnectionsApiInstance.ListVpnConnections(&page_, &limit_,\
+          \ nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.VpnConnection)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0\"\
+          \n"
+    post:
+      tags:
+      - VpnConnections
+      summary: Create a VPN connection
+      description: Create VPN connection.
+      operationId: createVpnConnection
+      parameters:
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: b3e237d5-7370-460f-906c-5ee8d0b76183
+      requestBody:
+        description: Create VPN connection request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/networking.v4.0.config.VpnConnection'
+        required: true
+      responses:
+        '202':
+          description: Create VPN connection response
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create Vpn Connection
+        roleList:
+        - Super Admin
+        - Account Owner
+        - Administrator
+        - Prism Admin
+        - Network Infra Admin
+        - VPC Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.networking.java.client.ApiClient;\nimport com.nutanix.networking.java.client.api.VpnConnectionsApi;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.IpsecConfig;\nimport com.nutanix.dp1.networking.networking.v4.config.GatewayRole;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.VpnConnection;\nimport com.nutanix.dp1.networking.networking.v4.config.TaskReferenceApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        VpnConnectionsApi vpnConnectionsApi = new VpnConnectionsApi(apiClient);\n\
+          \n        VpnConnection vpnConnection = new VpnConnection();\n\n        // VpnConnection object initializations\
+          \ here...\n        vpnConnection.setIpsecConfig(new IpsecConfig());  // required field\n        vpnConnection.setLocalGatewayReference(\"\
+          bAC1Ea8d-9DA1-4dfF-BeE1-ED63FC1dc7Ad\");  // required field\n        vpnConnection.setLocalGatewayRole(GatewayRole.UNKNOWN);\
+          \  // required field\n        vpnConnection.setName(\"vpn-connection-1\");  // required field\n        vpnConnection.setRemoteGatewayReference(\"\
+          Bbaf64B7-eaFB-F6a6-edAa-Ef375eF0eD2e\");  // required field\n\n        try {\n            TaskReferenceApiResponse\
+          \ taskReferenceApiResponse = vpnConnectionsApi.createVpnConnection(vpnConnection);\n            System.out.println(taskReferenceApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VpnConnectionsApi, IpsecConfig, GatewayRole, VpnConnection } from \"@nutanix-api/networking-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet vpnConnectionsApi = new VpnConnectionsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let vpnConnection = new VpnConnection();\n\n    // VpnConnection object initializations\
+          \ here...\n    vpnConnection.setIpsecConfig(new IpsecConfig());  // required field\n    vpnConnection.setLocalGatewayReference(\"\
+          7DBBCcD5-Ec7b-FAf2-f97f-FF8fa7dEF6DE\");  // required field\n    vpnConnection.setLocalGatewayRole(GatewayRole.UNKNOWN);\
+          \  // required field\n    vpnConnection.setName(\"vpn-connection-1\");  // required field\n    vpnConnection.setRemoteGatewayReference(\"\
+          7Ede0ff1-92ae-BFB8-d74d-d75A9F1D0faa\");  // required field\n\n\n\n\n\n\n    vpnConnectionsApi.createVpnConnection(vpnConnection).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_networking_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_networking_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_networking_py_client.ApiClient(configuration=config)\n    vpn_connections_api\
+          \ = ntnx_networking_py_client.VpnConnectionsApi(api_client=client)\n    vpnConnection = ntnx_networking_py_client.VpnConnection()\n\
+          \n    # VpnConnection object initializations here...\n    vpnConnection.ipsec_config = ntnx_networking_py_client.IpsecConfig()\
+          \  # required field\n    vpnConnection.local_gateway_reference = \"F05bFfB6-aF73-eF9E-6Bbe-9b37766DadbF\"  # required\
+          \ field\n    vpnConnection.local_gateway_role = ntnx_networking_py_client.GatewayRole._UNKNOWN  # required field\n\
+          \    vpnConnection.name = \"vpn-connection-1\"  # required field\n    vpnConnection.remote_gateway_reference = \"\
+          ce7d3D14-f4CE-8f0f-FFF7-8cbadcbfDB6f\"  # required field\n\n\n    try:\n        api_response = vpn_connections_api.create_vpn_connection(body=vpnConnection)\n\
+          \        print(api_response)\n    except ntnx_networking_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/models/networking/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/models/prism/v4/config\"\n)\n\
+          \nvar (\n    ApiClientInstance *client.ApiClient\n    VpnConnectionsApiInstance *api.VpnConnectionsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VpnConnectionsApiInstance = api.NewVpnConnectionsApi(ApiClientInstance)\n\n    vpnConnection :=\
+          \ import1.NewVpnConnection()\n\n    // VpnConnection object initializations here...\n\n\n\n    response, error :=\
+          \ VpnConnectionsApiInstance.CreateVpnConnection(vpnConnection)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"metadata\":{\"ownerReferenceId\"\
+          :\"string\",\"ownerUserName\":\"string\",\"projectReferenceId\":\"string\",\"projectName\":\"string\",\"categoryIds\"\
+          :[\"string\"],\"$objectType\":\"common.v1.config.Metadata\"},\"name\":\"vpn-connection-1\",\"description\":\"Exampleconnectiondescription\"\
+          ,\"localGatewayReference\":\"string\",\"remoteGatewayReference\":\"string\",\"ipsecConfig\":{\"preSharedKey\":\"\
+          string\",\"localVtiIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"remoteVtiIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"localAuthenticationId\":\"string\",\"remoteAuthenticationId\"\
+          :\"string\",\"ikeLifetimeSecs\":30,\"ipsecLifetimeSecs\":30,\"ikeEncryptionAlgorithm\":\"$UNKNOWN\",\"ikeAuthenticationAlgorithm\"\
+          :\"$UNKNOWN\",\"ipsecEncryptionAlgorithm\":\"$UNKNOWN\",\"ipsecAuthenticationAlgorithm\":\"$UNKNOWN\",\"$objectType\"\
+          :\"networking.v4.config.IpsecConfig\"},\"dpdConfig\":{\"operation\":\"$UNKNOWN\",\"intervalSecs\":15,\"timeoutSecs\"\
+          :60,\"$objectType\":\"networking.v4.config.DpdConfig\"},\"qosConfig\":{\"ingressLimitMbps\":64,\"egressLimitMbps\"\
+          :12,\"$objectType\":\"networking.v4.config.QosConfig\"},\"localGatewayRole\":\"$UNKNOWN\",\"advertisedPrefixes\"\
+          :[{\"ipv4\":{\"ip\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"\
+          prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"},\"ipv6\":{\"ip\":{\"value\":\"string\",\"\
+          prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"\
+          },\"$objectType\":\"networking.v4.config.IPSubnet\"}],\"learnedPrefixes\":[{\"ipv4\":{\"ip\":{\"value\":\"string\"\
+          ,\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"\
+          },\"ipv6\":{\"ip\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"\
+          prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"},\"$objectType\":\"networking.v4.config.IPSubnet\"\
+          }],\"ipsecTunnelStatus\":{\"message\":\"Entityishealthy\",\"state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"\
+          },\"ebgpStatus\":{\"message\":\"Entityishealthy\",\"state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"\
+          },\"$objectType\":\"networking.v4.config.VpnConnection\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          metadata\":{\"ownerReferenceId\":\"string\",\"ownerUserName\":\"string\",\"projectReferenceId\":\"string\",\"projectName\"\
+          :\"string\",\"categoryIds\":[\"string\"],\"$objectType\":\"common.v1.config.Metadata\"},\"name\":\"vpn-connection-1\"\
+          ,\"description\":\"Exampleconnectiondescription\",\"localGatewayReference\":\"string\",\"remoteGatewayReference\"\
+          :\"string\",\"ipsecConfig\":{\"preSharedKey\":\"string\",\"localVtiIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"},\"remoteVtiIp\":{\"ipv4\":{\"\
+          value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"\
+          string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"localAuthenticationId\":\"string\",\"remoteAuthenticationId\":\"string\",\"ikeLifetimeSecs\":30,\"ipsecLifetimeSecs\"\
+          :30,\"ikeEncryptionAlgorithm\":\"$UNKNOWN\",\"ikeAuthenticationAlgorithm\":\"$UNKNOWN\",\"ipsecEncryptionAlgorithm\"\
+          :\"$UNKNOWN\",\"ipsecAuthenticationAlgorithm\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.IpsecConfig\"\
+          },\"dpdConfig\":{\"operation\":\"$UNKNOWN\",\"intervalSecs\":15,\"timeoutSecs\":60,\"$objectType\":\"networking.v4.config.DpdConfig\"\
+          },\"qosConfig\":{\"ingressLimitMbps\":64,\"egressLimitMbps\":12,\"$objectType\":\"networking.v4.config.QosConfig\"\
+          },\"localGatewayRole\":\"$UNKNOWN\",\"advertisedPrefixes\":[{\"ipv4\":{\"ip\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"\
+          },\"ipv6\":{\"ip\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"\
+          prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"},\"$objectType\":\"networking.v4.config.IPSubnet\"\
+          }],\"learnedPrefixes\":[{\"ipv4\":{\"ip\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"},\"ipv6\":{\"ip\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"\
+          },\"$objectType\":\"networking.v4.config.IPSubnet\"}],\"ipsecTunnelStatus\":{\"message\":\"Entityishealthy\",\"\
+          state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"},\"ebgpStatus\":{\"message\":\"Entityishealthy\"\
+          ,\"state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"},\"$objectType\":\"networking.v4.config.VpnConnection\"\
+          } \\\n- \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections\"\n"
+  /networking/v4.0/config/vpn-connections/{extId}:
+    get:
+      tags:
+      - VpnConnections
+      summary: Get VPN connection
+      description: Get VPN connection for a specified ExtId.
+      operationId: getVpnConnectionById
+      parameters:
+      - name: extId
+        in: path
+        description: VPN connection UUID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 8990814a-db67-48f8-aa0c-36105f2a0736
+      responses:
+        '200':
+          description: VPN connection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.config.VpnConnection'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Vpn Connection
+        roleList:
+        - Super Admin
+        - Account Owner
+        - Administrator
+        - User
+        - Prism Admin
+        - Prism Viewer
+        - Network Infra Admin
+        - VPC Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.networking.java.client.ApiClient;\nimport com.nutanix.networking.java.client.api.VpnConnectionsApi;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.GetVpnConnectionApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VpnConnectionsApi vpnConnectionsApi =\
+          \ new VpnConnectionsApi(apiClient);\n\n        \n        String extId = \"f3DaE012-89C1-FE6c-dEFc-d4CE5bfCeeFD\"\
+          ;\n\n        try {\n            GetVpnConnectionApiResponse getVpnConnectionApiResponse = vpnConnectionsApi.getVpnConnectionById(extId);\n\
+          \            System.out.println(getVpnConnectionApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VpnConnectionsApi } from \"@nutanix-api/networking-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet vpnConnectionsApi = new VpnConnectionsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"cCcffB4a-9dAf-5fcD-6c95-Ce0CcFd1A81E\";\n\n\n\n\n\n    vpnConnectionsApi.getVpnConnectionById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_networking_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_networking_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_networking_py_client.ApiClient(configuration=config)\n    vpn_connections_api\
+          \ = ntnx_networking_py_client.VpnConnectionsApi(api_client=client)\n    \n    ext_id = \"bdBBBa00-dFF8-E0Db-df56-EE5e0ef9BeFb\"\
+          \n\n\n    try:\n        api_response = vpn_connections_api.get_vpn_connection_by_id(extId=ext_id)\n        print(api_response)\n\
+          \    except ntnx_networking_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/models/networking/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VpnConnectionsApiInstance *api.VpnConnectionsApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VpnConnectionsApiInstance = api.NewVpnConnectionsApi(ApiClientInstance)\n\n    \n    extId :=\
+          \ \"A9c6D77D-54eE-1A4d-bf1D-e7eE7cbBFeBb\"\n\n\n    response, error := VpnConnectionsApiInstance.GetVpnConnectionById(&extId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.VpnConnection)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections/D4642bbE-FBBc-bC6F-13a6-acd8ddd58d3C\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections/aA1aE5ef-fC0A-D774-2Eec-B9AF1cF5fE7E\"\
+          \n"
+    put:
+      tags:
+      - VpnConnections
+      summary: Update VPN connection
+      description: Update VPN connection.
+      operationId: updateVpnConnectionById
+      parameters:
+      - name: extId
+        in: path
+        description: VPN connection UUID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 11004052-6141-4a5a-8d7e-f2dfc5c0150a
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 632f78f6-323d-47b3-a5c1-4a500cfa86b7
+      requestBody:
+        description: Update VPN connection request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/networking.v4.0.config.VpnConnection'
+        required: true
+      responses:
+        '202':
+          description: Update VPN connection response
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Update Vpn Connection
+        roleList:
+        - Super Admin
+        - Account Owner
+        - Administrator
+        - Prism Admin
+        - Network Infra Admin
+        - VPC Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.networking.java.client.ApiClient;\nimport com.nutanix.networking.java.client.api.VpnConnectionsApi;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.IpsecConfig;\nimport com.nutanix.dp1.networking.networking.v4.config.GatewayRole;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.VpnConnection;\nimport com.nutanix.dp1.networking.networking.v4.config.GetVpnConnectionApiResponse;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.TaskReferenceApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        VpnConnectionsApi vpnConnectionsApi = new VpnConnectionsApi(apiClient);\n\
+          \n        VpnConnection vpnConnection = new VpnConnection();\n\n        // VpnConnection object initializations\
+          \ here...\n        vpnConnection.setIpsecConfig(new IpsecConfig());  // required field\n        vpnConnection.setLocalGatewayReference(\"\
+          Fea4Da17-794a-2D6f-6b91-ACaa1D7Bf8E5\");  // required field\n        vpnConnection.setLocalGatewayRole(GatewayRole.UNKNOWN);\
+          \  // required field\n        vpnConnection.setName(\"vpn-connection-1\");  // required field\n        vpnConnection.setRemoteGatewayReference(\"\
+          5dB61473-1beE-FDea-4B89-D68C4bCB5Dda\");  // required field\n        \n        String extId = \"Dd8dBaE3-e0Da-4e2f-A096-BdDdFcf2C5Cd\"\
+          ;\n\n        // perform GET call\n        GetVpnConnectionApiResponse getResponse = null;\n        try {\n     \
+          \       getResponse = vpnConnectionsApi.getVpnConnectionById(extId);\n        } catch(RestClientException ex) {\n\
+          \            System.out.println(ex.getMessage());\n        }\n        // Extract E-Tag Header\n        String eTag\
+          \ = ApiClient.getEtag(getResponse);\n        // initialize/change parameters for update\n        HashMap<String,\
+          \ Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH, eTag);\n        try {\n            TaskReferenceApiResponse\
+          \ taskReferenceApiResponse = vpnConnectionsApi.updateVpnConnectionById(extId, vpnConnection, opts);\n          \
+          \  System.out.println(taskReferenceApiResponse.toString());\n\n        } catch (RestClientException ex) {\n    \
+          \        System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VpnConnectionsApi, IpsecConfig, GatewayRole, VpnConnection, GetVpnConnectionApiResponse\
+          \ } from \"@nutanix-api/networking-js-client\";\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n\
+          // IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port to which to connect\
+          \ to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts\
+          \ = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to\
+          \ connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password\
+          \ = 'password';\n// Please add authorization information here if needed.\nlet vpnConnectionsApi = new VpnConnectionsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let vpnConnection = new VpnConnection();\n\n    // VpnConnection object initializations\
+          \ here...\n    vpnConnection.setIpsecConfig(new IpsecConfig());  // required field\n    vpnConnection.setLocalGatewayReference(\"\
+          4b44A9f8-aAeA-Cc84-a6dF-f02B6bba204D\");  // required field\n    vpnConnection.setLocalGatewayRole(GatewayRole.UNKNOWN);\
+          \  // required field\n    vpnConnection.setName(\"vpn-connection-1\");  // required field\n    vpnConnection.setRemoteGatewayReference(\"\
+          b47adE4D-E2eF-912E-25eE-aAFCEcc5FDa3\");  // required field\n\n    \n    let extId = \"6C845aC8-4Cee-bcc4-bD9F-720bdfe4BBdE\"\
+          ;\n\n\n    // Perform Get call\n    vpnConnectionsApi.getVpnConnectionById(extId).then(({data, response}) => {\n\
+          \        console.log(`API returned the following status code: ${response.status}`);\n        // Extract E-Tag Header\n\
+          \        let etagValue = ApiClient.getEtag(data);\n\n        vpnConnectionsApi.updateVpnConnectionById(extId, vpnConnection,\
+          \ {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the following\
+          \ status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error) => {\n\
+          \            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_networking_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_networking_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_networking_py_client.ApiClient(configuration=config)\n    vpn_connections_api\
+          \ = ntnx_networking_py_client.VpnConnectionsApi(api_client=client)\n    vpnConnection = ntnx_networking_py_client.VpnConnection()\n\
+          \n    # VpnConnection object initializations here...\n    vpnConnection.ipsec_config = ntnx_networking_py_client.IpsecConfig()\
+          \  # required field\n    vpnConnection.local_gateway_reference = \"14efC02f-C8F2-aCaC-E945-2A1d1B9bA23a\"  # required\
+          \ field\n    vpnConnection.local_gateway_role = ntnx_networking_py_client.GatewayRole._UNKNOWN  # required field\n\
+          \    vpnConnection.name = \"vpn-connection-1\"  # required field\n    vpnConnection.remote_gateway_reference = \"\
+          5De8FCdC-d5E5-4c5e-CB7c-F5b3E90c0bdE\"  # required field\n    \n    ext_id = \"bbFCF8fa-2Cae-eAdE-5bcd-a3E593FDFD37\"\
+          \n\n    try:\n        api_response = vpn_connections_api.get_vpn_connection_by_id(extId=ext_id)\n    except ntnx_networking_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value = ntnx_networking_py_client.ApiClient.get_etag(api_response)\n\
+          \n    try:\n        api_response = vpn_connections_api.update_vpn_connection_by_id(extId=ext_id, body=vpnConnection,\
+          \ if_match=etag_value)\n        print(api_response)\n    except ntnx_networking_py_client.rest.ApiException as e:\n\
+          \        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/models/networking/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/models/prism/v4/config\"\n)\n\
+          \nvar (\n    ApiClientInstance *client.ApiClient\n    VpnConnectionsApiInstance *api.VpnConnectionsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VpnConnectionsApiInstance = api.NewVpnConnectionsApi(ApiClientInstance)\n\n    vpnConnection :=\
+          \ import1.NewVpnConnection()\n\n    // VpnConnection object initializations here...\n\n    \n    extId := \"6DfcFe0F-eF6a-69d4-AcFD-BCFBbD32afBb\"\
+          \n\n    getResponse, err := VpnConnectionsApiInstance.GetVpnConnectionById(&extId)\n    if err != nil {\n      \
+          \  fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\
+          \n    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := VpnConnectionsApiInstance.UpdateVpnConnectionById(&extId,\
+          \ vpnConnection, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ :=\
+          \ response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections/Abb7cf7D-D71D-AE93-e2a9-72aCAA73f6BA\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"metadata\":{\"ownerReferenceId\":\"string\",\"ownerUserName\":\"string\",\"projectReferenceId\":\"string\"\
+          ,\"projectName\":\"string\",\"categoryIds\":[\"string\"],\"$objectType\":\"common.v1.config.Metadata\"},\"name\"\
+          :\"vpn-connection-1\",\"description\":\"Exampleconnectiondescription\",\"localGatewayReference\":\"string\",\"remoteGatewayReference\"\
+          :\"string\",\"ipsecConfig\":{\"preSharedKey\":\"string\",\"localVtiIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"},\"remoteVtiIp\":{\"ipv4\":{\"\
+          value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"\
+          string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"localAuthenticationId\":\"string\",\"remoteAuthenticationId\":\"string\",\"ikeLifetimeSecs\":30,\"ipsecLifetimeSecs\"\
+          :30,\"ikeEncryptionAlgorithm\":\"$UNKNOWN\",\"ikeAuthenticationAlgorithm\":\"$UNKNOWN\",\"ipsecEncryptionAlgorithm\"\
+          :\"$UNKNOWN\",\"ipsecAuthenticationAlgorithm\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.IpsecConfig\"\
+          },\"dpdConfig\":{\"operation\":\"$UNKNOWN\",\"intervalSecs\":15,\"timeoutSecs\":60,\"$objectType\":\"networking.v4.config.DpdConfig\"\
+          },\"qosConfig\":{\"ingressLimitMbps\":64,\"egressLimitMbps\":12,\"$objectType\":\"networking.v4.config.QosConfig\"\
+          },\"localGatewayRole\":\"$UNKNOWN\",\"advertisedPrefixes\":[{\"ipv4\":{\"ip\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"\
+          },\"ipv6\":{\"ip\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"\
+          prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"},\"$objectType\":\"networking.v4.config.IPSubnet\"\
+          }],\"learnedPrefixes\":[{\"ipv4\":{\"ip\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"},\"ipv6\":{\"ip\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"\
+          },\"$objectType\":\"networking.v4.config.IPSubnet\"}],\"ipsecTunnelStatus\":{\"message\":\"Entityishealthy\",\"\
+          state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"},\"ebgpStatus\":{\"message\":\"Entityishealthy\"\
+          ,\"state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"},\"$objectType\":\"networking.v4.config.VpnConnection\"\
+          } \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"metadata\":{\"ownerReferenceId\":\"string\",\"ownerUserName\":\"string\",\"\
+          projectReferenceId\":\"string\",\"projectName\":\"string\",\"categoryIds\":[\"string\"],\"$objectType\":\"common.v1.config.Metadata\"\
+          },\"name\":\"vpn-connection-1\",\"description\":\"Exampleconnectiondescription\",\"localGatewayReference\":\"string\"\
+          ,\"remoteGatewayReference\":\"string\",\"ipsecConfig\":{\"preSharedKey\":\"string\",\"localVtiIp\":{\"ipv4\":{\"\
+          value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"\
+          string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"remoteVtiIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"localAuthenticationId\":\"string\",\"remoteAuthenticationId\":\"string\",\"ikeLifetimeSecs\"\
+          :30,\"ipsecLifetimeSecs\":30,\"ikeEncryptionAlgorithm\":\"$UNKNOWN\",\"ikeAuthenticationAlgorithm\":\"$UNKNOWN\"\
+          ,\"ipsecEncryptionAlgorithm\":\"$UNKNOWN\",\"ipsecAuthenticationAlgorithm\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.IpsecConfig\"\
+          },\"dpdConfig\":{\"operation\":\"$UNKNOWN\",\"intervalSecs\":15,\"timeoutSecs\":60,\"$objectType\":\"networking.v4.config.DpdConfig\"\
+          },\"qosConfig\":{\"ingressLimitMbps\":64,\"egressLimitMbps\":12,\"$objectType\":\"networking.v4.config.QosConfig\"\
+          },\"localGatewayRole\":\"$UNKNOWN\",\"advertisedPrefixes\":[{\"ipv4\":{\"ip\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"\
+          },\"ipv6\":{\"ip\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"\
+          prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"},\"$objectType\":\"networking.v4.config.IPSubnet\"\
+          }],\"learnedPrefixes\":[{\"ipv4\":{\"ip\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"prefixLength\":24,\"$objectType\":\"networking.v4.config.IPv4Subnet\"},\"ipv6\":{\"ip\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"prefixLength\":64,\"$objectType\":\"networking.v4.config.IPv6Subnet\"\
+          },\"$objectType\":\"networking.v4.config.IPSubnet\"}],\"ipsecTunnelStatus\":{\"message\":\"Entityishealthy\",\"\
+          state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"},\"ebgpStatus\":{\"message\":\"Entityishealthy\"\
+          ,\"state\":\"$UNKNOWN\",\"$objectType\":\"networking.v4.config.Status\"},\"$objectType\":\"networking.v4.config.VpnConnection\"\
+          } \\\n- \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections/bd4CEddD-8CcE-d9be-6E5B-6039eaB961Cd\"\
+          \n"
+    delete:
+      tags:
+      - VpnConnections
+      summary: Delete VPN connection
+      description: Delete VPN connection request body
+      operationId: deleteVpnConnectionById
+      parameters:
+      - name: extId
+        in: path
+        description: VPN connection UUID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 08497659-fb31-49be-9b1e-88cb52a1045a
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 7317b4e8-cb68-4dc1-b397-f91acec4d6db
+      responses:
+        '202':
+          description: Delete VPN connection response
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/networking.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /networking/v4.0/config/vpn-connections/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete Vpn Connection
+        roleList:
+        - Super Admin
+        - Account Owner
+        - Administrator
+        - Prism Admin
+        - Network Infra Admin
+        - VPC Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.networking.java.client.ApiClient;\nimport com.nutanix.networking.java.client.api.VpnConnectionsApi;\n\
+          import com.nutanix.dp1.networking.networking.v4.config.TaskReferenceApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VpnConnectionsApi vpnConnectionsApi =\
+          \ new VpnConnectionsApi(apiClient);\n\n        \n        String extId = \"a372CB45-12cD-544E-cCCb-8e9F5AccCDdE\"\
+          ;\n\n        try {\n            TaskReferenceApiResponse taskReferenceApiResponse = vpnConnectionsApi.deleteVpnConnectionById(extId);\n\
+          \            System.out.println(taskReferenceApiResponse.toString());\n\n        } catch (RestClientException ex)\
+          \ {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VpnConnectionsApi } from \"@nutanix-api/networking-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet vpnConnectionsApi = new VpnConnectionsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"cCC63bDA-53B0-dAFd-F31B-9FbeDc7D4aC8\";\n\n\n\n\n\n    vpnConnectionsApi.deleteVpnConnectionById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_networking_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_networking_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_networking_py_client.ApiClient(configuration=config)\n    vpn_connections_api\
+          \ = ntnx_networking_py_client.VpnConnectionsApi(api_client=client)\n    \n    ext_id = \"a3Bb3DAE-4Fcc-9DEC-ba3a-dDABFA59Cf4e\"\
+          \n\n\n    try:\n        api_response = vpn_connections_api.delete_vpn_connection_by_id(extId=ext_id)\n        print(api_response)\n\
+          \    except ntnx_networking_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VpnConnectionsApiInstance *api.VpnConnectionsApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VpnConnectionsApiInstance = api.NewVpnConnectionsApi(ApiClientInstance)\n\n    \n    extId :=\
+          \ \"abe1b8e1-f04a-E7BE-BCCF-Cc2aBfbA32AF\"\n\n\n    response, error := VpnConnectionsApiInstance.DeleteVpnConnectionById(&extId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections/Ad2a2b9b-d3FC-dbCF-2F84-a91cB93dDe5B\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\
+          \n- \"https://{pc-ip}:9440/api/networking/v4.0/config/vpn-connections/af68cFA4-ECbC-3bdA-9cF4-ba6e9bFAfe8A\"\n"
+components:
+  schemas:
+    networking.v4.0.config.NetworkingBaseModel:
+      description: Networking common base object
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          metadata:
+            $ref: '#/components/schemas/common.v1.0.config.Metadata'
+        additionalProperties: false
+    networking.v4.0.config.QosConfig:
+      title: Quality of Service configuration for the site-to-site VPN tunnel
+      type: object
+      properties:
+        ingressLimitMbps:
+          type: integer
+          description: Ingress traffic limit (Mbps)
+          format: int64
+          example: 64
+        egressLimitMbps:
+          type: integer
+          description: Egress traffic limit (Mbps)
+          format: int64
+          example: 12
+      additionalProperties: false
+      description: Quality of Service configuration for the VPN IPSec tunnel
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.config.IPAddress:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    networking.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    networking.v4.0.config.IPSubnet:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv4Subnet'
+        ipv6:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv6Subnet'
+      additionalProperties: false
+      description: IP subnet.
+    networking.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    networking.v4.0.config.GatewayRole:
+      title: Local gateway role
+      type: string
+      description: Local gateway role (acceptor or initiator) in the connection
+      enum:
+      - INITIATOR
+      - ACCEPTOR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        INITIATOR: Gateway role to initiate connection.
+        ACCEPTOR: Gateway role to accept connection.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 250be642-1b1b-4687-bf88-af93fc7abf59
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.config.Status:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Detailed message of component status.
+          example: Entity is healthy
+        state:
+          $ref: '#/components/schemas/networking.v4.0.config.State'
+      additionalProperties: false
+      description: Up/Down status of component and message.
+    networking.v4.0.config.IPv4Subnet:
+      required:
+      - ip
+      - prefixLength
+      type: object
+      properties:
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: Prefix length of the IPv4 subnet.
+          format: int32
+          example: 24
+      additionalProperties: false
+      description: IPv4 subnet.
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    networking.v4.0.config.DpdOperation:
+      type: string
+      description: Operation to be performed on detecting a dead peer. The default is HOLD.
+      enum:
+      - RESTART
+      - CLEAR
+      - HOLD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        RESTART: Attempt to re-negotiate the connection.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        CLEAR: Close the connection.
+        HOLD: Queue traffic while waiting for the connection to be re-established.
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.config.AuthenticationAlgorithm:
+      type: string
+      description: Authentication algorithm.
+      enum:
+      - MD5
+      - SHA1
+      - SHA256
+      - SHA384
+      - SHA512
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SHA256: Authentication algorithm is sha256.
+        SHA1: Authentication algorithm is sha1.
+        SHA384: Authentication algorithm is sha384.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SHA512: Authentication algorithm is sha512.
+        $REDACTED: 'Redacted value.
+
+          '
+        MD5: Authentication algorithm is md5.
+    networking.v4.0.config.EncryptionAlgorithm:
+      type: string
+      description: Encryption algorithm.
+      enum:
+      - AES128
+      - AES256
+      - TRIPLE_DES
+      - AES256GCM128
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        TRIPLE_DES: Encryption algorithm is triple-des.
+        AES128: Encryption algorithm is aes-128.
+        AES256: Encryption algorithm is aes-256.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        AES256GCM128: Encryption algorithm is 256 bit AES-GCM with 128 bit ICV.
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.config.DpdConfig:
+      title: DPD configuration
+      type: object
+      properties:
+        operation:
+          $ref: '#/components/schemas/networking.v4.0.config.DpdOperation'
+        intervalSecs:
+          type: integer
+          description: 'The amount of time the peer waits for traffic before sending a DPD request
+
+            '
+          format: int64
+          example: 15
+        timeoutSecs:
+          type: integer
+          description: 'The maximum amount of time to wait for a DPD response before marking the peer as dead
+
+            '
+          format: int64
+          example: 60
+      additionalProperties: false
+      description: Dead peer detection configuration for the VPN connection
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 870ef0a7-1d70-4ba5-839b-436e2c69e445
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    networking.v4.0.config.IPv6Subnet:
+      required:
+      - ip
+      - prefixLength
+      type: object
+      properties:
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: Prefix length of the IPv6 subnet.
+          format: int32
+          example: 64
+      additionalProperties: false
+      description: IPv6 subnet.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    networking.v4.0.config.State:
+      type: string
+      description: Up/Down status of component.
+      enum:
+      - UP
+      - DOWN
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DOWN: Component is not functional and down.
+        UP: Component is up and running.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 52
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 28
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+          example: eff4:180b:7f8b:7a40:8c4e:ea2c:d804:15e9
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    networking.v4.0.config.VpnConnection:
+      title: VPN connection
+      description: VPN connection
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
+      - required:
+        - ipsecConfig
+        - localGatewayReference
+        - localGatewayRole
+        - name
+        - remoteGatewayReference
+        type: object
+        properties:
+          name:
+            maxLength: 128
+            type: string
+            description: VPN connection name
+            example: vpn-connection-1
+          description:
+            maxLength: 1000
+            type: string
+            description: VPN connection description
+            example: Example connection description
+          localGatewayReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The local VPN gateway reference
+            example: 558755c6-0733-4d8e-9556-6afb33dc34be
+          remoteGatewayReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The remote VPN gateway reference
+            example: 887b7750-4783-49b6-9de2-f3ed2ecc373a
+          ipsecConfig:
+            $ref: '#/components/schemas/networking.v4.0.config.IpsecConfig'
+          dpdConfig:
+            $ref: '#/components/schemas/networking.v4.0.config.DpdConfig'
+          qosConfig:
+            $ref: '#/components/schemas/networking.v4.0.config.QosConfig'
+          localGatewayRole:
+            $ref: '#/components/schemas/networking.v4.0.config.GatewayRole'
+          dynamicRoutePriority:
+            maximum: 1000
+            minimum: 10
+            type: integer
+            description: 'Priority assigned to routes received on this connection over eBGP. A higher priority value indicates
+              that the routes are more preferred
+
+              '
+            format: int16
+            example: 123
+          advertisedPrefixes:
+            maxItems: 250
+            minItems: 0
+            type: array
+            description: IP prefixes advertised to the remote gateway over BGP.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
+          learnedPrefixes:
+            maxItems: 250
+            minItems: 0
+            type: array
+            description: IP prefixes learned from the remote gateway over BGP.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
+          ipsecTunnelStatus:
+            $ref: '#/components/schemas/networking.v4.0.config.Status'
+          ebgpStatus:
+            $ref: '#/components/schemas/networking.v4.0.config.Status'
+        additionalProperties: false
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 92
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:9bf9c2d8-1857-4824-8f55-cbb6ab4eb85e
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    networking.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 17
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+          example: 59.225.95.31
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    networking.v4.0.config.IpsecConfig:
+      title: IPSec Configuration
+      required:
+      - preSharedKey
+      type: object
+      properties:
+        preSharedKey:
+          type: string
+          description: Shared secret for authentication between gateway peers
+        localVtiIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        remoteVtiIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        localAuthenticationId:
+          type: string
+          description: Local IKE authentication Id used for this connection
+        remoteAuthenticationId:
+          type: string
+          description: IKE authentication Id of the remote peer
+        ikeLifetimeSecs:
+          type: integer
+          description: IKE lifetime (seconds)
+          format: int64
+          example: 30
+        ipsecLifetimeSecs:
+          type: integer
+          description: IPSec lifetime (seconds)
+          format: int64
+          example: 30
+        espPfsDhGroupNumber:
+          type: integer
+          description: 'Diffie-Hellman group value of 14, 19 or 20 to be used for Perfect Forward Secrecy (PFS)
+
+            '
+          format: int16
+          example: 7
+        ikeEncryptionAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.EncryptionAlgorithm'
+        ikeAuthenticationAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationAlgorithm'
+        ipsecEncryptionAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.EncryptionAlgorithm'
+        ipsecAuthenticationAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationAlgorithm'
+      additionalProperties: false
+      description: IPSec configuration
+    common.v1.0.config.Metadata:
+      type: object
+      properties:
+        ownerReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the owner of this resource.
+
+            '
+          example: 88c007ec-0157-4901-a28a-c93e6cd73adc
+        ownerUserName:
+          maxLength: 128
+          type: string
+          description: 'The userName of the owner of this resource.
+
+            '
+        projectReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the project this resource belongs to.
+
+            '
+          example: 3e2a7199-b4d8-481c-a4d1-446470c8d864
+        projectName:
+          maxLength: 128
+          type: string
+          description: 'The name of the project this resource belongs to.
+
+            '
+        categoryIds:
+          maxItems: 256
+          minItems: 1
+          type: array
+          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
+            with.
+
+            '
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            example: 61bf1201-334e-4002-a9da-0ad47bd7fa2e
+      additionalProperties: false
+      description: 'Metadata associated with this resource.
+
+        '
+    networking.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

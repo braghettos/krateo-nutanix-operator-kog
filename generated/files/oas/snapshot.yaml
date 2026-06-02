@@ -1,0 +1,1335 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Files APIs
+  description: Manage virtual file servers, create and configure shares for client access, protect them using DR and sync
+    policies, provision storage space and administer security controls.
+  version: '4.0'
+  x-repo-name: files
+  x-logo:
+    altText: Files Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/files/images/files-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots:
+    get:
+      tags:
+      - Snapshots
+      summary: List mount target snapshots
+      description: 'Get a paginated list of mount target snapshots.
+
+        '
+      operationId: listMountTargetSnapshots
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 298072e8-427f-4795-a3b5-44364e2e06f1
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: c036bef5-e1d6-4c8a-b703-d459fed32543
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - name
+
+          - reclaimableSpaceBytes
+
+          - totalSpaceBytes
+
+          - type
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - createTime
+
+          - name
+
+          - reclaimableSpaceBytes
+
+          - totalSpaceBytes
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - createTime
+
+          - extId
+
+          - name
+
+          - reclaimableSpaceBytes
+
+          - totalSpaceBytes
+
+          - type
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of mount target snapshots queried.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/files.v4.0.config.Snapshot'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Snapshot File Server Share
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - File Server Share Admin
+        - File Server Security Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ListMountTargetSnapshotsApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SnapshotsApi snapshotsApi = new SnapshotsApi(apiClient);\n\
+          \n        \n        String fileServerExtId = \"FbeA07be-FB2e-dFCa-Afbb-B0AeeE3F4f70\";\n        \n        String\
+          \ mountTargetExtId = \"4dcb1CEC-CFF2-0BFA-Cf0b-BdfcDc4ac8F5\";\n        \n        int page = 0;\n        \n    \
+          \    int limit = 50;\n\n        try {\n            ListMountTargetSnapshotsApiResponse listMountTargetSnapshotsApiResponse\
+          \ = snapshotsApi.listMountTargetSnapshots(fileServerExtId, mountTargetExtId, page, limit, null, null, null);\n \
+          \           System.out.println(listMountTargetSnapshotsApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotsApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet snapshotsApi = new SnapshotsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ fileServerExtId = \"DC40Ac96-D6c6-aFE7-85e8-D0a70ADe94cB\";\n    \n    let mountTargetExtId = \"CB4DE3bb-Ff2a-0cfe-bfCe-CC17FBAdcbCD\"\
+          ;\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] =\
+          \ 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"\
+          $select\"] = \"string_sample_data\";\n\n\n\n\n    snapshotsApi.listMountTargetSnapshots(fileServerExtId, mountTargetExtId,\
+          \ opts).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshots_api = ntnx_files_py_client.SnapshotsApi(api_client=client)\n    \n    file_server_ext_id = \"f3EC6Fd0-66Af-aF96-dfF2-1Cf3cd8ddcac\"\
+          \n    \n    mount_target_ext_id = \"Ed965FEB-d9fF-96fe-E29a-eEbEeAFEfbE9\"\n    \n    page = 0\n    \n    limit\
+          \ = 50\n\n\n    try:\n        api_response = snapshots_api.list_mount_target_snapshots(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, _page=page, _limit=limit)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SnapshotsApiInstance *api.SnapshotsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    SnapshotsApiInstance = api.NewSnapshotsApi(ApiClientInstance)\n\
+          \n    \n    fileServerExtId := \"eB276AC4-9C6C-19C8-ebb1-3400d0eFCAE5\"\n    \n    mountTargetExtId := \"5edEfC75-fbeF-FAcB-aFae-Cd49baC15abD\"\
+          \n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error := SnapshotsApiInstance.ListMountTargetSnapshots(&fileServerExtId,\
+          \ &mountTargetExtId, &page_, &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n      \
+          \  return\n    }\n    data, _ := response.GetData().([]import1.Snapshot)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/A8dd1FaD-3Cd4-aA66-D46F-aE8dCC25Dd8C/mount-targets/85C1c7E5-1BdE-f6DB-3FAA-9eB7dEeb1FF9/snapshots?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/0b65f0Ff-c8fa-e0Ce-bc40-76b6461D1eed/mount-targets/faFCcBcf-2f92-315C-91A7-4ceF728DACA5/snapshots?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - Snapshots
+      summary: Create mount target snapshot
+      description: 'Create a mount target snapshot by using the provided request body.
+
+
+        Specify a valid external identifier of the file server (`fileServerExtId`) and the mount target (`mountTargetExtId`).
+
+
+        User created snapshot will always be of type `USER_SNAPSHOT`.
+
+        '
+      operationId: createMountTargetSnapshot
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 1d6ab4dd-dfad-41ee-995d-ef08c658109f
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 688c5f0c-e0dc-4553-a243-dbc117168341
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 955120a4-1404-4219-97dd-e199b6e72699
+      requestBody:
+        description: Mount target snapshot model.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.Snapshot'
+        required: true
+      responses:
+        '202':
+          description: Response to create mount target snapshot request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Create File Server Share Snapshot
+        roleList:
+        - Files Admin
+        - File Server Share Admin
+        - File Server Security Admin
+        - Prism Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2023.4
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.Snapshot;\nimport com.nutanix.dp1.fil.files.v4.config.CreateMountTargetSnapshotApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        SnapshotsApi snapshotsApi = new SnapshotsApi(apiClient);\n\n        Snapshot\
+          \ snapshot = new Snapshot();\n\n        // Snapshot object initializations here...\n        snapshot.setName(\"\
+          string_sample_data\");  // required field\n        \n        String fileServerExtId = \"fdba73Ba-9Baa-fEDd-18DD-0cCC6FdDEba2\"\
+          ;\n        \n        String mountTargetExtId = \"4FCa73b7-50Bf-973F-1f1F-24DCb95b9CCD\";\n\n        try {\n    \
+          \        CreateMountTargetSnapshotApiResponse createMountTargetSnapshotApiResponse = snapshotsApi.createMountTargetSnapshot(fileServerExtId,\
+          \ mountTargetExtId, snapshot);\n            System.out.println(createMountTargetSnapshotApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotsApi, Snapshot } from \"@nutanix-api/files-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet snapshotsApi = new SnapshotsApi(apiClientInstance);\n\nfunction\
+          \ sample() {\n    let snapshot = new Snapshot();\n\n    // Snapshot object initializations here...\n    snapshot.setName(\"\
+          string_sample_data\");  // required field\n\n    \n    let fileServerExtId = \"FBDdAAFc-5A8c-9BbC-cFBd-70Cb8E5a0851\"\
+          ;\n    \n    let mountTargetExtId = \"e8BAcF6A-bAcd-EB0F-dfa3-1Ed8c64FC54b\";\n\n\n\n\n\n    snapshotsApi.createMountTargetSnapshot(fileServerExtId,\
+          \ mountTargetExtId, snapshot).then(({data, response}) => {\n        console.log(`API returned the following status\
+          \ code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshots_api = ntnx_files_py_client.SnapshotsApi(api_client=client)\n    snapshot = ntnx_files_py_client.Snapshot()\n\
+          \n    # Snapshot object initializations here...\n    snapshot.name = \"string_sample_data\"  # required field\n\
+          \    \n    file_server_ext_id = \"edEBeFfc-ceeF-ddfc-EeA8-fdc2DEdC7C4F\"\n    \n    mount_target_ext_id = \"8CCF977E-B6da-bC8C-AC8D-eCbE7B25AFc9\"\
+          \n\n\n    try:\n        api_response = snapshots_api.create_mount_target_snapshot(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, body=snapshot)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    SnapshotsApiInstance *api.SnapshotsApi\n)\n\nfunc main() {\n \
+          \   ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    SnapshotsApiInstance = api.NewSnapshotsApi(ApiClientInstance)\n\
+          \n    snapshot := import1.NewSnapshot()\n\n    // Snapshot object initializations here...\n\n    \n    fileServerExtId\
+          \ := \"fb9D0b7B-fBe4-1cc6-DCDe-D11fbAcDacF6\"\n    \n    mountTargetExtId := \"fce8d2E5-7f4A-c3Cd-DB1D-Efc1EB7BBEbd\"\
+          \n\n\n    response, error := SnapshotsApiInstance.CreateMountTargetSnapshot(&fileServerExtId, &mountTargetExtId,\
+          \ snapshot)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/18fC2F2B-Cbf1-9e6D-Aa50-3eD0AedFc2AA/mount-targets/EADcCB47-fC0f-Afed-b8d7-1faACe4F0b1B/snapshots\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"type\":\"\
+          $UNKNOWN\",\"createTime\":\"2015-07-20T15:49:04-07:00\",\"totalSpaceBytes\":0,\"reclaimableSpaceBytes\":0,\"$objectType\"\
+          :\"files.v4.config.Snapshot\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          name\":\"string\",\"type\":\"$UNKNOWN\",\"createTime\":\"2015-07-20T15:49:04-07:00\",\"totalSpaceBytes\":0,\"reclaimableSpaceBytes\"\
+          :0,\"$objectType\":\"files.v4.config.Snapshot\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/dEC80fFC-Ae24-b99D-bC7f-ddD532fBCCc0/mount-targets/3dd6ECAb-9fBc-26dA-EFEC-Faaf0dABC918/snapshots\"\
+          \n"
+  /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots/{extId}:
+    get:
+      tags:
+      - Snapshots
+      summary: Get mount target snapshot
+      description: "Get mount target snapshot with the given external identifier.\n\nSpecify a valid identifier of the file\
+        \ server (`fileServerExtId`) and \nthe mount target (`mountTargetExtId`) to which the snapshot belongs and a valid\
+        \ external identifier of the snapshot (`extId`).\n"
+      operationId: getMountTargetSnapshotById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b2a2de07-8ca6-4fd2-b33f-cf1569598e50
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 2c80d437-7287-4830-965a-d4c095375787
+      - name: extId
+        in: path
+        description: The external identifier of the snapshot. Example:48f78959-14a6-4c47-b5db-920460c4b668
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 6f8874f7-8bd8-40eb-af7e-cd9bfe1eb52f
+      responses:
+        '200':
+          description: Details of the queried mount target snapshot.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.config.Snapshot'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Snapshot File Server Share
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - File Server Share Admin
+        - File Server Security Admin
+        - Super Admin
+        - CSI System
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetMountTargetSnapshotApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SnapshotsApi snapshotsApi = new SnapshotsApi(apiClient);\n\
+          \n        \n        String fileServerExtId = \"51B464d0-a5FC-AB5e-FC7F-6dCFcc5c7B77\";\n        \n        String\
+          \ mountTargetExtId = \"FBCb4f03-1bc3-cAb1-ac7d-dccbdFbac8E6\";\n        \n        String extId = \"f731D56b-cD4D-7aED-Bddb-3bCFb9FEb6A6\"\
+          ;\n\n        try {\n            GetMountTargetSnapshotApiResponse getMountTargetSnapshotApiResponse = snapshotsApi.getMountTargetSnapshotById(fileServerExtId,\
+          \ mountTargetExtId, extId);\n            System.out.println(getMountTargetSnapshotApiResponse.toString());\n\n \
+          \       } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotsApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet snapshotsApi = new SnapshotsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ fileServerExtId = \"9aaBeAb6-eA5f-CAB0-Aed9-bFBAeA59DAaA\";\n    \n    let mountTargetExtId = \"1dB7Edcb-FCAd-A8B7-8d28-bEed1F8EF4Ea\"\
+          ;\n    \n    let extId = \"f8Fbf8Fc-0DBd-D5Bd-AaE9-DAf7ED1C5adB\";\n\n\n\n\n\n    snapshotsApi.getMountTargetSnapshotById(fileServerExtId,\
+          \ mountTargetExtId, extId).then(({data, response}) => {\n        console.log(`API returned the following status\
+          \ code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshots_api = ntnx_files_py_client.SnapshotsApi(api_client=client)\n    \n    file_server_ext_id = \"1FcDfBf4-8ace-ED1d-dBc9-2189a32EeDaF\"\
+          \n    \n    mount_target_ext_id = \"fADcBb6e-b84F-71A2-a1Ad-c175ceBf9BD4\"\n    \n    ext_id = \"1c442D08-1CE4-750D-FA2D-6ae93bfDB2D2\"\
+          \n\n\n    try:\n        api_response = snapshots_api.get_mount_target_snapshot_by_id(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, extId=ext_id)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SnapshotsApiInstance *api.SnapshotsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    SnapshotsApiInstance = api.NewSnapshotsApi(ApiClientInstance)\n\
+          \n    \n    fileServerExtId := \"f8dbdCee-B7dd-8AcD-1bdb-0A11B5Bd1dB0\"\n    \n    mountTargetExtId := \"03bCd0B3-CB5D-fc2d-bd5F-0271DBCdBAd2\"\
+          \n    \n    extId := \"5abcFDE0-3CB2-e2AF-Cc5b-9D152aA02bd7\"\n\n\n    response, error := SnapshotsApiInstance.GetMountTargetSnapshotById(&fileServerExtId,\
+          \ &mountTargetExtId, &extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data,\
+          \ _ := response.GetData().(import1.Snapshot)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/88DA76fF-1Bbe-A146-EBca-8cfbDbD9BB6b/mount-targets/AFb7DcdD-15AF-4dF9-DBC5-Fd384D2aefDD/snapshots/6B26457A-7Fa1-dD8E-dDbf-E25bb21cA3Ef\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/B61c0fc9-94EF-dCAB-C90A-cbE3CdC6Fdbf/mount-targets/5c1dc8D9-3f13-CAEF-acd9-dEBCAaC258fc/snapshots/BdbC8Ef6-B77F-bb0a-7bD6-9Da98fe6DA72\"\
+          \n"
+    delete:
+      tags:
+      - Snapshots
+      summary: Delete mount target snapshot
+      description: 'Delete a mount target snapshot with the given external identifier.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and
+
+        the mount target (`mountTargetExtId`) to which the snapshot belongs and a valid external identifier of the snapshot
+        (`extId`).
+
+        '
+      operationId: deleteMountTargetSnapshotById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: d51602fc-12c9-4cb8-8315-7f81b484ee58
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 35ef69ae-4747-4b98-a407-220e3ea8c7c6
+      - name: extId
+        in: path
+        description: The external identifier of the snapshot. Example:48f78959-14a6-4c47-b5db-920460c4b668
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 07ecf5db-1f17-4190-81bf-d879aa222897
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 11583ab3-7de7-4606-9c49-4557d1fa12b2
+      responses:
+        '202':
+          description: Task ID returned for the delete mount target snapshot request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/snapshots/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Delete Snapshot File Server Share
+        roleList:
+        - Files Admin
+        - File Server Share Admin
+        - File Server Security Admin
+        - Prism Admin
+        - Super Admin
+        - CSI System
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotsApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.DeleteMountTargetSnapshotApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SnapshotsApi snapshotsApi = new SnapshotsApi(apiClient);\n\
+          \n        \n        String fileServerExtId = \"B9ADad4F-efAC-c5aa-dcBd-B1c24BE2aa83\";\n        \n        String\
+          \ mountTargetExtId = \"B2cFAa9C-11cE-c8aC-4FEF-7efAdf9AbF2d\";\n        \n        String extId = \"aBF8EAc3-15Fd-FDC2-0F4C-C0ADDeBd3aaF\"\
+          ;\n\n        try {\n            DeleteMountTargetSnapshotApiResponse deleteMountTargetSnapshotApiResponse = snapshotsApi.deleteMountTargetSnapshotById(fileServerExtId,\
+          \ mountTargetExtId, extId);\n            System.out.println(deleteMountTargetSnapshotApiResponse.toString());\n\n\
+          \        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotsApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet snapshotsApi = new SnapshotsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ fileServerExtId = \"eB0FCca5-CECb-8A70-dDF0-7fDf29Fd8bCC\";\n    \n    let mountTargetExtId = \"c9aDD39A-Fdec-CcaF-e3d3-bbdC8CcA33C6\"\
+          ;\n    \n    let extId = \"3AbA7f87-7c51-0E1B-46de-fFcAFaa95cec\";\n\n\n\n\n\n    snapshotsApi.deleteMountTargetSnapshotById(fileServerExtId,\
+          \ mountTargetExtId, extId).then(({data, response}) => {\n        console.log(`API returned the following status\
+          \ code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshots_api = ntnx_files_py_client.SnapshotsApi(api_client=client)\n    \n    file_server_ext_id = \"AAfeEDAe-33A5-227a-BFdE-Af1c86cdfB35\"\
+          \n    \n    mount_target_ext_id = \"Ee7b5C8B-Ef7e-ac7B-257F-cbEcdC0f9C4e\"\n    \n    ext_id = \"dccAEbC6-4F47-d932-785C-c1BCC5DE1ADf\"\
+          \n\n\n    try:\n        api_response = snapshots_api.delete_mount_target_snapshot_by_id(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, extId=ext_id)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SnapshotsApiInstance *api.SnapshotsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    SnapshotsApiInstance = api.NewSnapshotsApi(ApiClientInstance)\n\
+          \n    \n    fileServerExtId := \"65A0cfa8-9fFE-aCAE-a0E8-1fEA5Df83EcB\"\n    \n    mountTargetExtId := \"c3e8e7C9-6af2-CDBE-daFb-1B56b9bbF6A2\"\
+          \n    \n    extId := \"FA06af67-13DF-4aeb-B1bE-A4aEd5ECc477\"\n\n\n    response, error := SnapshotsApiInstance.DeleteMountTargetSnapshotById(&fileServerExtId,\
+          \ &mountTargetExtId, &extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data,\
+          \ _ := response.GetData().(import1.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/2cee3AE1-adaf-31B6-8aaa-fe4d55CC1CEC/mount-targets/aF33Abd5-DF07-1ea9-aca8-cdd8DFcA1DaB/snapshots/AFfba5Ee-DdAb-BA6D-CCCc-5Eef4DCaFf6d\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\
+          \n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/a56D0bdd-6beE-F5ce-dcBD-aF2aaA8F33Ee/mount-targets/7D4E35BD-c2FF-0fFB-Ad3B-e42dbDfB70Ed/snapshots/F1cd02ea-e9bB-0a45-Ab1a-bf0d6BAa5eEe\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2022.6
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+components:
+  schemas:
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    files.v4.0.config.SnapshotType:
+      title: Snapshot type
+      type: string
+      description: Mount target snapshot type enum values.
+      enum:
+      - SSR_SNAPSHOT
+      - USER_SNAPSHOT
+      - REPLICATION_SNAPSHOT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        USER_SNAPSHOT: Backup type snapshot.
+        SSR_SNAPSHOT: SSR type snapshot.
+        REPLICATION_SNAPSHOT: Replication type snapshot.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    files.v4.0.config.Snapshot:
+      title: Mount target snapshot model
+      description: Mount target snapshot model.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - name
+        type: object
+        properties:
+          name:
+            maxLength: 80
+            minLength: 1
+            type: string
+            description: Mount target snapshot name.
+            nullable: false
+          type:
+            $ref: '#/components/schemas/files.v4.0.config.SnapshotType'
+          createTime:
+            type: string
+            description: Mount target snapshot created time. This is a read-only field.
+            format: date-time
+            readOnly: true
+            example: 2009-09-23 14:30:00-07:00
+          totalSpaceBytes:
+            minimum: 0
+            type: integer
+            description: Mount target snapshot total space in bytes. This is a read-only field.
+            format: int64
+            readOnly: true
+            default: 0
+          reclaimableSpaceBytes:
+            minimum: 0
+            type: integer
+            description: Mount target snapshot reclaimable space in bytes. This is a read-only field.
+            format: int64
+            readOnly: true
+            default: 0
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:d5a5af10-1466-4d38-8d66-465c1e19d1b2
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    files.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 13
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 41
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    files.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 3
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

@@ -1,0 +1,1271 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Cluster Management APIs
+  description: Manage Hosts, Clusters and other Infrastructure.
+  version: 4.0.2
+  x-logo:
+    altText: Clustermgmt Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/clustermgmt/images/clustermgmt-logo-img.svg
+  x-repo-name: clustermgmt
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps:
+    post:
+      tags:
+      - Clusters
+      summary: Add SNMP trap
+      description: Add SNMP trap configuration associated with the cluster identified by {clusterExtId}.
+      operationId: createSnmpTrap
+      parameters:
+      - name: clusterExtId
+        in: path
+        description: Cluster UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 35f07f45-1c55-42bb-bd76-9d549e8f3f0a
+      requestBody:
+        description: SNMP trap to add.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrap'
+        required: true
+      responses:
+        '202':
+          description: SNMP trap is added.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create Cluster Snmp Trap
+        roleList:
+        - Cluster Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.common.v1.config.IPAddress;\nimport com.nutanix.dp1.clu.clustermgmt.v4.config.SnmpTrapVersion;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.SnmpTrap;\nimport com.nutanix.dp1.clu.clustermgmt.v4.config.CreateSnmpTrapApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\n        SnmpTrap\
+          \ snmpTrap = new SnmpTrap();\n\n        // SnmpTrap object initializations here...\n        snmpTrap.setAddress(new\
+          \ IPAddress());  // required field\n        snmpTrap.setVersion(SnmpTrapVersion.UNKNOWN);  // required field\n \
+          \       \n        String clusterExtId = \"A3B95cDB-C9c6-Fbaf-0Ffe-AdEBc0BBDE0A\";\n\n        try {\n           \
+          \ CreateSnmpTrapApiResponse createSnmpTrapApiResponse = clustersApi.createSnmpTrap(clusterExtId, snmpTrap);\n  \
+          \          System.out.println(createSnmpTrapApiResponse.toString());\n\n        } catch (RestClientException ex)\
+          \ {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi, IPAddress, SnmpTrapVersion, SnmpTrap } from \"@nutanix-api/clustermgmt-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let snmpTrap = new SnmpTrap();\n\n    // SnmpTrap object initializations here...\n  \
+          \  snmpTrap.setAddress(new IPAddress());  // required field\n    snmpTrap.setVersion(SnmpTrapVersion.UNKNOWN); \
+          \ // required field\n\n    \n    let clusterExtId = \"FcE0bb2f-Bb71-Fc2f-BA1C-61dd83fE88ad\";\n\n\n\n\n\n    clustersApi.createSnmpTrap(clusterExtId,\
+          \ snmpTrap).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    snmpTrap = ntnx_clustermgmt_py_client.SnmpTrap()\n\n    # SnmpTrap object initializations here...\n    snmpTrap.address\
+          \ = ntnx_clustermgmt_py_client.IPAddress()  # required field\n    snmpTrap.version = ntnx_clustermgmt_py_client.SnmpTrapVersion._UNKNOWN\
+          \  # required field\n    \n    cluster_ext_id = \"C6EDfcB8-AFD5-FBBa-8cAC-bFCBF8faFfAc\"\n\n\n    try:\n       \
+          \ api_response = clusters_api.create_snmp_trap(clusterExtId=cluster_ext_id, body=snmpTrap)\n        print(api_response)\n\
+          \    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/prism/v4/config\"\n)\n\
+          \nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    snmpTrap := import1.NewSnmpTrap()\n\n    // SnmpTrap object initializations\
+          \ here...\n\n    \n    clusterExtId := \"DCCf4EB6-2Fcb-6eFb-7Dd8-E4cc552EfA1c\"\n\n\n    response, error := ClustersApiInstance.CreateSnmpTrap(&clusterExtId,\
+          \ snmpTrap)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/cAc4Bb16-03cc-c09e-9fc1-f8c9a9aCd1cc/snmp/traps\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"\
+          ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"username\":\"TestUserName\",\"protocol\":\"$UNKNOWN\",\"port\":0,\"shouldInform\"\
+          :true,\"engineId\":\"TestsnmpengineId\",\"version\":\"$UNKNOWN\",\"recieverName\":\"TestReceiverName\",\"communityString\"\
+          :\"snmp-servercommunitypublicRO192.168.1.0255.255.255.0\",\"$objectType\":\"clustermgmt.v4.config.SnmpTrap\"} \\\
+          \n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"username\":\"TestUserName\",\"protocol\":\"$UNKNOWN\",\"port\"\
+          :0,\"shouldInform\":true,\"engineId\":\"TestsnmpengineId\",\"version\":\"$UNKNOWN\",\"recieverName\":\"TestReceiverName\"\
+          ,\"communityString\":\"snmp-servercommunitypublicRO192.168.1.0255.255.255.0\",\"$objectType\":\"clustermgmt.v4.config.SnmpTrap\"\
+          } \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/eC1cf227-6d55-7d24-7bfe-1abC13BBDefC/snmp/traps\"\
+          \n"
+  /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}:
+    get:
+      tags:
+      - Clusters
+      summary: Get SNMP trap configuration details
+      description: ' Fetches SNMP trap configuration details identified by {extId} associated with the cluster identified
+        by {clusterExtId}.'
+      operationId: getSnmpTrapById
+      parameters:
+      - name: clusterExtId
+        in: path
+        description: Cluster UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: ce7461ff-3709-4b03-a6dd-507e4e1d4838
+      - name: extId
+        in: path
+        description: SNMP trap UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: d7572ca2-da2c-4fc0-8019-d35b3d41d482
+      responses:
+        '200':
+          description: SNMP trap retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrap'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Cluster Snmp Trap
+        roleList:
+        - Cluster Admin
+        - Cluster Viewer
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.GetSnmpTrapApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\
+          \n        \n        String clusterExtId = \"3a2cab7b-eC2b-9197-DA8c-1bc817AE66ca\";\n        \n        String extId\
+          \ = \"A06fdfcE-EAe3-F84e-BdB9-0c71FEbEeBAD\";\n\n        try {\n            GetSnmpTrapApiResponse getSnmpTrapApiResponse\
+          \ = clustersApi.getSnmpTrapById(clusterExtId, extId);\n            System.out.println(getSnmpTrapApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ clusterExtId = \"Df4Cbb0f-aEBD-8cef-d018-B0860E2B3e6A\";\n    \n    let extId = \"eEAEbB58-DaBa-9A71-be9c-FabEddF1Dedb\"\
+          ;\n\n\n\n\n\n    clustersApi.getSnmpTrapById(clusterExtId, extId).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    \n    cluster_ext_id = \"eDBCcbfc-E06E-c952-d5Eb-D7Ae5FC7c2EC\"\n    \n    ext_id = \"6c6aAEcb-F74D-9e4C-EAFE-A15BCbc8BdbA\"\
+          \n\n\n    try:\n        api_response = clusters_api.get_snmp_trap_by_id(clusterExtId=cluster_ext_id, extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    \n    clusterExtId := \"FA20444E-adc8-0b11-2dC8-1FCe3dD4Ca02\"\n\
+          \    \n    extId := \"888BB2cD-A93d-C50B-b1CB-eDCbf09D22Fa\"\n\n\n    response, error := ClustersApiInstance.GetSnmpTrapById(&clusterExtId,\
+          \ &extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.SnmpTrap)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/4E4cc15d-0B9F-59ab-cb6a-807D0FCFBEC4/snmp/traps/6F1bA065-e3De-CC8B-F219-CbCbdcaBDfbB\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/afe956ef-D5bf-Be6e-abab-cC45031e39E6/snmp/traps/EE6b0f3e-6e8e-bCdF-3BA3-F2a4474afA6B\"\
+          \n"
+    put:
+      tags:
+      - Clusters
+      summary: Update SNMP trap
+      description: Update SNMP trap configuration identified by {extId} associated with the cluster identified by {clusterExtId}.
+      operationId: updateSnmpTrapById
+      parameters:
+      - name: clusterExtId
+        in: path
+        description: Cluster UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 2443f2f9-71ed-4760-9831-9cd0ca31f214
+      - name: extId
+        in: path
+        description: SNMP trap UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 0b3b92b8-f697-44d3-b296-16a0907879b3
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: SNMP trap to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrap'
+        required: true
+      responses:
+        '202':
+          description: SNMP trap is updated.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Update Cluster Snmp Trap
+        roleList:
+        - Cluster Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.common.v1.config.IPAddress;\nimport com.nutanix.dp1.clu.clustermgmt.v4.config.SnmpTrapVersion;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.SnmpTrap;\nimport com.nutanix.dp1.clu.clustermgmt.v4.config.GetSnmpTrapApiResponse;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.UpdateSnmpTrapApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\n        SnmpTrap\
+          \ snmpTrap = new SnmpTrap();\n\n        // SnmpTrap object initializations here...\n        snmpTrap.setAddress(new\
+          \ IPAddress());  // required field\n        snmpTrap.setVersion(SnmpTrapVersion.UNKNOWN);  // required field\n \
+          \       \n        String clusterExtId = \"aB88cCFB-237B-EadA-aeBc-e3DB79FbeEa4\";\n        \n        String extId\
+          \ = \"e7dcc19F-19BC-9AbE-Da4d-bc8e9AAcD1AC\";\n\n        // perform GET call\n        GetSnmpTrapApiResponse getResponse\
+          \ = null;\n        try {\n            getResponse = clustersApi.getSnmpTrapById(clusterExtId, extId);\n        }\
+          \ catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n        // Extract\
+          \ E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change parameters for\
+          \ update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH, eTag);\n\
+          \        try {\n            UpdateSnmpTrapApiResponse updateSnmpTrapApiResponse = clustersApi.updateSnmpTrapById(clusterExtId,\
+          \ extId, snmpTrap, opts);\n            System.out.println(updateSnmpTrapApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi, IPAddress, SnmpTrapVersion, SnmpTrap, GetSnmpTrapApiResponse } from \"\
+          @nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6\
+          \ address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port\
+          \ = '9440';\n// Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts\
+          \ = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to\
+          \ connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password\
+          \ = 'password';\n// Please add authorization information here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let snmpTrap = new SnmpTrap();\n\n    // SnmpTrap object initializations here...\n  \
+          \  snmpTrap.setAddress(new IPAddress());  // required field\n    snmpTrap.setVersion(SnmpTrapVersion.UNKNOWN); \
+          \ // required field\n\n    \n    let clusterExtId = \"Bb6Cf1Eb-4974-ACE2-dAaE-D3EdEBFD5bea\";\n    \n    let extId\
+          \ = \"b31fbDdf-A7FA-3fDD-7Fb6-FAFaE6dDaDBC\";\n\n\n    // Perform Get call\n    clustersApi.getSnmpTrapById(clusterExtId,\
+          \ extId).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        // Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        clustersApi.updateSnmpTrapById(clusterExtId,\
+          \ extId, snmpTrap, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned\
+          \ the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    snmpTrap = ntnx_clustermgmt_py_client.SnmpTrap()\n\n    # SnmpTrap object initializations here...\n    snmpTrap.address\
+          \ = ntnx_clustermgmt_py_client.IPAddress()  # required field\n    snmpTrap.version = ntnx_clustermgmt_py_client.SnmpTrapVersion._UNKNOWN\
+          \  # required field\n    \n    cluster_ext_id = \"dADfec56-7dCB-7aEE-F9da-f4ac0DFacB04\"\n    \n    ext_id = \"\
+          825aA288-6b9A-CAbD-48Dc-e8bFfA80Dc2b\"\n\n    try:\n        api_response = clusters_api.get_snmp_trap_by_id(clusterExtId=cluster_ext_id,\
+          \ extId=ext_id)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n    # Extract\
+          \ E-Tag Header\n    etag_value = ntnx_clustermgmt_py_client.ApiClient.get_etag(api_response)\n\n    try:\n     \
+          \   api_response = clusters_api.update_snmp_trap_by_id(clusterExtId=cluster_ext_id, extId=ext_id, body=snmpTrap,\
+          \ if_match=etag_value)\n        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as\
+          \ e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/prism/v4/config\"\n)\n\
+          \nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    snmpTrap := import1.NewSnmpTrap()\n\n    // SnmpTrap object initializations\
+          \ here...\n\n    \n    clusterExtId := \"42A87F25-Cf0f-40fE-BdCd-BfcAC1C3A5F6\"\n    \n    extId := \"bA872b4e-eB0b-caB1-eaA9-7AfEb760Ce2e\"\
+          \n\n    getResponse, err := ClustersApiInstance.GetSnmpTrapById(&clusterExtId, &extId)\n    if err != nil {\n  \
+          \      fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\
+          \n    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := ClustersApiInstance.UpdateSnmpTrapById(&clusterExtId,\
+          \ &extId, snmpTrap, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _\
+          \ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/e4AC1Fb1-2aA5-AC05-037a-B9896fEDDeAD/snmp/traps/9f0Bcd32-FF2a-d6bf-bBAC-FDFC4b5faf6B\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN'\
+          \ \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\"\
+          :\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"},\"username\":\"TestUserName\"\
+          ,\"protocol\":\"$UNKNOWN\",\"port\":0,\"shouldInform\":true,\"engineId\":\"TestsnmpengineId\",\"version\":\"$UNKNOWN\"\
+          ,\"recieverName\":\"TestReceiverName\",\"communityString\":\"snmp-servercommunitypublicRO192.168.1.0255.255.255.0\"\
+          ,\"$objectType\":\"clustermgmt.v4.config.SnmpTrap\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"address\":{\"ipv4\":{\"value\"\
+          :\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"username\":\"TestUserName\",\"protocol\":\"$UNKNOWN\",\"port\":0,\"shouldInform\":true,\"engineId\":\"TestsnmpengineId\"\
+          ,\"version\":\"$UNKNOWN\",\"recieverName\":\"TestReceiverName\",\"communityString\":\"snmp-servercommunitypublicRO192.168.1.0255.255.255.0\"\
+          ,\"$objectType\":\"clustermgmt.v4.config.SnmpTrap\"} \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/fdcC1cf6-fbC3-D0da-CBa4-c338CADBcC50/snmp/traps/2AC4EC39-CC50-13Cd-F4c3-d5e99ecdCCeA\"\
+          \n"
+    delete:
+      tags:
+      - Clusters
+      summary: Delete SNMP trap
+      description: Deletes SNMP trap configuration identified by {extId} associated with the cluster identified by {clusterExtId}.
+      operationId: deleteSnmpTrapById
+      parameters:
+      - name: clusterExtId
+        in: path
+        description: Cluster UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 7663dfff-2784-4932-96a4-9570dc7fefb7
+      - name: extId
+        in: path
+        description: SNMP trap UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b6c81993-9ee1-4070-9708-f31926417eab
+      responses:
+        '202':
+          description: SNMP trap is deleted.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{clusterExtId}/snmp/traps/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete Cluster Snmp Trap
+        roleList:
+        - Cluster Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.DeleteSnmpTrapApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\
+          \n        \n        String clusterExtId = \"DCa3EdDd-5fcE-FfE8-Ad9d-656cfDEDEe7D\";\n        \n        String extId\
+          \ = \"661bA5e1-bbf5-3B1C-E2Cf-3ACB49F3bC3b\";\n\n        try {\n            DeleteSnmpTrapApiResponse deleteSnmpTrapApiResponse\
+          \ = clustersApi.deleteSnmpTrapById(clusterExtId, extId);\n            System.out.println(deleteSnmpTrapApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ clusterExtId = \"97A0f69E-d5dE-c6BD-EA7e-cBeeFab4AcAA\";\n    \n    let extId = \"eDF24CFA-Cb7F-E03A-84fd-CE42f2acEBcc\"\
+          ;\n\n\n\n\n\n    clustersApi.deleteSnmpTrapById(clusterExtId, extId).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    \n    cluster_ext_id = \"cBaBFcf7-eeCe-1Ddc-A68e-DF53faaadbde\"\n    \n    ext_id = \"6b2ef4E1-DfFC-dB6b-85d3-1aDdcf16AfF8\"\
+          \n\n\n    try:\n        api_response = clusters_api.delete_snmp_trap_by_id(clusterExtId=cluster_ext_id, extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    \n    clusterExtId := \"8b9b9b7a-de0C-E9Bb-e65f-a6faA1A35CBB\"\n\
+          \    \n    extId := \"e69Ca89d-3BEc-aCaF-ada6-B1cb1D6Bbf92\"\n\n\n    response, error := ClustersApiInstance.DeleteSnmpTrapById(&clusterExtId,\
+          \ &extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/9edBfc4C-AfDb-C33F-7ACD-5Fce4DefEaAf/snmp/traps/bebf98E3-Eb1c-BaC0-F3A7-F2BBBE53D3Fc\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/C400DEbB-60fF-3CF0-AEcD-EbC0c4a4Dea2/snmp/traps/1ff4c56a-AF9B-1FF8-7b6e-40AD1deEf9BC\"\
+          \n"
+components:
+  schemas:
+    clustermgmt.v4.0.config.SnmpTrap:
+      description: SNMP trap details.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - address
+        - version
+        type: object
+        properties:
+          address:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+          username:
+            maxLength: 64
+            type: string
+            description: SNMP username. For SNMP trap v3 version, SNMP username is required parameter.
+            example: Test UserName
+          protocol:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpProtocol'
+          port:
+            type: integer
+            description: SNMP port.
+            format: int32
+            example: 72
+          shouldInform:
+            type: boolean
+            description: SNMP information status.
+            example: false
+          engineId:
+            pattern: ^(?:0[xX])?[0-9a-fA-F]+$
+            type: string
+            description: SNMP engine Id.
+            example: Test snmp engine Id
+          version:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrapVersion'
+          recieverName:
+            maxLength: 64
+            type: string
+            description: SNMP receiver name.
+            example: Test Receiver Name
+          communityString:
+            type: string
+            description: Community string(plaintext) for SNMP version 2.0.
+            example: snmp-server community public RO 192.168.1.0 255.255.255.0
+        additionalProperties: false
+        description: SNMP trap details.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.config.IPAddress:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    clustermgmt.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 22
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 9d4ffa56-91af-4dfb-99b2-ab3df07628fa
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    clustermgmt.v4.0.config.SnmpTrapVersion:
+      type: string
+      description: SNMP version.
+      enum:
+      - V2
+      - V3
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        V2: V2 SNMP version.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        V3: V3 SNMP version.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: acf0fa40-7920-4a1c-8555-445a56268e96
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    clustermgmt.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 66
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 56
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    clustermgmt.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+          example: 2cd8:0415:e91d:2cb3:386f:e395:8af4:dcb8
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    clustermgmt.v4.0.config.SnmpProtocol:
+      type: string
+      description: SNMP protocol type.
+      enum:
+      - UDP
+      - UDP6
+      - TCP
+      - TCP6
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        UDP: UDP protocol.
+        TCP: TCP protocol.
+        UDP6: UDP6 protocol.
+        TCP6: TCP6 protocol.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 74
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:8637ae89-6d88-4345-bd2d-682dfad61b73
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+          example: 39.47.28.212
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    clustermgmt.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

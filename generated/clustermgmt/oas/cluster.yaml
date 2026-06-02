@@ -1,0 +1,2647 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Cluster Management APIs
+  description: Manage Hosts, Clusters and other Infrastructure.
+  version: 4.0.2
+  x-logo:
+    altText: Clustermgmt Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/clustermgmt/images/clustermgmt-logo-img.svg
+  x-repo-name: clustermgmt
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /clustermgmt/v4.0/config/clusters:
+    get:
+      tags:
+      - Clusters
+      summary: Get the list of clusters
+      description: Lists all cluster entities registered to Prism Central.
+      operationId: listClusters
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - backupEligibilityScore
+
+          - clusterProfileExtId
+
+          - config/buildInfo/version
+
+          - config/clusterFunction
+
+          - config/encryptionInTransitStatus
+
+          - config/encryptionOption
+
+          - config/encryptionScope
+
+          - config/hypervisorTypes
+
+          - config/isAvailable
+
+          - extId
+
+          - name
+
+          - network/keyManagementServerType
+
+          - upgradeStatus
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - backupEligibilityScore
+
+          - config/buildInfo/version
+
+          - config/isAvailable
+
+          - extId
+
+          - inefficientVmCount
+
+          - name
+
+          - network/keyManagementServerType
+
+          - nodes/numberOfNodes
+
+          - upgradeStatus
+
+          - vmCount
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $apply
+        in: query
+        description: 'A URL query parameter that allows clients to specify a sequence of transformations to the entity set,
+          such as groupby, filter, aggregate etc. As of now only support for groupby exists.For example ''$apply=groupby((templateName))''
+          would get all templates grouped by templateName.
+
+          The groupby can be applied on the following fields:
+
+          - config/buildInfo/version
+
+          - nodes/numberOfNodes
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $expand
+        in: query
+        description: 'A URL query parameter that allows clients to request related resources when a resource that satisfies
+          a particular request is retrieved. Each expanded item is evaluated relative to the entity containing the property
+          being expanded. Other query options can be applied to an expanded property by appending a semicolon-separated list
+          of query options, enclosed in parentheses, to the property name. Permissible system query options are $filter, $select
+          and $orderby. The following expansion keys are supported.
+
+          - clusterProfile
+
+          - storageSummary
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - backupEligibilityScore
+
+          - inefficientVmCount
+
+          - name
+
+          - upgradeStatus
+
+          - vmCount
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The requested Cluster entities.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/clustermgmt.v4.0.config.Cluster'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Cluster
+        roleList:
+        - Developer
+        - Prism Admin
+        - Prism Viewer
+        - Project Admin
+        - Self-Service Admin
+        - Super Admin
+        - Objects Admin
+        - Network Infra Admin
+        - VPC Admin
+        - Consumer
+        - Storage Admin
+        - Storage Viewer
+        - Files Admin
+        - Cluster Admin
+        - Cluster Viewer
+        - Virtual Machine Admin
+        - Virtual Machine Operator
+        - Virtual Machine Viewer
+        - Kubernetes Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.ListClustersApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\
+          \n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListClustersApiResponse\
+          \ listClustersApiResponse = clustersApi.listClusters(page, limit, null, null, null, null, null);\n            System.out.println(listClustersApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\nfunction sample() {\n\n\n    // Construct\
+          \ Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n    opts[\"$filter\"\
+          ] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"$apply\"] = \"string_sample_data\"\
+          ;\n    opts[\"$expand\"] = \"string_sample_data\";\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n  \
+          \  clustersApi.listClusters(opts).then(({data, response}) => {\n        console.log(`API returned the following\
+          \ status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = clusters_api.list_clusters(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n  \
+          \      print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error\
+          \ := ClustersApiInstance.ListClusters(&page_, &limit_, nil, nil, nil, nil, nil)\n    if error != nil {\n       \
+          \ fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.Cluster)\n    fmt.Println(data)\n\
+          \n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters?$apply=string_sample_data&$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters?$apply=string_sample_data&$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - Clusters
+      summary: Create a cluster
+      description: Cluster create operation.
+      operationId: createCluster
+      parameters:
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 97115f3f-291f-4ea4-8d18-316aded1a005
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: false
+      requestBody:
+        description: The required parameters for cluster create workflow.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.Cluster'
+        required: true
+      responses:
+        '202':
+          description: Cluster created.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create Cluster
+        roleList:
+        - Cluster Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.Cluster;\nimport com.nutanix.dp1.clu.clustermgmt.v4.config.CreateClusterApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\n        Cluster\
+          \ cluster = new Cluster();\n\n        // Cluster object initializations here...\n        \n        boolean dryrun\
+          \ = true;\n\n        try {\n            CreateClusterApiResponse createClusterApiResponse = clustersApi.createCluster(dryrun,\
+          \ cluster);\n            System.out.println(createClusterApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi, Cluster } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\nfunction sample()\
+          \ {\n    let cluster = new Cluster();\n\n    // Cluster object initializations here...\n\n\n    // Construct Optional\
+          \ Parameters\n    var opts = {};\n    opts[\"$dryrun\"] = true;\n\n\n\n\n    clustersApi.createCluster(cluster,\
+          \ opts).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    cluster = ntnx_clustermgmt_py_client.Cluster()\n\n    # Cluster object initializations here...\n    \n    dryrun\
+          \ = True\n\n\n    try:\n        api_response = clusters_api.create_cluster(_dryrun=dryrun, body=cluster)\n     \
+          \   print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/prism/v4/config\"\n)\n\
+          \nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    cluster := import1.NewCluster()\n\n    // Cluster object initializations\
+          \ here...\n\n    \n    dryrun_ := true\n\n\n    response, error := ClustersApiInstance.CreateCluster(&dryrun_, cluster)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"test_cluster_name\",\"\
+          nodes\":{\"numberOfNodes\":0,\"nodeList\":[{\"controllerVmIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"},\"nodeUuid\":\"string\",\"hostIp\"\
+          :{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"},\"$objectType\":\"clustermgmt.v4.config.NodeListItemReference\"}],\"$objectType\"\
+          :\"clustermgmt.v4.config.NodeReference\"},\"config\":{\"incarnationId\":0,\"buildInfo\":{\"buildType\":\"release/opt\"\
+          ,\"version\":\"6.7\",\"fullVersion\":\"el7.3-release-fraser-6.5.5.6-stable-e36389d5f36fa8e7cacfdccdc2049f85206c6d7c\"\
+          ,\"commitId\":\"da8e2cbac08b1d4171e451b7ce008c4f1430d54d\",\"shortCommitId\":\"f978e71\",\"$objectType\":\"clustermgmt.v4.config.BuildReference\"\
+          },\"hypervisorTypes\":[\"$UNKNOWN\"],\"clusterFunction\":[\"$UNKNOWN\"],\"timezone\":\"UTC/IST\",\"authorizedPublicKeyList\"\
+          :[{\"name\":\"Testpublickeyname\",\"key\":\"Testkey\",\"$objectType\":\"clustermgmt.v4.config.PublicKey\"}],\"redundancyFactor\"\
+          :0,\"clusterSoftwareMap\":[{\"softwareType\":\"$UNKNOWN\",\"version\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SoftwareMapReference\"\
+          }],\"clusterArch\":\"$UNKNOWN\",\"faultToleranceState\":{\"currentMaxFaultTolerance\":0,\"desiredMaxFaultTolerance\"\
+          :0,\"domainAwarenessLevel\":\"$UNKNOWN\",\"currentClusterFaultTolerance\":\"$UNKNOWN\",\"desiredClusterFaultTolerance\"\
+          :\"$UNKNOWN\",\"redundancyStatus\":{\"isCassandraPreparationDone\":true,\"isZookeeperPreparationDone\":true,\"$objectType\"\
+          :\"clustermgmt.v4.config.RedundancyStatusDetails\"},\"$objectType\":\"clustermgmt.v4.config.FaultToleranceState\"\
+          },\"isRemoteSupportEnabled\":true,\"operationMode\":\"$UNKNOWN\",\"isLts\":true,\"isPasswordRemoteLoginEnabled\"\
+          :true,\"encryptionInTransitStatus\":\"$UNKNOWN\",\"encryptionOption\":[\"$UNKNOWN\"],\"encryptionScope\":[\"$UNKNOWN\"\
+          ],\"pulseStatus\":{\"isEnabled\":true,\"piiScrubbingLevel\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.PulseStatus\"\
+          },\"isAvailable\":true,\"$objectType\":\"clustermgmt.v4.config.ClusterConfigReference\"},\"network\":{\"externalAddress\"\
+          :{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"},\"externalDataServiceIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"externalSubnet\":\"10.49.144.0/255.255.240.0\",\"internalSubnet\"\
+          :\"192.138.5.0/255.255.255.128\",\"nfsSubnetWhitelist\":[\"string\"],\"nameServerIpList\":[{\"ipv4\":{\"value\"\
+          :\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\"\
+          :\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"ntpServerIpList\":[{\"ipv4\"\
+          :{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\"\
+          :\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\"\
+          ,\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"smtpServer\"\
+          :{\"emailAddress\":\"string\",\"server\":{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"port\":0,\"username\":\"user1\",\"password\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SmtpNetwork\"\
+          },\"type\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.SmtpServerRef\"},\"masqueradingIp\":{\"ipv4\":{\"\
+          value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"\
+          string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"masqueradingPort\":0,\"managementServer\":{\"ip\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"type\":\"$UNKNOWN\",\"isDrsEnabled\":true,\"isRegistered\":true,\"\
+          isInUse\":true,\"$objectType\":\"clustermgmt.v4.config.ManagementServerRef\"},\"fqdn\":\"string\",\"keyManagementServerType\"\
+          :\"$UNKNOWN\",\"backplane\":{\"isSegmentationEnabled\":true,\"vlanTag\":0,\"subnet\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"netmask\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"$objectType\":\"clustermgmt.v4.config.BackplaneNetworkParams\"},\"httpProxyList\"\
+          :[{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"port\":0,\"username\":\"string\",\"password\":\"string\",\"name\":\"string\"\
+          ,\"proxyTypes\":[\"$UNKNOWN\"],\"$objectType\":\"clustermgmt.v4.config.HttpProxyConfig\"}],\"httpProxyWhiteList\"\
+          :[{\"targetType\":\"$UNKNOWN\",\"target\":\"string\",\"$objectType\":\"clustermgmt.v4.config.HttpProxyWhiteListConfig\"\
+          }],\"$objectType\":\"clustermgmt.v4.config.ClusterNetworkReference\"},\"upgradeStatus\":\"$UNKNOWN\",\"vmCount\"\
+          :0,\"inefficientVmCount\":0,\"containerName\":\"Testcontainer_name\",\"categories\":[\"string\"],\"clusterProfileExtId\"\
+          :\"string\",\"backupEligibilityScore\":0,\"$objectType\":\"clustermgmt.v4.config.Cluster\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          name\":\"test_cluster_name\",\"nodes\":{\"numberOfNodes\":0,\"nodeList\":[{\"controllerVmIp\":{\"ipv4\":{\"value\"\
+          :\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"nodeUuid\":\"string\",\"hostIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"$objectType\":\"clustermgmt.v4.config.NodeListItemReference\"}],\"$objectType\"\
+          :\"clustermgmt.v4.config.NodeReference\"},\"config\":{\"incarnationId\":0,\"buildInfo\":{\"buildType\":\"release/opt\"\
+          ,\"version\":\"6.7\",\"fullVersion\":\"el7.3-release-fraser-6.5.5.6-stable-e36389d5f36fa8e7cacfdccdc2049f85206c6d7c\"\
+          ,\"commitId\":\"da8e2cbac08b1d4171e451b7ce008c4f1430d54d\",\"shortCommitId\":\"f978e71\",\"$objectType\":\"clustermgmt.v4.config.BuildReference\"\
+          },\"hypervisorTypes\":[\"$UNKNOWN\"],\"clusterFunction\":[\"$UNKNOWN\"],\"timezone\":\"UTC/IST\",\"authorizedPublicKeyList\"\
+          :[{\"name\":\"Testpublickeyname\",\"key\":\"Testkey\",\"$objectType\":\"clustermgmt.v4.config.PublicKey\"}],\"redundancyFactor\"\
+          :0,\"clusterSoftwareMap\":[{\"softwareType\":\"$UNKNOWN\",\"version\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SoftwareMapReference\"\
+          }],\"clusterArch\":\"$UNKNOWN\",\"faultToleranceState\":{\"currentMaxFaultTolerance\":0,\"desiredMaxFaultTolerance\"\
+          :0,\"domainAwarenessLevel\":\"$UNKNOWN\",\"currentClusterFaultTolerance\":\"$UNKNOWN\",\"desiredClusterFaultTolerance\"\
+          :\"$UNKNOWN\",\"redundancyStatus\":{\"isCassandraPreparationDone\":true,\"isZookeeperPreparationDone\":true,\"$objectType\"\
+          :\"clustermgmt.v4.config.RedundancyStatusDetails\"},\"$objectType\":\"clustermgmt.v4.config.FaultToleranceState\"\
+          },\"isRemoteSupportEnabled\":true,\"operationMode\":\"$UNKNOWN\",\"isLts\":true,\"isPasswordRemoteLoginEnabled\"\
+          :true,\"encryptionInTransitStatus\":\"$UNKNOWN\",\"encryptionOption\":[\"$UNKNOWN\"],\"encryptionScope\":[\"$UNKNOWN\"\
+          ],\"pulseStatus\":{\"isEnabled\":true,\"piiScrubbingLevel\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.PulseStatus\"\
+          },\"isAvailable\":true,\"$objectType\":\"clustermgmt.v4.config.ClusterConfigReference\"},\"network\":{\"externalAddress\"\
+          :{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"},\"externalDataServiceIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"externalSubnet\":\"10.49.144.0/255.255.240.0\",\"internalSubnet\"\
+          :\"192.138.5.0/255.255.255.128\",\"nfsSubnetWhitelist\":[\"string\"],\"nameServerIpList\":[{\"ipv4\":{\"value\"\
+          :\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\"\
+          :\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"ntpServerIpList\":[{\"ipv4\"\
+          :{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\"\
+          :\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\"\
+          ,\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"smtpServer\"\
+          :{\"emailAddress\":\"string\",\"server\":{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"port\":0,\"username\":\"user1\",\"password\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SmtpNetwork\"\
+          },\"type\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.SmtpServerRef\"},\"masqueradingIp\":{\"ipv4\":{\"\
+          value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"\
+          string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"masqueradingPort\":0,\"managementServer\":{\"ip\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"type\":\"$UNKNOWN\",\"isDrsEnabled\":true,\"isRegistered\":true,\"\
+          isInUse\":true,\"$objectType\":\"clustermgmt.v4.config.ManagementServerRef\"},\"fqdn\":\"string\",\"keyManagementServerType\"\
+          :\"$UNKNOWN\",\"backplane\":{\"isSegmentationEnabled\":true,\"vlanTag\":0,\"subnet\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"netmask\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"$objectType\":\"clustermgmt.v4.config.BackplaneNetworkParams\"},\"httpProxyList\"\
+          :[{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"port\":0,\"username\":\"string\",\"password\":\"string\",\"name\":\"string\"\
+          ,\"proxyTypes\":[\"$UNKNOWN\"],\"$objectType\":\"clustermgmt.v4.config.HttpProxyConfig\"}],\"httpProxyWhiteList\"\
+          :[{\"targetType\":\"$UNKNOWN\",\"target\":\"string\",\"$objectType\":\"clustermgmt.v4.config.HttpProxyWhiteListConfig\"\
+          }],\"$objectType\":\"clustermgmt.v4.config.ClusterNetworkReference\"},\"upgradeStatus\":\"$UNKNOWN\",\"vmCount\"\
+          :0,\"inefficientVmCount\":0,\"containerName\":\"Testcontainer_name\",\"categories\":[\"string\"],\"clusterProfileExtId\"\
+          :\"string\",\"backupEligibilityScore\":0,\"$objectType\":\"clustermgmt.v4.config.Cluster\"} \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters?$dryrun=true\"\
+          \n"
+  /clustermgmt/v4.0/config/clusters/{extId}:
+    get:
+      tags:
+      - Clusters
+      summary: Get details of a cluster
+      description: Fetches the cluster entity details identified by {extId}.
+      operationId: getClusterById
+      parameters:
+      - name: extId
+        in: path
+        description: Cluster UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 678373f4-c346-45bb-b3c6-fce7bec87b2a
+      - name: $expand
+        in: query
+        description: 'A URL query parameter that allows clients to request related resources when a resource that satisfies
+          a particular request is retrieved. Each expanded item is evaluated relative to the entity containing the property
+          being expanded. Other query options can be applied to an expanded property by appending a semicolon-separated list
+          of query options, enclosed in parentheses, to the property name. Permissible system query options are $filter, $select
+          and $orderby. The following expansion keys are supported.
+
+          - clusterProfile
+
+          - storageSummary
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The requested Cluster entity.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.config.Cluster'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Cluster
+        roleList:
+        - Developer
+        - Prism Admin
+        - Prism Viewer
+        - Project Admin
+        - Self-Service Admin
+        - Super Admin
+        - Objects Admin
+        - Network Infra Admin
+        - VPC Admin
+        - Consumer
+        - Storage Admin
+        - Storage Viewer
+        - Files Admin
+        - Cluster Admin
+        - Cluster Viewer
+        - Virtual Machine Admin
+        - Virtual Machine Operator
+        - Virtual Machine Viewer
+        - Kubernetes Admin
+        - Monitoring Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.GetClusterApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\
+          \n        \n        String extId = \"0be8fBcc-97Cf-AE43-bcCa-6EAAE9ABc570\";\n\n        try {\n            GetClusterApiResponse\
+          \ getClusterApiResponse = clustersApi.getClusterById(extId, null);\n            System.out.println(getClusterApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ extId = \"3eAf377e-B6B3-EC3d-1ced-c89fcbDaC4Df\";\n\n    // Construct Optional Parameters\n    var opts = {};\n\
+          \    opts[\"$expand\"] = \"string_sample_data\";\n\n\n\n\n    clustersApi.getClusterById(extId, opts).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    \n    ext_id = \"9BbCfEDe-c69C-AEEb-aBDD-2daD8EEC8b4B\"\n\n\n    try:\n        api_response = clusters_api.get_cluster_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    \n    extId := \"6Ed15dCb-F9B5-23bb-9dfD-cE2A4eCACBeC\"\n\n\n \
+          \   response, error := ClustersApiInstance.GetClusterById(&extId, nil)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().(import1.Cluster)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/a112B7b5-45Df-1FdB-eAEd-ee7D84FDC36A?$expand=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/d3bEC0aF-feA1-ADDe-Ac50-DFaddC709EDA?$expand=string_sample_data\"\
+          \n"
+    put:
+      tags:
+      - Clusters
+      summary: Update cluster
+      description: Update cluster operation.
+      operationId: updateClusterById
+      parameters:
+      - name: extId
+        in: path
+        description: Cluster UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: a1419a38-333a-4c2c-8309-8b93d7dbc10f
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Cluster resource to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.Cluster'
+        required: true
+      responses:
+        '202':
+          description: Cluster resource is updated.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Put
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Put
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Put
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Update Cluster
+        roleList:
+        - Cluster Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.7'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.Cluster;\nimport com.nutanix.dp1.clu.clustermgmt.v4.config.GetClusterApiResponse;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.UpdateClusterApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\n        Cluster\
+          \ cluster = new Cluster();\n\n        // Cluster object initializations here...\n        \n        String extId\
+          \ = \"DbBfbFdc-D8E4-b9D8-fa27-aAA634eCBf69\";\n\n        // perform GET call\n        GetClusterApiResponse getResponse\
+          \ = null;\n        try {\n            getResponse = clustersApi.getClusterById(extId);\n        } catch(RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n        // Extract E-Tag Header\n        String\
+          \ eTag = ApiClient.getEtag(getResponse);\n        // initialize/change parameters for update\n        HashMap<String,\
+          \ Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH, eTag);\n        try {\n            UpdateClusterApiResponse\
+          \ updateClusterApiResponse = clustersApi.updateClusterById(extId, cluster, opts);\n            System.out.println(updateClusterApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi, Cluster, GetClusterApiResponse } from \"@nutanix-api/clustermgmt-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let cluster = new Cluster();\n\n    // Cluster object initializations here...\n\n   \
+          \ \n    let extId = \"cEcaB1A3-1B2f-B3f9-CEB9-DBCc4fA0fFEe\";\n\n\n    // Perform Get call\n    clustersApi.getClusterById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        clustersApi.updateClusterById(extId,\
+          \ cluster, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the following\
+          \ status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error) => {\n\
+          \            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    cluster = ntnx_clustermgmt_py_client.Cluster()\n\n    # Cluster object initializations here...\n    \n    ext_id\
+          \ = \"7BF24FE1-2DcA-7Ec2-A12a-EC3AABfdfdFF\"\n\n    try:\n        api_response = clusters_api.get_cluster_by_id(extId=ext_id)\n\
+          \    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n \
+          \   etag_value = ntnx_clustermgmt_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response =\
+          \ clusters_api.update_cluster_by_id(extId=ext_id, body=cluster, if_match=etag_value)\n        print(api_response)\n\
+          \    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/prism/v4/config\"\n)\n\
+          \nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    cluster := import1.NewCluster()\n\n    // Cluster object initializations\
+          \ here...\n\n    \n    extId := \"Dd7bA2EE-9C6C-de1b-Da0B-Ab53AEae8ee3\"\n\n    getResponse, err := ClustersApiInstance.GetClusterById(&extId)\n\
+          \    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue\
+          \ := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"If-Match\"\
+          ] = etagValue\n\n    response, error := ClustersApiInstance.UpdateClusterById(&extId, cluster, args)\n    if error\
+          \ != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/3BA3dE95-8Be3-cfB3-02a2-BaFF7abda1Dd\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN'\
+          \ \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\"\
+          :\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"test_cluster_name\",\"nodes\":{\"numberOfNodes\"\
+          :0,\"nodeList\":[{\"controllerVmIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"nodeUuid\":\"string\",\"hostIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"},\"$objectType\":\"clustermgmt.v4.config.NodeListItemReference\"\
+          }],\"$objectType\":\"clustermgmt.v4.config.NodeReference\"},\"config\":{\"incarnationId\":0,\"buildInfo\":{\"buildType\"\
+          :\"release/opt\",\"version\":\"6.7\",\"fullVersion\":\"el7.3-release-fraser-6.5.5.6-stable-e36389d5f36fa8e7cacfdccdc2049f85206c6d7c\"\
+          ,\"commitId\":\"da8e2cbac08b1d4171e451b7ce008c4f1430d54d\",\"shortCommitId\":\"f978e71\",\"$objectType\":\"clustermgmt.v4.config.BuildReference\"\
+          },\"hypervisorTypes\":[\"$UNKNOWN\"],\"clusterFunction\":[\"$UNKNOWN\"],\"timezone\":\"UTC/IST\",\"authorizedPublicKeyList\"\
+          :[{\"name\":\"Testpublickeyname\",\"key\":\"Testkey\",\"$objectType\":\"clustermgmt.v4.config.PublicKey\"}],\"redundancyFactor\"\
+          :0,\"clusterSoftwareMap\":[{\"softwareType\":\"$UNKNOWN\",\"version\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SoftwareMapReference\"\
+          }],\"clusterArch\":\"$UNKNOWN\",\"faultToleranceState\":{\"currentMaxFaultTolerance\":0,\"desiredMaxFaultTolerance\"\
+          :0,\"domainAwarenessLevel\":\"$UNKNOWN\",\"currentClusterFaultTolerance\":\"$UNKNOWN\",\"desiredClusterFaultTolerance\"\
+          :\"$UNKNOWN\",\"redundancyStatus\":{\"isCassandraPreparationDone\":true,\"isZookeeperPreparationDone\":true,\"$objectType\"\
+          :\"clustermgmt.v4.config.RedundancyStatusDetails\"},\"$objectType\":\"clustermgmt.v4.config.FaultToleranceState\"\
+          },\"isRemoteSupportEnabled\":true,\"operationMode\":\"$UNKNOWN\",\"isLts\":true,\"isPasswordRemoteLoginEnabled\"\
+          :true,\"encryptionInTransitStatus\":\"$UNKNOWN\",\"encryptionOption\":[\"$UNKNOWN\"],\"encryptionScope\":[\"$UNKNOWN\"\
+          ],\"pulseStatus\":{\"isEnabled\":true,\"piiScrubbingLevel\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.PulseStatus\"\
+          },\"isAvailable\":true,\"$objectType\":\"clustermgmt.v4.config.ClusterConfigReference\"},\"network\":{\"externalAddress\"\
+          :{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"},\"externalDataServiceIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"externalSubnet\":\"10.49.144.0/255.255.240.0\",\"internalSubnet\"\
+          :\"192.138.5.0/255.255.255.128\",\"nfsSubnetWhitelist\":[\"string\"],\"nameServerIpList\":[{\"ipv4\":{\"value\"\
+          :\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\"\
+          :\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"ntpServerIpList\":[{\"ipv4\"\
+          :{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\"\
+          :\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\"\
+          ,\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"smtpServer\"\
+          :{\"emailAddress\":\"string\",\"server\":{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"port\":0,\"username\":\"user1\",\"password\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SmtpNetwork\"\
+          },\"type\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.SmtpServerRef\"},\"masqueradingIp\":{\"ipv4\":{\"\
+          value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"\
+          string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"masqueradingPort\":0,\"managementServer\":{\"ip\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"type\":\"$UNKNOWN\",\"isDrsEnabled\":true,\"isRegistered\":true,\"\
+          isInUse\":true,\"$objectType\":\"clustermgmt.v4.config.ManagementServerRef\"},\"fqdn\":\"string\",\"keyManagementServerType\"\
+          :\"$UNKNOWN\",\"backplane\":{\"isSegmentationEnabled\":true,\"vlanTag\":0,\"subnet\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"netmask\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"$objectType\":\"clustermgmt.v4.config.BackplaneNetworkParams\"},\"httpProxyList\"\
+          :[{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"port\":0,\"username\":\"string\",\"password\":\"string\",\"name\":\"string\"\
+          ,\"proxyTypes\":[\"$UNKNOWN\"],\"$objectType\":\"clustermgmt.v4.config.HttpProxyConfig\"}],\"httpProxyWhiteList\"\
+          :[{\"targetType\":\"$UNKNOWN\",\"target\":\"string\",\"$objectType\":\"clustermgmt.v4.config.HttpProxyWhiteListConfig\"\
+          }],\"$objectType\":\"clustermgmt.v4.config.ClusterNetworkReference\"},\"upgradeStatus\":\"$UNKNOWN\",\"vmCount\"\
+          :0,\"inefficientVmCount\":0,\"containerName\":\"Testcontainer_name\",\"categories\":[\"string\"],\"clusterProfileExtId\"\
+          :\"string\",\"backupEligibilityScore\":0,\"$objectType\":\"clustermgmt.v4.config.Cluster\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"test_cluster_name\",\"\
+          nodes\":{\"numberOfNodes\":0,\"nodeList\":[{\"controllerVmIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"},\"nodeUuid\":\"string\",\"hostIp\"\
+          :{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"},\"$objectType\":\"clustermgmt.v4.config.NodeListItemReference\"}],\"$objectType\"\
+          :\"clustermgmt.v4.config.NodeReference\"},\"config\":{\"incarnationId\":0,\"buildInfo\":{\"buildType\":\"release/opt\"\
+          ,\"version\":\"6.7\",\"fullVersion\":\"el7.3-release-fraser-6.5.5.6-stable-e36389d5f36fa8e7cacfdccdc2049f85206c6d7c\"\
+          ,\"commitId\":\"da8e2cbac08b1d4171e451b7ce008c4f1430d54d\",\"shortCommitId\":\"f978e71\",\"$objectType\":\"clustermgmt.v4.config.BuildReference\"\
+          },\"hypervisorTypes\":[\"$UNKNOWN\"],\"clusterFunction\":[\"$UNKNOWN\"],\"timezone\":\"UTC/IST\",\"authorizedPublicKeyList\"\
+          :[{\"name\":\"Testpublickeyname\",\"key\":\"Testkey\",\"$objectType\":\"clustermgmt.v4.config.PublicKey\"}],\"redundancyFactor\"\
+          :0,\"clusterSoftwareMap\":[{\"softwareType\":\"$UNKNOWN\",\"version\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SoftwareMapReference\"\
+          }],\"clusterArch\":\"$UNKNOWN\",\"faultToleranceState\":{\"currentMaxFaultTolerance\":0,\"desiredMaxFaultTolerance\"\
+          :0,\"domainAwarenessLevel\":\"$UNKNOWN\",\"currentClusterFaultTolerance\":\"$UNKNOWN\",\"desiredClusterFaultTolerance\"\
+          :\"$UNKNOWN\",\"redundancyStatus\":{\"isCassandraPreparationDone\":true,\"isZookeeperPreparationDone\":true,\"$objectType\"\
+          :\"clustermgmt.v4.config.RedundancyStatusDetails\"},\"$objectType\":\"clustermgmt.v4.config.FaultToleranceState\"\
+          },\"isRemoteSupportEnabled\":true,\"operationMode\":\"$UNKNOWN\",\"isLts\":true,\"isPasswordRemoteLoginEnabled\"\
+          :true,\"encryptionInTransitStatus\":\"$UNKNOWN\",\"encryptionOption\":[\"$UNKNOWN\"],\"encryptionScope\":[\"$UNKNOWN\"\
+          ],\"pulseStatus\":{\"isEnabled\":true,\"piiScrubbingLevel\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.PulseStatus\"\
+          },\"isAvailable\":true,\"$objectType\":\"clustermgmt.v4.config.ClusterConfigReference\"},\"network\":{\"externalAddress\"\
+          :{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\"\
+          :{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"\
+          common.v1.config.IPAddress\"},\"externalDataServiceIp\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"externalSubnet\":\"10.49.144.0/255.255.240.0\",\"internalSubnet\"\
+          :\"192.138.5.0/255.255.255.128\",\"nfsSubnetWhitelist\":[\"string\"],\"nameServerIpList\":[{\"ipv4\":{\"value\"\
+          :\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\"\
+          ,\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\"\
+          :\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"ntpServerIpList\":[{\"ipv4\"\
+          :{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\"\
+          :\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\"\
+          ,\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"smtpServer\"\
+          :{\"emailAddress\":\"string\",\"server\":{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"port\":0,\"username\":\"user1\",\"password\":\"string\",\"$objectType\":\"clustermgmt.v4.config.SmtpNetwork\"\
+          },\"type\":\"$UNKNOWN\",\"$objectType\":\"clustermgmt.v4.config.SmtpServerRef\"},\"masqueradingIp\":{\"ipv4\":{\"\
+          value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"\
+          string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\":\"common.v1.config.IPAddress\"\
+          },\"masqueradingPort\":0,\"managementServer\":{\"ip\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"$objectType\":\"common.v1.config.IPAddress\"},\"type\":\"$UNKNOWN\",\"isDrsEnabled\":true,\"isRegistered\":true,\"\
+          isInUse\":true,\"$objectType\":\"clustermgmt.v4.config.ManagementServerRef\"},\"fqdn\":\"string\",\"keyManagementServerType\"\
+          :\"$UNKNOWN\",\"backplane\":{\"isSegmentationEnabled\":true,\"vlanTag\":0,\"subnet\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"netmask\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"$objectType\":\"clustermgmt.v4.config.BackplaneNetworkParams\"},\"httpProxyList\"\
+          :[{\"ipAddress\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"$objectType\"\
+          :\"common.v1.config.IPAddress\"},\"port\":0,\"username\":\"string\",\"password\":\"string\",\"name\":\"string\"\
+          ,\"proxyTypes\":[\"$UNKNOWN\"],\"$objectType\":\"clustermgmt.v4.config.HttpProxyConfig\"}],\"httpProxyWhiteList\"\
+          :[{\"targetType\":\"$UNKNOWN\",\"target\":\"string\",\"$objectType\":\"clustermgmt.v4.config.HttpProxyWhiteListConfig\"\
+          }],\"$objectType\":\"clustermgmt.v4.config.ClusterNetworkReference\"},\"upgradeStatus\":\"$UNKNOWN\",\"vmCount\"\
+          :0,\"inefficientVmCount\":0,\"containerName\":\"Testcontainer_name\",\"categories\":[\"string\"],\"clusterProfileExtId\"\
+          :\"string\",\"backupEligibilityScore\":0,\"$objectType\":\"clustermgmt.v4.config.Cluster\"} \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/ddeceAdE-29C4-5Aef-5BcD-fb7FDda3eAba\"\
+          \n"
+    delete:
+      tags:
+      - Clusters
+      summary: Delete a cluster
+      description: Deletes the cluster identified by {extId}.
+      operationId: deleteClusterById
+      parameters:
+      - name: extId
+        in: path
+        description: Cluster UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 5058238a-6223-4df0-ace0-b27d92d36fdd
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 1185e73b-53a5-456a-b654-02277ed156dd
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: false
+      responses:
+        '202':
+          description: Cluster deleted.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Delete
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Delete
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/clusters/{extId} Delete
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Destroy Cluster
+        roleList:
+        - Cluster Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.1'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.ClustersApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.DeleteClusterApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ClustersApi clustersApi = new ClustersApi(apiClient);\n\
+          \n        \n        String extId = \"FdDf8BD9-5bBF-aCbe-cdaD-aCbEfA2cDff4\";\n        \n        boolean dryrun =\
+          \ true;\n\n        try {\n            DeleteClusterApiResponse deleteClusterApiResponse = clustersApi.deleteClusterById(extId,\
+          \ dryrun);\n            System.out.println(deleteClusterApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ClustersApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet clustersApi = new ClustersApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let\
+          \ extId = \"0dFEfb8B-eabF-eA0d-c90f-fBcA5C5baC8C\";\n\n    // Construct Optional Parameters\n    var opts = {};\n\
+          \    opts[\"$dryrun\"] = true;\n\n\n\n\n    clustersApi.deleteClusterById(extId, opts).then(({data, response}) =>\
+          \ {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    clusters_api = ntnx_clustermgmt_py_client.ClustersApi(api_client=client)\n\
+          \    \n    ext_id = \"8eded9dA-A9dE-a2FF-8c2F-Fb9fbafba8f8\"\n    \n    dryrun = True\n\n\n    try:\n        api_response\
+          \ = clusters_api.delete_cluster_by_id(extId=ext_id, _dryrun=dryrun)\n        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ClustersApiInstance *api.ClustersApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    ClustersApiInstance\
+          \ = api.NewClustersApi(ApiClientInstance)\n\n    \n    extId := \"dbeD8965-0bDF-1eeA-D6Ea-6ecbccc0DEf5\"\n    \n\
+          \    dryrun_ := true\n\n\n    response, error := ClustersApiInstance.DeleteClusterById(&extId, &dryrun_)\n    if\
+          \ error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/EBB1a47c-fCe8-b95b-1Cee-9bc6Ae7dFE6D?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\
+          \n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/clusters/Ae6f6896-bdD9-4FF6-7edE-EfA9AE2Ebc2C?$dryrun=true\"\
+          \n"
+components:
+  schemas:
+    common.v1.0.config.FQDN:
+      type: object
+      properties:
+        value:
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
+          type: string
+          description: 'The fully qualified domain name of the host.
+
+            '
+          example: www.example-corp.com
+      additionalProperties: false
+      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
+        System.
+
+        '
+    clustermgmt.v4.0.config.SoftwareMapReference:
+      type: object
+      properties:
+        softwareType:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.SoftwareTypeRef'
+        version:
+          type: string
+          description: Software version.
+      additionalProperties: false
+      description: Cluster software version details.
+    clustermgmt.v4.0.config.ClusterArchReference:
+      type: string
+      description: Cluster arch.
+      enum:
+      - X86_64
+      - PPC64LE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PPC64LE: PPC64LE cluster architecture type.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        X86_64: X86_64 cluster architecture type.
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.PIIScrubbingLevel:
+      type: string
+      description: PII Scrubbing Level for pulse.
+      enum:
+      - DEFAULT
+      - ALL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ALL: Scrub All PII Information from Pulse including data like entity names and IP addresses.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DEFAULT: Default PII Scrubbing level. Data like entity names and IP addresses will not be scrubbed from Pulse.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.config.IPAddress:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    clustermgmt.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 22
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    clustermgmt.v4.0.config.EncryptionStatus:
+      type: string
+      description: Encryption in transit Status.
+      enum:
+      - ENABLED
+      - DISABLED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DISABLED: Disabled encryption status.
+        ENABLED: Enabled encryption status.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.UpgradeStatus:
+      type: string
+      description: Upgrade status of a cluster.
+      enum:
+      - PENDING
+      - DOWNLOADING
+      - QUEUED
+      - PREUPGRADE
+      - UPGRADING
+      - SUCCEEDED
+      - FAILED
+      - CANCELLED
+      - SCHEDULED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CANCELLED: The cluster upgrade is cancelled.
+        FAILED: The cluster upgrade failed.
+        QUEUED: The cluster upgrade is in the queue.
+        SUCCEEDED: The cluster was upgraded successfully.
+        DOWNLOADING: The luster upgrade is downloading.
+        PENDING: The cluster upgrade is in pending state.
+        UPGRADING: The cluster is in upgrade state.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        PREUPGRADE: The cluster is in pre-upgrade state.
+        SCHEDULED: The cluster upgrade is in scheduled state.
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.NodeReference:
+      type: object
+      properties:
+        numberOfNodes:
+          type: integer
+          description: Number of nodes in a cluster.
+          format: int32
+          readOnly: true
+          example: 76
+        nodeList:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: List of nodes in a cluster.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.NodeListItemReference'
+      additionalProperties: false
+      description: Node reference for a cluster.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 9d4ffa56-91af-4dfb-99b2-ab3df07628fa
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    clustermgmt.v4.0.config.OperationMode:
+      type: string
+      description: Cluster operation mode. This is part of payload for cluster update operation only.
+      enum:
+      - NORMAL
+      - READ_ONLY
+      - STAND_ALONE
+      - SWITCH_TO_TWO_NODE
+      - OVERRIDE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        OVERRIDE: Override operation mode.
+        STAND_ALONE: Stand-alone operation mode.
+        SWITCH_TO_TWO_NODE: Switch to two-node operation mode.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        NORMAL: Normal operation mode.
+        READ_ONLY: Read-only operation mode.
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.HttpProxyWhiteListConfig:
+      required:
+      - target
+      - targetType
+      type: object
+      properties:
+        targetType:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.HttpProxyWhiteListTargetType'
+        target:
+          type: string
+          description: Target's identifier which is exempted from going through the configured HTTP Proxy.
+      additionalProperties: false
+      description: Targets HTTP traffic to which is exempted from going through the configured HTTP Proxy.
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.ClusterNetworkReference:
+      type: object
+      properties:
+        externalAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        externalDataServiceIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        externalSubnet:
+          type: string
+          description: Cluster external subnet address.
+          readOnly: true
+          example: 10.49.144.0/255.255.240.0
+        internalSubnet:
+          type: string
+          description: Cluster internal subnet address.
+          readOnly: true
+          example: 192.138.5.0/255.255.255.128
+        nfsSubnetWhitelist:
+          maxItems: 1024
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: NFS subnet whitelist addresses. This is part of payload for cluster update operation only.
+          items:
+            pattern: \b(?:\d{1,3}\.){3}\d{1,3}/(?:\d{1,3}\.){3}\d{1,3}\b
+            type: string
+        nameServerIpList:
+          maxItems: 1024
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: List of name servers on a cluster. This is part of payload for both cluster create & update operations.
+            For create operation, only ipv4 address / fqdn values are supported currently.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        ntpServerIpList:
+          maxItems: 1024
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: List of NTP servers on a cluster. This is part of payload for both cluster create & update operations.
+            For create operation, only ipv4 address / fqdn values are supported currently.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        smtpServer:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.SmtpServerRef'
+        masqueradingIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        masqueradingPort:
+          type: integer
+          description: The port to connect to the cluster when using masquerading IP.
+          format: int32
+          readOnly: true
+          example: 53
+        managementServer:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.ManagementServerRef'
+        fqdn:
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
+          type: string
+          description: Cluster fully qualified domain name. This is part of payload for cluster update operation only.
+          example: www.example-corp.com
+        keyManagementServerType:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.KeyManagementServerType'
+        backplane:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.BackplaneNetworkParams'
+        httpProxyList:
+          maxItems: 1
+          minItems: 0
+          type: array
+          description: List of HTTP Proxy server configuration needed to access a cluster which is hosted behind a HTTP Proxy
+            to not reveal its identity.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.HttpProxyConfig'
+        httpProxyWhiteList:
+          maxItems: 1000
+          minItems: 0
+          type: array
+          description: Targets HTTP traffic to which is exempted from going through the configured HTTP Proxy.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.HttpProxyWhiteListConfig'
+      additionalProperties: false
+      description: Network details of a cluster.
+    clustermgmt.v4.0.config.ClusterConfigReference:
+      type: object
+      properties:
+        incarnationId:
+          type: integer
+          description: Cluster incarnation Id. This is part of payload for cluster update operation only.
+          format: int64
+          readOnly: true
+          example: 86
+        buildInfo:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.BuildReference'
+        hypervisorTypes:
+          maxItems: 5
+          minItems: 0
+          type: array
+          description: Hypervisor type.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorType'
+        clusterFunction:
+          maxItems: 7
+          minItems: 0
+          type: array
+          description: Cluster function. This is part of payload for cluster create operation only (allowed enum values for
+            creation are AOS, ONE_NODE & TWO_NODE only).
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterFunctionRef'
+        timezone:
+          type: string
+          description: Time zone on a cluster.
+          readOnly: true
+          example: UTC/IST
+        authorizedPublicKeyList:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: Public ssh key details. This is part of payload for cluster update operation only.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.PublicKey'
+        redundancyFactor:
+          type: integer
+          description: Redundancy factor of a cluster. This is part of payload for both cluster create & update operations.
+          format: int64
+          example: 51
+        clusterSoftwareMap:
+          maxItems: 3
+          minItems: 0
+          type: array
+          description: Cluster software version details.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.SoftwareMapReference'
+        clusterArch:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterArchReference'
+        faultToleranceState:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.FaultToleranceState'
+        isRemoteSupportEnabled:
+          type: boolean
+          description: Remote support status.
+          readOnly: true
+          example: true
+        operationMode:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.OperationMode'
+        isLts:
+          type: boolean
+          description: Indicates whether the release is categorized as Long-term or not.
+          readOnly: true
+          example: false
+        isPasswordRemoteLoginEnabled:
+          type: boolean
+          description: Indicates whether the password ssh into the cluster is enabled or not.
+          readOnly: true
+          example: true
+        encryptionInTransitStatus:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.EncryptionStatus'
+        encryptionOption:
+          maxItems: 3
+          minItems: 0
+          type: array
+          description: Encryption option.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.EncryptionOptionInfo'
+        encryptionScope:
+          maxItems: 2
+          minItems: 0
+          type: array
+          description: Encryption scope.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.EncryptionScopeInfo'
+        pulseStatus:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.PulseStatus'
+        isAvailable:
+          type: boolean
+          description: Indicates if cluster is available to contact or not.
+          readOnly: true
+          example: true
+      additionalProperties: false
+      description: Cluster configuration details.
+    clustermgmt.v4.0.config.FaultToleranceState:
+      type: object
+      properties:
+        currentMaxFaultTolerance:
+          type: integer
+          description: Maximum fault tolerance that is supported currently.
+          format: int32
+          readOnly: true
+          example: 29
+        desiredMaxFaultTolerance:
+          type: integer
+          description: Maximum fault tolerance desired.
+          format: int32
+          readOnly: true
+          example: 28
+        domainAwarenessLevel:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.DomainAwarenessLevel'
+        currentClusterFaultTolerance:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterFaultToleranceRef'
+        desiredClusterFaultTolerance:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterFaultToleranceRef'
+        redundancyStatus:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.RedundancyStatusDetails'
+      additionalProperties: false
+      description: Fault tolerant state of cluster.
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    clustermgmt.v4.0.config.PublicKey:
+      required:
+      - key
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 1024
+          type: string
+          description: Ssh key name.
+          example: Test public key name
+        key:
+          type: string
+          description: Ssh key value.
+          example: Test key
+      additionalProperties: false
+      description: Public ssh key details. This is part of payload for cluster update operation only.
+    clustermgmt.v4.0.config.BuildReference:
+      type: object
+      properties:
+        buildType:
+          type: string
+          description: Software build type.
+          example: release/opt
+        version:
+          type: string
+          description: Software version.
+          example: '6.7'
+        fullVersion:
+          type: string
+          description: Full name of software version.
+          example: el7.3-release-fraser-6.5.5.6-stable-e36389d5f36fa8e7cacfdccdc2049f85206c6d7c
+        commitId:
+          type: string
+          description: Commit Id used for version.
+          example: da8e2cbac08b1d4171e451b7ce008c4f1430d54d
+        shortCommitId:
+          type: string
+          description: Short commit Id used for version.
+          example: f978e71
+      additionalProperties: false
+      description: Build information details.
+    clustermgmt.v4.0.config.SmtpType:
+      type: string
+      description: Type of SMTP server.
+      enum:
+      - PLAIN
+      - STARTTLS
+      - SSL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PLAIN: Plain type SMTP server.
+        STARTTLS: Start TLS type SMTP server.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SSL: SSL type SMTP server.
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.HypervisorType:
+      type: string
+      description: Hypervisor type.
+      enum:
+      - AHV
+      - ESX
+      - HYPERV
+      - XEN
+      - NATIVEHOST
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        XEN: Xen hypervisor.
+        HYPERV: HyperV hypervisor.
+        NATIVEHOST: NativeHost type where AOS runs natively, without hypervisor.
+        ESX: ESX hypervisor.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        AHV: AHV hypervisor.
+    clustermgmt.v4.0.config.SmtpServerRef:
+      required:
+      - emailAddress
+      - server
+      type: object
+      properties:
+        emailAddress:
+          pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+          type: string
+          description: SMTP email address.
+          example: john.doe@example.com
+        server:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.SmtpNetwork'
+        type:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.SmtpType'
+      additionalProperties: false
+      description: SMTP servers on a cluster. This is part of payload for cluster update operation only.
+    clustermgmt.v4.0.config.EncryptionScopeInfo:
+      type: string
+      description: Encryption scope.
+      enum:
+      - CLUSTER
+      - CONTAINER
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CONTAINER: Container encryption scope.
+        CLUSTER: Cluster encryption scope.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.SmtpNetwork:
+      required:
+      - ipAddress
+      type: object
+      properties:
+        ipAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        port:
+          type: integer
+          description: SMTP port.
+          format: int32
+          example: 99
+        username:
+          maxLength: 64
+          type: string
+          description: SMTP server user name.
+          example: user1
+        password:
+          type: string
+          description: SMTP server password.
+      additionalProperties: false
+      description: SMTP network details.
+    clustermgmt.v4.0.config.EncryptionOptionInfo:
+      type: string
+      description: Encryption option.
+      enum:
+      - SOFTWARE
+      - HARDWARE
+      - SOFTWARE_AND_HARDWARE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        HARDWARE: Hardware encryption.
+        SOFTWARE_AND_HARDWARE: Software and hardware encryption.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SOFTWARE: Software encryption.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: acf0fa40-7920-4a1c-8555-445a56268e96
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    clustermgmt.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    clustermgmt.v4.0.config.ManagementServerRef:
+      type: object
+      properties:
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        type:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.ManagementServerType'
+        isDrsEnabled:
+          type: boolean
+          description: Indicates whether it is DRS enabled or not.
+          example: true
+        isRegistered:
+          type: boolean
+          description: Indicates whether it is registered or not.
+          example: true
+        isInUse:
+          type: boolean
+          description: Indicates whether the host is managed by an entity or not.
+          example: false
+      additionalProperties: false
+      description: Management server information.
+    clustermgmt.v4.0.config.HttpProxyWhiteListTargetType:
+      type: string
+      description: Type of the target which is exempted from going through the configured HTTP Proxy.
+      enum:
+      - IPV4_ADDRESS
+      - IPV6_ADDRESS
+      - IPV4_NETWORK_MASK
+      - DOMAIN_NAME_SUFFIX
+      - HOST_NAME
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        IPV6_ADDRESS: IPV6 address.
+        HOST_NAME: Name of the host.
+        DOMAIN_NAME_SUFFIX: Domain Name Suffix required for http proxy whitelist.
+        IPV4_NETWORK_MASK: Network Mask of the IpV4 family.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        IPV4_ADDRESS: IPV4 address.
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 66
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 56
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    clustermgmt.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    clustermgmt.v4.0.config.KeyManagementServerType:
+      type: string
+      description: Management server type.
+      enum:
+      - LOCAL
+      - PRISM_CENTRAL
+      - EXTERNAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PRISM_CENTRAL: Prism Central management server.
+        EXTERNAL: External management server.
+        LOCAL: Local management server.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+          example: 2cd8:0415:e91d:2cb3:386f:e395:8af4:dcb8
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    clustermgmt.v4.0.config.RedundancyStatusDetails:
+      type: object
+      properties:
+        isCassandraPreparationDone:
+          type: boolean
+          description: Boolean flag to indicate if Cassandra ensemble can meet the desired FT.
+          readOnly: true
+          example: false
+        isZookeeperPreparationDone:
+          type: boolean
+          description: Boolean flag to indicate if Zookeeper ensemble can meet the desired FT.
+          readOnly: true
+          example: false
+      additionalProperties: false
+      description: Redundancy Status of the cluster
+      readOnly: true
+    clustermgmt.v4.0.config.NodeListItemReference:
+      type: object
+      properties:
+        controllerVmIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        nodeUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the host.
+          readOnly: true
+          example: 4b5ac9e3-b234-4fb7-9f68-12e0feacb50e
+        hostIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+      additionalProperties: false
+      description: List of nodes in a cluster.
+      x-required-by-operation:
+        create:
+        - controllerVmIp
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 74
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    clustermgmt.v4.0.config.ManagementServerType:
+      type: string
+      description: Management server type.
+      enum:
+      - VCENTER
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        VCENTER: Vcenter management server.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.SoftwareTypeRef:
+      type: string
+      description: Software type.
+      enum:
+      - NOS
+      - NCC
+      - PRISM_CENTRAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PRISM_CENTRAL: Prism Central software type.
+        NOS: NOS software.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        NCC: NCC software.
+    clustermgmt.v4.0.config.BackplaneNetworkParams:
+      type: object
+      properties:
+        isSegmentationEnabled:
+          type: boolean
+          description: Flag to indicate if the backplane segmentation needs to be enabled or not.
+          example: false
+        vlanTag:
+          type: integer
+          description: VLAN Id tagged to the backplane network on the cluster. This is part of cluster create payload.
+          format: int64
+          example: 38
+        subnet:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        netmask:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+      additionalProperties: false
+      description: Params associated to the backplane network segmentation. This is part of payload for cluster create operation
+        only.
+    common.v1.0.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.0.config.FQDN'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+
+        '
+    clustermgmt.v4.0.config.PulseStatus:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+          description: Flag determines whether pulse is enabled for a cluster.
+          example: false
+        piiScrubbingLevel:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.PIIScrubbingLevel'
+      additionalProperties: false
+      description: Pulse status for a cluster.
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:8637ae89-6d88-4345-bd2d-682dfad61b73
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    clustermgmt.v4.0.config.DomainAwarenessLevel:
+      type: string
+      description: Domain awareness level corresponds to unit of cluster group. This is part of payload for both cluster create
+        & update operations.
+      enum:
+      - NODE
+      - BLOCK
+      - RACK
+      - DISK
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        RACK: Rack level awareness.
+        NODE: Node level awareness.
+        BLOCK: Block level awareness.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DISK: Disk level awareness.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+          example: 39.47.28.212
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    clustermgmt.v4.0.config.Cluster:
+      description: Cluster entity with its attributes.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 75
+            type: string
+            description: Cluster name. This is part of payload for both cluster create & update operations.
+            example: test_cluster_name
+          nodes:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.NodeReference'
+          config:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterConfigReference'
+          network:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterNetworkReference'
+          upgradeStatus:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.UpgradeStatus'
+          vmCount:
+            type: integer
+            description: Number of VMs.
+            format: int64
+            readOnly: true
+            example: 68
+          inefficientVmCount:
+            type: integer
+            description: Number of inefficient VMs.
+            format: int64
+            readOnly: true
+            example: 85
+          containerName:
+            maxLength: 64
+            type: string
+            description: The name of the default container created as part of cluster creation. This is part of payload for
+              cluster create operation only.
+            example: Test container_name
+          categories:
+            maxItems: 1024
+            minItems: 0
+            type: array
+            description: List of categories associated to the PE cluster.
+            items:
+              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+              type: string
+              example: 0dfe52e2-4359-48e2-ae34-65fc89caf05f
+          clusterProfileExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Cluster Profile UUID
+            readOnly: true
+            example: 53c169bf-d253-4d65-90d8-ddb5b656b36a
+          backupEligibilityScore:
+            type: integer
+            description: Score to indicate how much cluster is eligible for storing domain manager backup.
+            format: int64
+            readOnly: true
+            example: 68
+        additionalProperties: false
+        description: Cluster entity with its attributes.
+    clustermgmt.v4.0.config.ClusterFunctionRef:
+      type: string
+      description: Cluster function. This is part of payload for cluster create operation only (allowed enum values for creation
+        are AOS, ONE_NODE & TWO_NODE only).
+      enum:
+      - AOS
+      - PRISM_CENTRAL
+      - CLOUD_DATA_GATEWAY
+      - AFS
+      - ONE_NODE
+      - TWO_NODE
+      - ANALYTICS_PLATFORM
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PRISM_CENTRAL: Prism Central.
+        ANALYTICS_PLATFORM: Analytic platform cluster.
+        AOS: AOS cluster.
+        TWO_NODE: Two node cluster.
+        CLOUD_DATA_GATEWAY: Cloud data gateway.
+        ONE_NODE: One node cluster.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        AFS: Acropolis file system.
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.HttpProxyConfig:
+      required:
+      - name
+      type: object
+      properties:
+        ipAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        port:
+          type: integer
+          description: HTTP Proxy server port configuration needed to access a cluster which is hosted behind a HTTP Proxy
+            to not reveal its identity.
+          format: int32
+          example: 31
+        username:
+          maxLength: 64
+          type: string
+          description: HTTP Proxy server username needed to access a cluster which is hosted behind a HTTP Proxy to not reveal
+            its identity.
+        password:
+          type: string
+          description: HTTP Proxy server password needed to access a cluster which is hosted behind a HTTP Proxy to not reveal
+            its identity.
+        name:
+          maxLength: 64
+          type: string
+          description: HTTP Proxy server name configuration needed to access a cluster which is hosted behind a HTTP Proxy
+            to not reveal its identity.
+        proxyTypes:
+          maxItems: 3
+          minItems: 0
+          type: array
+          description: List of HTTP proxy types.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.HttpProxyType'
+      additionalProperties: false
+      description: HTTP Proxy server configuration needed to access a cluster which is hosted behind a HTTP Proxy to not reveal
+        its identity.
+    clustermgmt.v4.0.config.HttpProxyType:
+      type: string
+      description: HTTP proxy type which is needed to access a cluster hosted behind a HTTP Proxy.
+      enum:
+      - HTTP
+      - HTTPS
+      - SOCKS
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        HTTPS: HTTPS proxy protocol type.
+        SOCKS: SOCKS proxy protocol type.
+        HTTP: HTTP proxy protocol type.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.ClusterFaultToleranceRef:
+      type: string
+      description: Cluster Fault tolerance. Set desiredClusterFaultTolerance for cluster create and update.
+      enum:
+      - CFT_0N_AND_0D
+      - CFT_1N_OR_1D
+      - CFT_2N_OR_2D
+      - CFT_1N_AND_1D
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CFT_1N_OR_1D: System can handle fault of one node or one disk
+        CFT_2N_OR_2D: System can handle fault of two nodes or two disks
+        CFT_1N_AND_1D: System can handle fault of one node and one disk on the other node simultaneously
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        CFT_0N_AND_0D: System can not handle any fault with a node or a disk
+    clustermgmt.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

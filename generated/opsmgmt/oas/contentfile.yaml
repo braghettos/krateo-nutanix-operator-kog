@@ -1,0 +1,551 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Cloud Management Platform APIs
+  description: Provide functionalities that are common to APIs in namespaces aiops, devops, secops, finops.
+  version: 1.0.0
+  x-logo:
+    altText: Ops Management Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/opsmgmt/images/opsmgmt-logo-img.svg
+  x-repo-name: opsmgmt
+  x-minimum-negotiation-version: v4.0
+servers:
+- url: https://{host}:{port}/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /opsmgmt/v4.0/content/reports/{reportExtId}/file:
+    get:
+      tags:
+      - Reports
+      summary: Download a report
+      description: Downloads a generated report by utilizing the given report type and UUID.
+      operationId: downloadReport
+      parameters:
+      - name: reportExtId
+        in: path
+        description: UUID of the report.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 7b5f0529-a9ac-42de-afc9-fea5c27278d1
+      - name: Accept
+        in: header
+        description: A MIME Type value to specify the format in which the report should be downloaded. The only supported
+          formats are PDF and CSV. To download the report in PDF format, set the header to 'application/pdf'. To download
+          the report in CSV format, set the header to 'application/zip'.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: string
+      responses:
+        '200':
+          description: Download completed.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/opsmgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /opsmgmt/v4.0/content/reports/{reportExtId}/file
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/opsmgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /opsmgmt/v4.0/content/reports/{reportExtId}/file
+                  Get operation
+      x-permissions:
+        operationName: Download Report
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        roleList:
+        - name: Consumer
+        - name: Developer
+        - name: Operator
+        - name: Prism Admin
+        - name: Prism Viewer
+        - name: Project Admin
+        - deprecated: true
+          name: Self-Service Admin
+        - name: Project Manager
+        - name: Super Admin
+        - name: Operations Management Admin
+        - name: Operations Management Viewer
+        - name: NCM Admin
+        - name: Intelligent Ops Admin
+        - name: NCM Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.ops.java.client.ApiClient;\nimport com.nutanix.ops.java.client.api.ReportsApi;\n\
+          import com.nutanix.dp1.ops.opsmgmt.v4.request.Reports.DownloadReportRequest;\nimport com.nutanix.dp1.ops.opsmgmt.v4.content.DownloadReportApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port used\
+          \ for the connection. PC products typically use port 9440, while NC products typically use port 443. See the product-specific\
+          \ documentation for accurate configuration.\n        apiClient.setPort(9440);\n        // Interval in ms to use\
+          \ during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting\
+          \ on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n\
+          \        String username = \"username\";\n        // Password to connect to the cluster\n        String password\
+          \ = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n      \
+          \  // Please add authorization information here if needed.\n        ReportsApi reportsApi = new ReportsApi(apiClient);\n\
+          \n        \n        String reportExtId = \"aAFeBd1E-B32F-3B7d-C83D-FCdDEAEaC1Cf\";\n\n        try {\n          \
+          \  // Pass in parameters using the request builder object associated with the operation.\n            DownloadReportApiResponse\
+          \ downloadReportApiResponse = reportsApi.downloadReport(DownloadReportRequest.builder()\n                .reportExtId(reportExtId)\n\
+          \                .build());\n\n            System.out.println(downloadReportApiResponse.toString());\n\n       \
+          \     /*\n            Response supports application/zip content type.\n            DownloadReportApiResponse downloadReportApiResponse\
+          \ = reportsApi.downloadReport(DownloadReportRequest.builder()\n                .reportExtId(reportExtId)\n     \
+          \           .build());\n\n            System.out.println(downloadReportApiResponse.toString());\n            */\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ReportsApi } from \"@nutanix-api/opsmgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port used for the connection. PC products typically use port 9440, while NC products typically\
+          \ use port 443. See the product-specific documentation for accurate configuration.\napiClientInstance.port = '9440';\n\
+          // Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet reportsApi = new ReportsApi(apiClientInstance);\n\n\
+          function sample() {\n\n    \n    let reportExtId = \"5ddCCEef-bAbD-EAAf-FfEC-91febAfE5dff\";\n\n\n\n\n\n    reportsApi.downloadReport(reportExtId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n    /*\n    Response supports\
+          \ application/zip content type.\n\n    reportsApi.downloadReport(reportExtId).then(({data, response}) => {\n   \
+          \     console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n    */\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_opsmgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_opsmgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port used for the connection. PC products typically use port 9440, while NC products typically use port\
+          \ 443. See the product-specific documentation for accurate configuration.\n    config.port = 9440\n    # Max retry\
+          \ attempts while reconnecting on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to\
+          \ use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username\
+          \ = \"username\"\n    # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add\
+          \ authorization information here if needed.\n    client = ntnx_opsmgmt_py_client.ApiClient(configuration=config)\n\
+          \    reports_api = ntnx_opsmgmt_py_client.ReportsApi(api_client=client)\n    \n    report_ext_id = \"dBeeFFcf-CEce-cE1D-D1f2-eecb0dE7b114\"\
+          \n\n\n    try:\n        api_response = reports_api.download_report(reportExtId=report_ext_id)\n        print(api_response)\n\
+          \    except ntnx_opsmgmt_py_client.rest.ApiException as e:\n        print(e)\n\n    \"\"\"\n    Response supports\
+          \ application/zip content type.\n    try:\n        api_response = reports_api.download_report(reportExtId=report_ext_id)\n\
+          \        print(api_response)\n    except ntnx_opsmgmt_py_client.rest.ApiException as e:\n        print(e)\n    \"\
+          \"\"\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"context\"\n    \"github.com/nutanix/ntnx-api-golang-clients/opsmgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/opsmgmt-go-client/v4/client\"\n    \"github.com/nutanix/ntnx-api-golang-clients/opsmgmt-go-client/v4/models/opsmgmt/v4/request/reports\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ReportsServiceApiInstance *api.ReportsServiceApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port used for the connection. PC products typically use port\
+          \ 9440, while NC products typically use port 443. See the product-specific documentation for accurate configuration.\n\
+          \    ApiClientInstance.Port = 9440\n    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval\
+          \ = 5 * time.Second\n    // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts\
+          \ = 5\n    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password\
+          \ to connect to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information\
+          \ here if needed.\n    ReportsServiceApiInstance = api.NewReportsServiceApi(ApiClientInstance)\n    ctx := context.Background()\n\
+          \n    \n    reportExtId := \"DBFAE9Ae-dFFA-273a-e43f-4D0eEcf7d4BF\"\n\n\n    request := reports.DownloadReportRequest{\
+          \ ReportExtId: &reportExtId }\n    response, error := ReportsServiceApiInstance.DownloadReport(ctx, &request)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import.)\n\
+          \    fmt.Println(data)\n\n    /*\n    Response supports application/zip content type.\n\n    request := reports.DownloadReportRequest{\
+          \ ReportExtId: &reportExtId }\n    response, error := ReportsServiceApiInstance.DownloadReport(ctx, &request)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import.)\n\
+          \    fmt.Println(data)\n    */\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://host:port/api/opsmgmt/v4.0/content/reports/Ddaba304-aecc-9Bfa-34bA-7cC36c8eff3c/file\"\
+          \ \\\n     --header 'Accept: application/pdf' \\\n              --header 'Accept: string_sample_data' \\\n     --header\
+          \ 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n#Response supports more than one content type.\n#curl --request\
+          \ GET \\\n#     --url \"https://host:port/api/opsmgmt/v4.0/content/reports/Ddaba304-aecc-9Bfa-34bA-7cC36c8eff3c/file\"\
+          \ \\\n#     --header 'Accept: application/zip' \\\n         #     --header 'Accept: string_sample_data' \\\n#  \
+          \   --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/pdf' \\\n         --header\
+          \ 'Accept: string_sample_data' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://host:port/api/opsmgmt/v4.0/content/reports/9CBE2383-8fB0-9A9D-a791-DCCEcF3f13Ae/file\"\
+          \n\n#Response supports more than one content type.\n#wget --verbose \\\n#     --method GET \\\n#     --header 'Accept:\
+          \ application/zip' \\\n         #--header 'Accept: string_sample_data' \\\n#--header 'Authorization:Basic $APP_ACCESS_TOKEN'\
+          \ \\\n#- \"https://host:port/api/opsmgmt/v4.0/content/reports/9CBE2383-8fB0-9A9D-a791-DCCEcF3f13Ae/file\"\n"
+      - lang: Csharp
+        source: "\n\nusing Nutanix.OpsSDK.Client;\nusing Nutanix.OpsSDK.Api;\nusing Nutanix.OpsSDK.Model.Opsmgmt.V4.Content;\n\
+          \nnamespace CsharpSdkSample\n{\n  class Program\n  {\n    static void Main(string[] args) {\n      // Configure\
+          \ the client\n      Configuration _config = new Configuration\n      {\n        // UserName to connect to the cluster\n\
+          \        Username = \"username\",\n        // Password(SecureString) to connect to the cluster \n        Password\
+          \ = Configuration.CreateSecurePassword(\"password\"),\n        // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \     Host = \"localhost\",\n        // Port used for the connection. \n        Port = 9440,\n        // Backoff\
+          \ period in seconds (exponential backoff: 2, 4, 8... seconds)\n        BackOffPeriod = 2,\n        // Max retry\
+          \ attempts while reconnecting on a loss of connection\n        MaxRetryAttempts = 5\n      };\n\n      ApiClient\
+          \ client = new ApiClient(_config);\n\n      ReportsApi reportsApi = new ReportsApi(client);\n\n      String reportExtId\
+          \ = \"2B20fE2C-7e8d-DBB2-aAED-f87EBeD7e4ec\";\n\n        // Create request object with parameters\n        var request\
+          \ = new DownloadReportRequest {\n            ReportExtId = reportExtId\n        };\n        try {\n            DownloadReportApiResponse\
+          \ downloadReportApiResponse = reportsApi.DownloadReport(request);\n        } catch (ApiException ex) {\n       \
+          \     Console.WriteLine(ex.Message);\n        }\n        // Create request object with parameters\n        var request\
+          \ = new DownloadReportRequest {\n            ReportExtId = reportExtId\n        };\n        try {\n            DownloadReportApiResponse\
+          \ downloadReportApiResponse = reportsApi.DownloadReport(request);\n        } catch (ApiException ex) {\n       \
+          \     Console.WriteLine(ex.Message);\n        }\n    }\n  }\n}\n"
+components:
+  schemas:
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    opsmgmt.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 72
+        error:
+          type: string
+          description: The generic error message for the response.
+          example: string
+        path:
+          type: string
+          description: API path on which the request was made.
+          example: string
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/opsmgmt.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    opsmgmt.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/opsmgmt.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/opsmgmt.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+          example: string
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+            example: string
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 28
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+              example: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 23
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    opsmgmt.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+          example: string
+        message:
+          type: string
+          description: The detailed message for the validation error.
+          example: string
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    opsmgmt.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
+            the endpoint belongs. For example: VMM-40000'
+          example: string
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 60
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

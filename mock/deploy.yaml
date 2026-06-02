@@ -1,0 +1,45 @@
+# Mock Nutanix v4 API - Deployment + Service.
+# The server script is mounted from a ConfigMap built by mock/kustomization.yaml.
+# Apply with:  kubectl apply -k mock/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nutanix-mock
+  namespace: nutanix-system
+  labels: { app: nutanix-mock }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: nutanix-mock }
+  template:
+    metadata:
+      labels: { app: nutanix-mock }
+    spec:
+      containers:
+        - name: mock
+          image: python:3.12-slim
+          command: ["python3", "/app/mock_server.py"]
+          env:
+            - { name: PORT, value: "8080" }
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet: { path: /api/prism/v4.0/config/categories, port: 8080 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          volumeMounts:
+            - { name: app, mountPath: /app }
+      volumes:
+        - name: app
+          configMap: { name: nutanix-mock-src }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nutanix-mock
+  namespace: nutanix-system
+  labels: { app: nutanix-mock }
+spec:
+  selector: { app: nutanix-mock }
+  ports:
+    - { name: http, port: 8080, targetPort: 8080 }

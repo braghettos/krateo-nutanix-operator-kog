@@ -1,0 +1,39 @@
+apiVersion: ogen.krateo.io/v1alpha1
+kind: RestDefinition
+metadata:
+  name: nutanix-image
+  namespace: nutanix-system
+spec:
+  oasPath: configmap://nutanix-system/nutanix-image-oas/image.yaml
+  resourceGroup: vmm.nutanix.krateo.io
+  resource:
+    kind: Image
+    identifiers:
+      - name
+    additionalStatusFields:
+      - extId
+    verbsDescription:
+      - action: findby
+        method: GET
+        path: /vmm/v4.1/content/images
+      - action: create
+        method: POST
+        path: /vmm/v4.1/content/images
+      - action: get
+        method: GET
+        path: /vmm/v4.1/content/images/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId
+      - action: update
+        method: PUT
+        path: /vmm/v4.1/content/images/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId
+      - action: delete
+        method: DELETE
+        path: /vmm/v4.1/content/images/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId

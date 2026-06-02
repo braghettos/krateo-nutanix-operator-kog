@@ -1,0 +1,43 @@
+apiVersion: ogen.krateo.io/v1alpha1
+kind: RestDefinition
+metadata:
+  name: nutanix-category
+  namespace: nutanix-system
+spec:
+  oasPath: configmap://nutanix-system/nutanix-category-oas/category.yaml
+  resourceGroup: prism.nutanix.krateo.io
+  resource:
+    kind: Category
+    # Categories are synchronous full-CRUD - the best first end-to-end test.
+    identifiers:
+      - key
+      - value
+    additionalStatusFields:
+      - extId
+    verbsDescription:
+      - action: findby
+        method: GET
+        path: /prism/v4.0/config/categories
+        # Both key AND value must match to identify a category.
+        identifiersMatchPolicy: AND
+      - action: create
+        method: POST
+        path: /prism/v4.0/config/categories
+      - action: get
+        method: GET
+        path: /prism/v4.0/config/categories/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId
+      - action: update
+        method: PUT
+        path: /prism/v4.0/config/categories/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId
+      - action: delete
+        method: DELETE
+        path: /prism/v4.0/config/categories/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId

@@ -1,0 +1,1823 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Volumes APIs
+  description: Configure volumes.
+  version: '4.0'
+  x-logo:
+    altText: Volumes Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/storage/images/storage-logo-img.svg
+  x-namespace-backward-compatibility:
+  - redirect: storage
+    to: volumes
+  x-repo-name: volumes
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /volumes/v4.0/config/volume-groups:
+    get:
+      tags:
+      - VolumeGroups
+      summary: List all the Volume Groups
+      description: Query the list of Volume Groups.
+      operationId: listVolumeGroups
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - clusterReference
+
+          - extId
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - clusterReference
+
+          - extId
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $expand
+        in: query
+        description: 'A URL query parameter that allows clients to request related resources when a resource that satisfies
+          a particular request is retrieved. Each expanded item is evaluated relative to the entity containing the property
+          being expanded. Other query options can be applied to an expanded property by appending a semicolon-separated list
+          of query options, enclosed in parentheses, to the property name. Permissible system query options are $filter, $select
+          and $orderby. The following expansion keys are supported.
+
+          - cluster
+
+          - metadata
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - clusterReference
+
+          - extId
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated list of Volume Groups.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/volumes.v4.0.config.VolumeGroup'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Volume Group Details
+        roleList:
+        - CSI System
+        - Kubernetes Data Services System
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Storage Admin
+        - Storage Viewer
+        - Disaster Recovery Admin
+        - Disaster Recovery Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 25
+        timeUnit: seconds
+      - type: large
+        count: 25
+        timeUnit: seconds
+      - type: xlarge
+        count: 25
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.VolumeGroupsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.ListVolumeGroupsApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VolumeGroupsApi volumeGroupsApi = new\
+          \ VolumeGroupsApi(apiClient);\n\n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try\
+          \ {\n            ListVolumeGroupsApiResponse listVolumeGroupsApiResponse = volumeGroupsApi.listVolumeGroups(page,\
+          \ limit, null, null, null, null);\n            System.out.println(listVolumeGroupsApiResponse.toString());\n\n \
+          \       } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VolumeGroupsApi } from \"@nutanix-api/volumes-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet volumeGroupsApi = new VolumeGroupsApi(apiClientInstance);\n\nfunction sample() {\n\n\n  \
+          \  // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n\
+          \    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"\
+          $expand\"] = \"string_sample_data\";\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    volumeGroupsApi.listVolumeGroups(opts).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    volume_groups_api = ntnx_volumes_py_client.VolumeGroupsApi(api_client=client)\n\
+          \    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = volume_groups_api.list_volume_groups(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_volumes_py_client.rest.ApiException as e:\n      \
+          \  print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/volumes/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VolumeGroupsApiInstance *api.VolumeGroupsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VolumeGroupsApiInstance = api.NewVolumeGroupsApi(ApiClientInstance)\n\n    \n    page_ := 0\n\
+          \    \n    limit_ := 50\n\n\n    response, error := VolumeGroupsApiInstance.ListVolumeGroups(&page_, &limit_, nil,\
+          \ nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.VolumeGroup)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$expand=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - VolumeGroups
+      summary: Creates a new Volume Group
+      description: Creates a new Volume Group.
+      operationId: createVolumeGroup
+      parameters:
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 19b737b6-1fa1-4e19-9016-361ce80999a5
+      requestBody:
+        description: A model that represents a Volume Group resource.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/volumes.v4.0.config.VolumeGroup'
+        required: true
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Group create operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Create Volume Group
+        roleList:
+        - CSI System
+        - Kubernetes Data Services System
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Storage Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 25
+        timeUnit: seconds
+      - type: large
+        count: 25
+        timeUnit: seconds
+      - type: xlarge
+        count: 25
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.VolumeGroupsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.VolumeGroup;\nimport com.nutanix.dp1.vol.volumes.v4.config.CreateVolumeGroupApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        VolumeGroupsApi volumeGroupsApi = new VolumeGroupsApi(apiClient);\n\n   \
+          \     VolumeGroup volumeGroup = new VolumeGroup();\n\n        // VolumeGroup object initializations here...\n\n\
+          \        try {\n            CreateVolumeGroupApiResponse createVolumeGroupApiResponse = volumeGroupsApi.createVolumeGroup(volumeGroup);\n\
+          \            System.out.println(createVolumeGroupApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VolumeGroupsApi, VolumeGroup } from \"@nutanix-api/volumes-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet volumeGroupsApi = new VolumeGroupsApi(apiClientInstance);\n\nfunction\
+          \ sample() {\n    let volumeGroup = new VolumeGroup();\n\n    // VolumeGroup object initializations here...\n\n\n\
+          \n\n\n\n    volumeGroupsApi.createVolumeGroup(volumeGroup).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    volume_groups_api = ntnx_volumes_py_client.VolumeGroupsApi(api_client=client)\n\
+          \    volumeGroup = ntnx_volumes_py_client.VolumeGroup()\n\n    # VolumeGroup object initializations here...\n\n\n\
+          \    try:\n        api_response = volume_groups_api.create_volume_group(body=volumeGroup)\n        print(api_response)\n\
+          \    except ntnx_volumes_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/volumes/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/prism/v4/config\"\n)\n\n\
+          var (\n    ApiClientInstance *client.ApiClient\n    VolumeGroupsApiInstance *api.VolumeGroupsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    VolumeGroupsApiInstance\
+          \ = api.NewVolumeGroupsApi(ApiClientInstance)\n\n    volumeGroup := import1.NewVolumeGroup()\n\n    // VolumeGroup\
+          \ object initializations here...\n\n\n\n    response, error := VolumeGroupsApiInstance.CreateVolumeGroup(volumeGroup)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups\" \\\n\
+          \     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n     \
+          \         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\"\
+          :\"string\",\"shouldLoadBalanceVmAttachments\":false,\"sharingStatus\":\"$UNKNOWN\",\"targetPrefix\":\"string\"\
+          ,\"targetName\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"iscsiFeatures\":{\"targetSecret\":\"string\"\
+          ,\"enabledAuthentications\":\"$UNKNOWN\",\"$objectType\":\"volumes.v4.config.IscsiFeatures\"},\"createdBy\":\"string\"\
+          ,\"clusterReference\":\"string\",\"storageFeatures\":{\"flashMode\":{\"isEnabled\":false,\"$objectType\":\"volumes.v4.config.FlashMode\"\
+          },\"$objectType\":\"volumes.v4.config.StorageFeatures\"},\"usageType\":\"$UNKNOWN\",\"attachmentType\":\"$UNKNOWN\"\
+          ,\"protocol\":\"$UNKNOWN\",\"isHidden\":false,\"disks\":[{\"tenantId\":\"string\",\"extId\":\"string\",\"links\"\
+          :[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"index\":0,\"diskSizeBytes\"\
+          :0,\"storageContainerId\":\"string\",\"description\":\"string\",\"diskDataSourceReference\":{\"extId\":\"string\"\
+          ,\"name\":\"string\",\"uris\":[\"string\"],\"entityType\":\"$UNKNOWN\",\"$objectType\":\"common.v1.config.EntityReference\"\
+          },\"diskStorageFeatures\":{\"flashMode\":{\"isEnabled\":false,\"$objectType\":\"volumes.v4.config.FlashMode\"},\"\
+          $objectType\":\"volumes.v4.config.DiskStorageFeatures\"},\"$objectType\":\"volumes.v4.config.VolumeDisk\"}],\"$objectType\"\
+          :\"volumes.v4.config.VolumeGroup\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          name\":\"string\",\"description\":\"string\",\"shouldLoadBalanceVmAttachments\":false,\"sharingStatus\":\"$UNKNOWN\"\
+          ,\"targetPrefix\":\"string\",\"targetName\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"iscsiFeatures\"\
+          :{\"targetSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"$objectType\":\"volumes.v4.config.IscsiFeatures\"\
+          },\"createdBy\":\"string\",\"clusterReference\":\"string\",\"storageFeatures\":{\"flashMode\":{\"isEnabled\":false,\"\
+          $objectType\":\"volumes.v4.config.FlashMode\"},\"$objectType\":\"volumes.v4.config.StorageFeatures\"},\"usageType\"\
+          :\"$UNKNOWN\",\"attachmentType\":\"$UNKNOWN\",\"protocol\":\"$UNKNOWN\",\"isHidden\":false,\"disks\":[{\"tenantId\"\
+          :\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"index\":0,\"diskSizeBytes\":0,\"storageContainerId\":\"string\",\"description\":\"string\",\"diskDataSourceReference\"\
+          :{\"extId\":\"string\",\"name\":\"string\",\"uris\":[\"string\"],\"entityType\":\"$UNKNOWN\",\"$objectType\":\"\
+          common.v1.config.EntityReference\"},\"diskStorageFeatures\":{\"flashMode\":{\"isEnabled\":false,\"$objectType\"\
+          :\"volumes.v4.config.FlashMode\"},\"$objectType\":\"volumes.v4.config.DiskStorageFeatures\"},\"$objectType\":\"\
+          volumes.v4.config.VolumeDisk\"}],\"$objectType\":\"volumes.v4.config.VolumeGroup\"} \\\n- \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups\"\
+          \n"
+  /volumes/v4.0/config/volume-groups/{extId}:
+    get:
+      tags:
+      - VolumeGroups
+      summary: Get a Volume Group
+      description: Query the Volume Group identified by {extId}.
+      operationId: getVolumeGroupById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of a Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: d09aeec9-5bb7-4bfd-9717-a051178f6e7c
+      responses:
+        '200':
+          description: Details of the queried Volume Group.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.config.VolumeGroup'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Volume Group Details
+        roleList:
+        - CSI System
+        - Kubernetes Data Services System
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Storage Admin
+        - Storage Viewer
+        - Disaster Recovery Admin
+        - Disaster Recovery Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 25
+        timeUnit: seconds
+      - type: large
+        count: 25
+        timeUnit: seconds
+      - type: xlarge
+        count: 25
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.VolumeGroupsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.GetVolumeGroupApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VolumeGroupsApi volumeGroupsApi = new\
+          \ VolumeGroupsApi(apiClient);\n\n        \n        String extId = \"dacfde3F-fCCa-e1D5-ecfb-AffBc15A8ce0\";\n\n\
+          \        try {\n            GetVolumeGroupApiResponse getVolumeGroupApiResponse = volumeGroupsApi.getVolumeGroupById(extId);\n\
+          \            System.out.println(getVolumeGroupApiResponse.toString());\n\n        } catch (RestClientException ex)\
+          \ {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VolumeGroupsApi } from \"@nutanix-api/volumes-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet volumeGroupsApi = new VolumeGroupsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n\
+          \    let extId = \"dEebedEC-F7f3-DCEA-dedd-7Ca10c8ffDD0\";\n\n\n\n\n\n    volumeGroupsApi.getVolumeGroupById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    volume_groups_api = ntnx_volumes_py_client.VolumeGroupsApi(api_client=client)\n\
+          \    \n    ext_id = \"89AFabEA-1A4F-f421-5AFc-25FDaDCF2F4f\"\n\n\n    try:\n        api_response = volume_groups_api.get_volume_group_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_volumes_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/volumes/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VolumeGroupsApiInstance *api.VolumeGroupsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VolumeGroupsApiInstance = api.NewVolumeGroupsApi(ApiClientInstance)\n\n    \n    extId := \"4BBcbAAd-CaBB-e81a-04d5-4D0cE1Ba76cB\"\
+          \n\n\n    response, error := VolumeGroupsApiInstance.GetVolumeGroupById(&extId)\n    if error != nil {\n       \
+          \ fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.VolumeGroup)\n    fmt.Println(data)\n\
+          \n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups/ceCCAD92-0ab3-748A-5ef8-EeEDA8ae5e1c\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups/efA12d6C-182f-CCE7-B0ED-F8c8Cbb6cC31\"\
+          \n"
+    put:
+      tags:
+      - VolumeGroups
+      summary: Update details of a specified Volume Group
+      description: Updates details of a specific Volume Group identified by {extId}.
+      operationId: updateVolumeGroupById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of a Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 2eb3971e-7d53-4f3d-b046-8cc9c0e72845
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 1dd2f8cf-772a-41ac-b3b9-fa41f7316a75
+      requestBody:
+        description: A model that represents a Volume Group resource.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/volumes.v4.0.config.VolumeGroup'
+        required: true
+      responses:
+        '202':
+          description: Returns the task ID corresponding to the Volume Group update operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Put
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Put
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Put
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Update Volume Group Details
+        roleList:
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Storage Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 15
+        timeUnit: seconds
+      - type: small
+        count: 15
+        timeUnit: seconds
+      - type: large
+        count: 15
+        timeUnit: seconds
+      - type: xlarge
+        count: 15
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.VolumeGroupsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.VolumeGroup;\nimport com.nutanix.dp1.vol.volumes.v4.config.GetVolumeGroupApiResponse;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.UpdateVolumeGroupApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        VolumeGroupsApi volumeGroupsApi = new VolumeGroupsApi(apiClient);\n\n   \
+          \     VolumeGroup volumeGroup = new VolumeGroup();\n\n        // VolumeGroup object initializations here...\n  \
+          \      \n        String extId = \"009Bcf8C-Bf54-26Db-99eC-FdbA3cdFba54\";\n\n        // perform GET call\n     \
+          \   GetVolumeGroupApiResponse getResponse = null;\n        try {\n            getResponse = volumeGroupsApi.getVolumeGroupById(extId);\n\
+          \        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n      \
+          \  // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdateVolumeGroupApiResponse updateVolumeGroupApiResponse = volumeGroupsApi.updateVolumeGroupById(extId,\
+          \ volumeGroup, opts);\n            System.out.println(updateVolumeGroupApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VolumeGroupsApi, VolumeGroup, GetVolumeGroupApiResponse } from \"@nutanix-api/volumes-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet volumeGroupsApi = new VolumeGroupsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let volumeGroup = new VolumeGroup();\n\n    // VolumeGroup object initializations here...\n\
+          \n    \n    let extId = \"be9cd43B-Bb68-afad-0c1d-DCF2CBcAAd8B\";\n\n\n    // Perform Get call\n    volumeGroupsApi.getVolumeGroupById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        volumeGroupsApi.updateVolumeGroupById(extId,\
+          \ volumeGroup, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the\
+          \ following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    volume_groups_api = ntnx_volumes_py_client.VolumeGroupsApi(api_client=client)\n\
+          \    volumeGroup = ntnx_volumes_py_client.VolumeGroup()\n\n    # VolumeGroup object initializations here...\n  \
+          \  \n    ext_id = \"aA7eF8ce-DDE6-9DBD-dCfd-afFc6f74e9Bd\"\n\n    try:\n        api_response = volume_groups_api.get_volume_group_by_id(extId=ext_id)\n\
+          \    except ntnx_volumes_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value\
+          \ = ntnx_volumes_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response = volume_groups_api.update_volume_group_by_id(extId=ext_id,\
+          \ body=volumeGroup, if_match=etag_value)\n        print(api_response)\n    except ntnx_volumes_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/volumes/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/prism/v4/config\"\n)\n\n\
+          var (\n    ApiClientInstance *client.ApiClient\n    VolumeGroupsApiInstance *api.VolumeGroupsApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    VolumeGroupsApiInstance\
+          \ = api.NewVolumeGroupsApi(ApiClientInstance)\n\n    volumeGroup := import1.NewVolumeGroup()\n\n    // VolumeGroup\
+          \ object initializations here...\n\n    \n    extId := \"AE4A9973-Efc4-b2Df-bDd0-78DFdCcDA5ac\"\n\n    getResponse,\
+          \ err := VolumeGroupsApiInstance.GetVolumeGroupById(&extId)\n    if err != nil {\n        fmt.Println(err)\n   \
+          \     return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\n\
+          \    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := VolumeGroupsApiInstance.UpdateVolumeGroupById(&extId,\
+          \ volumeGroup, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups/F18cFE4e-edc4-a08A-6daf-323eDAfcc0dc\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"name\":\"string\",\"description\":\"string\",\"shouldLoadBalanceVmAttachments\":false,\"sharingStatus\":\"\
+          $UNKNOWN\",\"targetPrefix\":\"string\",\"targetName\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"iscsiFeatures\"\
+          :{\"targetSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"$objectType\":\"volumes.v4.config.IscsiFeatures\"\
+          },\"createdBy\":\"string\",\"clusterReference\":\"string\",\"storageFeatures\":{\"flashMode\":{\"isEnabled\":false,\"\
+          $objectType\":\"volumes.v4.config.FlashMode\"},\"$objectType\":\"volumes.v4.config.StorageFeatures\"},\"usageType\"\
+          :\"$UNKNOWN\",\"attachmentType\":\"$UNKNOWN\",\"protocol\":\"$UNKNOWN\",\"isHidden\":false,\"disks\":[{\"tenantId\"\
+          :\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"index\":0,\"diskSizeBytes\":0,\"storageContainerId\":\"string\",\"description\":\"string\",\"diskDataSourceReference\"\
+          :{\"extId\":\"string\",\"name\":\"string\",\"uris\":[\"string\"],\"entityType\":\"$UNKNOWN\",\"$objectType\":\"\
+          common.v1.config.EntityReference\"},\"diskStorageFeatures\":{\"flashMode\":{\"isEnabled\":false,\"$objectType\"\
+          :\"volumes.v4.config.FlashMode\"},\"$objectType\":\"volumes.v4.config.DiskStorageFeatures\"},\"$objectType\":\"\
+          volumes.v4.config.VolumeDisk\"}],\"$objectType\":\"volumes.v4.config.VolumeGroup\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\":\"string\",\"shouldLoadBalanceVmAttachments\"\
+          :false,\"sharingStatus\":\"$UNKNOWN\",\"targetPrefix\":\"string\",\"targetName\":\"string\",\"enabledAuthentications\"\
+          :\"$UNKNOWN\",\"iscsiFeatures\":{\"targetSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"$objectType\"\
+          :\"volumes.v4.config.IscsiFeatures\"},\"createdBy\":\"string\",\"clusterReference\":\"string\",\"storageFeatures\"\
+          :{\"flashMode\":{\"isEnabled\":false,\"$objectType\":\"volumes.v4.config.FlashMode\"},\"$objectType\":\"volumes.v4.config.StorageFeatures\"\
+          },\"usageType\":\"$UNKNOWN\",\"attachmentType\":\"$UNKNOWN\",\"protocol\":\"$UNKNOWN\",\"isHidden\":false,\"disks\"\
+          :[{\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"index\":0,\"diskSizeBytes\":0,\"storageContainerId\":\"string\",\"description\"\
+          :\"string\",\"diskDataSourceReference\":{\"extId\":\"string\",\"name\":\"string\",\"uris\":[\"string\"],\"entityType\"\
+          :\"$UNKNOWN\",\"$objectType\":\"common.v1.config.EntityReference\"},\"diskStorageFeatures\":{\"flashMode\":{\"isEnabled\"\
+          :false,\"$objectType\":\"volumes.v4.config.FlashMode\"},\"$objectType\":\"volumes.v4.config.DiskStorageFeatures\"\
+          },\"$objectType\":\"volumes.v4.config.VolumeDisk\"}],\"$objectType\":\"volumes.v4.config.VolumeGroup\"} \\\n- \"\
+          https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups/fdf63aEf-bcdB-77bf-F380-A6BC0AfF49ba\"\n"
+    delete:
+      tags:
+      - VolumeGroups
+      summary: Delete the Volume Group
+      description: Delete the Volume Group identified by {extId}.
+      operationId: deleteVolumeGroupById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of a Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: ccf79021-64c1-49aa-8abb-3bf328a0556e
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 0ff16953-91de-4cf4-9e9e-7a7f3ef6cacb
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Group delete operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Delete
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Delete
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/volumes.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /volumes/v4.0/config/volume-groups/{extId} Delete
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Delete Volume Group
+        roleList:
+        - CSI System
+        - Kubernetes Data Services System
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Storage Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 25
+        timeUnit: seconds
+      - type: large
+        count: 25
+        timeUnit: seconds
+      - type: xlarge
+        count: 25
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vol.java.client.ApiClient;\nimport com.nutanix.vol.java.client.api.VolumeGroupsApi;\n\
+          import com.nutanix.dp1.vol.volumes.v4.config.DeleteVolumeGroupApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VolumeGroupsApi volumeGroupsApi = new\
+          \ VolumeGroupsApi(apiClient);\n\n        \n        String extId = \"f64a7BaA-FdCE-EEaA-75ec-CFF55acEcc89\";\n\n\
+          \        try {\n            DeleteVolumeGroupApiResponse deleteVolumeGroupApiResponse = volumeGroupsApi.deleteVolumeGroupById(extId);\n\
+          \            System.out.println(deleteVolumeGroupApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VolumeGroupsApi } from \"@nutanix-api/volumes-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet volumeGroupsApi = new VolumeGroupsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n\
+          \    let extId = \"D27eaca8-C7Bc-CF5f-4Cde-8D135fDF53CA\";\n\n\n\n\n\n    volumeGroupsApi.deleteVolumeGroupById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_volumes_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_volumes_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss\
+          \ of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor\
+          \ = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n    # Password to connect to\
+          \ the cluster\n    config.password = \"password\"\n    # Please add authorization information here if needed.\n\
+          \    client = ntnx_volumes_py_client.ApiClient(configuration=config)\n    volume_groups_api = ntnx_volumes_py_client.VolumeGroupsApi(api_client=client)\n\
+          \    \n    ext_id = \"7ab2fAF0-eCC3-E4f3-e5Af-E1aC48BAdaBc\"\n\n\n    try:\n        api_response = volume_groups_api.delete_volume_group_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_volumes_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/volumes-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VolumeGroupsApiInstance *api.VolumeGroupsApi\n)\n\nfunc\
+          \ main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \ ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    VolumeGroupsApiInstance = api.NewVolumeGroupsApi(ApiClientInstance)\n\n    \n    extId := \"EefbFbD4-4BD7-ccBD-3a58-7A0aBbaEDcac\"\
+          \n\n\n    response, error := VolumeGroupsApiInstance.DeleteVolumeGroupById(&extId)\n    if error != nil {\n    \
+          \    fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n    fmt.Println(data)\n\
+          \n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups/bB6afCDD-C8AD-85EB-90F1-8edBe0dDeBAf\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\
+          \n- \"https://{pc-ip}:9440/api/volumes/v4.0/config/volume-groups/90ea2A0E-CCcE-dd9B-7Db8-f8dE30ebbEcb\"\n"
+components:
+  schemas:
+    volumes.v4.0.config.StorageFeatures:
+      type: object
+      properties:
+        flashMode:
+          $ref: '#/components/schemas/volumes.v4.0.config.FlashMode'
+      additionalProperties: false
+      description: Storage optimization features which must be enabled on the Volume Group. This is an optional field.
+    volumes.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    volumes.v4.0.config.IscsiFeatures:
+      title: Iscsi target features title
+      type: object
+      properties:
+        targetSecret:
+          maxLength: 16
+          minLength: 12
+          type: string
+          description: Target secret in case of a CHAP authentication. This field must only be provided in case the authentication
+            type is not set to CHAP. This is an optional field and it cannot be retrieved once configured.
+          format: password
+          writeOnly: true
+          example: '*************'
+        enabledAuthentications:
+          $ref: '#/components/schemas/volumes.v4.0.config.AuthenticationType'
+      additionalProperties: false
+      description: iSCSI specific settings for the Volume Group. This is an optional field.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    volumes.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/volumes.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    volumes.v4.0.config.FlashMode:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+          description: This field will indicate whether flash mode is enabled or not.
+          default: false
+      additionalProperties: false
+      description: Once configured, this field will avoid down migration of data from the hot tier unless the overrides field
+        is specified for the virtual disks.
+    volumes.v4.0.config.UsageType:
+      title: Supported Volume Group Usage types
+      type: string
+      description: Expected usage type for the Volume Group. This is an indicative hint on how the caller will consume the
+        Volume Group. This is an optional field.
+      enum:
+      - USER
+      - INTERNAL
+      - TEMPORARY
+      - BACKUP_TARGET
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        BACKUP_TARGET: The Volume Groups which store backup data.
+        INTERNAL: The Volume Groups, which are critical to AOS and its related applications must not be modified externally.
+        TEMPORARY: The temporary Volume Groups which are created to access the data from the disks and may be deleted without
+          any data loss.
+        USER: The Volume Groups created by the user, typically using the UI.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    volumes.v4.0.config.VolumeDisk:
+      title: Volume Disk object
+      description: A model that represents a Volume Disk associated with a Volume Group, supported by a backing file on DSF.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          index:
+            maximum: 16383
+            minimum: 0
+            type: integer
+            description: Index of the disk in a Volume Group. This field is optional and immutable.
+            example: 74
+          diskSizeBytes:
+            maximum: 219902325555200
+            minimum: 524288
+            type: integer
+            description: Size of the disk in bytes. This field is mandatory during Volume Group creation if a new disk is
+              created on the storage container.
+            format: int64
+            example: 156650882979022
+          storageContainerId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Storage container on which the disk must be created. This is a read-only field.
+            readOnly: true
+            example: 85858c65-8cb8-4aa3-a466-493d95850f9d
+          description:
+            maxLength: 1000
+            type: string
+            description: Volume Disk description. This is an optional field.
+          diskDataSourceReference:
+            $ref: '#/components/schemas/common.v1.0.config.EntityReference'
+          diskStorageFeatures:
+            $ref: '#/components/schemas/volumes.v4.0.config.DiskStorageFeatures'
+        additionalProperties: false
+        x-required-by-operation:
+          create:
+          - diskDataSourceReference
+    volumes.v4.0.config.SharingStatus:
+      title: The supported sharing status types
+      type: string
+      description: Indicates whether the Volume Group can be shared across multiple iSCSI initiators. The mode cannot be changed
+        from SHARED to NOT_SHARED on a Volume Group with multiple attachments. Similarly, a Volume Group cannot be associated
+        with more than one attachment as long as it is in exclusive mode. This is an optional field.
+      enum:
+      - SHARED
+      - NOT_SHARED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SHARED: The Volume Group is shared between multiple iSCSI-clients or VMs.
+        NOT_SHARED: The Volume Group is exclusively accessed by an iSCSI client or VM.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d92bfbe7-1b58-4493-ba79-3cf2a204bdca
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    volumes.v4.0.config.AuthenticationType:
+      title: Supported types of authentication
+      type: string
+      description: The authentication type enabled for the Volume Group. This is an optional field. If omitted, the authentication
+        is not configured for the Volume Group. If this is set to CHAP, the target/client secret must be provided.
+      enum:
+      - CHAP
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CHAP: Access to the Volume Group requires CHAP authentication.
+        NONE: Access to the Volume Group doesn't require any authentication.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    volumes.v4.0.config.AttachmentType:
+      title: Supported Volume Group attachment types
+      type: string
+      description: The field indicates whether a VG has a VM or an external attachment associated with it.
+      enum:
+      - NONE
+      - DIRECT
+      - EXTERNAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        EXTERNAL: Volume Group has an external iSCSI or NVMf attachment.
+        NONE: Volume Group has no attachment.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DIRECT: Volume Group has a VM attachment.
+        $REDACTED: 'Redacted value.
+
+          '
+    volumes.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 73
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    volumes.v4.0.config.VolumeGroup:
+      title: Volume Group object
+      description: A model that represents a Volume Group resource.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 256
+            type: string
+            description: Volume Group name.
+          description:
+            maxLength: 1000
+            type: string
+            description: Volume Group description. This is an optional field.
+          shouldLoadBalanceVmAttachments:
+            type: boolean
+            description: Indicates whether to enable Volume Group load balancing for VM attachments. This cannot be enabled
+              if there are iSCSI client attachments already associated with the Volume Group, and vice-versa. This is an optional
+              field.
+            default: false
+          sharingStatus:
+            $ref: '#/components/schemas/volumes.v4.0.config.SharingStatus'
+          targetPrefix:
+            maxLength: 512
+            pattern: ^[\da-zA-Z:\.\-]+$
+            type: string
+            description: The specifications contain the target prefix for external clients as the value. This is an optional
+              field.
+            writeOnly: true
+          targetName:
+            maxLength: 512
+            minLength: 12
+            type: string
+            description: Name of the external client target that will be visible and accessible to the client. This is an
+              optional field.
+          enabledAuthentications:
+            $ref: '#/components/schemas/volumes.v4.0.config.AuthenticationType'
+          iscsiFeatures:
+            $ref: '#/components/schemas/volumes.v4.0.config.IscsiFeatures'
+          createdBy:
+            maxLength: 512
+            type: string
+            description: Service/user who created this Volume Group. This is an optional field.
+          clusterReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The UUID of the cluster that will host the Volume Group. This is a mandatory field for creating a
+              Volume Group on Prism Central.
+            example: 0caed483-a63d-4c31-a5ca-70161af400af
+          storageFeatures:
+            $ref: '#/components/schemas/volumes.v4.0.config.StorageFeatures'
+          usageType:
+            $ref: '#/components/schemas/volumes.v4.0.config.UsageType'
+          attachmentType:
+            $ref: '#/components/schemas/volumes.v4.0.config.AttachmentType'
+          protocol:
+            $ref: '#/components/schemas/volumes.v4.0.config.Protocol'
+          isHidden:
+            type: boolean
+            description: Indicates whether the Volume Group is meant to be hidden or not. This is an optional field. If omitted,
+              the VG will not be hidden.
+            default: false
+          disks:
+            maxItems: 10
+            minItems: 1
+            type: array
+            description: A list of Volume Disks to be attached to the Volume Group.
+            writeOnly: true
+            items:
+              $ref: '#/components/schemas/volumes.v4.0.config.VolumeDisk'
+        additionalProperties: false
+        x-required-by-operation:
+          create:
+          - clusterReference
+          - name
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    volumes.v4.0.config.DiskStorageFeatures:
+      type: object
+      properties:
+        flashMode:
+          $ref: '#/components/schemas/volumes.v4.0.config.FlashMode'
+      additionalProperties: false
+      description: Storage optimization features which must be enabled on the Volume Disks. This is an optional field. If
+        omitted, the disks will honor the Volume Group specific storage features setting.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: d4e34a80-abc5-46ca-8fcd-af3f00f2930a
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    volumes.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 92
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 52
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 17
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.EntityReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+            '
+          example: 1632c00d-c762-4aa5-b370-440584b6952b
+        name:
+          maxLength: 256
+          type: string
+          description: 'Name of entity that''s represented by this reference.
+
+            '
+        uris:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: URI of entities that's represented by this reference.
+          items:
+            type: string
+        entityType:
+          $ref: '#/components/schemas/common.v1.0.config.EntityType'
+      additionalProperties: false
+    common.v1.0.config.EntityType:
+      type: string
+      description: 'Type of entity that''s represented by this reference. eg: VPC
+
+        '
+      enum:
+      - CLUSTER
+      - VM
+      - STORAGE_CONTAINER
+      - VOLUME_GROUP
+      - TASK
+      - IMAGE
+      - CATEGORY
+      - NODE
+      - VPC
+      - SUBNET
+      - ROUTING_POLICY
+      - FLOATING_IP
+      - VPN_GATEWAY
+      - VPN_CONNECTION
+      - DIRECT_CONNECT
+      - DIRECT_CONNECT_VIF
+      - VIRTUAL_NIC
+      - VIRTUAL_SWITCH
+      - VM_DISK
+      - VOLUME_DISK
+      - DISK_RECOVERY_POINT
+      - VTEP_GATEWAY
+      - RECOVERY_PLAN
+      - RECOVERY_PLAN_JOB
+      - AVAILABILITY_ZONE
+      - VIRTUAL_NETWORK
+      - CONSISTENCY_GROUP
+      - SUBNET_EXTENSION
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        VOLUME_GROUP: 'Entity representing a volume group.
+
+          '
+        ROUTING_POLICY: 'Entity representing a Routing Policy.
+
+          '
+        DIRECT_CONNECT_VIF: 'Entity representing a Direct Connect Virtual Interface.
+
+          '
+        AVAILABILITY_ZONE: 'Entity representing an Availability Zone.
+
+          '
+        STORAGE_CONTAINER: 'Entity representing a storage container.
+
+          '
+        VPC: 'Entity representing a Virtual Private Cloud.
+
+          '
+        VPN_CONNECTION: 'Entity representing a VPN Connection.
+
+          '
+        VOLUME_DISK: 'Entity representing a Volume Disk.
+
+          '
+        VPN_GATEWAY: 'Entity representing a VPN Gateway.
+
+          '
+        IMAGE: 'Entity representing an image that can be used for creating VM disks etc.
+
+          '
+        CATEGORY: 'Entity representing a category in the form of a Key Value pair.
+
+          '
+        RECOVERY_PLAN: 'Entity representing a Disaster Recovery Plan.
+
+          '
+        CLUSTER: 'Entity representing a Nutanix managed cluster.
+
+          '
+        DISK_RECOVERY_POINT: 'Entity representing the recovery point of a protected Disk.
+
+          '
+        CONSISTENCY_GROUP: 'Entity representing a Consistency Group.
+
+          '
+        VIRTUAL_NIC: 'Entity representing a Virtual Network Interface Card.
+
+          '
+        TASK: 'Entity representing a task.
+
+          '
+        VIRTUAL_SWITCH: 'Entity representing a Virtual Switch.
+
+          '
+        VIRTUAL_NETWORK: 'Entity representing a Virtual Network.
+
+          '
+        NODE: 'Entity representing a node in a Nutanix managed cluster.
+
+          '
+        FLOATING_IP: 'Entity representing a Floating IP.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        SUBNET: 'Entity representing a Subnet.
+
+          '
+        VM_DISK: 'Entity representing a VM Disk.
+
+          '
+        VTEP_GATEWAY: 'Entity representing a Virtual Tunnel End Point.
+
+          '
+        VM: 'Entity representing an AHV or ESX Virtual Machine.
+
+          '
+        DIRECT_CONNECT: 'Entity representing a Direct Connect.
+
+          '
+        SUBNET_EXTENSION: 'Entity representing a Subnet Extension.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:2eb25ec6-5070-4b62-a03e-4717e1ffec5a
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    volumes.v4.0.config.Protocol:
+      title: Supported Volume group protocols
+      type: string
+      description: Type of protocol to be used for Volume Group.
+      enum:
+      - NOT_ASSIGNED
+      - ISCSI
+      - NVMF
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NOT_ASSIGNED: Volume Group does not use any protocol.
+        ISCSI: Volume Group uses iSCSI protocol.
+        NVMF: Volume Group uses NVMf protocol.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

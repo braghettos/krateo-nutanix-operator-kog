@@ -1,0 +1,196 @@
+openapi: 3.0.3
+# -----------------------------------------------------------------------------
+# TRIMMED OAS SLICE - Nutanix Prism Central v4 - Subnet (networking namespace)
+# Starter spec. Replace/extend with the version-exact doc from your PC.
+# Same async + If-Match/Ntnx-Request-Id caveats as the other v4 resources.
+# -----------------------------------------------------------------------------
+info:
+  title: Nutanix Networking - Subnet (trimmed)
+  version: v4.0
+servers:
+  - url: "{scheme}://{prismCentral}/api"
+    variables:
+      scheme:
+        default: https
+        enum: [https, http]
+        description: Use http only for the local mock server; https for a real PC
+      prismCentral:
+        default: prism-central.example.com:9440
+security:
+  - basicAuth: []
+  - apiKeyAuth: []
+paths:
+  /networking/v4.0/config/subnets:
+    get:
+      operationId: listSubnets
+      parameters:
+        - name: $filter
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of subnets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubnetListResponse"
+    post:
+      operationId: createSubnet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Subnet"
+      responses:
+        "202":
+          description: Accepted - task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskReferenceResponse"
+  /networking/v4.0/config/subnets/{extId}:
+    get:
+      operationId: getSubnetById
+      parameters:
+        - $ref: "#/components/parameters/ExtId"
+      responses:
+        "200":
+          description: A subnet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubnetResponse"
+    put:
+      operationId: updateSubnetById
+      parameters:
+        - $ref: "#/components/parameters/ExtId"
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/NtnxRequestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Subnet"
+      responses:
+        "202":
+          description: Accepted - task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskReferenceResponse"
+    delete:
+      operationId: deleteSubnetById
+      parameters:
+        - $ref: "#/components/parameters/ExtId"
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/NtnxRequestId"
+      responses:
+        "202":
+          description: Accepted - task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskReferenceResponse"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Ntnx-Api-Key
+  parameters:
+    ExtId:
+      name: extId
+      in: path
+      required: true
+      schema:
+        type: string
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      schema:
+        type: string
+    NtnxRequestId:
+      name: Ntnx-Request-Id
+      in: header
+      required: false
+      schema:
+        type: string
+  schemas:
+    Subnet:
+      type: object
+      properties:
+        extId:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        subnetType:
+          type: string
+          enum: [VLAN, OVERLAY]
+        networkId:
+          type: integer
+          format: int32
+          description: VLAN id (for VLAN subnets)
+        clusterReference:
+          type: string
+          description: External id of the cluster hosting this subnet
+        ipConfig:
+          type: array
+          items:
+            $ref: "#/components/schemas/IpConfig"
+    IpConfig:
+      type: object
+      properties:
+        ipv4:
+          $ref: "#/components/schemas/Ipv4Config"
+    Ipv4Config:
+      type: object
+      properties:
+        ipSubnet:
+          type: object
+          properties:
+            ip:
+              type: object
+              properties:
+                value:
+                  type: string
+            prefixLength:
+              type: integer
+              format: int32
+        defaultGatewayIp:
+          type: object
+          properties:
+            value:
+              type: string
+    SubnetResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/Subnet"
+    SubnetListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subnet"
+    TaskReferenceResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/TaskReference"
+    TaskReference:
+      type: object
+      properties:
+        extId:
+          type: string

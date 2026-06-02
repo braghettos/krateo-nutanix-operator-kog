@@ -1,0 +1,1820 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Files APIs
+  description: Manage virtual file servers, create and configure shares for client access, protect them using DR and sync
+    policies, provision storage space and administer security controls.
+  version: '4.0'
+  x-repo-name: files
+  x-logo:
+    altText: Files Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/files/images/files-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers:
+    get:
+      tags:
+      - PartnerServers
+      summary: List partner servers
+      description: Get a paginated list of partner servers.
+      operationId: listPartnerServers
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 4f724fa8-1cd7-49ed-8bdc-0ae33a7d9270
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - name
+
+          - partnerType
+
+          - vendorName
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - name
+
+          - vendorName
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - description
+
+          - name
+
+          - partnerType
+
+          - vendorName
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Response to list partner servers.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/files.v4.0.config.PartnerServer'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Partner Server
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2023.4
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.PartnerServersApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ListPartnerServersApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        PartnerServersApi partnerServersApi =\
+          \ new PartnerServersApi(apiClient);\n\n        \n        String fileServerExtId = \"3c5bcABC-A5b6-EfC5-FBf5-EEaac4da7e4c\"\
+          ;\n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListPartnerServersApiResponse\
+          \ listPartnerServersApiResponse = partnerServersApi.listPartnerServers(fileServerExtId, page, limit, null, null,\
+          \ null);\n            System.out.println(listPartnerServersApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, PartnerServersApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet partnerServersApi = new PartnerServersApi(apiClientInstance);\n\nfunction sample() {\n\n\
+          \    \n    let fileServerExtId = \"eDCcdFc8-23e3-b5d9-Fbf1-A1b9f82841F6\";\n\n    // Construct Optional Parameters\n\
+          \    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\"\
+          ;\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n \
+          \   partnerServersApi.listPartnerServers(fileServerExtId, opts).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    partner_servers_api = ntnx_files_py_client.PartnerServersApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"ada8a01A-BE19-E9EE-bFEc-BCC5FC445A6b\"\n    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response\
+          \ = partner_servers_api.list_partner_servers(fileServerExtId=file_server_ext_id, _page=page, _limit=limit)\n   \
+          \     print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    PartnerServersApiInstance *api.PartnerServersApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  PartnerServersApiInstance = api.NewPartnerServersApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"4CAe7EE8-BC8f-f331-f269-1FeCB72Bba9e\"\
+          \n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error := PartnerServersApiInstance.ListPartnerServers(&fileServerExtId,\
+          \ &page_, &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n  \
+          \  data, _ := response.GetData().([]import1.PartnerServer)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/fBab8Dfa-ef7E-2FC5-feCb-bfCe4dEdA8Fb/partner-servers?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/CC4edbF4-62C0-Fd9e-c7f9-fEC2Df0fa3dF/partner-servers?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - PartnerServers
+      summary: Create partner server
+      description: 'Create partner server by using the provided request body.
+
+        '
+      operationId: createPartnerServer
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: d30b3202-2b18-4fa4-a70b-9bd18c1c79f1
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: eb1aa18b-882e-4949-96c9-b0022880ffeb
+      requestBody:
+        description: Partner server model. Attributes `vendorProperties` and `backupServerConfig` are mutually exclusive.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.PartnerServer'
+        required: true
+      responses:
+        '202':
+          description: Response to the create partner server request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Create File Server Partner Server
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2023.4
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.PartnerServersApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.PartnerType;\nimport com.nutanix.dp1.fil.files.v4.config.PartnerServer;\n\
+          import com.nutanix.dp1.fil.files.v4.config.CreatePartnerServerApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        PartnerServersApi partnerServersApi =\
+          \ new PartnerServersApi(apiClient);\n\n        PartnerServer partnerServer = new PartnerServer();\n\n        //\
+          \ PartnerServer object initializations here...\n        partnerServer.setName(\"string_sample_data\");  // required\
+          \ field\n        partnerServer.setPartnerType(PartnerType.UNKNOWN);  // required field\n        partnerServer.setVendorName(\"\
+          string_sample_data\");  // required field\n        \n        String fileServerExtId = \"Ac1BFDbD-D984-54ce-EC99-ABF66a6eFcB2\"\
+          ;\n\n        try {\n            CreatePartnerServerApiResponse createPartnerServerApiResponse = partnerServersApi.createPartnerServer(fileServerExtId,\
+          \ partnerServer);\n            System.out.println(createPartnerServerApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, PartnerServersApi, PartnerType, PartnerServer } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet partnerServersApi = new PartnerServersApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let partnerServer = new PartnerServer();\n\n    // PartnerServer object initializations\
+          \ here...\n    partnerServer.setName(\"string_sample_data\");  // required field\n    partnerServer.setPartnerType(PartnerType.UNKNOWN);\
+          \  // required field\n    partnerServer.setVendorName(\"string_sample_data\");  // required field\n\n    \n    let\
+          \ fileServerExtId = \"Dd38A92f-d9eE-1Bf7-dA43-EE0c906EFCf9\";\n\n\n\n\n\n    partnerServersApi.createPartnerServer(fileServerExtId,\
+          \ partnerServer).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    partner_servers_api = ntnx_files_py_client.PartnerServersApi(api_client=client)\n    partnerServer = ntnx_files_py_client.PartnerServer()\n\
+          \n    # PartnerServer object initializations here...\n    partnerServer.name = \"string_sample_data\"  # required\
+          \ field\n    partnerServer.partner_type = ntnx_files_py_client.PartnerType._UNKNOWN  # required field\n    partnerServer.vendor_name\
+          \ = \"string_sample_data\"  # required field\n    \n    file_server_ext_id = \"3aAD0CfC-5b0B-FBCD-75C7-afe36cCbbfbf\"\
+          \n\n\n    try:\n        api_response = partner_servers_api.create_partner_server(fileServerExtId=file_server_ext_id,\
+          \ body=partnerServer)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n  \
+          \      print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    PartnerServersApiInstance *api.PartnerServersApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    PartnerServersApiInstance = api.NewPartnerServersApi(ApiClientInstance)\n\
+          \n    partnerServer := import1.NewPartnerServer()\n\n    // PartnerServer object initializations here...\n\n   \
+          \ \n    fileServerExtId := \"08cD5BFb-4e1f-BAeC-c17d-e248BdfCD1b9\"\n\n\n    response, error := PartnerServersApiInstance.CreatePartnerServer(&fileServerExtId,\
+          \ partnerServer)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/f5afedE6-C733-dEDE-Ad7f-912C99BabdfD/partner-servers\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"description\":\"string\",\"vendorName\"\
+          :\"string\",\"name\":\"string\",\"partnerType\":\"$UNKNOWN\",\"vendorProperties\":{\"customProperties\":[{\"name\"\
+          :\"string\",\"value\":\"\",\"$objectType\":\"common.v1.config.KVStringPair\"}],\"connectionStatus\":\"$UNKNOWN\"\
+          ,\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\"\
+          :{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"port\":0,\"serverType\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.VendorProperties\"},\"backupServerConfig\"\
+          :{\"expiryInSecs\":86400,\"backupClientAccessConfigs\":[{\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"\
+          $objectType\":\"common.v1.config.IPAddressOrFQDN\"},\"accessType\":\"$UNKNOWN\",\"mountTargetExtId\":\"string\"\
+          ,\"operationType\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.BackupServerAccessControlBlock\"}],\"$objectType\"\
+          :\"files.v4.config.BackupServerConfig\"},\"$objectType\":\"files.v4.config.PartnerServer\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          description\":\"string\",\"vendorName\":\"string\",\"name\":\"string\",\"partnerType\":\"$UNKNOWN\",\"vendorProperties\"\
+          :{\"customProperties\":[{\"name\":\"string\",\"value\":\"\",\"$objectType\":\"common.v1.config.KVStringPair\"}],\"\
+          connectionStatus\":\"$UNKNOWN\",\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"port\":0,\"serverType\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.VendorProperties\"},\"backupServerConfig\"\
+          :{\"expiryInSecs\":86400,\"backupClientAccessConfigs\":[{\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"\
+          $objectType\":\"common.v1.config.IPAddressOrFQDN\"},\"accessType\":\"$UNKNOWN\",\"mountTargetExtId\":\"string\"\
+          ,\"operationType\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.BackupServerAccessControlBlock\"}],\"$objectType\"\
+          :\"files.v4.config.BackupServerConfig\"},\"$objectType\":\"files.v4.config.PartnerServer\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/Ca2DDF3c-c4f9-33bD-cc72-eaFebAaF044c/partner-servers\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2023.4
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+  /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}:
+    get:
+      tags:
+      - PartnerServers
+      summary: Get partner server
+      description: 'Get partner server for the provided external identifier.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and of the partner server (`extId`) to be fetched.
+
+        '
+      operationId: getPartnerServerById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 296f300a-16f0-4570-a29c-6fd792c5dfa1
+      - name: extId
+        in: path
+        description: Partner server external identifier. Example:18f78959-14a6-4c47-b5db-920460c4b668.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 5bade6bf-94aa-4d61-94cc-7a7979d93274
+      responses:
+        '200':
+          description: Response to the get partner server for the provided external identifier.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.config.PartnerServer'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Partner Server
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2023.4
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.PartnerServersApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetPartnerServerApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        PartnerServersApi partnerServersApi =\
+          \ new PartnerServersApi(apiClient);\n\n        \n        String fileServerExtId = \"fffEcdAB-dbfb-1BFA-FBE0-1B3dEA2DBddB\"\
+          ;\n        \n        String extId = \"FEbaC881-7a83-9C8a-DAAE-CCd746bCbda4\";\n\n        try {\n            GetPartnerServerApiResponse\
+          \ getPartnerServerApiResponse = partnerServersApi.getPartnerServerById(fileServerExtId, extId);\n            System.out.println(getPartnerServerApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, PartnerServersApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet partnerServersApi = new PartnerServersApi(apiClientInstance);\n\nfunction sample() {\n\n\
+          \    \n    let fileServerExtId = \"cfEF95ee-e33e-1f9d-b68B-CeF9B7d734Ac\";\n    \n    let extId = \"FDec5E54-70bA-bED7-dACF-cDDf4D4defFf\"\
+          ;\n\n\n\n\n\n    partnerServersApi.getPartnerServerById(fileServerExtId, extId).then(({data, response}) => {\n \
+          \       console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    partner_servers_api = ntnx_files_py_client.PartnerServersApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"cCCCC9aa-5F2F-7AaE-5e7A-2aDBCf2fEB7B\"\n    \n    ext_id = \"d6ACaD26-62Fe-C095-c1A2-BaBAFeef75dd\"\n\n\n\
+          \    try:\n        api_response = partner_servers_api.get_partner_server_by_id(fileServerExtId=file_server_ext_id,\
+          \ extId=ext_id)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\
+          \n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    PartnerServersApiInstance *api.PartnerServersApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  PartnerServersApiInstance = api.NewPartnerServersApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"E4cDCd6E-aAcD-125B-aEd8-Fc00cf882eFd\"\
+          \n    \n    extId := \"FDFAadAa-dCdB-FFB0-9fc6-6fcff5d99AA7\"\n\n\n    response, error := PartnerServersApiInstance.GetPartnerServerById(&fileServerExtId,\
+          \ &extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.PartnerServer)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/7ecFe59b-A9cD-98DF-8EA8-beCccDCfECa0/partner-servers/40BBd732-eB5B-Af1c-A0F6-e7bedddd1e87\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/0dcda20b-f6d8-cF6f-cfC1-8f7FE10a85aB/partner-servers/6afAfe6b-a58D-A4AF-eEdc-cccBE3AFAAde\"\
+          \n"
+    put:
+      tags:
+      - PartnerServers
+      summary: Update partner server
+      description: 'Update partner server by using the provided request body.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and of
+
+        the partner server (`extId`).
+
+
+        It is always recommended to perform a GET request on a resource before requesting an UPDATE call.
+
+        '
+      operationId: updatePartnerServerById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: aec8ab55-86cf-4dfb-aecf-81ec36caa59e
+      - name: extId
+        in: path
+        description: Partner server external identifier. Example:18f78959-14a6-4c47-b5db-920460c4b668.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: f8e32f11-53b1-4173-93ce-d006a0ba2b7b
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 6b6946ca-402e-47f4-b3a9-a5f209e30b12
+      requestBody:
+        description: Partner server update model.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.PartnerServer'
+        required: true
+      responses:
+        '202':
+          description: Response to the update partner server request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Update File Server Partner Server
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2023.4
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.PartnerServersApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.PartnerType;\nimport com.nutanix.dp1.fil.files.v4.config.PartnerServer;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetPartnerServerApiResponse;\nimport com.nutanix.dp1.fil.files.v4.config.UpdatePartnerServerApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        PartnerServersApi partnerServersApi =\
+          \ new PartnerServersApi(apiClient);\n\n        PartnerServer partnerServer = new PartnerServer();\n\n        //\
+          \ PartnerServer object initializations here...\n        partnerServer.setName(\"string_sample_data\");  // required\
+          \ field\n        partnerServer.setPartnerType(PartnerType.UNKNOWN);  // required field\n        partnerServer.setVendorName(\"\
+          string_sample_data\");  // required field\n        \n        String fileServerExtId = \"a6c2C1cC-08b8-B2dc-16bF-cf0EBBbcfBBe\"\
+          ;\n        \n        String extId = \"52eeEdAD-Fc0e-4925-fcd1-3BcC94C9ca90\";\n\n        // perform GET call\n \
+          \       GetPartnerServerApiResponse getResponse = null;\n        try {\n            getResponse = partnerServersApi.getPartnerServerById(fileServerExtId,\
+          \ extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n       \
+          \ }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdatePartnerServerApiResponse updatePartnerServerApiResponse = partnerServersApi.updatePartnerServerById(fileServerExtId,\
+          \ extId, partnerServer, opts);\n            System.out.println(updatePartnerServerApiResponse.toString());\n\n \
+          \       } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, PartnerServersApi, PartnerType, PartnerServer, GetPartnerServerApiResponse } from \"\
+          @nutanix-api/files-js-client\";\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6\
+          \ address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port\
+          \ = '9440';\n// Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts\
+          \ = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to\
+          \ connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password\
+          \ = 'password';\n// Please add authorization information here if needed.\nlet partnerServersApi = new PartnerServersApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let partnerServer = new PartnerServer();\n\n    // PartnerServer object initializations\
+          \ here...\n    partnerServer.setName(\"string_sample_data\");  // required field\n    partnerServer.setPartnerType(PartnerType.UNKNOWN);\
+          \  // required field\n    partnerServer.setVendorName(\"string_sample_data\");  // required field\n\n    \n    let\
+          \ fileServerExtId = \"4E11945a-FAb5-Ec1B-BCdE-deFa0e8a5fF8\";\n    \n    let extId = \"E6f20DAB-C995-E0A3-f1ED-eaD5cBfFbAAb\"\
+          ;\n\n\n    // Perform Get call\n    partnerServersApi.getPartnerServerById(fileServerExtId, extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        partnerServersApi.updatePartnerServerById(fileServerExtId,\
+          \ extId, partnerServer, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned\
+          \ the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    partner_servers_api = ntnx_files_py_client.PartnerServersApi(api_client=client)\n    partnerServer = ntnx_files_py_client.PartnerServer()\n\
+          \n    # PartnerServer object initializations here...\n    partnerServer.name = \"string_sample_data\"  # required\
+          \ field\n    partnerServer.partner_type = ntnx_files_py_client.PartnerType._UNKNOWN  # required field\n    partnerServer.vendor_name\
+          \ = \"string_sample_data\"  # required field\n    \n    file_server_ext_id = \"Fadd1b78-aB67-5EAA-beDd-FD3fafBE3AdE\"\
+          \n    \n    ext_id = \"E0aaF2ca-AcD2-6416-dc4e-Fb7dB7F8EeFf\"\n\n    try:\n        api_response = partner_servers_api.get_partner_server_by_id(fileServerExtId=file_server_ext_id,\
+          \ extId=ext_id)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag\
+          \ Header\n    etag_value = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response\
+          \ = partner_servers_api.update_partner_server_by_id(fileServerExtId=file_server_ext_id, extId=ext_id, body=partnerServer,\
+          \ if_match=etag_value)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n \
+          \       print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    PartnerServersApiInstance *api.PartnerServersApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    PartnerServersApiInstance = api.NewPartnerServersApi(ApiClientInstance)\n\
+          \n    partnerServer := import1.NewPartnerServer()\n\n    // PartnerServer object initializations here...\n\n   \
+          \ \n    fileServerExtId := \"3B7EeDe5-Afdd-8D0c-eAEE-0bC614A1f4Da\"\n    \n    extId := \"eca5FeEB-fCaF-f3ec-bAd6-FCEdEfD2DdE4\"\
+          \n\n    getResponse, err := PartnerServersApiInstance.GetPartnerServerById(&fileServerExtId, &extId)\n    if err\
+          \ != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\
+          \n    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := PartnerServersApiInstance.UpdatePartnerServerById(&fileServerExtId,\
+          \ &extId, partnerServer, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data,\
+          \ _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/d3Bcb0BF-B23e-bEdf-EBd9-EB73851F3eaf/partner-servers/87EAf70E-ece1-1DCE-EEfd-6e8beabD4c1B\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"description\":\"string\",\"vendorName\":\"string\",\"name\":\"string\",\"partnerType\":\"$UNKNOWN\",\"vendorProperties\"\
+          :{\"customProperties\":[{\"name\":\"string\",\"value\":\"\",\"$objectType\":\"common.v1.config.KVStringPair\"}],\"\
+          connectionStatus\":\"$UNKNOWN\",\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\"\
+          :\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"\
+          },\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"port\":0,\"serverType\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.VendorProperties\"},\"backupServerConfig\"\
+          :{\"expiryInSecs\":86400,\"backupClientAccessConfigs\":[{\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\"\
+          :32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"\
+          $objectType\":\"common.v1.config.IPAddressOrFQDN\"},\"accessType\":\"$UNKNOWN\",\"mountTargetExtId\":\"string\"\
+          ,\"operationType\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.BackupServerAccessControlBlock\"}],\"$objectType\"\
+          :\"files.v4.config.BackupServerConfig\"},\"$objectType\":\"files.v4.config.PartnerServer\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"description\":\"string\",\"vendorName\":\"string\",\"name\":\"string\",\"partnerType\"\
+          :\"$UNKNOWN\",\"vendorProperties\":{\"customProperties\":[{\"name\":\"string\",\"value\":\"\",\"$objectType\":\"\
+          common.v1.config.KVStringPair\"}],\"connectionStatus\":\"$UNKNOWN\",\"address\":{\"ipv4\":{\"value\":\"string\"\
+          ,\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\"\
+          :128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"\
+          },\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"},\"port\":0,\"serverType\":\"$UNKNOWN\",\"$objectType\":\"\
+          files.v4.config.VendorProperties\"},\"backupServerConfig\":{\"expiryInSecs\":86400,\"backupClientAccessConfigs\"\
+          :[{\"address\":{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\"\
+          :{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          },\"accessType\":\"$UNKNOWN\",\"mountTargetExtId\":\"string\",\"operationType\":\"$UNKNOWN\",\"$objectType\":\"\
+          files.v4.config.BackupServerAccessControlBlock\"}],\"$objectType\":\"files.v4.config.BackupServerConfig\"},\"$objectType\"\
+          :\"files.v4.config.PartnerServer\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/Ed7Adc91-a9Be-f7f7-fcaC-b2aAf1C71425/partner-servers/3bE6cE71-5aa3-eaa9-AfaA-7e8BAFdA1b3B\"\
+          \n"
+    delete:
+      tags:
+      - PartnerServers
+      summary: Delete partner server
+      description: "Delete the partner server with the given external identifier.\n\nSpecify a valid identifier of the file\
+        \ server (`fileServerExtId`) and \nof the partner server (`extId`).\n"
+      operationId: deletePartnerServerById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: dda52454-e41a-42f1-b1d2-ad8c40780b7e
+      - name: extId
+        in: path
+        description: Partner server external identifier. Example:18f78959-14a6-4c47-b5db-920460c4b668.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: eb1ec4c8-7031-4f88-9cb9-a15274ba71a7
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 509f55e0-70e2-431c-9bfa-19429785a288
+      responses:
+        '202':
+          description: Delete partner server response.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/partner-servers/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Delete File Server Partner Server
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2023.4
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.PartnerServersApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetPartnerServerApiResponse;\nimport com.nutanix.dp1.fil.files.v4.config.DeletePartnerServerApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        PartnerServersApi partnerServersApi =\
+          \ new PartnerServersApi(apiClient);\n\n        \n        String fileServerExtId = \"f5Abd4D0-A46E-DbfD-FEbA-F35B76A1dDcb\"\
+          ;\n        \n        String extId = \"eA0CBFb5-0eec-1CAB-1551-b3fbEEfbCccB\";\n\n        // perform GET call\n \
+          \       GetPartnerServerApiResponse getResponse = null;\n        try {\n            getResponse = partnerServersApi.getPartnerServerById(fileServerExtId,\
+          \ extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n       \
+          \ }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            DeletePartnerServerApiResponse deletePartnerServerApiResponse = partnerServersApi.deletePartnerServerById(fileServerExtId,\
+          \ extId, opts);\n            System.out.println(deletePartnerServerApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, PartnerServersApi, GetPartnerServerApiResponse } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet partnerServersApi = new PartnerServersApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let fileServerExtId = \"Ba52BEB7-9064-2c47-AfE1-3d60aAfd7cc5\";\n    \n    let\
+          \ extId = \"CFaaBCFb-BCC6-2dF0-5E5d-7EcbEFEF2DEA\";\n\n\n    // Perform Get call\n    partnerServersApi.getPartnerServerById(fileServerExtId,\
+          \ extId).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        // Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        partnerServersApi.deletePartnerServerById(fileServerExtId,\
+          \ extId, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the following\
+          \ status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error) => {\n\
+          \            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    partner_servers_api = ntnx_files_py_client.PartnerServersApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"bbdBBE46-A210-CCf5-FB34-E900EcAAEfdB\"\n    \n    ext_id = \"bDFaE8BF-Bff0-50d8-DfED-cf9fDFFE1e6a\"\n\n  \
+          \  try:\n        api_response = partner_servers_api.get_partner_server_by_id(fileServerExtId=file_server_ext_id,\
+          \ extId=ext_id)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag\
+          \ Header\n    etag_value = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response\
+          \ = partner_servers_api.delete_partner_server_by_id(fileServerExtId=file_server_ext_id, extId=ext_id, if_match=etag_value)\n\
+          \        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    PartnerServersApiInstance *api.PartnerServersApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  PartnerServersApiInstance = api.NewPartnerServersApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"AAbD98f8-EddC-E62A-E38c-e4dAB6Dcbee9\"\
+          \n    \n    extId := \"3ebEADBb-c2A5-7ECC-ce5c-d6b3Db6fcd9d\"\n\n    getResponse, err := PartnerServersApiInstance.GetPartnerServerById(&fileServerExtId,\
+          \ &extId)\n    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n\
+          \    etagValue := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"\
+          If-Match\"] = etagValue\n\n    response, error := PartnerServersApiInstance.DeletePartnerServerById(&fileServerExtId,\
+          \ &extId, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/CE4aAaAE-1d01-942E-fC36-dDE29dFAcBbD/partner-servers/feCBC47b-f45c-a9c5-D2d1-e9ade2AC82Ce\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'If-Match: string_sample_data' \\\n  \
+          \            --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\
+          \n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/EA0BE770-fCcD-26FE-B0be-D98eB9cFe1cD/partner-servers/DdABfAb6-5eF8-B1Ba-5b0b-CfcfdbAb98dD\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2023.4
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+components:
+  schemas:
+    common.v1.0.config.FQDN:
+      type: object
+      properties:
+        value:
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
+          type: string
+          description: 'The fully qualified domain name of the host.
+
+            '
+          example: www.example-corp.com
+      additionalProperties: false
+      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
+        System.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    files.v4.0.config.BackupAccessType:
+      title: Access type of the mount target.
+      type: string
+      description: Access type of the mount target.
+      enum:
+      - READ_WRITE
+      - READ_ONLY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        READ_ONLY: Read-only access type for mount target.
+        $REDACTED: 'Redacted value.
+
+          '
+        READ_WRITE: Read-write access type for mount target.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    files.v4.0.config.BackupServerConfig:
+      title: Backup server configuration. Required only for BACKUP type partner server.
+      type: object
+      properties:
+        expiryInSecs:
+          type: integer
+          description: The expiry time in seconds for the backup client to access the shares. The default value is 24 hours.
+          format: int64
+          default: 86400
+        backupClientAccessConfigs:
+          maxItems: 40
+          minItems: 0
+          type: array
+          description: List of backup client details along with request access permissions.
+          items:
+            $ref: '#/components/schemas/files.v4.0.config.BackupServerAccessControlBlock'
+      additionalProperties: false
+      description: Configuration for partner server of type BACKUP.
+    files.v4.0.config.ServerType:
+      title: Server type
+      type: string
+      description: Type of the server, PRIMARY server type is allowed. This field is only applicable to partner server of
+        type NOTIFICATION.
+      enum:
+      - PRIMARY
+      - SECONDARY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SECONDARY: Type of server is secondary.
+        PRIMARY: Type of server is primary.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.BackupServerAccessControlBlock:
+      title: Partner server host access client entity
+      required:
+      - accessType
+      - address
+      - operationType
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        accessType:
+          $ref: '#/components/schemas/files.v4.0.config.BackupAccessType'
+        mountTargetExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Mount target external identifier for the partner server.
+          example: 2a8b1c22-5732-4066-9c53-d0fa8cde098e
+        operationType:
+          $ref: '#/components/schemas/files.v4.0.config.OperationType'
+      additionalProperties: false
+      description: Backup server details along with access permission type.
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    files.v4.0.config.PartnerServer:
+      title: Partner server details
+      description: Partner server model.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - name
+        - partnerType
+        - vendorName
+        type: object
+        properties:
+          description:
+            maxLength: 180
+            type: string
+            description: Partner server details or any third-party vendors to register the server with AFS.
+          vendorName:
+            maxLength: 256
+            type: string
+            description: Vendor name of the partner server. For partner type ANTIVIRUS, vendor name denotes the icapServiceName.
+          name:
+            maxLength: 64
+            type: string
+            description: Partner server name.
+          partnerType:
+            $ref: '#/components/schemas/files.v4.0.config.PartnerType'
+          vendorProperties:
+            $ref: '#/components/schemas/files.v4.0.config.VendorProperties'
+          backupServerConfig:
+            $ref: '#/components/schemas/files.v4.0.config.BackupServerConfig'
+        additionalProperties: false
+    common.v1.0.config.KVStringPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: The key of this key-value string pair
+        value:
+          type: string
+          description: The value associated with the key for this key-value string pair
+          default: ''
+      additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    files.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 13
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 41
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+          example: 3611:a7d9:a64d:f8dd:fd83:9c6c:4eae:35c0
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    files.v4.0.config.VendorProperties:
+      title: Partner server configuration.
+      required:
+      - address
+      - port
+      type: object
+      properties:
+        customProperties:
+          maxItems: 40
+          minItems: 0
+          type: array
+          description: 'Indicates the vendor specific custom properties of the partner server. It contains key value pairs
+            separated by pipe(|)operator. For example: kafkatopic=1P1R| brokerlist=10.5.119.71:29092,10.5.119.71:39092,10.5.119.71:49092'
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVStringPair'
+        connectionStatus:
+          $ref: '#/components/schemas/files.v4.0.config.ConnectionStatus'
+        address:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        port:
+          maximum: 65536
+          minimum: 1
+          type: integer
+          description: Partner server port.
+          format: int32
+          example: 99
+        serverType:
+          $ref: '#/components/schemas/files.v4.0.config.ServerType'
+      additionalProperties: false
+      description: "Partner server configuration for the following types of servers\n```\n  - BACKUP\n  - MIGRATION\n  - NOTIFICATION\n\
+        ```\n"
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 3
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    files.v4.0.config.ConnectionStatus:
+      title: Connection status enum
+      type: string
+      description: Connection status values. This is a read-only field.
+      enum:
+      - NOT_TESTED
+      - NOT_REACHABLE
+      - OK
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NOT_REACHABLE: Indicates that the antivirus is unreachable and is in 'not reachable' connection state.
+        NOT_TESTED: Indicates that the antivirus is attached to the file server and the connection is in a 'not tested' state.
+        OK: Indicates that the antivirus is attached to the file server, and the connection state is tested and marked as
+          'ok'.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.0.config.FQDN'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+
+        '
+    files.v4.0.config.PartnerType:
+      title: Partner type
+      type: string
+      description: Usage type of the partner server.
+      enum:
+      - NOTIFICATION
+      - BACKUP
+      - MIGRATION
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        MIGRATION: Indicates the partner server type is migration.
+        BACKUP: Indicates the partner server type is backup.
+        NOTIFICATION: Indicates the partner server type is notification.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:d5a5af10-1466-4d38-8d66-465c1e19d1b2
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+          example: 55.140.252.240
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    files.v4.0.config.OperationType:
+      title: Backup server management operation
+      type: string
+      description: Backup server (client IP-address/FDQN) management operation.
+      enum:
+      - ADD
+      - REMOVE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ADD: Operation type is add.
+        REMOVE: Operation type is remove.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

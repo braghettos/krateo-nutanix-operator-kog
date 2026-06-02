@@ -1,0 +1,534 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Objects Storage Management APIs
+  description: Manage Petabytes of Unstructured and Machine-generated data using a software-defined Object Store Service
+  version: 1.0.0
+  x-logo:
+    altText: Objects Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/objects/images/objects-logo-img.svg
+  x-repo-name: objects
+  x-minimum-negotiation-version: v4.0
+servers:
+- url: https://{host}:{port}/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /objects/v4.0/config/object-stores/{objectStoreExtId}/certificates/{certificateExtId}/certificate-authority:
+    get:
+      tags:
+      - ObjectStores
+      summary: Download the certificate authority
+      description: Download the certificate authority of an Object store certificate.
+      operationId: getCaByCertificateId
+      parameters:
+      - name: objectStoreExtId
+        in: path
+        description: The UUID of the Object store.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 1d463a7f-3ac5-43ae-ad97-213e7952546c
+      - name: certificateExtId
+        in: path
+        description: The UUID of the certificate of an Object store.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 1d388e44-55b1-4be0-8d07-7537b037e741
+      responses:
+        '200':
+          description: The certificate authority of an Object store certificate is downloaded successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/objects.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /objects/v4.0/config/object-stores/{objectStoreExtId}/certificates/{certificateExtId}/certificate-authority
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/objects.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /objects/v4.0/config/object-stores/{objectStoreExtId}/certificates/{certificateExtId}/certificate-authority
+                  Get operation
+      x-permissions:
+        operationName: View Object Store Certificate
+        roleList:
+        - name: Objects Viewer
+        - name: Objects Editor
+        - name: Objects Admin
+        - name: Prism Admin
+        - name: Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      - type: default
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2024.3.1
+      - product: PE
+        version: '7.0'
+      - product: Objects Manager
+        version: 5.1.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.obj.java.client.ApiClient;\nimport com.nutanix.obj.java.client.api.ObjectStoresApi;\n\
+          import com.nutanix.dp1.obj.objects.v4.request.ObjectStores.GetCaByCertificateIdRequest;\nimport com.nutanix.dp1.obj.objects.v4.config.GetCaApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport java.util.Map;\n\n\
+          public class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n  \
+          \      ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port used for the connection. PC products typically use port 9440, while NC products typically\
+          \ use port 443. See the product-specific documentation for accurate configuration.\n        apiClient.setPort(9440);\n\
+          \        // Interval in ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max\
+          \ retry attempts while reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n       \
+          \ // UserName to connect to the cluster\n        String username = \"username\";\n        // Password to connect\
+          \ to the cluster\n        String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ObjectStoresApi objectStoresApi = new\
+          \ ObjectStoresApi(apiClient);\n\n        \n        String objectStoreExtId = \"F1a8D2F3-Fe8b-7FBb-b254-dCCb0CAe9FB4\"\
+          ;\n        \n        String certificateExtId = \"9D88f41e-e729-BfDe-3ddD-aDF8BAF3eDdd\";\n\n        try {\n    \
+          \        // Pass in parameters using the request builder object associated with the operation.\n            Map<String,\
+          \ Object> opts = new HashMap<>();\n            opts.put(HttpHeaders.ACCEPT, MediaType.APPLICATION_OCTET_STREAM_VALUE);\n\
+          \            GetCaApiResponse getCaApiResponse = objectStoresApi.getCaByCertificateId(GetCaByCertificateIdRequest.builder()\n\
+          \                .objectStoreExtId(objectStoreExtId)\n                .certificateExtId(certificateExtId)\n    \
+          \            .build(), opts);\n\n            Path pathOfDownloadedFile = getCaApiResponse.getData();\n         \
+          \   System.out.println(pathOfDownloadedFile.toString());\n\n        } catch (RestClientException ex) {\n       \
+          \     System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ObjectStoresApi } from \"@nutanix-api/objects-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port used for the connection. PC products typically use port 9440, while NC products typically\
+          \ use port 443. See the product-specific documentation for accurate configuration.\napiClientInstance.port = '9440';\n\
+          // Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet objectStoresApi = new ObjectStoresApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let objectStoreExtId = \"Cf7f1cdD-aeb4-FcE8-f469-7cCcb0Df73dA\";\n    \n    let\
+          \ certificateExtId = \"FCc2aFBb-Bf7D-45aA-82bd-aeCDA8CDB8Ff\";\n\n\n\n\n    var args = new Object();\n    args.Accept\
+          \ = \"application/octet-stream\"\n\n    objectStoresApi.getCaByCertificateId(objectStoreExtId, certificateExtId,\
+          \ args).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        let downloadedFilePath = data.data.path;\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n\
+          \    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_objects_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config =\
+          \ ntnx_objects_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\
+          \n    # Port used for the connection. PC products typically use port 9440, while NC products typically use port\
+          \ 443. See the product-specific documentation for accurate configuration.\n    config.port = 9440\n    # Max retry\
+          \ attempts while reconnecting on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to\
+          \ use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username\
+          \ = \"username\"\n    # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add\
+          \ authorization information here if needed.\n    client = ntnx_objects_py_client.ApiClient(configuration=config)\n\
+          \    object_stores_api = ntnx_objects_py_client.ObjectStoresApi(api_client=client)\n    \n    object_store_ext_id\
+          \ = \"9FEBad0C-0917-7B4C-9f9f-9B9aE6FdAbCb\"\n    \n    certificate_ext_id = \"Dc3B37BD-cF8a-1f4C-21eF-928EB0CeacDf\"\
+          \n\n\n    try:\n        headers = {'Accept': 'application/octet-stream'} # This is required for operations that\
+          \ support multiple media types in the response i.e. application/json, application/octet-stream etc.\n        # If\
+          \ only one request body content type is defined i.e. application/octet-stream\n        api_response = object_stores_api.get_ca_by_certificate_id(objectStoreExtId=object_store_ext_id,\
+          \ certificateExtId=certificate_ext_id, **headers)\n        downloaded_file_path = api_response.data['path'] # Returns\
+          \ object of pathlib.Path\n    except ntnx_objects_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"context\"\n    \"github.com/nutanix/ntnx-api-golang-clients/objects-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/objects-go-client/v4/client\"\n    \"github.com/nutanix/ntnx-api-golang-clients/objects-go-client/v4/models/objects/v4/request/objectstores\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ObjectStoresServiceApiInstance *api.ObjectStoresServiceApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port used for the connection. PC products typically use port\
+          \ 9440, while NC products typically use port 443. See the product-specific documentation for accurate configuration.\n\
+          \    ApiClientInstance.Port = 9440\n    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval\
+          \ = 5 * time.Second\n    // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts\
+          \ = 5\n    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password\
+          \ to connect to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information\
+          \ here if needed.\n    ObjectStoresServiceApiInstance = api.NewObjectStoresServiceApi(ApiClientInstance)\n    ctx\
+          \ := context.Background()\n\n    \n    objectStoreExtId := \"E70DfAD9-1F4C-100F-b4e1-F1E51D6B7cb9\"\n    \n    certificateExtId\
+          \ := \"6CfC423b-cBde-aB85-2bCa-0Ae9AA045b6E\"\n\n    args := make(map[string]interface{})\n    args[\"Accept\"]\
+          \ = \"application/octet-stream\" // This is required for operations that support multiple media types in the response\
+          \ i.e. application/json, application/octet-stream etc.\n\n    request := objectstores.GetCaByCertificateIdRequest{\
+          \ ObjectStoreExtId: &objectStoreExtId, CertificateExtId: &certificateExtId }\n    response, error := ObjectStoresServiceApiInstance.GetCaByCertificateId(ctx,\
+          \ &request, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    fileInfo := response.GetData().(import.FileDetail)\n\
+          \    downloadedFilePath := fileInfo.Path\n    fmt.Println(downloadedFilePath)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://host:port/api/objects/v4.0/config/object-stores/2fA467B3-fEaC-cdfC-7BAb-39c4f5FaEa4A/certificates/E15dFF5c-CFBF-cafe-cCa5-eda13Ee1e82b/certificate-authority\"\
+          \ \\\n     --header 'Accept: application/octet-stream' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN'\
+          \ \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/octet-stream' \\\n--header\
+          \ 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://host:port/api/objects/v4.0/config/object-stores/27d3ce33-3bA0-C9dF-eFfc-bA41be9b3C6A/certificates/BbbAFCEb-55BE-Ea5E-b3cD-FCb3Faa1C4DB/certificate-authority\"\
+          \n"
+      - lang: Csharp
+        source: "\n\nusing Nutanix.ObjSDK.Client;\nusing Nutanix.ObjSDK.Api;\nusing Nutanix.ObjSDK.Model.Objects.V4.Config;\n\
+          \nnamespace CsharpSdkSample\n{\n  class Program\n  {\n    static void Main(string[] args) {\n      // Configure\
+          \ the client\n      Configuration _config = new Configuration\n      {\n        // UserName to connect to the cluster\n\
+          \        Username = \"username\",\n        // Password(SecureString) to connect to the cluster \n        Password\
+          \ = Configuration.CreateSecurePassword(\"password\"),\n        // IPv4/IPv6 address or FQDN of the cluster\n   \
+          \     Host = \"localhost\",\n        // Port used for the connection. \n        Port = 9440,\n        // Backoff\
+          \ period in seconds (exponential backoff: 2, 4, 8... seconds)\n        BackOffPeriod = 2,\n        // Max retry\
+          \ attempts while reconnecting on a loss of connection\n        MaxRetryAttempts = 5\n      };\n\n      ApiClient\
+          \ client = new ApiClient(_config);\n\n      ObjectStoresApi objectStoresApi = new ObjectStoresApi(client);\n\n \
+          \     String objectStoreExtId = \"d3dF7d8d-CDe9-Cd88-a71a-415cF12AB7da\";\n      String certificateExtId = \"a20a74e0-cA9c-7FFA-56bc-B1Dac3dCC8c8\"\
+          ;\n\n        // Create request object with parameters\n        var request = new GetCaByCertificateIdRequest {\n\
+          \            ObjectStoreExtId = objectStoreExtId,\n            CertificateExtId = certificateExtId,\n          \
+          \  \n        };\n        try {\n            GetCaApiResponse getCaApiResponse = objectStoresApi.GetCaByCertificateId(request);\n\
+          \        } catch (ApiException ex) {\n            Console.WriteLine(ex.Message);\n        }\n    }\n  }\n}\n"
+components:
+  schemas:
+    objects.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/objects.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/objects.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    objects.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
+            the endpoint belongs. For example: VMM-40000'
+          example: string
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+          example: string
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    objects.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 72
+        error:
+          type: string
+          description: The generic error message for the response.
+          example: string
+        path:
+          type: string
+          description: API path on which the request was made.
+          example: string
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/objects.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+            example: string
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+              example: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 41
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    objects.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+          example: string
+        message:
+          type: string
+          description: The detailed message for the validation error.
+          example: string
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 87
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

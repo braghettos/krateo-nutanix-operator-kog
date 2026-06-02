@@ -1,0 +1,1261 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Storage APIs
+  description: Manage storage configuration and operations.
+  version: 4.0.1-alpha-3
+  x-repo-name: storage
+  x-logo:
+    altText: Storage Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/storage/images/storage-logo-img.svg
+  x-minimum-negotiation-version: v4.2
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+paths:
+  /storage/v4.0.a3/config/storage-containers:
+    get:
+      tags:
+      - StorageContainer
+      summary: Get Storage containers for the cluster.
+      description: Query the list of Storage containers.
+      operationId: getAllStorageContainers
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource.  Any number out of this range will
+          be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number greater
+          than the total available pages would be set to the last page.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource.  Any number out of this range
+            will be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number
+            greater than the total available pages would be set to the last page.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number of
+          records, which is 100.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number
+            of records, which is 100.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the OData V4.01 URL conventions.
+
+          The filter can be applied on the following fields:
+
+          - affinityHostUuid
+
+          - clusterExtId
+
+          - containerExtId
+
+          - containerId
+
+          - name
+
+          - ownerUuid
+
+          - replicationFactor
+
+          - storagePoolUuid
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified
+          the resources will be sorted in ascending order by default. For example, ''orderby=templateName desc'' would get
+          all templates sorted by templateName in desc order.
+
+          The orderby can be applied to the following fields:
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the OData V4.01 URL conventions. If a $select
+          expression consists of a single select item that is an asterisk (i.e. *), then all properties on the matching resource
+          will be returned.
+
+          - advertisedCapacity
+
+          - affinityHostUuid
+
+          - clusterExtId
+
+          - compressionDelayInSecs
+
+          - compressionEnabled
+
+          - containerExtId
+
+          - containerId
+
+          - downMigrateTimesInSecs
+
+          - enableSoftwareEncryption
+
+          - encrypted
+
+          - erasureCode
+
+          - erasureCodeDelaySecs
+
+          - extId
+
+          - fingerPrintOnWrite
+
+          - inlineEcEnabled
+
+          - isNfsWhitelistInherited
+
+          - isNutanixManaged
+
+          - links
+
+          - mappedRemoteContainers
+
+          - markedForRemoval
+
+          - maxCapacity
+
+          - name
+
+          - nfsWhitelistAddress
+
+          - onDiskDedup
+
+          - oplogReplicationFactor
+
+          - ownerUuid
+
+          - preferHigherECFaultDomain
+
+          - randomIoPreference
+
+          - replicationFactor
+
+          - seqIoPreference
+
+          - storagePoolUuid
+
+          - tenantId
+
+          - totalExplicitReservedCapacity
+
+          - totalImplicitReservedCapacity
+
+          - vstoreNameList
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+      responses:
+        '200':
+          description: Successfully retrieved the list of Storage containers in the cluster.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainersResponse'
+        default:
+          description: Default Error Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainersResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainersResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainersResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.sto.java.client.ApiClient;\nimport com.nutanix.sto.java.client.api.StorageContainerApi;\n\
+          import com.nutanix.dp1.sto.storage.v4.config.StorageContainersResponse;\n\npublic class JavaSdkSample {\n\tpublic\
+          \ static void main(String[] args) {\n\t\tApiClient client = new ApiClient();\n\t\tclient.setHost(\"localhost\");\n\
+          \t\tclient.setPort(9440);\n\t\tclient.setRetryInterval(100);\n\t\tclient.setMaxRetryAttempts(2);\n\t\tclient.setUsername(\"\
+          username\");\n\t\tclient.setPassword(\"password\");\n\n\t\tStorageContainerApi storageContainerApi = new StorageContainerApi(client);\n\
+          \n\t\tint $page = 0;\n\t\tint $limit = 50;\n\t\tString $filter = \"string_sample_data\";\n\t\tString $orderby =\
+          \ \"string_sample_data\";\n\t\tString $select = \"string_sample_data\";\n\t\tStorageContainersResponse storageContainersResponse\
+          \ = storageContainerApi.getAllStorageContainers($page, $limit, $filter, $orderby, $select);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport ApiClient from \"@nutanix/prism-apis-js-client/src/ApiClient\";\nimport StorageContainerApi from\
+          \ \"@nutanix/prism-apis-js-client/src/apis/StorageContainer-endpoints\";\nimport StorageContainersResponse from\
+          \ \"@nutanix/prism-apis-js-client/src/models/storage/v4/config/StorageContainersResponse\";\n\nlet apiClientInstance\
+          \ = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.retryInterval = 500;\napiClientInstance.host\
+          \ = 'localhost'\napiClientInstance.port = '9440';\napiClientInstance.username = 'username';\napiClientInstance.password\
+          \ = 'password';\nlet storageContainerApi = new StorageContainerApi(apiClientInstance);\n\nfunction sample() {\n\
+          \    let $page = 0;\n    let $limit = 50;\n    let $filter = \"string_sample_data\";\n    let $orderby = \"string_sample_data\"\
+          ;\n    let $select = \"string_sample_data\";\n\n    storageContainerApi.getAllStorageContainers($page, $limit, $filter,\
+          \ $orderby, $select).then(({data, response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n\
+          \        done();\n    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport ntnx_prism-apis_py_client\n\nif __name__ == \"__main__\":\n    config = ntnx_prism-apis_py_client.configuration.Configuration()\n\
+          \    config.host = \"localhost\"\n    config.port = 9440\n    config.max_retry_attempts = 1\n    config.backoff_factor\
+          \ = 3\n    config.username = \"username\"\n    config.password = \"password\"\n    client = ntnx_prism-apis_py_client.ApiClient(configuration=config)\n\
+          \    storageContainerApi = ntnx_prism-apis_py_client.StorageContainerApi(api_client=client)\n    $page = 0\n   \
+          \ $limit = 50\n    $filter = \"string_sample_data\"\n    $orderby = \"string_sample_data\"\n    $select = \"string_sample_data\"\
+          \n    api_response = storageContainerApi.get_all_storage_containers($page, $limit, $filter, $orderby, $select)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"nutanix/prism-apis-go-client/v4/api\"\n    \"nutanix/prism-apis-go-client/v4/client\"\
+          \n}\n\nvar (\n    ApiClientInstance *client.ApiClient\n    StorageContainerApiInstance *api.StorageContainerApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    ApiClientInstance.Host = \"localhost\"\n\
+          \    ApiClientInstance.Port = 9440\n    ApiClientInstance.RetryInterval = 100\n    ApiClientInstance.MaxRetryAttempts\
+          \ = 2\n    ApiClientInstance.AllowVersionNegotiation = true\n    ApiClientInstance.Username = \"username\"\n   \
+          \ ApiClientInstance.Password = \"password\"\n\n    StorageContainerApiInstance = api.StorageContainerApi(ApiClientInstance)\n\
+          \n    $page := 0\n    $limit := 50\n    $filter := \"string_sample_data\"\n    $orderby := \"string_sample_data\"\
+          \n    $select := \"string_sample_data\"\n\n    response, _ := StorageContainerApiInstance.GetAllStorageContainers($page,\
+          \ $limit, $filter, $orderby, $select)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - StorageContainer
+      summary: Add Storage container to the cluster.
+      description: Create a new Storage container on a cluster.
+      operationId: addStorageContainerForCluster
+      parameters:
+      - name: X-Cluster-Id
+        in: header
+        description: Remote cluster uuid to forward the request.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 24a94e0a-2eec-46ec-9b82-9e2458aa95eb
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainer'
+        required: true
+      responses:
+        '202':
+          description: 'Http Status code when the request has been accepted by the server but has not been completed yet.
+            The Location Header contains the URL of the Task object that can be used to track the status of the request.
+
+            '
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        default:
+          description: Default Error Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.sto.java.client.ApiClient;\nimport com.nutanix.sto.java.client.api.StorageContainerApi;\n\
+          import com.nutanix.dp1.sto.storage.v4.config.StorageContainer;\nimport com.nutanix.dp1.sto.storage.v4.config.StorageContainerTaskResponse;\n\
+          \npublic class JavaSdkSample {\n\tpublic static void main(String[] args) {\n\t\tApiClient client = new ApiClient();\n\
+          \t\tclient.setHost(\"localhost\");\n\t\tclient.setPort(9440);\n\t\tclient.setRetryInterval(100);\n\t\tclient.setMaxRetryAttempts(2);\n\
+          \t\tclient.setUsername(\"username\");\n\t\tclient.setPassword(\"password\");\n\n\t\tStorageContainerApi storageContainerApi\
+          \ = new StorageContainerApi(client);\n\n\t\tStorageContainer storageContainer = new StorageContainer();\n\n\t\t\
+          // StorageContainer object initializations here...\n\n\t\tString X-Cluster-Id = \"^3AC8BEf0-A4df-Afa0-Fefe-DefdeEdBaE73$\"\
+          ;\n\t\tStorageContainerTaskResponse storageContainerTaskResponse = storageContainerApi.addStorageContainerForCluster(storageContainer,\
+          \ X-Cluster-Id);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport ApiClient from \"@nutanix/prism-apis-js-client/src/ApiClient\";\nimport StorageContainerApi from\
+          \ \"@nutanix/prism-apis-js-client/src/apis/StorageContainer-endpoints\";\nimport StorageContainer from \"@nutanix/prism-apis-js-client/src/models/storage/v4/config/StorageContainer\"\
+          ;\nimport StorageContainerTaskResponse from \"@nutanix/prism-apis-js-client/src/models/storage/v4/config/StorageContainerTaskResponse\"\
+          ;\n\nlet apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.retryInterval\
+          \ = 500;\napiClientInstance.host = 'localhost'\napiClientInstance.port = '9440';\napiClientInstance.username = 'username';\n\
+          apiClientInstance.password = 'password';\nlet storageContainerApi = new StorageContainerApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let storageContainer = new StorageContainer();\n\n    // StorageContainer object initializations\
+          \ here...\n\n    let X-Cluster-Id = \"^e7C480de-D866-FCeb-af9d-1ffbddfCCfA5$\";\n\n    storageContainerApi.addStorageContainerForCluster(storageContainer,\
+          \ X-Cluster-Id).then(({data, response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n\
+          \        done();\n    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport ntnx_prism-apis_py_client\n\nif __name__ == \"__main__\":\n    config = ntnx_prism-apis_py_client.configuration.Configuration()\n\
+          \    config.host = \"localhost\"\n    config.port = 9440\n    config.max_retry_attempts = 1\n    config.backoff_factor\
+          \ = 3\n    config.username = \"username\"\n    config.password = \"password\"\n    client = ntnx_prism-apis_py_client.ApiClient(configuration=config)\n\
+          \    storageContainerApi = ntnx_prism-apis_py_client.StorageContainerApi(api_client=client)\n    storageContainer\
+          \ = ntnx_prism-apis_py_client.StorageContainer()\n\n    # StorageContainer object initializations here...\n\n  \
+          \  X-Cluster-Id = \"^5f2bdeB3-8e5C-0ffd-5c0D-62bc74aDC3af$\"\n    api_response = storageContainerApi.add_storage_container_for_cluster(storageContainer,\
+          \ X-Cluster-Id)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    import1 \"nutanix/prism-apis-go-client/models/prism-apis/v4/defaultapi\"\
+          \n    \"nutanix/prism-apis-go-client/v4/api\"\n    \"nutanix/prism-apis-go-client/v4/client\"\n}\n\nvar (\n    ApiClientInstance\
+          \ *client.ApiClient\n    StorageContainerApiInstance *api.StorageContainerApi\n)\n\nfunc main() {\n    ApiClientInstance\
+          \ = client.NewApiClient()\n    ApiClientInstance.Host = \"localhost\"\n    ApiClientInstance.Port = 9440\n    ApiClientInstance.RetryInterval\
+          \ = 100\n    ApiClientInstance.MaxRetryAttempts = 2\n    ApiClientInstance.AllowVersionNegotiation = true\n    ApiClientInstance.Username\
+          \ = \"username\"\n    ApiClientInstance.Password = \"password\"\n\n    StorageContainerApiInstance = api.StorageContainerApi(ApiClientInstance)\n\
+          \n    storageContainer := import1.newStorageContainer()\n\n    // StorageContainer object initializations here...\n\
+          \n    X-Cluster-Id := \"^D0a1AdB4-07ee-dB0f-c9C5-C2e8AfeA0db2$\"\n\n    response, _ := StorageContainerApiInstance.AddStorageContainerForCluster(storageContainer,\
+          \ X-Cluster-Id)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --header\
+          \ 'X-Cluster-Id: ^ce71DDfB-D4B0-eDCe-d6a1-0CEc84EfdC64$' \\\n     --data {\"tenantId\":\"string\",\"extId\":\"string\"\
+          ,\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"containerId\"\
+          :\"string\",\"containerExtId\":\"string\",\"ownerUuid\":\"string\",\"name\":\"string\",\"clusterExtId\":\"string\"\
+          ,\"storagePoolUuid\":\"string\",\"markedForRemoval\":true,\"maxCapacity\":0,\"totalExplicitReservedCapacity\":0,\"\
+          totalImplicitReservedCapacity\":0,\"advertisedCapacity\":0,\"replicationFactor\":0,\"oplogReplicationFactor\":0,\"\
+          nfsWhitelistAddress\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"\
+          },\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\"\
+          :{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"\
+          }],\"isNfsWhitelistInherited\":true,\"randomIoPreference\":[\"string\"],\"seqIoPreference\":[\"string\"],\"downMigrateTimesInSecs\"\
+          :{\"additionalProp1\":0,\"additionalProp2\":0,\"additionalProp3\":0},\"erasureCode\":\"$UNKNOWN\",\"inlineEcEnabled\"\
+          :true,\"preferHigherECFaultDomain\":true,\"erasureCodeDelaySecs\":0,\"fingerPrintOnWrite\":\"$UNKNOWN\",\"onDiskDedup\"\
+          :\"$UNKNOWN\",\"compressionEnabled\":true,\"compressionDelayInSecs\":0,\"isNutanixManaged\":true,\"enableSoftwareEncryption\"\
+          :true,\"vstoreNameList\":[\"string\"],\"mappedRemoteContainers\":{\"additionalProp1\":\"string\",\"additionalProp2\"\
+          :\"string\",\"additionalProp3\":\"string\"},\"encrypted\":true,\"affinityHostUuid\":\"string\",\"$objectType\":\"\
+          storage.v4.config.StorageContainer\"} \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type:\
+          \ application/json' \\\n     --header 'X-Cluster-Id: ^A12a33bb-A41d-E7c0-9e00-c8cAED9B2Fd5$' \\\n     --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"containerId\":\"string\",\"containerExtId\":\"string\",\"ownerUuid\":\"string\"\
+          ,\"name\":\"string\",\"clusterExtId\":\"string\",\"storagePoolUuid\":\"string\",\"markedForRemoval\":true,\"maxCapacity\"\
+          :0,\"totalExplicitReservedCapacity\":0,\"totalImplicitReservedCapacity\":0,\"advertisedCapacity\":0,\"replicationFactor\"\
+          :0,\"oplogReplicationFactor\":0,\"nfsWhitelistAddress\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"\
+          $objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"\
+          $objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"isNfsWhitelistInherited\":true,\"randomIoPreference\":[\"\
+          string\"],\"seqIoPreference\":[\"string\"],\"downMigrateTimesInSecs\":{\"additionalProp1\":0,\"additionalProp2\"\
+          :0,\"additionalProp3\":0},\"erasureCode\":\"$UNKNOWN\",\"inlineEcEnabled\":true,\"preferHigherECFaultDomain\":true,\"\
+          erasureCodeDelaySecs\":0,\"fingerPrintOnWrite\":\"$UNKNOWN\",\"onDiskDedup\":\"$UNKNOWN\",\"compressionEnabled\"\
+          :true,\"compressionDelayInSecs\":0,\"isNutanixManaged\":true,\"enableSoftwareEncryption\":true,\"vstoreNameList\"\
+          :[\"string\"],\"mappedRemoteContainers\":{\"additionalProp1\":\"string\",\"additionalProp2\":\"string\",\"additionalProp3\"\
+          :\"string\"},\"encrypted\":true,\"affinityHostUuid\":\"string\",\"$objectType\":\"storage.v4.config.StorageContainer\"\
+          } \\\n     - \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers\"\n"
+  /storage/v4.0.a3/config/storage-containers/{containerExtId}:
+    get:
+      tags:
+      - StorageContainer
+      summary: Get existing Storage container.
+      description: Query for metadata information which is associated with the Storage container identified by {containerExtId}.
+      operationId: getStorageContainerByExtId
+      parameters:
+      - name: containerExtId
+        in: path
+        description: Uuid of the Storage container.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b2fb095c-f935-4ef4-97d2-a7d84583a643
+      responses:
+        '200':
+          description: Successfully retrieved specified Storage container in the cluster.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerResponse'
+        default:
+          description: Default Error Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.sto.java.client.ApiClient;\nimport com.nutanix.sto.java.client.api.StorageContainerApi;\n\
+          import com.nutanix.dp1.sto.storage.v4.config.StorageContainerResponse;\n\npublic class JavaSdkSample {\n\tpublic\
+          \ static void main(String[] args) {\n\t\tApiClient client = new ApiClient();\n\t\tclient.setHost(\"localhost\");\n\
+          \t\tclient.setPort(9440);\n\t\tclient.setRetryInterval(100);\n\t\tclient.setMaxRetryAttempts(2);\n\t\tclient.setUsername(\"\
+          username\");\n\t\tclient.setPassword(\"password\");\n\n\t\tStorageContainerApi storageContainerApi = new StorageContainerApi(client);\n\
+          \n\t\tStorageContainerResponse storageContainerResponse = storageContainerApi.getStorageContainerByExtId();\n\t\
+          }\n}\n"
+      - lang: JavaScript
+        source: "\nimport ApiClient from \"@nutanix/prism-apis-js-client/src/ApiClient\";\nimport StorageContainerApi from\
+          \ \"@nutanix/prism-apis-js-client/src/apis/StorageContainer-endpoints\";\nimport StorageContainerResponse from \"\
+          @nutanix/prism-apis-js-client/src/models/storage/v4/config/StorageContainerResponse\";\n\nlet apiClientInstance\
+          \ = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.retryInterval = 500;\napiClientInstance.host\
+          \ = 'localhost'\napiClientInstance.port = '9440';\napiClientInstance.username = 'username';\napiClientInstance.password\
+          \ = 'password';\nlet storageContainerApi = new StorageContainerApi(apiClientInstance);\n\nfunction sample() {\n\n\
+          \    storageContainerApi.getStorageContainerByExtId().then(({data, response}) =>\n        console.log(response.status);\n\
+          \        console.log(data.getData());\n        done();\n    }).catch((error) => {\n        console.log(error);\n\
+          \        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport ntnx_prism-apis_py_client\n\nif __name__ == \"__main__\":\n    config = ntnx_prism-apis_py_client.configuration.Configuration()\n\
+          \    config.host = \"localhost\"\n    config.port = 9440\n    config.max_retry_attempts = 1\n    config.backoff_factor\
+          \ = 3\n    config.username = \"username\"\n    config.password = \"password\"\n    client = ntnx_prism-apis_py_client.ApiClient(configuration=config)\n\
+          \    storageContainerApi = ntnx_prism-apis_py_client.StorageContainerApi(api_client=client)\n    api_response =\
+          \ storageContainerApi.get_storage_container_by_ext_id()\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"nutanix/prism-apis-go-client/v4/api\"\n    \"nutanix/prism-apis-go-client/v4/client\"\
+          \n}\n\nvar (\n    ApiClientInstance *client.ApiClient\n    StorageContainerApiInstance *api.StorageContainerApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    ApiClientInstance.Host = \"localhost\"\n\
+          \    ApiClientInstance.Port = 9440\n    ApiClientInstance.RetryInterval = 100\n    ApiClientInstance.MaxRetryAttempts\
+          \ = 2\n    ApiClientInstance.AllowVersionNegotiation = true\n    ApiClientInstance.Username = \"username\"\n   \
+          \ ApiClientInstance.Password = \"password\"\n\n    StorageContainerApiInstance = api.StorageContainerApi(ApiClientInstance)\n\
+          \n\n    response, _ := StorageContainerApiInstance.GetStorageContainerByExtId()\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers/{containerExtId}\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers/{containerExtId}\"\
+          \n"
+    put:
+      tags:
+      - StorageContainer
+      summary: Update existing Storage container.
+      description: Update an existing Storage container identified by {containerExtId}.
+      operationId: updateStorageContainer
+      parameters:
+      - name: containerExtId
+        in: path
+        description: Uuid of the Storage container.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b2fb095c-f935-4ef4-97d2-a7d84583a643
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainer'
+        required: true
+      responses:
+        '202':
+          description: 'Http Status code when the request has been accepted by the server but has not been completed yet.
+            The Location Header contains the URL of the Task object that can be used to track the status of the request.
+
+            '
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        default:
+          description: Default Error Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.sto.java.client.ApiClient;\nimport com.nutanix.sto.java.client.api.StorageContainerApi;\n\
+          import com.nutanix.dp1.sto.storage.v4.config.StorageContainer;\nimport com.nutanix.dp1.sto.storage.v4.config.StorageContainerTaskResponse;\n\
+          \npublic class JavaSdkSample {\n\tpublic static void main(String[] args) {\n\t\tApiClient client = new ApiClient();\n\
+          \t\tclient.setHost(\"localhost\");\n\t\tclient.setPort(9440);\n\t\tclient.setRetryInterval(100);\n\t\tclient.setMaxRetryAttempts(2);\n\
+          \t\tclient.setUsername(\"username\");\n\t\tclient.setPassword(\"password\");\n\n\t\tStorageContainerApi storageContainerApi\
+          \ = new StorageContainerApi(client);\n\n\t\tStorageContainer storageContainer = new StorageContainer();\n\n\t\t\
+          // StorageContainer object initializations here...\n\n\t\tStorageContainerTaskResponse storageContainerTaskResponse\
+          \ = storageContainerApi.updateStorageContainer(storageContainer);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport ApiClient from \"@nutanix/prism-apis-js-client/src/ApiClient\";\nimport StorageContainerApi from\
+          \ \"@nutanix/prism-apis-js-client/src/apis/StorageContainer-endpoints\";\nimport StorageContainer from \"@nutanix/prism-apis-js-client/src/models/storage/v4/config/StorageContainer\"\
+          ;\nimport StorageContainerTaskResponse from \"@nutanix/prism-apis-js-client/src/models/storage/v4/config/StorageContainerTaskResponse\"\
+          ;\n\nlet apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.retryInterval\
+          \ = 500;\napiClientInstance.host = 'localhost'\napiClientInstance.port = '9440';\napiClientInstance.username = 'username';\n\
+          apiClientInstance.password = 'password';\nlet storageContainerApi = new StorageContainerApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let storageContainer = new StorageContainer();\n\n    // StorageContainer object initializations\
+          \ here...\n\n\n    storageContainerApi.updateStorageContainer(storageContainer, ).then(({data, response}) =>\n \
+          \       console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error)\
+          \ => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport ntnx_prism-apis_py_client\n\nif __name__ == \"__main__\":\n    config = ntnx_prism-apis_py_client.configuration.Configuration()\n\
+          \    config.host = \"localhost\"\n    config.port = 9440\n    config.max_retry_attempts = 1\n    config.backoff_factor\
+          \ = 3\n    config.username = \"username\"\n    config.password = \"password\"\n    client = ntnx_prism-apis_py_client.ApiClient(configuration=config)\n\
+          \    storageContainerApi = ntnx_prism-apis_py_client.StorageContainerApi(api_client=client)\n    storageContainer\
+          \ = ntnx_prism-apis_py_client.StorageContainer()\n\n    # StorageContainer object initializations here...\n\n  \
+          \  api_response = storageContainerApi.update_storage_container(storageContainer)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    import1 \"nutanix/prism-apis-go-client/models/prism-apis/v4/defaultapi\"\
+          \n    \"nutanix/prism-apis-go-client/v4/api\"\n    \"nutanix/prism-apis-go-client/v4/client\"\n}\n\nvar (\n    ApiClientInstance\
+          \ *client.ApiClient\n    StorageContainerApiInstance *api.StorageContainerApi\n)\n\nfunc main() {\n    ApiClientInstance\
+          \ = client.NewApiClient()\n    ApiClientInstance.Host = \"localhost\"\n    ApiClientInstance.Port = 9440\n    ApiClientInstance.RetryInterval\
+          \ = 100\n    ApiClientInstance.MaxRetryAttempts = 2\n    ApiClientInstance.AllowVersionNegotiation = true\n    ApiClientInstance.Username\
+          \ = \"username\"\n    ApiClientInstance.Password = \"password\"\n\n    StorageContainerApiInstance = api.StorageContainerApi(ApiClientInstance)\n\
+          \n    storageContainer := import1.newStorageContainer()\n\n    // StorageContainer object initializations here...\n\
+          \n\n    response, _ := StorageContainerApiInstance.UpdateStorageContainer(storageContainer)\n    fmt.Println(response)\n\
+          }\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers/{containerExtId}\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"containerId\":\"string\",\"containerExtId\":\"string\",\"ownerUuid\":\"string\"\
+          ,\"name\":\"string\",\"clusterExtId\":\"string\",\"storagePoolUuid\":\"string\",\"markedForRemoval\":true,\"maxCapacity\"\
+          :0,\"totalExplicitReservedCapacity\":0,\"totalImplicitReservedCapacity\":0,\"advertisedCapacity\":0,\"replicationFactor\"\
+          :0,\"oplogReplicationFactor\":0,\"nfsWhitelistAddress\":[{\"ipv4\":{\"value\":\"string\",\"prefixLength\":32,\"\
+          $objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\":\"string\",\"prefixLength\":128,\"$objectType\"\
+          :\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\",\"$objectType\":\"common.v1.config.FQDN\"},\"\
+          $objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"isNfsWhitelistInherited\":true,\"randomIoPreference\":[\"\
+          string\"],\"seqIoPreference\":[\"string\"],\"downMigrateTimesInSecs\":{\"additionalProp1\":0,\"additionalProp2\"\
+          :0,\"additionalProp3\":0},\"erasureCode\":\"$UNKNOWN\",\"inlineEcEnabled\":true,\"preferHigherECFaultDomain\":true,\"\
+          erasureCodeDelaySecs\":0,\"fingerPrintOnWrite\":\"$UNKNOWN\",\"onDiskDedup\":\"$UNKNOWN\",\"compressionEnabled\"\
+          :true,\"compressionDelayInSecs\":0,\"isNutanixManaged\":true,\"enableSoftwareEncryption\":true,\"vstoreNameList\"\
+          :[\"string\"],\"mappedRemoteContainers\":{\"additionalProp1\":\"string\",\"additionalProp2\":\"string\",\"additionalProp3\"\
+          :\"string\"},\"encrypted\":true,\"affinityHostUuid\":\"string\",\"$objectType\":\"storage.v4.config.StorageContainer\"\
+          } \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type:\
+          \ application/json' \\\n     --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\"\
+          ,\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"containerId\":\"string\",\"containerExtId\"\
+          :\"string\",\"ownerUuid\":\"string\",\"name\":\"string\",\"clusterExtId\":\"string\",\"storagePoolUuid\":\"string\"\
+          ,\"markedForRemoval\":true,\"maxCapacity\":0,\"totalExplicitReservedCapacity\":0,\"totalImplicitReservedCapacity\"\
+          :0,\"advertisedCapacity\":0,\"replicationFactor\":0,\"oplogReplicationFactor\":0,\"nfsWhitelistAddress\":[{\"ipv4\"\
+          :{\"value\":\"string\",\"prefixLength\":32,\"$objectType\":\"common.v1.config.IPv4Address\"},\"ipv6\":{\"value\"\
+          :\"string\",\"prefixLength\":128,\"$objectType\":\"common.v1.config.IPv6Address\"},\"fqdn\":{\"value\":\"string\"\
+          ,\"$objectType\":\"common.v1.config.FQDN\"},\"$objectType\":\"common.v1.config.IPAddressOrFQDN\"}],\"isNfsWhitelistInherited\"\
+          :true,\"randomIoPreference\":[\"string\"],\"seqIoPreference\":[\"string\"],\"downMigrateTimesInSecs\":{\"additionalProp1\"\
+          :0,\"additionalProp2\":0,\"additionalProp3\":0},\"erasureCode\":\"$UNKNOWN\",\"inlineEcEnabled\":true,\"preferHigherECFaultDomain\"\
+          :true,\"erasureCodeDelaySecs\":0,\"fingerPrintOnWrite\":\"$UNKNOWN\",\"onDiskDedup\":\"$UNKNOWN\",\"compressionEnabled\"\
+          :true,\"compressionDelayInSecs\":0,\"isNutanixManaged\":true,\"enableSoftwareEncryption\":true,\"vstoreNameList\"\
+          :[\"string\"],\"mappedRemoteContainers\":{\"additionalProp1\":\"string\",\"additionalProp2\":\"string\",\"additionalProp3\"\
+          :\"string\"},\"encrypted\":true,\"affinityHostUuid\":\"string\",\"$objectType\":\"storage.v4.config.StorageContainer\"\
+          } \\\n     - \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers/{containerExtId}\"\n"
+    delete:
+      tags:
+      - StorageContainer
+      summary: Delete an existing Storage container.
+      description: Delete an existing Storage container identified by {containerExtId}.
+      operationId: deleteStorageContainerByExtId
+      parameters:
+      - name: containerExtId
+        in: path
+        description: Uuid of the Storage container.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b2fb095c-f935-4ef4-97d2-a7d84583a643
+      - name: ignoreSmallFiles
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          description: Indicates whether to ignore the small file.
+          default: true
+      responses:
+        '202':
+          description: 'Http Status code when the request has been accepted by the server but has not been completed yet.
+            The Location Header contains the URL of the Task object that can be used to track the status of the request.
+
+            '
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        default:
+          description: Default Error Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainerTaskResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.sto.java.client.ApiClient;\nimport com.nutanix.sto.java.client.api.StorageContainerApi;\n\
+          import com.nutanix.dp1.sto.storage.v4.config.StorageContainerTaskResponse;\n\npublic class JavaSdkSample {\n\tpublic\
+          \ static void main(String[] args) {\n\t\tApiClient client = new ApiClient();\n\t\tclient.setHost(\"localhost\");\n\
+          \t\tclient.setPort(9440);\n\t\tclient.setRetryInterval(100);\n\t\tclient.setMaxRetryAttempts(2);\n\t\tclient.setUsername(\"\
+          username\");\n\t\tclient.setPassword(\"password\");\n\n\t\tStorageContainerApi storageContainerApi = new StorageContainerApi(client);\n\
+          \n\t\tboolean ignoreSmallFiles = true;\n\t\tStorageContainerTaskResponse storageContainerTaskResponse = storageContainerApi.deleteStorageContainerByExtId(ignoreSmallFiles);\n\
+          \t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport ApiClient from \"@nutanix/prism-apis-js-client/src/ApiClient\";\nimport StorageContainerApi from\
+          \ \"@nutanix/prism-apis-js-client/src/apis/StorageContainer-endpoints\";\nimport StorageContainerTaskResponse from\
+          \ \"@nutanix/prism-apis-js-client/src/models/storage/v4/config/StorageContainerTaskResponse\";\n\nlet apiClientInstance\
+          \ = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.retryInterval = 500;\napiClientInstance.host\
+          \ = 'localhost'\napiClientInstance.port = '9440';\napiClientInstance.username = 'username';\napiClientInstance.password\
+          \ = 'password';\nlet storageContainerApi = new StorageContainerApi(apiClientInstance);\n\nfunction sample() {\n\
+          \    let ignoreSmallFiles = true;\n\n    storageContainerApi.deleteStorageContainerByExtId(ignoreSmallFiles).then(({data,\
+          \ response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n\
+          \    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport ntnx_prism-apis_py_client\n\nif __name__ == \"__main__\":\n    config = ntnx_prism-apis_py_client.configuration.Configuration()\n\
+          \    config.host = \"localhost\"\n    config.port = 9440\n    config.max_retry_attempts = 1\n    config.backoff_factor\
+          \ = 3\n    config.username = \"username\"\n    config.password = \"password\"\n    client = ntnx_prism-apis_py_client.ApiClient(configuration=config)\n\
+          \    storageContainerApi = ntnx_prism-apis_py_client.StorageContainerApi(api_client=client)\n    ignoreSmallFiles\
+          \ = true\n    api_response = storageContainerApi.delete_storage_container_by_ext_id(ignoreSmallFiles)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"nutanix/prism-apis-go-client/v4/api\"\n    \"nutanix/prism-apis-go-client/v4/client\"\
+          \n}\n\nvar (\n    ApiClientInstance *client.ApiClient\n    StorageContainerApiInstance *api.StorageContainerApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    ApiClientInstance.Host = \"localhost\"\n\
+          \    ApiClientInstance.Port = 9440\n    ApiClientInstance.RetryInterval = 100\n    ApiClientInstance.MaxRetryAttempts\
+          \ = 2\n    ApiClientInstance.AllowVersionNegotiation = true\n    ApiClientInstance.Username = \"username\"\n   \
+          \ ApiClientInstance.Password = \"password\"\n\n    StorageContainerApiInstance = api.StorageContainerApi(ApiClientInstance)\n\
+          \n    ignoreSmallFiles := true\n\n    response, _ := StorageContainerApiInstance.DeleteStorageContainerByExtId(ignoreSmallFiles)\n\
+          \    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers/{containerExtId}?ignoreSmallFiles=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n     - \"https://{pc-ip}:9440/api/storage/v4.0.a3/config/storage-containers/{containerExtId}?ignoreSmallFiles=true\"\
+          \n"
+components:
+  schemas:
+    storage.v4.r0.a3.config.StorageContainerResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainer'
+          - type: array
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/storage-containers/{containerExtId}
+        Get operation
+    common.v1.r0.a3.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+    storage.v4.r0.a3.config.StorageContainer:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          containerId:
+            type: string
+            description: Storage container instance Id.
+            example: string
+          containerExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Uuid of the Storage container.
+            example: a3fb4acf-9a14-4e4a-bfcd-77b7015da37b
+          ownerUuid:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Id of the owner.
+            example: bde4bc6e-f0a8-420a-b7a8-86f2a6259ac5
+          name:
+            maxLength: 75
+            type: string
+            description: Name of the Storage container.
+            example: string
+          clusterExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Owning cluster uuid of ctorage Container.
+            readOnly: true
+            example: b6930d37-03e0-4bb1-ac2b-a63b91a96e83
+          storagePoolUuid:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Owning storage pool uuid of the Storage container instance.
+            readOnly: true
+            example: ae483931-7f0f-4544-ac3e-ba654d59c5a9
+          markedForRemoval:
+            type: boolean
+            description: Indicates whether the Storage container is marked for removal.
+            readOnly: true
+            example: true
+          maxCapacity:
+            type: integer
+            description: Maximum capacity of the Storage container.
+            format: int64
+            readOnly: true
+            example: 72
+          totalExplicitReservedCapacity:
+            type: integer
+            description: Total explicit reserved capacity of the Storage container.
+            format: int64
+            example: 75
+          totalImplicitReservedCapacity:
+            type: integer
+            description: Total implicit reserved capacity of the Storage container.
+            format: int64
+            readOnly: true
+            example: 99
+          advertisedCapacity:
+            type: integer
+            description: Total advertised capacity of the Storage container.
+            format: int64
+            example: 5
+          replicationFactor:
+            type: integer
+            description: Replication factor of the Storage container.
+            format: int32
+            example: 22
+          oplogReplicationFactor:
+            type: integer
+            description: Oplog replication factor of the Storage container.
+            format: int32
+            readOnly: true
+            example: 26
+          nfsWhitelistAddress:
+            type: array
+            description: List of NFS addresses which needs to be whitelisted.
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.config.IPAddressOrFQDN'
+          isNfsWhitelistInherited:
+            type: boolean
+            description: Indicates whether the NFS whitelist is inherited from global config.
+            readOnly: true
+            example: false
+          randomIoPreference:
+            type: array
+            description: List of random IO preference tier.
+            items:
+              type: string
+              example: string
+          seqIoPreference:
+            type: array
+            description: List of sequential IO preference tier.
+            items:
+              type: string
+              example: string
+          downMigrateTimesInSecs:
+            type: object
+            additionalProperties:
+              type: integer
+              format: int32
+            description: Migrate down time in seconds for random IO preference tier.
+          erasureCode:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.ErasureCodeStatus'
+          inlineEcEnabled:
+            type: boolean
+            description: Indicates whether the inline erasure coding is enabled.
+            example: false
+          preferHigherECFaultDomain:
+            type: boolean
+            description: Indicates whether to prefer a higher erasure code fault domain.
+            example: true
+          erasureCodeDelaySecs:
+            type: integer
+            description: Erasure code delay in seconds.
+            format: int32
+            example: 17
+          fingerPrintOnWrite:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.FingerPrintOnWrite'
+          onDiskDedup:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.OnDiskDedup'
+          compressionEnabled:
+            type: boolean
+            description: Indicates whether the compression is enabled.
+            example: true
+          compressionDelayInSecs:
+            type: integer
+            description: The compression delay in seconds.
+            format: int32
+            example: 92
+          isNutanixManaged:
+            type: boolean
+            description: Indicates whether the Storage container is managed by Nutanix.
+            example: false
+          enableSoftwareEncryption:
+            type: boolean
+            description: Indicates whether the Storage container has enabled software encryption.
+            nullable: true
+            example: false
+          vstoreNameList:
+            type: array
+            description: List of volume stores in the Storage container.
+            readOnly: true
+            items:
+              type: string
+              example: string
+          mappedRemoteContainers:
+            type: object
+            additionalProperties:
+              type: string
+            description: Map of remote Storage containers.
+            readOnly: true
+          encrypted:
+            type: boolean
+            description: Indicates whether the Storage container is encrypted or not.
+            readOnly: true
+            example: false
+          affinityHostUuid:
+            type: string
+            description: Affinity host Id for RF 1 Storage container.
+            example: string
+        additionalProperties: false
+    common.v1.r0.a3.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+      additionalProperties: false
+    storage.v4.r0.a3.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.error.AppMessage'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
+      additionalProperties: false
+      description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
+    common.v1.r0.a3.config.IPv4Address:
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          example: 180.178.15.134
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+    storage.v4.r0.a3.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+        code:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: The locale for the message description.
+          default: en_US
+        errorGroup:
+          type: string
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+      description: This schema is generated from AppMessage.java
+    storage.v4.r0.a3.config.ErasureCodeStatus:
+      type: string
+      description: Indicates the possible values for the erasure code.
+      enum:
+      - NONE
+      - 'OFF'
+      - 'ON'
+      - $UNKNOWN
+      - $REDACTED
+    storage.v4.r0.a3.config.StorageContainerTaskResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - type: array
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/storage-containers/{containerExtId}/$actions/mount
+        Post operation
+    common.v1.r0.a3.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.FQDN'
+      additionalProperties: false
+      description: An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+    common.v1.r0.a3.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and therefore extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            example: ac7be6a0-e497-4e10-8744-ab55a2f96402
+          links:
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        additionalProperties: false
+    common.v1.r0.a3.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Flag'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          format: int32
+          example: 50
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+        extraInfo:
+          type: array
+          description: An array of entity specific metadata
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. Always present and minimally contains the self link for
+        the API request that produced this response.  Also contains pagination data for paginated requests.
+
+        '
+    common.v1.r0.a3.config.Flag:
+      type: object
+      properties:
+        name:
+          type: string
+          example: string
+        value:
+          type: boolean
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.r0.a3.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by this link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
+            special value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          example: string
+        message:
+          type: string
+          example: string
+        attributePath:
+          type: string
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+    storage.v4.r0.a3.config.OnDiskDedup:
+      type: string
+      description: Indicates the possible values for on disk deduplication.
+      enum:
+      - NONE
+      - 'OFF'
+      - POST_PROCESS
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity.  It is automatically
+            assigned by the system and is immutable from an API consumer perspective (some use cases may cause this Id to
+            change - for instance a use case may require the transfer of ownership of the entity, but these cases are handled
+            automatically on the server).
+
+            '
+          readOnly: true
+          example: 69d77424-8db5-4a6a-878a-c2ef281783df
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    storage.v4.r0.a3.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: string
+        statusCode:
+          type: integer
+          example: 25
+        error:
+          type: string
+          example: string
+        path:
+          type: string
+          example: string
+        validationErrorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+    common.v1.r0.a3.config.KVPair:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The key of this key value pair
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            example: string
+          - type: integer
+            example: 6
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    prism.v4.r0.a1.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: Globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:e783b480-4d55-4fd7-b760-10291f7ba4ca
+      additionalProperties: false
+      description: Reference to a task tracking the async operation.
+    storage.v4.r0.a3.config.FingerPrintOnWrite:
+      type: string
+      description: Indicates the possible values that can be set to finger print on write.
+      enum:
+      - NONE
+      - 'OFF'
+      - 'ON'
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.IPv6Address:
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          example: d9a6:4df8:ddfd:839c:6c4e:ae35:c0ba:4eae
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+    storage.v4.r0.a3.config.StorageContainersResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageContainer'
+          - type: array
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/storage-containers Get operation
+    common.v1.r0.a3.config.FQDN:
+      type: object
+      properties:
+        value:
+          pattern: ^(?:[a-z0-9][\w\-]*[a-z0-9]*\.)*(?:(?:(?:[a-z0-9][\w\-]*[a-z0-9]*)(?:\.[a-z0-9]+)?))$
+          type: string
+          example: string
+      additionalProperties: false
+      description: 'A fully qualified domain name specifying its exact location in the tree hierarchy of the Domain Name System.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

@@ -1,0 +1,1627 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Virtual Machine Management APIs
+  description: Manage the life-cycle of virtual machines hosted on Nutanix
+  version: '4.0'
+  x-logo:
+    altText: Vmm Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/vmm/images/vmm-logo-img.svg
+  x-repo-name: vmm
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /vmm/v4.0/ahv/config/vms/{vmExtId}/disks:
+    get:
+      tags:
+      - Vm
+      summary: List disks attached to a VM
+      description: Lists the disk devices attached to a virtual machine.
+      operationId: listDisksByVmId
+      parameters:
+      - name: vmExtId
+        in: path
+        description: A globally unique identifier of a VM of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 14471270-10f9-4e61-a99f-2f27d605776a
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      responses:
+        '200':
+          description: Returns the configuration details for the disk devices attached to a virtual machine.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/vmm.v4.0.ahv.config.Disk'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Virtual Machine Disk
+        roleList:
+        - Account Owner
+        - Administrator
+        - User
+        - Consumer
+        - Developer
+        - Operator
+        - Prism Admin
+        - Prism Viewer
+        - Project Admin
+        - Self-Service Admin
+        - Super Admin
+        - VPC Admin
+        - Storage Admin
+        - Network Infra Admin
+        - Virtual Machine Admin
+        - Virtual Machine Operator
+        - Virtual Machine Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 2
+        timeUnit: seconds
+      - type: Small
+        count: 3
+        timeUnit: seconds
+      - type: Large
+        count: 5
+        timeUnit: seconds
+      - type: XLarge
+        count: 7
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vmm.java.client.ApiClient;\nimport com.nutanix.vmm.java.client.api.VmApi;\n\
+          import com.nutanix.dp1.vmm.vmm.v4.ahv.config.ListDisksApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VmApi vmApi = new VmApi(apiClient);\n\
+          \n        \n        String vmExtId = \"be5ceEed-E2aA-35bf-beeE-A6FcDbe2CCdE\";\n        \n        int page = 0;\n\
+          \        \n        int limit = 50;\n\n        try {\n            ListDisksApiResponse listDisksApiResponse = vmApi.listDisksByVmId(vmExtId,\
+          \ page, limit);\n            System.out.println(listDisksApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VmApi } from \"@nutanix-api/vmm-js-client\";\n\n// Configure the client\nlet apiClientInstance\
+          \ = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port\
+          \ to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of\
+          \ connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval\
+          \ = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect\
+          \ to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information here if needed.\n\
+          let vmApi = new VmApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let vmExtId = \"Ff7cbb6D-bA0C-68D4-983F-Cfb2BdB4Fab0\"\
+          ;\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] =\
+          \ 50;\n\n\n\n\n    vmApi.listDisksByVmId(vmExtId, opts).then(({data, response}) => {\n        console.log(`API returned\
+          \ the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) =>\
+          \ {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_vmm_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_vmm_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_vmm_py_client.ApiClient(configuration=config)\n\
+          \    vm_api = ntnx_vmm_py_client.VmApi(api_client=client)\n    \n    vm_ext_id = \"6E51DCcd-3E84-De5d-c3ec-bc6AadD81ADb\"\
+          \n    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = vm_api.list_disks_by_vm_id(vmExtId=vm_ext_id,\
+          \ _page=page, _limit=limit)\n        print(api_response)\n    except ntnx_vmm_py_client.rest.ApiException as e:\n\
+          \        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/models/vmm/v4/ahv/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VmApiInstance *api.VmApi\n)\n\nfunc main() {\n    ApiClientInstance\
+          \ = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host = \"localhost\"\
+          \n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms to use during retry\
+          \ attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    VmApiInstance = api.NewVmApi(ApiClientInstance)\n\
+          \n    \n    vmExtId := \"cA9324a0-A9De-dcD7-f06d-C83e0F8DdBeF\"\n    \n    page_ := 0\n    \n    limit_ := 50\n\n\
+          \n    response, error := VmApiInstance.ListDisksByVmId(&vmExtId, &page_, &limit_)\n    if error != nil {\n     \
+          \   fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.Disk)\n    fmt.Println(data)\n\
+          \n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/CA11cAfD-Ccf4-B547-CAf7-b3da1432c76d/disks?$limit=50&$page=0\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/7Ff1AdEa-ab68-A9dF-Bbf3-dAc47f4aaEA7/disks?$limit=50&$page=0\"\
+          \n"
+    post:
+      tags:
+      - Vm
+      summary: Create a disk device for a VM
+      description: Creates and attaches a disk device to a virtual machine.
+      operationId: createDisk
+      parameters:
+      - name: vmExtId
+        in: path
+        description: A globally unique identifier of a VM of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 424bc99b-2c7a-4640-99ee-17b6cdb3b0d3
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 3e6784e8-92f8-4c82-b192-0045c8dc9bf0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vmm.v4.0.ahv.config.Disk'
+        required: true
+      responses:
+        '202':
+          description: The request to create a disk device for a VM is accepted.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks Post
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks Post
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks Post
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create Virtual Machine Disk
+        roleList:
+        - Account Owner
+        - Administrator
+        - User
+        - Consumer
+        - CSI System
+        - Developer
+        - Kubernetes Data Services System
+        - Kubernetes Infrastructure Provision
+        - Operator
+        - Prism Admin
+        - Project Admin
+        - Self-Service Admin
+        - Super Admin
+        - Virtual Machine Admin
+        - Storage Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: Small
+        count: 8
+        timeUnit: seconds
+      - type: Large
+        count: 20
+        timeUnit: seconds
+      - type: XLarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vmm.java.client.ApiClient;\nimport com.nutanix.vmm.java.client.api.VmApi;\n\
+          import com.nutanix.dp1.vmm.vmm.v4.ahv.config.Disk;\nimport com.nutanix.dp1.vmm.vmm.v4.ahv.config.CreateDiskApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VmApi vmApi = new VmApi(apiClient);\n\
+          \n        Disk disk = new Disk();\n\n        // Disk object initializations here...\n        \n        String vmExtId\
+          \ = \"6bFdE3FF-cbDA-0235-F42B-7e08aAfabDFf\";\n\n        /*\n        Some Create, Update, and Delete operations\
+          \ generally require an If-Match header with a value to be passed in order to protect against concurrent updates.\n\
+          \        The value that needs to be sent in the If-Match header needs to be retrieved by performing a Read(Get)\
+          \ operation on the same resource.\n        ETags can be retrieved by calling a static method of ApiClient as below:\n\
+          \        String eTag = ApiClient.getEtag(getResponse);\n        HashMap<String, Object> opts = new HashMap<>();\n\
+          \        opts.put(HttpHeaders.IF_MATCH, eTag);\n        */\n        try {\n            CreateDiskApiResponse createDiskApiResponse\
+          \ = vmApi.createDisk(vmExtId, disk, opts);\n            System.out.println(createDiskApiResponse.toString());\n\n\
+          \        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VmApi, Disk } from \"@nutanix-api/vmm-js-client\";\n\n// Configure the client\nlet\
+          \ apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n\
+          // Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a\
+          \ loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet vmApi = new VmApi(apiClientInstance);\n\nfunction sample() {\n    let disk = new Disk();\n\
+          \n    // Disk object initializations here...\n\n    \n    let vmExtId = \"3dbeCFaf-4Ec3-eAe0-80c4-49c0fbeaDA9F\"\
+          ;\n\n\n    /*\n    Some Create, Update, and Delete operations generally require an If-Match header with a value\
+          \ to be passed in order to protect against concurrent updates.\n    The value that needs to be sent in the If-Match\
+          \ header needs to be retrieved by performing a Read(Get) operation on the same resource.\n    ETags can be retrieved\
+          \ by calling a static method of ApiClient as below:\n    let etagValue = ApiClient.getEtag(data);\n    */\n    vmApi.createDisk(vmExtId,\
+          \ disk, {\"If-Match\" : etagValue}).then(({data, response}) => {\n        console.log(`API returned the following\
+          \ status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_vmm_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_vmm_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_vmm_py_client.ApiClient(configuration=config)\n\
+          \    vm_api = ntnx_vmm_py_client.VmApi(api_client=client)\n    disk = ntnx_vmm_py_client.Disk()\n\n    # Disk object\
+          \ initializations here...\n    \n    vm_ext_id = \"56eAFdfC-a3Bb-CA38-eec8-BBEFab2b36e8\"\n\n    \"\"\"\n    Some\
+          \ Create, Update, and Delete operations generally require an If-Match header with a value to be passed in order\
+          \ to protect against concurrent updates.\n    The value that needs to be sent in the If-Match header needs to be\
+          \ retrieved by performing a Read(Get) operation on the same resource.\n    ETags can be retrieved by calling a static\
+          \ method of ApiClient as below:\n    etag_value = ApiClient.get_etag(get_api_response)\n    \"\"\"\n\n    try:\n\
+          \        api_response = vm_api.create_disk(vmExtId=vm_ext_id, body=disk, if_match=etag_value)\n        print(api_response)\n\
+          \    except ntnx_vmm_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/models/vmm/v4/ahv/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/models/prism/v4/config\"\n)\n\nvar (\n\
+          \    ApiClientInstance *client.ApiClient\n    VmApiInstance *api.VmApi\n)\n\nfunc main() {\n    ApiClientInstance\
+          \ = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host = \"localhost\"\
+          \n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms to use during retry\
+          \ attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    VmApiInstance = api.NewVmApi(ApiClientInstance)\n\
+          \n    disk := import1.NewDisk()\n\n    // Disk object initializations here...\n\n    \n    vmExtId := \"02bDeBaC-Fb2c-36c5-A048-3Bf8611afFC0\"\
+          \n\n    /*\n    Some Create, Update, and Delete operations generally require an If-Match header with a value to\
+          \ be passed in order to protect against concurrent updates.\n    The value that needs to be sent in the If-Match\
+          \ header needs to be retrieved by performing a Read(Get) operation on the same resource.\n    ETags can be retrieved\
+          \ by calling a static method of ApiClient as below:\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n \
+          \   */\n\n    response, error := VmApiInstance.CreateDisk(&vmExtId, disk, args)\n    if error != nil {\n       \
+          \ fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\
+          \n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/a8E98E02-A2AA-2fdA-EDAa-BcdaCdDe4Cff/disks\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"diskAddress\":{\"busType\":\"$UNKNOWN\",\"index\":0,\"$objectType\":\"vmm.v4.ahv.config.DiskAddress\"},\"backingInfo\"\
+          :{\"diskExtId\":\"string\",\"diskSizeBytes\":0,\"storageContainer\":{\"extId\":\"string\",\"$objectType\":\"vmm.v4.ahv.config.VmDiskContainerReference\"\
+          },\"storageConfig\":{\"isFlashModeEnabled\":true,\"$objectType\":\"vmm.v4.ahv.config.VmDiskStorageConfig\"},\"dataSource\"\
+          :{\"reference\":{\"imageExtId\":\"string\",\"$objectType\":\"vmm.v4.ahv.config.ImageReference\"},\"$objectType\"\
+          :\"vmm.v4.ahv.config.DataSource\"},\"isMigrationInProgress\":true,\"$objectType\":\"vmm.v4.ahv.config.VmDisk\"},\"\
+          $objectType\":\"vmm.v4.ahv.config.Disk\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"diskAddress\":{\"busType\":\"$UNKNOWN\",\"index\":0,\"$objectType\":\"vmm.v4.ahv.config.DiskAddress\"\
+          },\"backingInfo\":{\"diskExtId\":\"string\",\"diskSizeBytes\":0,\"storageContainer\":{\"extId\":\"string\",\"$objectType\"\
+          :\"vmm.v4.ahv.config.VmDiskContainerReference\"},\"storageConfig\":{\"isFlashModeEnabled\":true,\"$objectType\"\
+          :\"vmm.v4.ahv.config.VmDiskStorageConfig\"},\"dataSource\":{\"reference\":{\"imageExtId\":\"string\",\"$objectType\"\
+          :\"vmm.v4.ahv.config.ImageReference\"},\"$objectType\":\"vmm.v4.ahv.config.DataSource\"},\"isMigrationInProgress\"\
+          :true,\"$objectType\":\"vmm.v4.ahv.config.VmDisk\"},\"$objectType\":\"vmm.v4.ahv.config.Disk\"} \\\n- \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/E3D82FE0-bdef-8D7A-beCA-dE1c1A7fDafE/disks\"\
+          \n"
+  /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}:
+    get:
+      tags:
+      - Vm
+      summary: Get configuration details for the provided disk device
+      description: Retrieves configuration details for the provided disk device attached to a virtual machine.
+      operationId: getDiskById
+      parameters:
+      - name: vmExtId
+        in: path
+        description: A globally unique identifier of a VM of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 79daf12a-c20d-4c75-8d9a-faa6b997287c
+      - name: extId
+        in: path
+        description: A globally unique identifier of a VM disk of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 54fed46d-1480-44ef-ab08-32a1efa740df
+      responses:
+        '200':
+          description: Returns the configuration details for the provided disk device attached to a virtual machine.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.ahv.config.Disk'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Virtual Machine Disk
+        roleList:
+        - Account Owner
+        - Administrator
+        - User
+        - Consumer
+        - Developer
+        - Operator
+        - Prism Admin
+        - Prism Viewer
+        - Project Admin
+        - Self-Service Admin
+        - Super Admin
+        - VPC Admin
+        - Storage Admin
+        - Network Infra Admin
+        - Virtual Machine Admin
+        - Virtual Machine Operator
+        - Virtual Machine Viewer
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: Small
+        count: 20
+        timeUnit: seconds
+      - type: Large
+        count: 25
+        timeUnit: seconds
+      - type: XLarge
+        count: 25
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vmm.java.client.ApiClient;\nimport com.nutanix.vmm.java.client.api.VmApi;\n\
+          import com.nutanix.dp1.vmm.vmm.v4.ahv.config.GetDiskApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VmApi vmApi = new VmApi(apiClient);\n\
+          \n        \n        String vmExtId = \"FF65eF0d-0cAe-C38a-aAcC-d3BBAFfa95cd\";\n        \n        String extId =\
+          \ \"Bae2Ed1B-B0aa-BAFa-8Ceb-e9ab8de3f4ef\";\n\n        try {\n            GetDiskApiResponse getDiskApiResponse\
+          \ = vmApi.getDiskById(vmExtId, extId);\n            System.out.println(getDiskApiResponse.toString());\n\n     \
+          \   } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VmApi } from \"@nutanix-api/vmm-js-client\";\n\n// Configure the client\nlet apiClientInstance\
+          \ = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port\
+          \ to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of\
+          \ connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval\
+          \ = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect\
+          \ to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information here if needed.\n\
+          let vmApi = new VmApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let vmExtId = \"bDAceDA8-a3eA-ee2a-57fb-CccfeeeeFB93\"\
+          ;\n    \n    let extId = \"F49cD097-d34A-FFC3-ed3C-7EC3bF4FddEB\";\n\n\n\n\n\n    vmApi.getDiskById(vmExtId, extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_vmm_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_vmm_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_vmm_py_client.ApiClient(configuration=config)\n\
+          \    vm_api = ntnx_vmm_py_client.VmApi(api_client=client)\n    \n    vm_ext_id = \"DC2eDaBA-fce3-4645-d9FD-bd53CDfC33F4\"\
+          \n    \n    ext_id = \"CefB6ACB-9cdC-CAcD-23d8-9D38bAbccC3f\"\n\n\n    try:\n        api_response = vm_api.get_disk_by_id(vmExtId=vm_ext_id,\
+          \ extId=ext_id)\n        print(api_response)\n    except ntnx_vmm_py_client.rest.ApiException as e:\n        print(e)\n\
+          \n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/models/vmm/v4/ahv/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VmApiInstance *api.VmApi\n)\n\nfunc main() {\n    ApiClientInstance\
+          \ = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host = \"localhost\"\
+          \n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms to use during retry\
+          \ attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    VmApiInstance = api.NewVmApi(ApiClientInstance)\n\
+          \n    \n    vmExtId := \"F40d14ad-d138-7CAe-cC2a-Eca6a3aFdCa5\"\n    \n    extId := \"e6cE5eFd-8c5D-d3cD-Aa53-9E52cd0CbAF2\"\
+          \n\n\n    response, error := VmApiInstance.GetDiskById(&vmExtId, &extId)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().(import1.Disk)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/8DFb9aFA-6FDD-Fdab-AED4-c74AD6Cc05Fb/disks/19EDE52a-fcAf-bdAC-FD24-cD20CC6BBF30\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/607febBE-95db-cdBa-B17B-DF75bdfdC5dA/disks/Ff6CAbaa-aaA6-FAEd-Ed72-FFadDe359E6a\"\
+          \n"
+    put:
+      tags:
+      - Vm
+      summary: Update the configuration for the provided disk device
+      description: Updates the configuration details for the provided disk device.
+      operationId: updateDiskById
+      parameters:
+      - name: vmExtId
+        in: path
+        description: A globally unique identifier of a VM of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 73e56e2d-7dfa-4d5b-b93c-19d4e0e8a7d7
+      - name: extId
+        in: path
+        description: A globally unique identifier of a VM disk of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 4ab2c29e-93fd-4d98-a964-93aaf7ef6dc1
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 288ed847-123a-4917-a4ff-80d217ae5995
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vmm.v4.0.ahv.config.Disk'
+        required: true
+      responses:
+        '202':
+          description: The request to update the configuration for the provided disk device is accepted.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Update Virtual Machine Disk
+        roleList:
+        - Account Owner
+        - Administrator
+        - User
+        - Consumer
+        - Developer
+        - Operator
+        - Prism Admin
+        - Project Admin
+        - Self-Service Admin
+        - Super Admin
+        - Virtual Machine Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: Small
+        count: 8
+        timeUnit: seconds
+      - type: Large
+        count: 15
+        timeUnit: seconds
+      - type: XLarge
+        count: 15
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vmm.java.client.ApiClient;\nimport com.nutanix.vmm.java.client.api.VmApi;\n\
+          import com.nutanix.dp1.vmm.vmm.v4.ahv.config.Disk;\nimport com.nutanix.dp1.vmm.vmm.v4.ahv.config.GetDiskApiResponse;\n\
+          import com.nutanix.dp1.vmm.vmm.v4.ahv.config.UpdateDiskApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        VmApi vmApi = new VmApi(apiClient);\n\n        Disk disk = new Disk();\n\n\
+          \        // Disk object initializations here...\n        \n        String vmExtId = \"EDF867a2-BeFe-dDB2-bbba-36B3De0dcB85\"\
+          ;\n        \n        String extId = \"3aFED1Bf-4fbE-1d3E-7eef-EEF757597E0a\";\n\n        // perform GET call\n \
+          \       GetDiskApiResponse getResponse = null;\n        try {\n            getResponse = vmApi.getDiskById(vmExtId,\
+          \ extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n       \
+          \ }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdateDiskApiResponse updateDiskApiResponse = vmApi.updateDiskById(vmExtId,\
+          \ extId, disk, opts);\n            System.out.println(updateDiskApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VmApi, Disk, GetDiskApiResponse } from \"@nutanix-api/vmm-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet vmApi = new VmApi(apiClientInstance);\n\nfunction sample() {\n\
+          \    let disk = new Disk();\n\n    // Disk object initializations here...\n\n    \n    let vmExtId = \"bbe5FCcA-9d6A-f46F-BF4F-d6BFB0cFfdf6\"\
+          ;\n    \n    let extId = \"a1EFaCF6-8aFD-efd6-6e1b-7eeEE57dFECe\";\n\n\n    // Perform Get call\n    vmApi.getDiskById(vmExtId,\
+          \ extId).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        // Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        vmApi.updateDiskById(vmExtId,\
+          \ extId, disk, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned the\
+          \ following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_vmm_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_vmm_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_vmm_py_client.ApiClient(configuration=config)\n\
+          \    vm_api = ntnx_vmm_py_client.VmApi(api_client=client)\n    disk = ntnx_vmm_py_client.Disk()\n\n    # Disk object\
+          \ initializations here...\n    \n    vm_ext_id = \"2C6bc8a7-BFc3-d8dB-BFa3-FDEb81Dc1BDb\"\n    \n    ext_id = \"\
+          31eCcAAc-B1C6-E05a-CC76-0Ef0EacEDFb1\"\n\n    try:\n        api_response = vm_api.get_disk_by_id(vmExtId=vm_ext_id,\
+          \ extId=ext_id)\n    except ntnx_vmm_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n\
+          \    etag_value = ntnx_vmm_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response = vm_api.update_disk_by_id(vmExtId=vm_ext_id,\
+          \ extId=ext_id, body=disk, if_match=etag_value)\n        print(api_response)\n    except ntnx_vmm_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/models/vmm/v4/ahv/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/models/prism/v4/config\"\n)\n\nvar (\n\
+          \    ApiClientInstance *client.ApiClient\n    VmApiInstance *api.VmApi\n)\n\nfunc main() {\n    ApiClientInstance\
+          \ = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host = \"localhost\"\
+          \n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms to use during retry\
+          \ attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    VmApiInstance = api.NewVmApi(ApiClientInstance)\n\
+          \n    disk := import1.NewDisk()\n\n    // Disk object initializations here...\n\n    \n    vmExtId := \"7AFB9B9a-BFBA-AEfe-ba9c-46cEf1bfBFe1\"\
+          \n    \n    extId := \"bEbCdcD2-6fF6-EB5a-b71C-F8F8a48a389b\"\n\n    getResponse, err := VmApiInstance.GetDiskById(&vmExtId,\
+          \ &extId)\n    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n\
+          \    etagValue := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"\
+          If-Match\"] = etagValue\n\n    response, error := VmApiInstance.UpdateDiskById(&vmExtId, &extId, disk, args)\n \
+          \   if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/Bd1E0c8F-Eaa1-00EE-A7BB-d3BfF4d0cef8/disks/DDDfd9Ef-AfA6-E77A-c9FE-eb8ABFfe0aAB\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"diskAddress\":{\"busType\":\"$UNKNOWN\",\"index\":0,\"$objectType\":\"vmm.v4.ahv.config.DiskAddress\"},\"backingInfo\"\
+          :{\"diskExtId\":\"string\",\"diskSizeBytes\":0,\"storageContainer\":{\"extId\":\"string\",\"$objectType\":\"vmm.v4.ahv.config.VmDiskContainerReference\"\
+          },\"storageConfig\":{\"isFlashModeEnabled\":true,\"$objectType\":\"vmm.v4.ahv.config.VmDiskStorageConfig\"},\"dataSource\"\
+          :{\"reference\":{\"imageExtId\":\"string\",\"$objectType\":\"vmm.v4.ahv.config.ImageReference\"},\"$objectType\"\
+          :\"vmm.v4.ahv.config.DataSource\"},\"isMigrationInProgress\":true,\"$objectType\":\"vmm.v4.ahv.config.VmDisk\"},\"\
+          $objectType\":\"vmm.v4.ahv.config.Disk\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"diskAddress\":{\"busType\":\"$UNKNOWN\",\"index\":0,\"$objectType\":\"vmm.v4.ahv.config.DiskAddress\"\
+          },\"backingInfo\":{\"diskExtId\":\"string\",\"diskSizeBytes\":0,\"storageContainer\":{\"extId\":\"string\",\"$objectType\"\
+          :\"vmm.v4.ahv.config.VmDiskContainerReference\"},\"storageConfig\":{\"isFlashModeEnabled\":true,\"$objectType\"\
+          :\"vmm.v4.ahv.config.VmDiskStorageConfig\"},\"dataSource\":{\"reference\":{\"imageExtId\":\"string\",\"$objectType\"\
+          :\"vmm.v4.ahv.config.ImageReference\"},\"$objectType\":\"vmm.v4.ahv.config.DataSource\"},\"isMigrationInProgress\"\
+          :true,\"$objectType\":\"vmm.v4.ahv.config.VmDisk\"},\"$objectType\":\"vmm.v4.ahv.config.Disk\"} \\\n- \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/Fab4d8dA-8Adb-D9D9-eDbD-CB7d8c40b8Fd/disks/9A80Dadb-7fEb-b8DC-13ED-623c28E9A59A\"\
+          \n"
+    delete:
+      tags:
+      - Vm
+      summary: Removes the specified disk device from a virtual machine.
+      description: Removes the specified disk device from a virtual machine.
+      operationId: deleteDiskById
+      parameters:
+      - name: vmExtId
+        in: path
+        description: A globally unique identifier of a VM of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 992b81e9-bbbe-4da9-85d7-a079fc6bbf32
+      - name: extId
+        in: path
+        description: A globally unique identifier of a VM disk of type UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: e9df36e0-023e-4300-a092-72244602d2f0
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 7803574a-719c-40e5-904a-2dc31157b988
+      responses:
+        '202':
+          description: The request to remove specified disk device from a virtual machine is accepted.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/vmm.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /vmm/v4.0/ahv/config/vms/{vmExtId}/disks/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete Virtual Machine Disk
+        roleList:
+        - Account Owner
+        - Administrator
+        - User
+        - Consumer
+        - CSI System
+        - Developer
+        - Kubernetes Data Services System
+        - Kubernetes Infrastructure Provision
+        - Operator
+        - Prism Admin
+        - Project Admin
+        - Self-Service Admin
+        - Super Admin
+        - Virtual Machine Admin
+        - Storage Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: Small
+        count: 10
+        timeUnit: seconds
+      - type: Large
+        count: 15
+        timeUnit: seconds
+      - type: XLarge
+        count: 15
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.vmm.java.client.ApiClient;\nimport com.nutanix.vmm.java.client.api.VmApi;\n\
+          import com.nutanix.dp1.vmm.vmm.v4.ahv.config.GetDiskApiResponse;\nimport com.nutanix.dp1.vmm.vmm.v4.ahv.config.DeleteDiskApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        VmApi vmApi = new VmApi(apiClient);\n\
+          \n        \n        String vmExtId = \"eeEFDD7f-eAA9-Af5C-Be58-F1CF51fDeB7c\";\n        \n        String extId =\
+          \ \"aD5e37a0-Fc4f-abA5-A9c4-9EAfbE2Fcb88\";\n\n        // perform GET call\n        GetDiskApiResponse getResponse\
+          \ = null;\n        try {\n            getResponse = vmApi.getDiskById(vmExtId, extId);\n        } catch(RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n        // Extract E-Tag Header\n        String\
+          \ eTag = ApiClient.getEtag(getResponse);\n        // initialize/change parameters for update\n        HashMap<String,\
+          \ Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH, eTag);\n        try {\n            DeleteDiskApiResponse\
+          \ deleteDiskApiResponse = vmApi.deleteDiskById(vmExtId, extId, opts);\n            System.out.println(deleteDiskApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, VmApi, GetDiskApiResponse } from \"@nutanix-api/vmm-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet vmApi = new VmApi(apiClientInstance);\n\nfunction sample() {\n\n\
+          \    \n    let vmExtId = \"5bAba2dD-EB0b-FaeE-fDBF-bEFD5eAe1F0B\";\n    \n    let extId = \"dDaDACBC-cE35-ABe8-E0AF-FfA12eaf1e0A\"\
+          ;\n\n\n    // Perform Get call\n    vmApi.getDiskById(vmExtId, extId).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        // Extract E-Tag Header\n        let etagValue\
+          \ = ApiClient.getEtag(data);\n\n        vmApi.deleteDiskById(vmExtId, extId, {\"If-Match\" : etagValue}).then(({data,\
+          \ response}) => {\n            console.log(`API returned the following status code: ${response.status}`);\n    \
+          \        console.log(data.getData());\n        }).catch((error) => {\n            console.log(`Error is: ${error}`);\n\
+          \        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_vmm_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_vmm_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_vmm_py_client.ApiClient(configuration=config)\n\
+          \    vm_api = ntnx_vmm_py_client.VmApi(api_client=client)\n    \n    vm_ext_id = \"2bc00f3A-daAD-4eA5-ec71-be1DFfb6cbbb\"\
+          \n    \n    ext_id = \"F3cC6f93-af5c-1DFb-DFC5-DcA43abaDcbf\"\n\n    try:\n        api_response = vm_api.get_disk_by_id(vmExtId=vm_ext_id,\
+          \ extId=ext_id)\n    except ntnx_vmm_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n\
+          \    etag_value = ntnx_vmm_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response = vm_api.delete_disk_by_id(vmExtId=vm_ext_id,\
+          \ extId=ext_id, if_match=etag_value)\n        print(api_response)\n    except ntnx_vmm_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/vmm-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    VmApiInstance *api.VmApi\n)\n\nfunc main() {\n    ApiClientInstance\
+          \ = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host = \"localhost\"\
+          \n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms to use during retry\
+          \ attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    VmApiInstance = api.NewVmApi(ApiClientInstance)\n\
+          \n    \n    vmExtId := \"FAFb8cF6-Eb6E-bdFE-dbAe-7fd5Fa0Be241\"\n    \n    extId := \"9cD9A7Db-b85F-bDE7-27ab-09dCf498FeeC\"\
+          \n\n    getResponse, err := VmApiInstance.GetDiskById(&vmExtId, &extId)\n    if err != nil {\n        fmt.Println(err)\n\
+          \        return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\
+          \n    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := VmApiInstance.DeleteDiskById(&vmExtId,\
+          \ &extId, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/4CE1aC4b-e7Bc-FDFe-a17F-16D1baEF419A/disks/DE971C0b-Aef4-F8Ac-ea84-e6E1aBBDEddE\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'If-Match: string_sample_data' \\\n  \
+          \            --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\
+          \n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/vmm/v4.0/ahv/config/vms/FbAa6cb4-BdDD-40eD-DBbA-814A4048cdfe/disks/1870AdbF-cC8f-6bBB-8Aba-bdFdaeFEebE9\"\
+          \n"
+components:
+  schemas:
+    vmm.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    vmm.v4.0.ahv.config.DiskAddress:
+      type: object
+      properties:
+        busType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskBusType'
+        index:
+          minimum: 0
+          type: integer
+          description: Device index on the bus. This field is ignored unless the bus details are specified.
+          format: int32
+          example: 3
+      additionalProperties: false
+      description: Disk address.
+    vmm.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 24
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    vmm.v4.0.ahv.config.ADSFVolumeGroupReference:
+      type: object
+      properties:
+        volumeGroupExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of an ADSF volume group. It should be of type UUID.
+          example: f2fa96a8-0261-4552-9113-ee2ecda90599
+      additionalProperties: false
+      description: Reference to an ADSF Volume Group.
+    vmm.v4.0.ahv.config.ImageReference:
+      type: object
+      properties:
+        imageExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of an image of type UUID.
+          example: 2bdbcec9-4333-46c5-a7d1-0b93c9233744
+      additionalProperties: false
+      description: Clone a disk from an image.
+    vmm.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    vmm.v4.0.ahv.config.DataSource:
+      type: object
+      properties:
+        reference:
+          required:
+          - $objectType
+          properties:
+            $objectType:
+              type: string
+              example: vmm.v4.ahv.config.ImageReference
+          description: A reference to a disk or image that contains the contents of a disk.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.ImageReference'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskReference'
+      additionalProperties: false
+      description: A reference to a disk or image that contains the contents of a disk.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 58c42276-2fd7-49bc-9bf7-67d18ba54f14
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    vmm.v4.0.ahv.config.VmReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM of type UUID.
+          example: 3916ccd2-31e5-4cfc-9ee3-a3abb8d5d1be
+      additionalProperties: false
+      description: This is a reference to a VM.
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.DiskBusType:
+      type: string
+      description: 'Bus type for the device. The acceptable values are: SCSI, IDE, PCI, SATA, SPAPR (only PPC).'
+      enum:
+      - SCSI
+      - IDE
+      - PCI
+      - SATA
+      - SPAPR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SCSI: The type of disk bus is SCSI.
+        SPAPR: The type of disk bus is SPAPR.
+        PCI: The type of disk bus is PCI.
+        IDE: The type of disk bus is IDE.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SATA: The type of disk bus is SATA.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    vmm.v4.0.ahv.config.VmDisk:
+      type: object
+      properties:
+        diskExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk of type UUID.
+          readOnly: true
+          example: 8fced97a-8296-49f2-913a-6490ab612e49
+        diskSizeBytes:
+          minimum: 1
+          type: integer
+          description: Size of the disk in bytes.
+          format: int64
+          example: 46
+        storageContainer:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskContainerReference'
+        storageConfig:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskStorageConfig'
+        dataSource:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DataSource'
+        isMigrationInProgress:
+          type: boolean
+          description: Indicates if the disk is undergoing migration to another container.
+          readOnly: true
+          example: false
+      additionalProperties: false
+      description: Storage provided by Nutanix ADSF.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 6c335c2e-8b41-4973-b7d4-08fefbe88680
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    vmm.v4.0.ahv.config.VmDiskReference:
+      type: object
+      properties:
+        diskExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk of type UUID.
+          example: 52f8951a-012a-4fd7-95cc-243b295a2546
+        diskAddress:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
+        vmReference:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmReference'
+      additionalProperties: false
+      description: Reference to an existing VM disk.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 31
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 99
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    vmm.v4.0.ahv.config.VmDiskStorageConfig:
+      type: object
+      properties:
+        isFlashModeEnabled:
+          type: boolean
+          description: Indicates whether the virtual disk is pinned to the hot tier or not.
+          example: true
+      additionalProperties: false
+      description: Storage configuration for VM disks.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 25
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    vmm.v4.0.ahv.config.VmDiskContainerReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk container. It should be of type UUID.
+          example: c1a39b16-fd62-41d3-b83e-ff006c19cf6e
+      additionalProperties: false
+      description: This reference is for disk level storage container preference. This preference specifies the storage container
+        to which this disk belongs.
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:37269b59-c649-45fd-956e-19134b3208a3
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    vmm.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    vmm.v4.0.ahv.config.Disk:
+      description: Virtual Machine disk (VM disk).
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          diskAddress:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
+          backingInfo:
+            required:
+            - $objectType
+            properties:
+              $objectType:
+                type: string
+                example: vmm.v4.ahv.config.VmDisk
+            description: Supporting storage to create virtual disk on.
+            oneOf:
+            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDisk'
+            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.ADSFVolumeGroupReference'
+        additionalProperties: false
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

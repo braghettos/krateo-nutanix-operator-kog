@@ -1,0 +1,1850 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Files APIs
+  description: Manage virtual file servers, create and configure shares for client access, protect them using DR and sync
+    policies, provision storage space and administer security controls.
+  version: '4.0'
+  x-repo-name: files
+  x-logo:
+    altText: Files Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/files/images/files-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /files/v4.0/config/replication-policies:
+    get:
+      tags:
+      - ReplicationPolicies
+      summary: List replication policies
+      description: 'Fetches a paginated list of replication policies.
+
+        '
+      operationId: listReplicationPolicies
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - name
+
+          - status
+
+          - type
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - description
+
+          - excludeFilePatterns
+
+          - isReverse
+
+          - name
+
+          - type
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated list of replication policies.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/files.v4.0.config.ReplicationPolicy'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies Get
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies Get
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies Get
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Data Protection Policy
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2024.1
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.ReplicationPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ListReplicationPoliciesApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ReplicationPoliciesApi replicationPoliciesApi\
+          \ = new ReplicationPoliciesApi(apiClient);\n\n        \n        int page = 0;\n        \n        int limit = 50;\n\
+          \n        try {\n            ListReplicationPoliciesApiResponse listReplicationPoliciesApiResponse = replicationPoliciesApi.listReplicationPolicies(page,\
+          \ limit, null, null, null);\n            System.out.println(listReplicationPoliciesApiResponse.toString());\n\n\
+          \        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ReplicationPoliciesApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet replicationPoliciesApi = new ReplicationPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n\
+          \    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\"\
+          ;\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    replicationPoliciesApi.listReplicationPolicies(opts).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    replication_policies_api = ntnx_files_py_client.ReplicationPoliciesApi(api_client=client)\n    \n    page =\
+          \ 0\n    \n    limit = 50\n\n\n    try:\n        api_response = replication_policies_api.list_replication_policies(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\
+          \n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ReplicationPoliciesApiInstance *api.ReplicationPoliciesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  ReplicationPoliciesApiInstance = api.NewReplicationPoliciesApi(ApiClientInstance)\n\n    \n    page_ := 0\n \
+          \   \n    limit_ := 50\n\n\n    response, error := ReplicationPoliciesApiInstance.ListReplicationPolicies(&page_,\
+          \ &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _\
+          \ := response.GetData().([]import1.ReplicationPolicy)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - ReplicationPolicies
+      summary: Create replication policy
+      description: 'Creates a new replication policy between a file server pair(s) by using the provided request body.
+
+
+        The users need to specify the `name` and `type` of the replication along with
+
+        replication configuration details inside the request body.
+
+        The user also needs to provide at least one replication configuration inside the request body, which contains `primaryfileServerExtId`,
+
+        `replicationEntities`, an array of `pathOfPrimaryFileServerMountTarget` strings, and replication `schedule`.
+
+        All schedules, and status should be consistent across all replicationConfigurations.
+
+        For example, if one replicationConfiguration is enabled, all replicationConfigurations should be enabled.
+
+
+        Use dry-run workflow with same payload to validate the request. Normal workflow won''t validate mount target paths,
+        file servers reachability, fs version compatibility, etc before task creation.
+
+        '
+      operationId: createReplicationPolicy
+      parameters:
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 1359e8ec-9fb2-4cae-a713-d30dec90b4bb
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: true
+      requestBody:
+        description: A model that represents replication policy resources.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.ReplicationPolicy'
+        required: true
+      responses:
+        '202':
+          description: External identifier of the task corresponding to the replication policy create operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies Post
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies Post
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies Post
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Create File Server Data Protection Policy
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2024.1
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.ReplicationPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ReplicationPolicyType;\nimport com.nutanix.dp1.fil.files.v4.config.ReplicationPolicy;\n\
+          import com.nutanix.dp1.fil.files.v4.config.CreateReplicationPolicyApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ReplicationPoliciesApi replicationPoliciesApi\
+          \ = new ReplicationPoliciesApi(apiClient);\n\n        ReplicationPolicy replicationPolicy = new ReplicationPolicy();\n\
+          \n        // ReplicationPolicy object initializations here...\n        replicationPolicy.setName(\"string_sample_data\"\
+          );  // required field\n        replicationPolicy.setReplicationConfigurations(new ArrayList<>());  // required field\n\
+          \        replicationPolicy.setType(ReplicationPolicyType.UNKNOWN);  // required field\n        \n        boolean\
+          \ dryrun = true;\n\n        try {\n            CreateReplicationPolicyApiResponse createReplicationPolicyApiResponse\
+          \ = replicationPoliciesApi.createReplicationPolicy(dryrun, replicationPolicy);\n            System.out.println(createReplicationPolicyApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ReplicationPoliciesApi, ReplicationPolicyType, ReplicationPolicy } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet replicationPoliciesApi = new ReplicationPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let replicationPolicy = new ReplicationPolicy();\n\n    // ReplicationPolicy object initializations\
+          \ here...\n    replicationPolicy.setName(\"string_sample_data\");  // required field\n    replicationPolicy.setReplicationConfigurations([]);\
+          \  // required field\n    replicationPolicy.setType(ReplicationPolicyType.UNKNOWN);  // required field\n\n\n   \
+          \ // Construct Optional Parameters\n    var opts = {};\n    opts[\"$dryrun\"] = true;\n\n\n\n\n    replicationPoliciesApi.createReplicationPolicy(replicationPolicy,\
+          \ opts).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    replication_policies_api = ntnx_files_py_client.ReplicationPoliciesApi(api_client=client)\n    replicationPolicy\
+          \ = ntnx_files_py_client.ReplicationPolicy()\n\n    # ReplicationPolicy object initializations here...\n    replicationPolicy.name\
+          \ = \"string_sample_data\"  # required field\n    replicationPolicy.replication_configurations = []  # required\
+          \ field\n    replicationPolicy.type = ntnx_files_py_client.ReplicationPolicyType._UNKNOWN  # required field\n  \
+          \  \n    dryrun = True\n\n\n    try:\n        api_response = replication_policies_api.create_replication_policy(_dryrun=dryrun,\
+          \ body=replicationPolicy)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n\
+          \        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    ReplicationPoliciesApiInstance *api.ReplicationPoliciesApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  ReplicationPoliciesApiInstance = api.NewReplicationPoliciesApi(ApiClientInstance)\n\n    replicationPolicy :=\
+          \ import1.NewReplicationPolicy()\n\n    // ReplicationPolicy object initializations here...\n\n    \n    dryrun_\
+          \ := true\n\n\n    response, error := ReplicationPoliciesApiInstance.CreateReplicationPolicy(&dryrun_, replicationPolicy)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\"\
+          :\"string\",\"type\":\"$UNKNOWN\",\"replicationConfigurations\":[{\"primaryFileServerExtId\":\"string\",\"secondaryFileServerExtId\"\
+          :\"string\",\"primaryDomainManagerExtId\":\"string\",\"secondaryDomainManagerExtId\":\"string\",\"replicationEntities\"\
+          :[{\"primaryFileServerMountTargetExtId\":\"string\",\"primaryFileServerMountTargetPath\":\"string\",\"secondaryFileServerMountTargetExtId\"\
+          :\"string\",\"secondaryFileServerMountTargetPath\":\"string\",\"excludeDirPatterns\":[\"string\"],\"isAvailableForReplication\"\
+          :true,\"$objectType\":\"files.v4.config.ReplicationEntity\"}],\"schedule\":{\"frequency\":0,\"scheduleInterval\"\
+          :\"$UNKNOWN\",\"startTime\":\"2015-07-20T15:49:04-07:00\",\"$objectType\":\"files.v4.config.ReplicationSchedule\"\
+          },\"status\":\"$UNKNOWN\",\"shouldCancelOngoingReplicationJobs\":false,\"replicationSummary\":\"$UNKNOWN\",\"$objectType\"\
+          :\"files.v4.config.ReplicationConfiguration\"}],\"status\":\"$UNKNOWN\",\"shouldIncludeNewMountTargets\":true,\"\
+          shouldKeepDeletedFiles\":true,\"excludeFilePatterns\":[\"string\"],\"changeUserSessionOwnershipSpec\":{\"currentOwnerFileServerExtId\"\
+          :\"string\",\"newOwnerFileServerExtId\":\"string\",\"$objectType\":\"files.v4.config.OwnershipSpec\"},\"isReverse\"\
+          :false,\"$objectType\":\"files.v4.config.ReplicationPolicy\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          name\":\"string\",\"description\":\"string\",\"type\":\"$UNKNOWN\",\"replicationConfigurations\":[{\"primaryFileServerExtId\"\
+          :\"string\",\"secondaryFileServerExtId\":\"string\",\"primaryDomainManagerExtId\":\"string\",\"secondaryDomainManagerExtId\"\
+          :\"string\",\"replicationEntities\":[{\"primaryFileServerMountTargetExtId\":\"string\",\"primaryFileServerMountTargetPath\"\
+          :\"string\",\"secondaryFileServerMountTargetExtId\":\"string\",\"secondaryFileServerMountTargetPath\":\"string\"\
+          ,\"excludeDirPatterns\":[\"string\"],\"isAvailableForReplication\":true,\"$objectType\":\"files.v4.config.ReplicationEntity\"\
+          }],\"schedule\":{\"frequency\":0,\"scheduleInterval\":\"$UNKNOWN\",\"startTime\":\"2015-07-20T15:49:04-07:00\",\"\
+          $objectType\":\"files.v4.config.ReplicationSchedule\"},\"status\":\"$UNKNOWN\",\"shouldCancelOngoingReplicationJobs\"\
+          :false,\"replicationSummary\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.ReplicationConfiguration\"}],\"status\"\
+          :\"$UNKNOWN\",\"shouldIncludeNewMountTargets\":true,\"shouldKeepDeletedFiles\":true,\"excludeFilePatterns\":[\"\
+          string\"],\"changeUserSessionOwnershipSpec\":{\"currentOwnerFileServerExtId\":\"string\",\"newOwnerFileServerExtId\"\
+          :\"string\",\"$objectType\":\"files.v4.config.OwnershipSpec\"},\"isReverse\":false,\"$objectType\":\"files.v4.config.ReplicationPolicy\"\
+          } \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies?$dryrun=true\"\n"
+    x-supported-versions:
+    - product: PC
+      version: 2024.1
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+  /files/v4.0/config/replication-policies/{extId}:
+    get:
+      tags:
+      - ReplicationPolicies
+      summary: Get replication policy
+      description: 'Fetches a replication policy identified by the external identifier of the file server and replication
+        policy.
+
+
+        Specify a valid identifier of the replication policy (`extId`).
+
+        '
+      operationId: getReplicationPolicyById
+      parameters:
+      - name: extId
+        in: path
+        description: 'The external identifier of the replication policy. Example: 9c1e537d-6777-4c22-5d41-ddd0c3337aa9.'
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 09942a8d-8376-490a-909a-8d89b5d84885
+      responses:
+        '200':
+          description: Details of the queried replication policy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.config.ReplicationPolicy'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Data Protection Policy
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2024.1
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.ReplicationPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetReplicationPolicyApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ReplicationPoliciesApi replicationPoliciesApi\
+          \ = new ReplicationPoliciesApi(apiClient);\n\n        \n        String extId = \"6E2a5adf-c1AD-DF2c-E5cc-Bcedd74ECDeA\"\
+          ;\n\n        try {\n            GetReplicationPolicyApiResponse getReplicationPolicyApiResponse = replicationPoliciesApi.getReplicationPolicyById(extId);\n\
+          \            System.out.println(getReplicationPolicyApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ReplicationPoliciesApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the\
+          \ client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet replicationPoliciesApi = new ReplicationPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"FEbFB2AE-adac-Ec4F-d7ca-7AEfdcAfDbeB\";\n\n\n\n\n\n    replicationPoliciesApi.getReplicationPolicyById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    replication_policies_api = ntnx_files_py_client.ReplicationPoliciesApi(api_client=client)\n    \n    ext_id\
+          \ = \"894A3dbB-FbDA-FC8C-D7Fc-0EdAaf0D08f1\"\n\n\n    try:\n        api_response = replication_policies_api.get_replication_policy_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ReplicationPoliciesApiInstance *api.ReplicationPoliciesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  ReplicationPoliciesApiInstance = api.NewReplicationPoliciesApi(ApiClientInstance)\n\n    \n    extId := \"EEBda89A-6E9E-aeFF-AfFd-7fDBBBAeeCab\"\
+          \n\n\n    response, error := ReplicationPoliciesApiInstance.GetReplicationPolicyById(&extId)\n    if error != nil\
+          \ {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.ReplicationPolicy)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies/1fFddE9D-f8AA-FE30-EE2b-C5BfEdeaA6f8\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies/f30f7AdB-9Cfc-3cfb-7AFA-E3cfB0df49eA\"\
+          \n"
+    put:
+      tags:
+      - ReplicationPolicies
+      summary: Update replication policy
+      description: 'Updates the replication policy with the given external identifier by using the provided request body.
+
+        For `DATA_SYNC` replication the fields `pathOfSecondaryFileServerMountTarget` and `secondaryFileServerExtId` are immutable
+        and user needs to provide inside the request body (otherwise a 400 error code will be returned).
+
+
+        This api can also be used to change the status(ENABLED or DISABLED) of the replication policy which is independent
+        of any other attributes. Partial enable is not supported.
+
+        Making `DISABLED` state also supports an optional boolean parameter named as `shouldCancelOngoingReplicationJobs`
+        to abort all the ongoing replication jobs for this configuration.
+
+        All schedules, and status should be consistent across all replicationConfigurations.
+
+        Use dry-run workflow with same payload to validate the request. Normal workflow won''t validate mount target paths,
+        file servers reachability, fs version compatibility, etc before task creation.
+
+        '
+      operationId: updateReplicationPolicyById
+      parameters:
+      - name: extId
+        in: path
+        description: 'The external identifier of the replication policy. Example: 9c1e537d-6777-4c22-5d41-ddd0c3337aa9.'
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 4683b728-cf98-42a2-9372-b8ee0d03b52c
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: daf68258-7e2e-4e42-ad64-c9a4a43ea457
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: false
+      requestBody:
+        description: A model that represents replication policy resources.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.ReplicationPolicy'
+        required: true
+      responses:
+        '202':
+          description: External identifier of the task corresponding to the replication policy update operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Update File Server Data Protection Policy
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2024.1
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.ReplicationPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ReplicationPolicyType;\nimport com.nutanix.dp1.fil.files.v4.config.ReplicationPolicy;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetReplicationPolicyApiResponse;\nimport com.nutanix.dp1.fil.files.v4.config.UpdateReplicationPolicyApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ReplicationPoliciesApi replicationPoliciesApi\
+          \ = new ReplicationPoliciesApi(apiClient);\n\n        ReplicationPolicy replicationPolicy = new ReplicationPolicy();\n\
+          \n        // ReplicationPolicy object initializations here...\n        replicationPolicy.setName(\"string_sample_data\"\
+          );  // required field\n        replicationPolicy.setReplicationConfigurations(new ArrayList<>());  // required field\n\
+          \        replicationPolicy.setType(ReplicationPolicyType.UNKNOWN);  // required field\n        \n        String\
+          \ extId = \"ADD7edF7-e038-7A2E-0BEb-5feF1d38ccbB\";\n        \n        boolean dryrun = true;\n\n        // perform\
+          \ GET call\n        GetReplicationPolicyApiResponse getResponse = null;\n        try {\n            getResponse\
+          \ = replicationPoliciesApi.getReplicationPolicyById(extId);\n        } catch(RestClientException ex) {\n       \
+          \     System.out.println(ex.getMessage());\n        }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n\
+          \        // initialize/change parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n \
+          \       opts.put(HttpHeaders.IF_MATCH, eTag);\n        try {\n            UpdateReplicationPolicyApiResponse updateReplicationPolicyApiResponse\
+          \ = replicationPoliciesApi.updateReplicationPolicyById(extId, dryrun, replicationPolicy, opts);\n            System.out.println(updateReplicationPolicyApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ReplicationPoliciesApi, ReplicationPolicyType, ReplicationPolicy, GetReplicationPolicyApiResponse\
+          \ } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n\
+          // IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port to which to connect\
+          \ to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts\
+          \ = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to\
+          \ connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password\
+          \ = 'password';\n// Please add authorization information here if needed.\nlet replicationPoliciesApi = new ReplicationPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let replicationPolicy = new ReplicationPolicy();\n\n    // ReplicationPolicy object initializations\
+          \ here...\n    replicationPolicy.setName(\"string_sample_data\");  // required field\n    replicationPolicy.setReplicationConfigurations([]);\
+          \  // required field\n    replicationPolicy.setType(ReplicationPolicyType.UNKNOWN);  // required field\n\n    \n\
+          \    let extId = \"A6dE8FBF-AECd-F51f-C29a-8e2bffCbdCd4\";\n\n    // Construct Optional Parameters\n    var opts\
+          \ = {};\n    opts[\"$dryrun\"] = true;\n\n    // Perform Get call\n    replicationPoliciesApi.getReplicationPolicyById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        replicationPoliciesApi.updateReplicationPolicyById(extId,\
+          \ replicationPolicy, opts, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API\
+          \ returned the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    replication_policies_api = ntnx_files_py_client.ReplicationPoliciesApi(api_client=client)\n    replicationPolicy\
+          \ = ntnx_files_py_client.ReplicationPolicy()\n\n    # ReplicationPolicy object initializations here...\n    replicationPolicy.name\
+          \ = \"string_sample_data\"  # required field\n    replicationPolicy.replication_configurations = []  # required\
+          \ field\n    replicationPolicy.type = ntnx_files_py_client.ReplicationPolicyType._UNKNOWN  # required field\n  \
+          \  \n    ext_id = \"9BbBCFbc-DeEC-d7FD-ca4B-CAF3bA367C7B\"\n    \n    dryrun = True\n\n    try:\n        api_response\
+          \ = replication_policies_api.get_replication_policy_by_id(extId=ext_id)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\
+          \n    try:\n        api_response = replication_policies_api.update_replication_policy_by_id(extId=ext_id, _dryrun=dryrun,\
+          \ body=replicationPolicy, if_match=etag_value)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    ReplicationPoliciesApiInstance *api.ReplicationPoliciesApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  ReplicationPoliciesApiInstance = api.NewReplicationPoliciesApi(ApiClientInstance)\n\n    replicationPolicy :=\
+          \ import1.NewReplicationPolicy()\n\n    // ReplicationPolicy object initializations here...\n\n    \n    extId :=\
+          \ \"E7EdeB62-5CC1-fffB-8ADF-fffFd7c8b0B0\"\n    \n    dryrun_ := true\n\n    getResponse, err := ReplicationPoliciesApiInstance.GetReplicationPolicyById(&extId)\n\
+          \    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue\
+          \ := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"If-Match\"\
+          ] = etagValue\n\n    response, error := ReplicationPoliciesApiInstance.UpdateReplicationPolicyById(&extId, &dryrun_,\
+          \ replicationPolicy, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data,\
+          \ _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies/dfd90e6D-6706-E23A-bDAC-c3eddb6958fC?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"name\":\"string\",\"description\":\"string\",\"type\":\"$UNKNOWN\",\"replicationConfigurations\":[{\"primaryFileServerExtId\"\
+          :\"string\",\"secondaryFileServerExtId\":\"string\",\"primaryDomainManagerExtId\":\"string\",\"secondaryDomainManagerExtId\"\
+          :\"string\",\"replicationEntities\":[{\"primaryFileServerMountTargetExtId\":\"string\",\"primaryFileServerMountTargetPath\"\
+          :\"string\",\"secondaryFileServerMountTargetExtId\":\"string\",\"secondaryFileServerMountTargetPath\":\"string\"\
+          ,\"excludeDirPatterns\":[\"string\"],\"isAvailableForReplication\":true,\"$objectType\":\"files.v4.config.ReplicationEntity\"\
+          }],\"schedule\":{\"frequency\":0,\"scheduleInterval\":\"$UNKNOWN\",\"startTime\":\"2015-07-20T15:49:04-07:00\",\"\
+          $objectType\":\"files.v4.config.ReplicationSchedule\"},\"status\":\"$UNKNOWN\",\"shouldCancelOngoingReplicationJobs\"\
+          :false,\"replicationSummary\":\"$UNKNOWN\",\"$objectType\":\"files.v4.config.ReplicationConfiguration\"}],\"status\"\
+          :\"$UNKNOWN\",\"shouldIncludeNewMountTargets\":true,\"shouldKeepDeletedFiles\":true,\"excludeFilePatterns\":[\"\
+          string\"],\"changeUserSessionOwnershipSpec\":{\"currentOwnerFileServerExtId\":\"string\",\"newOwnerFileServerExtId\"\
+          :\"string\",\"$objectType\":\"files.v4.config.OwnershipSpec\"},\"isReverse\":false,\"$objectType\":\"files.v4.config.ReplicationPolicy\"\
+          } \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\":\"string\",\"type\":\"$UNKNOWN\",\"replicationConfigurations\"\
+          :[{\"primaryFileServerExtId\":\"string\",\"secondaryFileServerExtId\":\"string\",\"primaryDomainManagerExtId\":\"\
+          string\",\"secondaryDomainManagerExtId\":\"string\",\"replicationEntities\":[{\"primaryFileServerMountTargetExtId\"\
+          :\"string\",\"primaryFileServerMountTargetPath\":\"string\",\"secondaryFileServerMountTargetExtId\":\"string\",\"\
+          secondaryFileServerMountTargetPath\":\"string\",\"excludeDirPatterns\":[\"string\"],\"isAvailableForReplication\"\
+          :true,\"$objectType\":\"files.v4.config.ReplicationEntity\"}],\"schedule\":{\"frequency\":0,\"scheduleInterval\"\
+          :\"$UNKNOWN\",\"startTime\":\"2015-07-20T15:49:04-07:00\",\"$objectType\":\"files.v4.config.ReplicationSchedule\"\
+          },\"status\":\"$UNKNOWN\",\"shouldCancelOngoingReplicationJobs\":false,\"replicationSummary\":\"$UNKNOWN\",\"$objectType\"\
+          :\"files.v4.config.ReplicationConfiguration\"}],\"status\":\"$UNKNOWN\",\"shouldIncludeNewMountTargets\":true,\"\
+          shouldKeepDeletedFiles\":true,\"excludeFilePatterns\":[\"string\"],\"changeUserSessionOwnershipSpec\":{\"currentOwnerFileServerExtId\"\
+          :\"string\",\"newOwnerFileServerExtId\":\"string\",\"$objectType\":\"files.v4.config.OwnershipSpec\"},\"isReverse\"\
+          :false,\"$objectType\":\"files.v4.config.ReplicationPolicy\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies/dddcedE1-DAFA-bCCE-Acf9-d23bdDdEfeaE?$dryrun=true\"\
+          \n"
+    delete:
+      tags:
+      - ReplicationPolicies
+      summary: Delete replication policy
+      description: 'Deletes the replication policy with the given external identifier.
+
+
+        Specify a valid identifier of the replication policy (`extId`).
+
+        '
+      operationId: deleteReplicationPolicyById
+      parameters:
+      - name: extId
+        in: path
+        description: 'The external identifier of the replication policy. Example: 9c1e537d-6777-4c22-5d41-ddd0c3337aa9.'
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 8f046f03-4661-4682-8f21-c9360d2868aa
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 24c37349-b2bc-4d87-afcd-f04f62e95de3
+      responses:
+        '202':
+          description: External identifier of the task corresponding to the replication policy delete operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/replication-policies/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Delete File Server Data Protection Policy
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2024.1
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.ReplicationPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetReplicationPolicyApiResponse;\nimport com.nutanix.dp1.fil.files.v4.config.DeleteReplicationPolicyApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        ReplicationPoliciesApi replicationPoliciesApi\
+          \ = new ReplicationPoliciesApi(apiClient);\n\n        \n        String extId = \"AD9e1b22-A7E4-fCF4-b478-971DC57CFF2e\"\
+          ;\n\n        // perform GET call\n        GetReplicationPolicyApiResponse getResponse = null;\n        try {\n \
+          \           getResponse = replicationPoliciesApi.getReplicationPolicyById(extId);\n        } catch(RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n        // Extract E-Tag Header\n        String\
+          \ eTag = ApiClient.getEtag(getResponse);\n        // initialize/change parameters for update\n        HashMap<String,\
+          \ Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH, eTag);\n        try {\n            DeleteReplicationPolicyApiResponse\
+          \ deleteReplicationPolicyApiResponse = replicationPoliciesApi.deleteReplicationPolicyById(extId, opts);\n      \
+          \      System.out.println(deleteReplicationPolicyApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, ReplicationPoliciesApi, GetReplicationPolicyApiResponse } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet replicationPoliciesApi = new ReplicationPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"c3ABf47F-ceaA-E58C-BFE2-a73EbfAaAb7C\";\n\n\n    // Perform Get\
+          \ call\n    replicationPoliciesApi.getReplicationPolicyById(extId).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        // Extract E-Tag Header\n        let etagValue\
+          \ = ApiClient.getEtag(data);\n\n        replicationPoliciesApi.deleteReplicationPolicyById(extId, {\"If-Match\"\
+          \ : etagValue}).then(({data, response}) => {\n            console.log(`API returned the following status code: ${response.status}`);\n\
+          \            console.log(data.getData());\n        }).catch((error) => {\n            console.log(`Error is: ${error}`);\n\
+          \        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    replication_policies_api = ntnx_files_py_client.ReplicationPoliciesApi(api_client=client)\n    \n    ext_id\
+          \ = \"2AF9cAE3-DEf9-aae3-eB0e-d79dDBD802bF\"\n\n    try:\n        api_response = replication_policies_api.get_replication_policy_by_id(extId=ext_id)\n\
+          \    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value\
+          \ = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response = replication_policies_api.delete_replication_policy_by_id(extId=ext_id,\
+          \ if_match=etag_value)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n \
+          \       print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    ReplicationPoliciesApiInstance *api.ReplicationPoliciesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  ReplicationPoliciesApiInstance = api.NewReplicationPoliciesApi(ApiClientInstance)\n\n    \n    extId := \"576feCB9-DD5B-3d7C-a3Bc-d3dBaAc7cB96\"\
+          \n\n    getResponse, err := ReplicationPoliciesApiInstance.GetReplicationPolicyById(&extId)\n    if err != nil {\n\
+          \        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\
+          \n    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := ReplicationPoliciesApiInstance.DeleteReplicationPolicyById(&extId,\
+          \ args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies/DBc76CbB-FE8f-2DBc-6fCE-dEd536CEBA20\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'If-Match: string_sample_data' \\\n  \
+          \            --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\
+          \n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/replication-policies/29FFCa4a-3Ee4-BF9c-CB5B-ECFBdCeadecb\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2024.1
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+components:
+  schemas:
+    files.v4.0.config.ReplicationPolicy:
+      title: Replication policy
+      description: Replication policy model.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - name
+        - replicationConfigurations
+        - type
+        type: object
+        properties:
+          name:
+            maxLength: 64
+            minLength: 1
+            type: string
+            description: Name of the replication policy.
+            nullable: false
+          description:
+            maxLength: 180
+            type: string
+            description: Replication policy description.
+            nullable: true
+          type:
+            $ref: '#/components/schemas/files.v4.0.config.ReplicationPolicyType'
+          replicationConfigurations:
+            maxItems: 10
+            minItems: 1
+            type: array
+            description: Replication configuration represents combination of file server entities involved in the replication
+              policy, schedules, policy status and replication summary status. For `SMART_DR` the system supports a single
+              replication configuration object per replication policy. For `DATA_SYNC` or `VDI_SYNC`, replicationConfigurations
+              are allowed between 1 and 10. Note that in `VDI_SYNC`, the primary file server of the first replication entity
+              is the preferred file server for replication.
+            items:
+              $ref: '#/components/schemas/files.v4.0.config.ReplicationConfiguration'
+          status:
+            $ref: '#/components/schemas/files.v4.0.config.PolicyStatus'
+          shouldIncludeNewMountTargets:
+            type: boolean
+            description: This attribute denotes whether the new mount targets in the file server should be included in the
+              replication policy. By default it is always `true`. If specific mount targets are selected then you should mark
+              this field as `false`. This is applicable for `SMART_DR`.
+            example: false
+          shouldKeepDeletedFiles:
+            type: boolean
+            description: Flag to maintain deleted files or folders on the target that are deleted on the source. This is applicable
+              for `DATA_SYNC`.
+            example: false
+          excludeFilePatterns:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: 'Display a list of file patterns to exclude from the replication. For example, ["*.txt", "*.yaml"].
+
+              This is applicable for `DATA_SYNC`.
+
+              '
+            items:
+              maxLength: 256
+              type: string
+          changeUserSessionOwnershipSpec:
+            $ref: '#/components/schemas/files.v4.0.config.OwnershipSpec'
+          isReverse:
+            type: boolean
+            description: A boolean flag to reverse the data replication configuration during a planned failover or to resume
+              replication from the secondary site. Use this configuration only if reverse replication is required for failover.
+              A reverse policy can be created when the file servers are in a failed-over state. No replication entities need
+              to be specified to create a reverse policy. This configuration is applicable only for the `SMART_DR` policy.
+            default: false
+        additionalProperties: false
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    files.v4.0.config.PolicyStatus:
+      title: Replication status
+      type: string
+      description: Status for the replication policy.
+      enum:
+      - ENABLED
+      - DISABLED
+      - PARTIALLY_ENABLED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DISABLED: Indicates the policy status is set to 'disabled'.
+        ENABLED: Indicates the policy status is set to 'enabled'.
+        PARTIALLY_ENABLED: Indicates the policy status is set to 'partially enabled'.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.ReplicationSchedule:
+      title: Schedules
+      required:
+      - frequency
+      - scheduleInterval
+      type: object
+      properties:
+        frequency:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          description: The frequency at which data should be copied from source to target path. RPO (Integer values are multiplied
+            by schedule type to get the next scheduled replication time).
+          format: int32
+          example: 84
+        scheduleInterval:
+          $ref: '#/components/schemas/files.v4.0.config.ScheduleInterval'
+        startTime:
+          type: string
+          description: Time of the day, the policy will be started. If the value not set, the policy will be applicable immediately.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+      additionalProperties: false
+      description: "This contains the schedule for all the replication and snapshot jobs. This includes the policy\u2019s\
+        \ the start time and replication frequency information."
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    files.v4.0.config.OwnershipSpec:
+      title: Change the ownership of the impacted `VDI_SYNC` users
+      required:
+      - currentOwnerFileServerExtId
+      - newOwnerFileServerExtId
+      type: object
+      properties:
+        currentOwnerFileServerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the file server from which ownership of impacted users is being released.
+          example: 95368693-a08b-4166-b59c-6389ce85095c
+        newOwnerFileServerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the file server that will take ownership of the impacted users from the
+            other file server.
+          example: 35b9b056-fcb9-4d6f-8fa7-c3e592a4bbe5
+      additionalProperties: false
+      description: Configuration to change ownership of the impacted `VDI_SYNC` users.
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.ReplicationPolicyType:
+      title: Replication policy type
+      type: string
+      description: Replication policy type value.
+      enum:
+      - SMART_DR
+      - DATA_SYNC
+      - VDI_SYNC
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DATA_SYNC: Indicates replication policy for synchronizing data from multiple sources to a single target.
+        SMART_DR: Indicates replication policy for a mount target level protection.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        VDI_SYNC: Indicates replication policy for VDI use case for synchronizing data across mount targets on multiple file
+          servers.
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    files.v4.0.config.ReplicationEntity:
+      title: Replication entity
+      type: object
+      properties:
+        primaryFileServerMountTargetExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+          example: 1d380e17-ab24-495e-98da-6a42eab940a3
+        primaryFileServerMountTargetPath:
+          maxLength: 4095
+          type: string
+          description: Path of the nested mount target.
+        secondaryFileServerMountTargetExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+          example: de51b900-ad70-473c-832e-9c7e280ab3a5
+        secondaryFileServerMountTargetPath:
+          maxLength: 4095
+          type: string
+          description: Path of the nested mount target.
+        excludeDirPatterns:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: "Displays a list of wildcard-based patterns to exclude files and directories from replication. Used\
+            \ only for `DATA_SYNC`. The wildcard-based patterns can contain \u201C\u201D which replaces all non-\u201C/\u201C\
+            \ characters and \u201C*\u201D which replaces any character. Ex. `/share1/subPath/`"
+          items:
+            maxLength: 4095
+            type: string
+        isAvailableForReplication:
+          type: boolean
+          description: 'A flag indicating whether any of the mount targets of the VDI sync replication entity is unavailable
+            for synchronization. This flag is read-only. This flag will be set to `false` in the following two scenarios:
+            ``` - when the mount target in the replication entity is deleted from the file server - when any file server deletes
+            the sync entity (path) from the policy. ```'
+          example: false
+      additionalProperties: false
+      description: Replication entity belonging to a replication configuration. Here, for `SMART_DR` and `DATA_SYNC`, primary
+        represents source file server or path, and secondary represents target file server or path.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    files.v4.0.config.ReplicationSummary:
+      title: Replication summary
+      type: string
+      description: Replication summary enum values.
+      enum:
+      - SCHEDULE_MET
+      - SCHEDULE_MISSED
+      - SCHEDULE_PAUSED
+      - REPLICATION_ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SCHEDULE_MET: Indicates the replication has met the schedule.
+        SCHEDULE_PAUSED: Indicates the replication has paused the schedule.
+        REPLICATION_ERROR: Indicates the replication is in error state.
+        SCHEDULE_MISSED: Indicates the replication has missed the schedule.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 13
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 41
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    files.v4.0.config.ReplicationConfiguration:
+      title: Replication configuration.
+      required:
+      - primaryFileServerExtId
+      - secondaryFileServerExtId
+      type: object
+      properties:
+        primaryFileServerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the primary file server for the replication.
+          example: 447145e3-8383-4754-8594-06367f21a07c
+        secondaryFileServerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the secondary file server for the replication.
+          example: c3e0cbdc-cdb6-439a-a9c9-f4736292c8b8
+        primaryDomainManagerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Domain manager (ex. Prism central) external identifier where the primary file server of the replication
+            configuration is registered. This is a required field in case of multi Prism central policy. When primary file
+            server is not local to the Prism central.
+          example: c3b5ab13-50f4-455f-a884-1cb500b393f8
+        secondaryDomainManagerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Domain manager (ex. Prism central) external identifier where the secondary file server of the replication
+            configuration is registered. This is a required field in case of multi Prism central policy. When secondary file
+            server is not local to the Prism central.
+          example: 241e2cd5-472b-42ad-841f-47887cc16eca
+        replicationEntities:
+          maxItems: 3300
+          minItems: 1
+          type: array
+          description: A list of replication entities belonging to the replication configuration.
+          items:
+            $ref: '#/components/schemas/files.v4.0.config.ReplicationEntity'
+        schedule:
+          $ref: '#/components/schemas/files.v4.0.config.ReplicationSchedule'
+        status:
+          $ref: '#/components/schemas/files.v4.0.config.PolicyStatus'
+        shouldCancelOngoingReplicationJobs:
+          type: boolean
+          description: This attribute indicates whether all replication jobs associated with the replication configuration
+            need to be aborted during the disable replication configuration operation. This field is ignored if used for any
+            operation other than disabling the policy. It is `false` by default.
+          default: false
+        replicationSummary:
+          $ref: '#/components/schemas/files.v4.0.config.ReplicationSummary'
+      additionalProperties: false
+      description: Replication configuration represents combination of file server entities involved in the replication policy,
+        schedules, policy status and replication summary status. For `SMART_DR` the system supports a single replication configuration
+        object per replication policy. For `DATA_SYNC` or `VDI_SYNC`, replicationConfigurations are allowed between 1 and
+        10. Note that in `VDI_SYNC`, the primary file server of the first replication entity is the preferred file server
+        for replication.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 3
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    files.v4.0.config.ScheduleInterval:
+      title: Schedule interval
+      type: string
+      description: Schedule interval enum values.
+      enum:
+      - YEAR
+      - MONTH
+      - WEEK
+      - DAY
+      - HOUR
+      - MINUTE
+      - SECOND
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        MONTH: To repeat the schedule on a per `Month` basis.
+        YEAR: To repeat the schedule on a per `Year` basis.
+        HOUR: To repeat the schedule on an per `Hour` basis.
+        MINUTE: To repeat the schedule on a per `Minute` basis.
+        SECOND: To repeat the schedule on a per `Second` basis.
+        WEEK: To repeat the schedule on a per `Week` basis.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DAY: To repeat the schedule on a per `Day` basis.
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:d5a5af10-1466-4d38-8d66-465c1e19d1b2
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    files.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

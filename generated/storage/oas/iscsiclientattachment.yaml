@@ -1,0 +1,557 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Storage APIs
+  description: Manage storage configuration and operations.
+  version: 4.0.1-alpha-3
+  x-repo-name: storage
+  x-logo:
+    altText: Storage Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/storage/images/storage-logo-img.svg
+  x-minimum-negotiation-version: v4.2
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+paths:
+  /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/iscsi-client-attachments:
+    get:
+      tags:
+      - VolumeGroup
+      summary: Get a list of all the external attachments associated with the given Volume Group identified by {volumeGroupExtId}.
+      description: Query the list of external attachments for a Volume Group identified by {volumeGroupExtId}.
+      operationId: getExternalAttachments
+      parameters:
+      - name: volumeGroupExtId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: a9d14180-b616-4054-a5ad-e195f956830e
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource.  Any number out of this range will
+          be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number greater
+          than the total available pages would be set to the last page.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource.  Any number out of this range
+            will be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number
+            greater than the total available pages would be set to the last page.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number of
+          records, which is 100.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number
+            of records, which is 100.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the OData V4.01 URL conventions.
+
+          The filter can be applied on the following fields:
+
+          - extId
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified
+          the resources will be sorted in ascending order by default. For example, ''orderby=templateName desc'' would get
+          all templates sorted by templateName in desc order.
+
+          The orderby can be applied to the following fields:
+
+          - extId
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+      responses:
+        '200':
+          description: Paginated list of external attachments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetExternalAttachmentsApiResponse'
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetExternalAttachmentsApiResponse'
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetExternalAttachmentsApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.GetExternalAttachmentsApiResponse;\n\
+          \npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\
+          \tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\"\
+          );\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\
+          \n\t\tString volumeGroupExtId = \"^2d9dB684-C2EE-C0A9-dEd7-c2cbdFfAc40A$\";\n\t\tint $page = 0;\n\t\tint $limit\
+          \ = 50;\n\t\tString $filter = \"string_sample_data\";\n\t\tString $orderby = \"string_sample_data\";\n\t\tGetExternalAttachmentsApiResponse\
+          \ getExternalAttachmentsApiResponse = volumeGroupApi.getExternalAttachments(volumeGroupExtId, $page, $limit, $filter,\
+          \ $orderby);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\"\
+          ;\nimport GetExternalAttachmentsApiResponse from \"../src/models/storage/v4/config/GetExternalAttachmentsApiResponse\"\
+          ;\n\nvar apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod\
+          \ = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let volumeGroupExtId = \"^e48f53Be-2dbC-9Ec1-2d88-7E17AeAC9BDa$\";\n    let $page = 0;\n\
+          \    let $limit = 50;\n    let $filter = \"string_sample_data\";\n    let $orderby = \"string_sample_data\";\n\n\
+          \    volumeGroupApi.getExternalAttachments(volumeGroupExtId, $page, $limit, $filter, $orderby).then(({data, response})\
+          \ =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error)\
+          \ => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n\
+          \    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1,\
+          \ retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeGroupExtId\
+          \ = \"^CaDbAbff-Ccaf-c1BA-5C76-dAD516DB545e$\"\n    $page = 0\n    $limit = 50\n    $filter = \"string_sample_data\"\
+          \n    $orderby = \"string_sample_data\"\n    api_response = volumeGroupApi.get_external_attachments(volumeGroupExtId,\
+          \ $page, $limit, $filter, $orderby)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\n\
+          func main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n\
+          \    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation\
+          \ = true\n\n    volumeGroupExtId := \"^EBe1a4ee-E98a-8C83-7CcA-d2b1f0CBD2eA$\"\n    $page := 0\n    $limit := 50\n\
+          \    $filter := \"string_sample_data\"\n    $orderby := \"string_sample_data\"\n\n    response, _ := VolumeGroupApiInstance.GetExternalAttachments(volumeGroupExtId,\
+          \ $page, $limit, $filter, $orderby)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^a8bb30B2-ce68-cC0F-eFc8-aEFcB2c4CaCB$/iscsi-client-attachments?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0\"\
+          \ \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^aCcbd5cF-BD6b-dc7F-Ef0C-568cF7eDE7E5$/iscsi-client-attachments?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0\"\
+          \n"
+components:
+  schemas:
+    common.v1.r0.a3.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+      additionalProperties: false
+    storage.v4.r0.a3.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.error.AppMessage'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
+      additionalProperties: false
+      description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
+    common.v1.r0.a3.config.IPv4Address:
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          example: 180.178.15.134
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+    storage.v4.r0.a3.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+        code:
+          type: string
+          example: string
+        locale:
+          type: string
+          description: The locale for the message description.
+          default: en_US
+        errorGroup:
+          type: string
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+      description: This schema is generated from AppMessage.java
+    common.v1.r0.a3.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.FQDN'
+      additionalProperties: false
+      description: An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+    common.v1.r0.a3.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and therefore extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            example: ac7be6a0-e497-4e10-8744-ab55a2f96402
+          links:
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        additionalProperties: false
+    common.v1.r0.a3.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Flag'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          format: int32
+          example: 50
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+        extraInfo:
+          type: array
+          description: An array of entity specific metadata
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. Always present and minimally contains the self link for
+        the API request that produced this response.  Also contains pagination data for paginated requests.
+
+        '
+    common.v1.r0.a3.config.Flag:
+      type: object
+      properties:
+        name:
+          type: string
+          example: string
+        value:
+          type: boolean
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          example: string
+        message:
+          type: string
+          example: string
+        attributePath:
+          type: string
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+    common.v1.r0.a3.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by this link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
+            special value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    storage.v4.r0.a3.config.VolumeGroupAttachmentSite:
+      title: Supported Volume Group attachment sites
+      type: string
+      description: The site where the Volume Group attach operation should be processed.
+      enum:
+      - PRIMARY
+      - SECONDARY
+      - $UNKNOWN
+      - $REDACTED
+    storage.v4.r0.a3.config.AuthenticationType:
+      title: Supported types of authentication
+      type: string
+      description: The authentication type enabled for the Volume Group. If this is set to CHAP, the target/client secret
+        must be provided.
+      enum:
+      - CHAP
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+    storage.v4.r0.a3.config.IscsiClient:
+      title: iSCSI client object
+      description: A model that represents an iSCSI client that can be associated with a Volume Group as an external attachment.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          iscsiInitiatorName:
+            maxLength: 64
+            type: string
+            description: iSCSI initiator name.
+            example: string
+          iscsiInitiatorNetworkId:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.IPAddressOrFQDN'
+          clientSecret:
+            maxLength: 16
+            minLength: 12
+            type: string
+            description: iSCSI initiator client secret in case of CHAP authentication. This field should not be provided in
+              case the authentication type is not set to CHAP.
+            format: password
+            writeOnly: true
+            example: '***************'
+          enabledAuthentications:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.AuthenticationType'
+          targetParams:
+            type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.TargetParam'
+          clusterReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The UUID of the cluster that will host the iSCSI client.
+            example: f9308d30-85cf-4137-900c-2e805b82af6e
+          attachmentSite:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroupAttachmentSite'
+          iscsiTargetNames:
+            type: array
+            description: List of iSCSI targets that will be visible and accessible to the iSCSI client.
+            readOnly: true
+            items:
+              type: string
+              example: string
+        additionalProperties: false
+    storage.v4.r0.a3.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          example: string
+        statusCode:
+          type: integer
+          example: 25
+        error:
+          type: string
+          example: string
+        path:
+          type: string
+          example: string
+        validationErrorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+    common.v1.r0.a3.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity.  It is automatically
+            assigned by the system and is immutable from an API consumer perspective (some use cases may cause this Id to
+            change - for instance a use case may require the transfer of ownership of the entity, but these cases are handled
+            automatically on the server).
+
+            '
+          readOnly: true
+          example: 69d77424-8db5-4a6a-878a-c2ef281783df
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    storage.v4.r0.a3.config.TargetParam:
+      title: Parameters associated with each iSCSI target corresponding to the iSSCI client
+      type: object
+      properties:
+        numVirtualTargets:
+          maximum: 32
+          minimum: 1
+          type: integer
+          description: Number of virtual targets generated for the iSCSI target.
+          format: int32
+          example: 20
+      additionalProperties: false
+      description: List of iSCSI target parameters that will be visible and accessible to the iSCSI client.
+    storage.v4.r0.a3.config.GetExternalAttachmentsApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.IscsiClient'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/iscsi-client-attachments
+        Get operation
+    common.v1.r0.a3.config.KVPair:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The key of this key value pair
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            example: string
+          - type: integer
+            example: 6
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.r0.a3.config.IPv6Address:
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          example: d9a6:4df8:ddfd:839c:6c4e:ae35:c0ba:4eae
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+    common.v1.r0.a3.config.FQDN:
+      type: object
+      properties:
+        value:
+          pattern: ^(?:[a-z0-9][\w\-]*[a-z0-9]*\.)*(?:(?:(?:[a-z0-9][\w\-]*[a-z0-9]*)(?:\.[a-z0-9]+)?))$
+          type: string
+          example: string
+      additionalProperties: false
+      description: 'A fully qualified domain name specifying its exact location in the tree hierarchy of the Domain Name System.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

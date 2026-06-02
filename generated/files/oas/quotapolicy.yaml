@@ -1,0 +1,1723 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Files APIs
+  description: Manage virtual file servers, create and configure shares for client access, protect them using DR and sync
+    policies, provision storage space and administer security controls.
+  version: '4.0'
+  x-repo-name: files
+  x-logo:
+    altText: Files Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/files/images/files-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies:
+    get:
+      tags:
+      - QuotaPolicies
+      summary: List quota policies
+      description: Get a paginated list of quota policies for specified mount target.
+      operationId: listQuotaPolicies
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: c003dfe7-d887-4db8-b71e-96f8d229eb17
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 9ea1c3cd-add0-4e87-be78-dd6615ff1dd5
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - enforcementType
+
+          - isNotificationEnabled
+
+          - notificationRecipients
+
+          - principalName
+
+          - principalType
+
+          - sizeInBytes
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - isNotificationEnabled
+
+          - principalName
+
+          - sizeInBytes
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - enforcementType
+
+          - extId
+
+          - isNotificationEnabled
+
+          - notificationRecipients
+
+          - principalName
+
+          - principalType
+
+          - sizeInBytes
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of quota policies queried.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/files.v4.0.config.QuotaPolicy'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Quota Policy File Server Share
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - File Server Share Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.QuotaPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ListQuotaPoliciesApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        QuotaPoliciesApi quotaPoliciesApi = new\
+          \ QuotaPoliciesApi(apiClient);\n\n        \n        String fileServerExtId = \"dB8eE60F-8eda-41Ea-b966-cfbFb8bB20b7\"\
+          ;\n        \n        String mountTargetExtId = \"eA8FEA3f-dFfB-6eCc-baDD-dFbb4d8A711C\";\n        \n        int\
+          \ page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListQuotaPoliciesApiResponse listQuotaPoliciesApiResponse\
+          \ = quotaPoliciesApi.listQuotaPolicies(fileServerExtId, mountTargetExtId, page, limit, null, null, null);\n    \
+          \        System.out.println(listQuotaPoliciesApiResponse.toString());\n\n        } catch (RestClientException ex)\
+          \ {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, QuotaPoliciesApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet quotaPoliciesApi = new QuotaPoliciesApi(apiClientInstance);\n\nfunction sample() {\n\n  \
+          \  \n    let fileServerExtId = \"5ADBa7d6-abab-4BFa-bE4D-ea6BB0c8C0D2\";\n    \n    let mountTargetExtId = \"bae9dbEB-8c1C-EbcD-1Efc-08ee71F1adFB\"\
+          ;\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] =\
+          \ 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"\
+          $select\"] = \"string_sample_data\";\n\n\n\n\n    quotaPoliciesApi.listQuotaPolicies(fileServerExtId, mountTargetExtId,\
+          \ opts).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    quota_policies_api = ntnx_files_py_client.QuotaPoliciesApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"d9cE4aDc-DAe4-6eDA-bdCf-EfdCF6d0CAaD\"\n    \n    mount_target_ext_id = \"6c8fCF2F-d4ea-EC58-4C7E-edad8eDACcEc\"\
+          \n    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = quota_policies_api.list_quota_policies(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, _page=page, _limit=limit)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    QuotaPoliciesApiInstance *api.QuotaPoliciesApi\n)\n\n\
+          func main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  QuotaPoliciesApiInstance = api.NewQuotaPoliciesApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"ED26eD84-cB3A-bebd-cfc1-0CcEad5edcCe\"\
+          \n    \n    mountTargetExtId := \"dAffFD4b-8b68-dEd2-8cB8-Fa355dDffDaf\"\n    \n    page_ := 0\n    \n    limit_\
+          \ := 50\n\n\n    response, error := QuotaPoliciesApiInstance.ListQuotaPolicies(&fileServerExtId, &mountTargetExtId,\
+          \ &page_, &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n  \
+          \  data, _ := response.GetData().([]import1.QuotaPolicy)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/6ca9dc59-9FEd-B2CE-7AA2-D4bce3e90Bcc/mount-targets/C06BB435-90ac-cD18-8BEA-e6b1f080b56F/quota-policies?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/c898eDCd-DcfD-dDFE-597e-5b0da4C80b96/mount-targets/3dDCdc4E-Cbef-2f26-61fE-59fFcF4a03e3/quota-policies?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - QuotaPolicies
+      summary: Create quota policy
+      description: 'Create a quota policy by using the provided request body.
+
+
+        Specify a valid identifier of the mount target for which quota policy needs to be created.
+
+        Users can specify `enforcementType`, `principalName`, `principalType`, `sizeInGb` as part of the request body.
+
+
+        Use dry-run workflow with same payload to validate the request. Normal workflow won''t validate `principalName` and
+        `principalType` before task creation.
+
+        '
+      operationId: createQuotaPolicy
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 2059fcff-88ea-4514-b47e-55f283dc11ac
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: dde39c8c-5bfa-47cb-a31e-d8f68aaacfd3
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 16299847-f3ea-4907-bc5c-1b77acc4057c
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: false
+      requestBody:
+        description: Quota policy model.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.QuotaPolicy'
+        required: true
+      responses:
+        '202':
+          description: Task ID returned for the create quota policy request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Create Quota Policy File Server Share
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - File Server Share Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.QuotaPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.EnforcementType;\nimport com.nutanix.dp1.fil.files.v4.config.PrincipalType;\n\
+          import com.nutanix.dp1.fil.files.v4.config.QuotaPolicy;\nimport com.nutanix.dp1.fil.files.v4.config.CreateQuotaPolicyApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        QuotaPoliciesApi quotaPoliciesApi = new QuotaPoliciesApi(apiClient);\n\n\
+          \        QuotaPolicy quotaPolicy = new QuotaPolicy();\n\n        // QuotaPolicy object initializations here...\n\
+          \        quotaPolicy.setEnforcementType(EnforcementType.UNKNOWN);  // required field\n        quotaPolicy.setPrincipalName(\"\
+          string_sample_data\");  // required field\n        quotaPolicy.setPrincipalType(PrincipalType.UNKNOWN);  // required\
+          \ field\n        quotaPolicy.setSizeInBytes(1);  // required field\n        \n        String fileServerExtId = \"\
+          ff5bBB78-a8BD-EeDA-3cfa-B349A771857e\";\n        \n        String mountTargetExtId = \"5304Cfb9-40ff-dBfb-3CCa-dBCc8a8F11a0\"\
+          ;\n        \n        boolean dryrun = true;\n\n        try {\n            CreateQuotaPolicyApiResponse createQuotaPolicyApiResponse\
+          \ = quotaPoliciesApi.createQuotaPolicy(fileServerExtId, mountTargetExtId, dryrun, quotaPolicy);\n            System.out.println(createQuotaPolicyApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, QuotaPoliciesApi, EnforcementType, PrincipalType, QuotaPolicy } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet quotaPoliciesApi = new QuotaPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let quotaPolicy = new QuotaPolicy();\n\n    // QuotaPolicy object initializations here...\n\
+          \    quotaPolicy.setEnforcementType(EnforcementType.UNKNOWN);  // required field\n    quotaPolicy.setPrincipalName(\"\
+          string_sample_data\");  // required field\n    quotaPolicy.setPrincipalType(PrincipalType.UNKNOWN);  // required\
+          \ field\n    quotaPolicy.setSizeInBytes(1);  // required field\n\n    \n    let fileServerExtId = \"80C56C6C-1EDc-ffA5-eAdb-ebAC541bDfdD\"\
+          ;\n    \n    let mountTargetExtId = \"af5baDFF-baa9-BBcC-045b-dcBa8f2f18Ec\";\n\n    // Construct Optional Parameters\n\
+          \    var opts = {};\n    opts[\"$dryrun\"] = true;\n\n\n\n\n    quotaPoliciesApi.createQuotaPolicy(fileServerExtId,\
+          \ mountTargetExtId, quotaPolicy, opts).then(({data, response}) => {\n        console.log(`API returned the following\
+          \ status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    quota_policies_api = ntnx_files_py_client.QuotaPoliciesApi(api_client=client)\n    quotaPolicy = ntnx_files_py_client.QuotaPolicy()\n\
+          \n    # QuotaPolicy object initializations here...\n    quotaPolicy.enforcement_type = ntnx_files_py_client.EnforcementType._UNKNOWN\
+          \  # required field\n    quotaPolicy.principal_name = \"string_sample_data\"  # required field\n    quotaPolicy.principal_type\
+          \ = ntnx_files_py_client.PrincipalType._UNKNOWN  # required field\n    quotaPolicy.size_in_bytes = 1  # required\
+          \ field\n    \n    file_server_ext_id = \"20ebBeed-3D5F-04FB-ead2-B7ec3df5cDa1\"\n    \n    mount_target_ext_id\
+          \ = \"fFe02B37-aC0E-e2DD-F58f-D5dEf9a0bAdc\"\n    \n    dryrun = True\n\n\n    try:\n        api_response = quota_policies_api.create_quota_policy(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, _dryrun=dryrun, body=quotaPolicy)\n        print(api_response)\n    except\
+          \ ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    QuotaPoliciesApiInstance *api.QuotaPoliciesApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    QuotaPoliciesApiInstance = api.NewQuotaPoliciesApi(ApiClientInstance)\n\
+          \n    quotaPolicy := import1.NewQuotaPolicy()\n\n    // QuotaPolicy object initializations here...\n\n    \n   \
+          \ fileServerExtId := \"546dA1BB-EDC1-0fAe-67FD-Cb7B0Cf1BFE4\"\n    \n    mountTargetExtId := \"5d3DFCaE-1C7C-eaBF-Dee1-1ecefcaD806a\"\
+          \n    \n    dryrun_ := true\n\n\n    response, error := QuotaPoliciesApiInstance.CreateQuotaPolicy(&fileServerExtId,\
+          \ &mountTargetExtId, &dryrun_, quotaPolicy)\n    if error != nil {\n        fmt.Println(error)\n        return\n\
+          \    }\n    data, _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/aB6Ae0CF-ba4D-EdBb-a6EB-0cf5EFffeBDb/mount-targets/6B4b1bCd-1BfF-75EC-9Ac6-Ff3Ec2ECdFFa/quota-policies?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"principalType\":\"$UNKNOWN\",\"\
+          principalName\":\"string\",\"sizeInBytes\":1,\"enforcementType\":\"$UNKNOWN\",\"notificationRecipients\":[\"string\"\
+          ],\"isNotificationEnabled\":true,\"$objectType\":\"files.v4.config.QuotaPolicy\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          principalType\":\"$UNKNOWN\",\"principalName\":\"string\",\"sizeInBytes\":1,\"enforcementType\":\"$UNKNOWN\",\"\
+          notificationRecipients\":[\"string\"],\"isNotificationEnabled\":true,\"$objectType\":\"files.v4.config.QuotaPolicy\"\
+          } \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/e08Ce3B7-1cB3-e63a-DE4f-a974B08ea21E/mount-targets/bdF0D72F-6dF2-E2DE-bf2f-c131DbB92fe0/quota-policies?$dryrun=true\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2022.6
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+  /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}:
+    get:
+      tags:
+      - QuotaPolicies
+      summary: Get quota policy
+      description: 'Get a quota policy with the given external identifier.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and the
+
+        mount target (`mountTargetExtId`) to which the quota policy belongs and a valid external identifier (`extId`) of the
+
+        quota policy to be fetched.
+
+        '
+      operationId: getQuotaPolicyById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 0690b932-3304-48fd-9acd-aed7c0f4e034
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: a78f9749-ca72-40e8-a048-4ac33affb29b
+      - name: extId
+        in: path
+        description: Quota policy UUID. Example:48f78959-14a6-4c47-b5db-920460c4b668.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: e1dd501f-dd10-41c2-a8e2-b275c01466e1
+      responses:
+        '200':
+          description: Quota policy details for the provided external identifier.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.config.QuotaPolicy'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Quota Policy File Server Share
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - File Server Share Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.QuotaPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetQuotaPolicyApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        QuotaPoliciesApi quotaPoliciesApi = new\
+          \ QuotaPoliciesApi(apiClient);\n\n        \n        String fileServerExtId = \"aA2469f3-f7af-6DeD-FEa5-BFabDBCCdbca\"\
+          ;\n        \n        String mountTargetExtId = \"8EB52AFC-4fc4-bFDb-DbB2-cebafddCEC8D\";\n        \n        String\
+          \ extId = \"afDa35D1-8FAa-0ABA-aFDa-84Ff4AAa0B5A\";\n\n        try {\n            GetQuotaPolicyApiResponse getQuotaPolicyApiResponse\
+          \ = quotaPoliciesApi.getQuotaPolicyById(fileServerExtId, mountTargetExtId, extId);\n            System.out.println(getQuotaPolicyApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, QuotaPoliciesApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet quotaPoliciesApi = new QuotaPoliciesApi(apiClientInstance);\n\nfunction sample() {\n\n  \
+          \  \n    let fileServerExtId = \"DF7Fcb8C-a4dC-ED5e-E7Be-36AfCa4cd4d8\";\n    \n    let mountTargetExtId = \"2B87BBAC-dEFa-D88b-fF4b-EF7aebDeA844\"\
+          ;\n    \n    let extId = \"2DBC6886-08CE-BAB2-CBcE-B132BffbaBbD\";\n\n\n\n\n\n    quotaPoliciesApi.getQuotaPolicyById(fileServerExtId,\
+          \ mountTargetExtId, extId).then(({data, response}) => {\n        console.log(`API returned the following status\
+          \ code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error\
+          \ is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    quota_policies_api = ntnx_files_py_client.QuotaPoliciesApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"D2Fcd5Cd-5DB0-Ed3b-BbfD-fBCB0c7B96f6\"\n    \n    mount_target_ext_id = \"1eFe5caC-ef86-eBcd-a7F2-C29FFD7EbDbF\"\
+          \n    \n    ext_id = \"bBe1cBBe-AD8B-ABdB-c0bB-3BC1defDCea9\"\n\n\n    try:\n        api_response = quota_policies_api.get_quota_policy_by_id(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, extId=ext_id)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    QuotaPoliciesApiInstance *api.QuotaPoliciesApi\n)\n\n\
+          func main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  QuotaPoliciesApiInstance = api.NewQuotaPoliciesApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"beDfC2ce-aFCd-bDFc-6F0F-aBbfdDA1a45d\"\
+          \n    \n    mountTargetExtId := \"baDfbcDf-8A7F-393A-1e3A-14ED3af57eA3\"\n    \n    extId := \"CF89Ebe9-F4ec-Ac64-62cD-a1BcFEDCAb48\"\
+          \n\n\n    response, error := QuotaPoliciesApiInstance.GetQuotaPolicyById(&fileServerExtId, &mountTargetExtId, &extId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.QuotaPolicy)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/BDAC6820-7E0C-236D-AeCE-F83A4dBc08dD/mount-targets/e4f3Ef3F-1d7a-a92A-5B2C-0CE1d4DF98eB/quota-policies/bE54DCfd-fd17-2B5D-ff5b-0fdaAA9FF4a4\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/a1E9eeE9-6fbB-CbC9-8FD6-9A3966f8edF6/mount-targets/78aA9633-d8F3-3aAC-0e97-283eEfE45BeB/quota-policies/C7BD436e-DeF1-Fbd9-c6F6-b6BFECc67ded\"\
+          \n"
+    put:
+      tags:
+      - QuotaPolicies
+      summary: Update quota policy
+      description: "Updates quota policy with the provided parameters.\n\nSpecify a valid identifier of the file server (`fileServerExtId`)\
+        \ and the\nmount target (`mountTargetExtId`) to which the quota policy belongs and a valid external identifier (`extId`)\
+        \ of the\nquota policy to be updated. \n\nIt is always recommended to perform a GET request on a resource before requesting\
+        \ an UPDATE call.\n\n`principalType` field is non-updatable field.\n\nUse dry-run workflow with same payload to validate\
+        \ the request. Normal workflow won't validate `principalName` and `principalType` before task creation.\n"
+      operationId: updateQuotaPolicyById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: abf83967-8177-4439-ae6f-30ce995a51d2
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: ac9b3a1c-acfe-463d-9ce6-cb6d89a543a0
+      - name: extId
+        in: path
+        description: Quota policy UUID. Example:48f78959-14a6-4c47-b5db-920460c4b668.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 3b4a3088-8eb5-4f21-b89e-578522daddfa
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: e8f72862-cbfb-4d88-b5e7-a0fc9e823112
+      - name: $dryrun
+        in: query
+        description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+          to identify trouble spots and system failures without performing the actual operation. Additionally this mode also
+          offers a summary snapshot of the resultant system in order to better understand how things fit together. The operation
+          runs in dry-run mode only if the provided value is true.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
+            to identify trouble spots and system failures without performing the actual operation. Additionally this mode
+            also offers a summary snapshot of the resultant system in order to better understand how things fit together.
+            The operation runs in dry-run mode only if the provided value is true.
+
+            '
+          example: false
+      requestBody:
+        description: Quota policy model.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.QuotaPolicy'
+        required: true
+      responses:
+        '202':
+          description: Task ID returned for the update quota policy request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Update Quota Policy File Server Share
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - File Server Share Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.QuotaPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.EnforcementType;\nimport com.nutanix.dp1.fil.files.v4.config.PrincipalType;\n\
+          import com.nutanix.dp1.fil.files.v4.config.QuotaPolicy;\nimport com.nutanix.dp1.fil.files.v4.config.GetQuotaPolicyApiResponse;\n\
+          import com.nutanix.dp1.fil.files.v4.config.UpdateQuotaPolicyApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        QuotaPoliciesApi quotaPoliciesApi = new QuotaPoliciesApi(apiClient);\n\n\
+          \        QuotaPolicy quotaPolicy = new QuotaPolicy();\n\n        // QuotaPolicy object initializations here...\n\
+          \        quotaPolicy.setEnforcementType(EnforcementType.UNKNOWN);  // required field\n        quotaPolicy.setPrincipalName(\"\
+          string_sample_data\");  // required field\n        quotaPolicy.setPrincipalType(PrincipalType.UNKNOWN);  // required\
+          \ field\n        quotaPolicy.setSizeInBytes(1);  // required field\n        \n        String fileServerExtId = \"\
+          FdeAa0ee-6085-DB7B-a1AF-EF4AE37BcE5a\";\n        \n        String mountTargetExtId = \"74D95eFd-4DE6-CBb7-c2CF-dfAF76B0Ad5D\"\
+          ;\n        \n        String extId = \"fe01A336-e57f-c558-Bd5F-FFaB9DA0EfAB\";\n        \n        boolean dryrun\
+          \ = true;\n\n        // perform GET call\n        GetQuotaPolicyApiResponse getResponse = null;\n        try {\n\
+          \            getResponse = quotaPoliciesApi.getQuotaPolicyById(fileServerExtId, mountTargetExtId, extId);\n    \
+          \    } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n        //\
+          \ Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change parameters\
+          \ for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH, eTag);\n\
+          \        try {\n            UpdateQuotaPolicyApiResponse updateQuotaPolicyApiResponse = quotaPoliciesApi.updateQuotaPolicyById(fileServerExtId,\
+          \ mountTargetExtId, extId, dryrun, quotaPolicy, opts);\n            System.out.println(updateQuotaPolicyApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, QuotaPoliciesApi, EnforcementType, PrincipalType, QuotaPolicy, GetQuotaPolicyApiResponse\
+          \ } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n\
+          // IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port to which to connect\
+          \ to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts\
+          \ = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to\
+          \ connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password\
+          \ = 'password';\n// Please add authorization information here if needed.\nlet quotaPoliciesApi = new QuotaPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let quotaPolicy = new QuotaPolicy();\n\n    // QuotaPolicy object initializations here...\n\
+          \    quotaPolicy.setEnforcementType(EnforcementType.UNKNOWN);  // required field\n    quotaPolicy.setPrincipalName(\"\
+          string_sample_data\");  // required field\n    quotaPolicy.setPrincipalType(PrincipalType.UNKNOWN);  // required\
+          \ field\n    quotaPolicy.setSizeInBytes(1);  // required field\n\n    \n    let fileServerExtId = \"E5b88BCD-63cC-b74e-39b8-acEa0AafF9fa\"\
+          ;\n    \n    let mountTargetExtId = \"2a4fc0A6-5Db0-fd6a-2dAc-2BFecB95cAfb\";\n    \n    let extId = \"CEf2fDCB-Fffd-fcd4-a0fE-B812cD943Cfe\"\
+          ;\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$dryrun\"] = true;\n\n    // Perform Get\
+          \ call\n    quotaPoliciesApi.getQuotaPolicyById(fileServerExtId, mountTargetExtId, extId).then(({data, response})\
+          \ => {\n        console.log(`API returned the following status code: ${response.status}`);\n        // Extract E-Tag\
+          \ Header\n        let etagValue = ApiClient.getEtag(data);\n\n        quotaPoliciesApi.updateQuotaPolicyById(fileServerExtId,\
+          \ mountTargetExtId, extId, quotaPolicy, opts, {\"If-Match\" : etagValue}).then(({data, response}) => {\n       \
+          \     console.log(`API returned the following status code: ${response.status}`);\n            console.log(data.getData());\n\
+          \        }).catch((error) => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    quota_policies_api = ntnx_files_py_client.QuotaPoliciesApi(api_client=client)\n    quotaPolicy = ntnx_files_py_client.QuotaPolicy()\n\
+          \n    # QuotaPolicy object initializations here...\n    quotaPolicy.enforcement_type = ntnx_files_py_client.EnforcementType._UNKNOWN\
+          \  # required field\n    quotaPolicy.principal_name = \"string_sample_data\"  # required field\n    quotaPolicy.principal_type\
+          \ = ntnx_files_py_client.PrincipalType._UNKNOWN  # required field\n    quotaPolicy.size_in_bytes = 1  # required\
+          \ field\n    \n    file_server_ext_id = \"ADDCe860-ab78-Cbfa-adDE-b3EaCDcdBbdA\"\n    \n    mount_target_ext_id\
+          \ = \"bCCbEdAc-EA2A-FEAd-DAFD-DcBa177DCdb8\"\n    \n    ext_id = \"D0fFb0dD-aBdf-bDcB-e8F7-9eDaaAea5a12\"\n    \n\
+          \    dryrun = True\n\n    try:\n        api_response = quota_policies_api.get_quota_policy_by_id(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, extId=ext_id)\n    except ntnx_files_py_client.rest.ApiException as e:\n\
+          \        print(e)\n    # Extract E-Tag Header\n    etag_value = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\
+          \n    try:\n        api_response = quota_policies_api.update_quota_policy_by_id(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, extId=ext_id, _dryrun=dryrun, body=quotaPolicy, if_match=etag_value)\n \
+          \       print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    QuotaPoliciesApiInstance *api.QuotaPoliciesApi\n)\n\nfunc main()\
+          \ {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry attempts while reconnecting\
+          \ on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect to the cluster\n\
+          \    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n    ApiClientInstance.Password\
+          \ = \"password\"\n    // Please add authorization information here if needed.\n    QuotaPoliciesApiInstance = api.NewQuotaPoliciesApi(ApiClientInstance)\n\
+          \n    quotaPolicy := import1.NewQuotaPolicy()\n\n    // QuotaPolicy object initializations here...\n\n    \n   \
+          \ fileServerExtId := \"0dEB4FEc-bDcD-cbE4-FeeD-62DB6C0CE7A4\"\n    \n    mountTargetExtId := \"b9b2F32b-2fBF-AbA0-3B7B-b51e24eceF5C\"\
+          \n    \n    extId := \"7B9b1ca5-B7A9-7C5c-EaE7-FbfF4eB9DBe5\"\n    \n    dryrun_ := true\n\n    getResponse, err\
+          \ := QuotaPoliciesApiInstance.GetQuotaPolicyById(&fileServerExtId, &mountTargetExtId, &extId)\n    if err != nil\
+          \ {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue := ApiClientInstance.GetEtag(getResponse)\n\
+          \n    args := make(map[string] interface{})\n    args[\"If-Match\"] = etagValue\n\n    response, error := QuotaPoliciesApiInstance.UpdateQuotaPolicyById(&fileServerExtId,\
+          \ &mountTargetExtId, &extId, &dryrun_, quotaPolicy, args)\n    if error != nil {\n        fmt.Println(error)\n \
+          \       return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/c250beaB-bbbc-F51e-eedC-40b9FdB0FEbB/mount-targets/cEf5BA64-dfDD-62C8-cfa7-6a900f4d674D/quota-policies/AFffcEEb-caac-1cCD-93Db-1c3f1A5a8caA?$dryrun=true\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"principalType\":\"$UNKNOWN\",\"principalName\":\"string\",\"sizeInBytes\":1,\"enforcementType\":\"$UNKNOWN\"\
+          ,\"notificationRecipients\":[\"string\"],\"isNotificationEnabled\":true,\"$objectType\":\"files.v4.config.QuotaPolicy\"\
+          } \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"principalType\":\"$UNKNOWN\",\"principalName\":\"string\",\"sizeInBytes\":1,\"\
+          enforcementType\":\"$UNKNOWN\",\"notificationRecipients\":[\"string\"],\"isNotificationEnabled\":true,\"$objectType\"\
+          :\"files.v4.config.QuotaPolicy\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/9caD7081-CefB-0A3b-C5CC-9F0EbB4D421f/mount-targets/b51D6AD3-4fAA-ad7F-C94e-6C30AdBDddCF/quota-policies/F6AaDDcC-Dc37-6CEf-948F-B8BAeF2dBEC4?$dryrun=true\"\
+          \n"
+    delete:
+      tags:
+      - QuotaPolicies
+      summary: Delete quota policy
+      description: 'Deletes a quota policy with the provided external identifier.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and the
+
+        mount target (`mountTargetExtId`) to which the quota policy belongs and a valid external identifier (`extId`) of the
+
+        quota policy to be deleted.
+
+        '
+      operationId: deleteQuotaPolicyById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 03ddd39e-30ba-44d3-8f97-e9a5356f8748
+      - name: mountTargetExtId
+        in: path
+        description: The external identifier of the mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: cf89ad35-f0fc-435e-a54a-1b08799c4196
+      - name: extId
+        in: path
+        description: Quota policy UUID. Example:48f78959-14a6-4c47-b5db-920460c4b668.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 905b1f8f-8a83-45d0-8b90-e1d72a673570
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 993c2888-d73b-46f4-a5bf-6d6db91f5809
+      responses:
+        '202':
+          description: Task ID returned for the delete quota policy request.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/mount-targets/{mountTargetExtId}/quota-policies/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Delete Quota Policy File Server Share
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - File Server Share Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 1
+        timeUnit: seconds
+      - type: small
+        count: 1
+        timeUnit: seconds
+      - type: large
+        count: 1
+        timeUnit: seconds
+      - type: xlarge
+        count: 1
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.QuotaPoliciesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetQuotaPolicyApiResponse;\nimport com.nutanix.dp1.fil.files.v4.config.DeleteQuotaPolicyApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        QuotaPoliciesApi quotaPoliciesApi = new\
+          \ QuotaPoliciesApi(apiClient);\n\n        \n        String fileServerExtId = \"0C15Df09-CF5f-dE41-ecEa-EF5Ea9C3fE6F\"\
+          ;\n        \n        String mountTargetExtId = \"C96F3d9D-5bBa-04DA-9a06-fc5aFCdcbE2D\";\n        \n        String\
+          \ extId = \"efAc7d89-3cf9-Fd04-7DaA-4bdcE7F6bB17\";\n\n        // perform GET call\n        GetQuotaPolicyApiResponse\
+          \ getResponse = null;\n        try {\n            getResponse = quotaPoliciesApi.getQuotaPolicyById(fileServerExtId,\
+          \ mountTargetExtId, extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n\
+          \        }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            DeleteQuotaPolicyApiResponse deleteQuotaPolicyApiResponse = quotaPoliciesApi.deleteQuotaPolicyById(fileServerExtId,\
+          \ mountTargetExtId, extId, opts);\n            System.out.println(deleteQuotaPolicyApiResponse.toString());\n\n\
+          \        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, QuotaPoliciesApi, GetQuotaPolicyApiResponse } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet quotaPoliciesApi = new QuotaPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let fileServerExtId = \"AFfcdEBe-e9af-A6A3-D3Bc-3CEd7CcCBbB9\";\n    \n    let\
+          \ mountTargetExtId = \"c3EFb7C7-9cfc-c552-D4ae-F3edCcB89974\";\n    \n    let extId = \"BddDebFe-F3E8-Aed1-dF4c-B83aBafbaA06\"\
+          ;\n\n\n    // Perform Get call\n    quotaPoliciesApi.getQuotaPolicyById(fileServerExtId, mountTargetExtId, extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        quotaPoliciesApi.deleteQuotaPolicyById(fileServerExtId,\
+          \ mountTargetExtId, extId, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API\
+          \ returned the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    quota_policies_api = ntnx_files_py_client.QuotaPoliciesApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"6b7D7c69-eC95-dEAf-fDbB-CdEfcE5Bf5F1\"\n    \n    mount_target_ext_id = \"BCfCCeae-Cd6d-609C-cfaC-fbE44Eff457d\"\
+          \n    \n    ext_id = \"B5CA1Fe6-0fc7-1BEB-3e1e-e7dfcd323Ea9\"\n\n    try:\n        api_response = quota_policies_api.get_quota_policy_by_id(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, extId=ext_id)\n    except ntnx_files_py_client.rest.ApiException as e:\n\
+          \        print(e)\n    # Extract E-Tag Header\n    etag_value = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\
+          \n    try:\n        api_response = quota_policies_api.delete_quota_policy_by_id(fileServerExtId=file_server_ext_id,\
+          \ mountTargetExtId=mount_target_ext_id, extId=ext_id, if_match=etag_value)\n        print(api_response)\n    except\
+          \ ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    QuotaPoliciesApiInstance *api.QuotaPoliciesApi\n)\n\n\
+          func main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  QuotaPoliciesApiInstance = api.NewQuotaPoliciesApi(ApiClientInstance)\n\n    \n    fileServerExtId := \"1e6Cd8Ad-AF8E-FcA0-cFf4-Fdcbae5bAE1B\"\
+          \n    \n    mountTargetExtId := \"86dabCCC-3fb7-eEDe-6746-bbFC460923F1\"\n    \n    extId := \"dF957Bde-2CDd-15e6-CDc1-dBCd80DdDFEC\"\
+          \n\n    getResponse, err := QuotaPoliciesApiInstance.GetQuotaPolicyById(&fileServerExtId, &mountTargetExtId, &extId)\n\
+          \    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue\
+          \ := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"If-Match\"\
+          ] = etagValue\n\n    response, error := QuotaPoliciesApiInstance.DeleteQuotaPolicyById(&fileServerExtId, &mountTargetExtId,\
+          \ &extId, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/1a2ee3Bf-eB7e-61f0-A8A3-0d0bdb6c719b/mount-targets/Bf3AFb7F-F1Be-B497-CE0B-bc50cf9fFAb5/quota-policies/43EafFac-bAB2-deEf-5df6-91080e5DADEa\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'If-Match: string_sample_data' \\\n  \
+          \            --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\
+          \n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/9cea38Aa-ec64-E26b-F2cD-CBbdFFB19a5B/mount-targets/EbB663BF-cdb5-C1C6-F3Cf-e45FE3ebBe37/quota-policies/fC31d6be-eC31-aAB7-C2FF-Dcb755C5ECAb\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2022.6
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+components:
+  schemas:
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    files.v4.0.config.QuotaPolicy:
+      title: Quota policy.
+      description: Quota policy model.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - enforcementType
+        - principalName
+        - principalType
+        - sizeInBytes
+        type: object
+        properties:
+          principalType:
+            $ref: '#/components/schemas/files.v4.0.config.PrincipalType'
+          principalName:
+            maxLength: 256
+            type: string
+            description: Principal name is the name of the user or group, assigned to the principal type.
+          sizeInBytes:
+            minimum: 0
+            type: integer
+            description: Quota size in bytes.
+            format: int64
+            default: 1
+          enforcementType:
+            $ref: '#/components/schemas/files.v4.0.config.EnforcementType'
+          notificationRecipients:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: List of recipient's emails.
+            items:
+              maxLength: 256
+              pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+              type: string
+              example: john.doe@example.com
+          isNotificationEnabled:
+            type: boolean
+            description: Enables email notifications for the user or group specified in the principal type.A notification
+              will only be sent if the user or group is close to the quota provided.
+            default: true
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:d5a5af10-1466-4d38-8d66-465c1e19d1b2
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    files.v4.0.config.EnforcementType:
+      title: Enforcement type
+      type: string
+      description: Enforcement types for the quota policy.
+      enum:
+      - SOFT
+      - HARD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        HARD: Hard enforcement of the quota limits.
+        SOFT: Soft enforcement of quota limits.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    files.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 13
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 41
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    files.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    files.v4.0.config.PrincipalType:
+      title: Principal type
+      type: string
+      description: Principle type.
+      enum:
+      - USER
+      - GROUP
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        GROUP: Principal type is group
+        USER: Principal type is user.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 3
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

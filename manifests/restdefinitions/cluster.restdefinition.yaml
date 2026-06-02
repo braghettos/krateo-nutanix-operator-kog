@@ -1,0 +1,31 @@
+apiVersion: ogen.krateo.io/v1alpha1
+kind: RestDefinition
+metadata:
+  name: nutanix-cluster
+  namespace: nutanix-system
+spec:
+  oasPath: configmap://nutanix-system/nutanix-cluster-oas/cluster.yaml
+  resourceGroup: clustermgmt.nutanix.krateo.io
+  resource:
+    kind: Cluster
+    # Clusters are registered to PC, not created via this API - read-oriented.
+    identifiers:
+      - name
+    additionalStatusFields:
+      - extId
+    verbsDescription:
+      - action: findby
+        method: GET
+        path: /clustermgmt/v4.0/config/clusters
+      - action: get
+        method: GET
+        path: /clustermgmt/v4.0/config/clusters/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId
+      - action: update
+        method: PUT
+        path: /clustermgmt/v4.0/config/clusters/{extId}
+        requestFieldMapping:
+          - inPath: extId
+            inCustomResource: status.extId

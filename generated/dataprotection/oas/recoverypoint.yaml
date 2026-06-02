@@ -1,0 +1,1510 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Data Protection APIs
+  description: Business Continuity with full spectrum of Disaster Recovery and Backup solution. Spanning across Single PC,
+    Cross AZ, MultiSite. Configuration of Recovery points, Protection policies, Recovery Plans. Execution and monitoring of
+    back up and recovery orchestrations on OnPrem as well as Cloud.
+  version: '4.0'
+  x-logo:
+    altText: Data Protection Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/dataprotection/images/dataprotection-logo-img.svg
+  x-repo-name: dataprotection
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /dataprotection/v4.0/config/recovery-points:
+    get:
+      tags:
+      - RecoveryPoints
+      summary: List recovery points
+      description: List of recovery point.
+      operationId: listRecoveryPoints
+      parameters:
+      - name: X-Cluster-Id
+        in: header
+        description: 'Cluster type from which recovery points must be fetched. Valid values: [AOS, MST]'
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - creationTime
+
+          - extId
+
+          - locationAgnosticId
+
+          - name
+
+          - ownerExtId
+
+          - recoveryPointType
+
+          - vmRecoveryPoints
+
+          - volumeGroupRecoveryPoints
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - creationTime
+
+          - expirationTime
+
+          - name
+
+          - ownerExtId
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - creationTime
+
+          - expirationTime
+
+          - extId
+
+          - name
+
+          - recoveryPointType
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of recovery point(s).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dataprotection.v4.0.config.RecoveryPoint'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Recovery Point
+        roleList:
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Disaster Recovery Admin
+        - Disaster Recovery Viewer
+        - CSI System
+        - Kubernetes Data Services System
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.dp.java.client.ApiClient;\nimport com.nutanix.dp.java.client.api.RecoveryPointsApi;\n\
+          import com.nutanix.dp1.dp.dataprotection.v4.config.ListRecoveryPointsApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        RecoveryPointsApi recoveryPointsApi =\
+          \ new RecoveryPointsApi(apiClient);\n\n        \n        int page = 0;\n        \n        int limit = 50;\n\n  \
+          \      try {\n            ListRecoveryPointsApiResponse listRecoveryPointsApiResponse = recoveryPointsApi.listRecoveryPoints(page,\
+          \ limit, null, null, null);\n            System.out.println(listRecoveryPointsApiResponse.toString());\n\n     \
+          \   } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, RecoveryPointsApi } from \"@nutanix-api/dataprotection-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet recoveryPointsApi = new RecoveryPointsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n\
+          \    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\"\
+          ;\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    recoveryPointsApi.listRecoveryPoints(opts).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_dataprotection_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_dataprotection_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_dataprotection_py_client.ApiClient(configuration=config)\n    recovery_points_api\
+          \ = ntnx_dataprotection_py_client.RecoveryPointsApi(api_client=client)\n    \n    page = 0\n    \n    limit = 50\n\
+          \n\n    try:\n        api_response = recovery_points_api.list_recovery_points(_page=page, _limit=limit)\n      \
+          \  print(api_response)\n    except ntnx_dataprotection_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/models/dataprotection/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    RecoveryPointsApiInstance *api.RecoveryPointsApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    RecoveryPointsApiInstance = api.NewRecoveryPointsApi(ApiClientInstance)\n\n    \n    page_ :=\
+          \ 0\n    \n    limit_ := 50\n\n\n    response, error := RecoveryPointsApiInstance.ListRecoveryPoints(&page_, &limit_,\
+          \ nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.RecoveryPoint)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'X-Cluster-Id: string_sample_data' \\\n\
+          \     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'X-Cluster-Id: string_sample_data' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - RecoveryPoints
+      summary: Create a recovery point
+      description: 'Create a new recovery point.<br>
+
+        #### Task Completion Details <br>
+
+        External identifier of the created recovery point can be found in the task completion details under the key `recoveryPointExtId`.'
+      operationId: createRecoveryPoint
+      parameters:
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 93bc102a-d58d-4054-9069-cd0ecfc43b69
+      requestBody:
+        description: Details of the request body to create a recovery point.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dataprotection.v4.0.config.RecoveryPoint'
+        required: true
+      responses:
+        '202':
+          description: Task Id to monitor the progress of recovery point create.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create Recovery Point
+        roleList:
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Disaster Recovery Admin
+        - CSI System
+        - Kubernetes Data Services System
+      x-rate-limit:
+      - type: xsmall
+        count: 2
+        timeUnit: seconds
+      - type: small
+        count: 2
+        timeUnit: seconds
+      - type: large
+        count: 3
+        timeUnit: seconds
+      - type: xlarge
+        count: 3
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.dp.java.client.ApiClient;\nimport com.nutanix.dp.java.client.api.RecoveryPointsApi;\n\
+          import com.nutanix.dp1.dp.dataprotection.v4.config.RecoveryPoint;\nimport com.nutanix.dp1.dp.dataprotection.v4.config.CreateRecoveryPointApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        RecoveryPointsApi recoveryPointsApi = new RecoveryPointsApi(apiClient);\n\
+          \n        RecoveryPoint recoveryPoint = new RecoveryPoint();\n\n        // RecoveryPoint object initializations\
+          \ here...\n\n        try {\n            CreateRecoveryPointApiResponse createRecoveryPointApiResponse = recoveryPointsApi.createRecoveryPoint(recoveryPoint);\n\
+          \            System.out.println(createRecoveryPointApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, RecoveryPointsApi, RecoveryPoint } from \"@nutanix-api/dataprotection-js-client\";\n\
+          \n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet recoveryPointsApi = new RecoveryPointsApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let recoveryPoint = new RecoveryPoint();\n\n    // RecoveryPoint object initializations\
+          \ here...\n\n\n\n\n\n\n    recoveryPointsApi.createRecoveryPoint(recoveryPoint).then(({data, response}) => {\n \
+          \       console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_dataprotection_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_dataprotection_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_dataprotection_py_client.ApiClient(configuration=config)\n    recovery_points_api\
+          \ = ntnx_dataprotection_py_client.RecoveryPointsApi(api_client=client)\n    recoveryPoint = ntnx_dataprotection_py_client.RecoveryPoint()\n\
+          \n    # RecoveryPoint object initializations here...\n\n\n    try:\n        api_response = recovery_points_api.create_recovery_point(body=recoveryPoint)\n\
+          \        print(api_response)\n    except ntnx_dataprotection_py_client.rest.ApiException as e:\n        print(e)\n\
+          \n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/models/dataprotection/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/models/prism/v4/config\"\n\
+          )\n\nvar (\n    ApiClientInstance *client.ApiClient\n    RecoveryPointsApiInstance *api.RecoveryPointsApi\n)\n\n\
+          func main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    RecoveryPointsApiInstance = api.NewRecoveryPointsApi(ApiClientInstance)\n\n    recoveryPoint :=\
+          \ import1.NewRecoveryPoint()\n\n    // RecoveryPoint object initializations here...\n\n\n\n    response, error :=\
+          \ RecoveryPointsApiInstance.CreateRecoveryPoint(recoveryPoint)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().(import2.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"locationAgnosticId\":\"string\"\
+          ,\"name\":\"RecoveryPoint_1\",\"creationTime\":\"2015-07-20T15:49:04-07:00\",\"expirationTime\":\"2015-07-20T15:49:04-07:00\"\
+          ,\"status\":\"$UNKNOWN\",\"recoveryPointType\":\"$UNKNOWN\",\"ownerExtId\":\"string\",\"locationReferences\":[{\"\
+          locationExtId\":\"string\",\"$objectType\":\"dataprotection.v4.config.LocationReference\"}],\"vmRecoveryPoints\"\
+          :[{\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"locationAgnosticId\":\"string\",\"name\":\"RecoveryPoint_1\",\"creationTime\"\
+          :\"2015-07-20T15:49:04-07:00\",\"expirationTime\":\"2015-07-20T15:49:04-07:00\",\"status\":\"$UNKNOWN\",\"recoveryPointType\"\
+          :\"$UNKNOWN\",\"consistencyGroupExtId\":\"string\",\"diskRecoveryPoints\":[{\"diskRecoveryPointExtId\":\"string\"\
+          ,\"diskExtId\":\"string\",\"$objectType\":\"dataprotection.v4.common.DiskRecoveryPoint\"}],\"vmExtId\":\"string\"\
+          ,\"vmCategories\":[],\"applicationConsistentProperties\":{\"backupType\":\"$UNKNOWN\",\"shouldIncludeWriters\":false,\"\
+          writers\":[\"string\"],\"shouldStoreVssMetadata\":false,\"$objectType\":\"dataprotection.v4.common.VssProperties\"\
+          },\"$objectType\":\"dataprotection.v4.config.VmRecoveryPoint\"}],\"volumeGroupRecoveryPoints\":[{\"tenantId\":\"\
+          string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"consistencyGroupExtId\":\"string\",\"locationAgnosticId\":\"string\",\"volumeGroupExtId\":\"string\",\"volumeGroupCategories\"\
+          :[\"dept_1/hr\"],\"diskRecoveryPoints\":[{\"diskRecoveryPointExtId\":\"string\",\"diskExtId\":\"string\",\"$objectType\"\
+          :\"dataprotection.v4.common.DiskRecoveryPoint\"}],\"$objectType\":\"dataprotection.v4.config.VolumeGroupRecoveryPoint\"\
+          }],\"$objectType\":\"dataprotection.v4.config.RecoveryPoint\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          locationAgnosticId\":\"string\",\"name\":\"RecoveryPoint_1\",\"creationTime\":\"2015-07-20T15:49:04-07:00\",\"expirationTime\"\
+          :\"2015-07-20T15:49:04-07:00\",\"status\":\"$UNKNOWN\",\"recoveryPointType\":\"$UNKNOWN\",\"ownerExtId\":\"string\"\
+          ,\"locationReferences\":[{\"locationExtId\":\"string\",\"$objectType\":\"dataprotection.v4.config.LocationReference\"\
+          }],\"vmRecoveryPoints\":[{\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"\
+          string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"locationAgnosticId\":\"string\",\"name\":\"RecoveryPoint_1\"\
+          ,\"creationTime\":\"2015-07-20T15:49:04-07:00\",\"expirationTime\":\"2015-07-20T15:49:04-07:00\",\"status\":\"$UNKNOWN\"\
+          ,\"recoveryPointType\":\"$UNKNOWN\",\"consistencyGroupExtId\":\"string\",\"diskRecoveryPoints\":[{\"diskRecoveryPointExtId\"\
+          :\"string\",\"diskExtId\":\"string\",\"$objectType\":\"dataprotection.v4.common.DiskRecoveryPoint\"}],\"vmExtId\"\
+          :\"string\",\"vmCategories\":[],\"applicationConsistentProperties\":{\"backupType\":\"$UNKNOWN\",\"shouldIncludeWriters\"\
+          :false,\"writers\":[\"string\"],\"shouldStoreVssMetadata\":false,\"$objectType\":\"dataprotection.v4.common.VssProperties\"\
+          },\"$objectType\":\"dataprotection.v4.config.VmRecoveryPoint\"}],\"volumeGroupRecoveryPoints\":[{\"tenantId\":\"\
+          string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"consistencyGroupExtId\":\"string\",\"locationAgnosticId\":\"string\",\"volumeGroupExtId\":\"string\",\"volumeGroupCategories\"\
+          :[\"dept_1/hr\"],\"diskRecoveryPoints\":[{\"diskRecoveryPointExtId\":\"string\",\"diskExtId\":\"string\",\"$objectType\"\
+          :\"dataprotection.v4.common.DiskRecoveryPoint\"}],\"$objectType\":\"dataprotection.v4.config.VolumeGroupRecoveryPoint\"\
+          }],\"$objectType\":\"dataprotection.v4.config.RecoveryPoint\"} \\\n- \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points\"\
+          \n"
+  /dataprotection/v4.0/config/recovery-points/{extId}:
+    get:
+      tags:
+      - RecoveryPoints
+      summary: Get a recovery point
+      description: Query the recovery point identified by {extId}.
+      operationId: getRecoveryPointById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier that can be used to retrieve the recovery point using its URL.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 1cefd0f5-6d38-4c9b-a07c-bdd2db004224
+      responses:
+        '200':
+          description: Details of the recovery point queried.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.config.RecoveryPoint'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Recovery Point
+        roleList:
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Disaster Recovery Admin
+        - Disaster Recovery Viewer
+        - CSI System
+        - Kubernetes Data Services System
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.dp.java.client.ApiClient;\nimport com.nutanix.dp.java.client.api.RecoveryPointsApi;\n\
+          import com.nutanix.dp1.dp.dataprotection.v4.config.GetRecoveryPointApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        RecoveryPointsApi recoveryPointsApi =\
+          \ new RecoveryPointsApi(apiClient);\n\n        \n        String extId = \"c470bbEE-CA49-7Ded-5Ee8-6ab5f2DaD6CF\"\
+          ;\n\n        try {\n            GetRecoveryPointApiResponse getRecoveryPointApiResponse = recoveryPointsApi.getRecoveryPointById(extId);\n\
+          \            System.out.println(getRecoveryPointApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, RecoveryPointsApi } from \"@nutanix-api/dataprotection-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet recoveryPointsApi = new RecoveryPointsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"F33d3803-2Aee-fE2E-ae48-B4eaA37F8B5e\";\n\n\n\n\n\n    recoveryPointsApi.getRecoveryPointById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_dataprotection_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_dataprotection_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_dataprotection_py_client.ApiClient(configuration=config)\n    recovery_points_api\
+          \ = ntnx_dataprotection_py_client.RecoveryPointsApi(api_client=client)\n    \n    ext_id = \"dDCB5AFe-9bFc-e6De-cc8B-7bAA9e9e66bd\"\
+          \n\n\n    try:\n        api_response = recovery_points_api.get_recovery_point_by_id(extId=ext_id)\n        print(api_response)\n\
+          \    except ntnx_dataprotection_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/models/dataprotection/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    RecoveryPointsApiInstance *api.RecoveryPointsApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    RecoveryPointsApiInstance = api.NewRecoveryPointsApi(ApiClientInstance)\n\n    \n    extId :=\
+          \ \"2ECD3d08-dcaa-cB51-81bF-eBBb9B269BDD\"\n\n\n    response, error := RecoveryPointsApiInstance.GetRecoveryPointById(&extId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.RecoveryPoint)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points/c64eb2Ef-a93C-BAD4-daF4-e8DF74bCEade\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points/fa394DBf-bBEA-a84f-DC7A-8aABFe8Bd84B\"\
+          \n"
+    delete:
+      tags:
+      - RecoveryPoints
+      summary: Delete a recovery point
+      description: Delete the recovery point identified by {extId}.
+      operationId: deleteRecoveryPointById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier that can be used to retrieve the recovery point using its URL.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 1257792b-2d8d-49c9-a3cc-99a01f7f93ab
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: d902088a-5077-4b08-9eab-ccd1a6030ca8
+      responses:
+        '202':
+          description: Task Id to monitor the progress of a recovery point delete operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points/{extId}
+                  Delete operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/dataprotection.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /dataprotection/v4.0/config/recovery-points/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete Recovery Point
+        roleList:
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Disaster Recovery Admin
+        - CSI System
+        - Kubernetes Data Services System
+      x-rate-limit:
+      - type: xsmall
+        count: 2
+        timeUnit: seconds
+      - type: small
+        count: 2
+        timeUnit: seconds
+      - type: large
+        count: 2
+        timeUnit: seconds
+      - type: xlarge
+        count: 2
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.8'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.dp.java.client.ApiClient;\nimport com.nutanix.dp.java.client.api.RecoveryPointsApi;\n\
+          import com.nutanix.dp1.dp.dataprotection.v4.config.DeleteRecoveryPointApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        RecoveryPointsApi recoveryPointsApi =\
+          \ new RecoveryPointsApi(apiClient);\n\n        \n        String extId = \"FF02a2CF-d3e6-BFFB-fcAC-1Ebc73Fba8eA\"\
+          ;\n\n        try {\n            DeleteRecoveryPointApiResponse deleteRecoveryPointApiResponse = recoveryPointsApi.deleteRecoveryPointById(extId);\n\
+          \            System.out.println(deleteRecoveryPointApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, RecoveryPointsApi } from \"@nutanix-api/dataprotection-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet recoveryPointsApi = new RecoveryPointsApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"5ABdedCD-FbAE-b5De-A1Ab-BdFda1E0a096\";\n\n\n\n\n\n    recoveryPointsApi.deleteRecoveryPointById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_dataprotection_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_dataprotection_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_dataprotection_py_client.ApiClient(configuration=config)\n    recovery_points_api\
+          \ = ntnx_dataprotection_py_client.RecoveryPointsApi(api_client=client)\n    \n    ext_id = \"A7cd3dB9-e076-fAeE-c9ed-EDA0fcaC2dd0\"\
+          \n\n\n    try:\n        api_response = recovery_points_api.delete_recovery_point_by_id(extId=ext_id)\n        print(api_response)\n\
+          \    except ntnx_dataprotection_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/dataprotection-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    RecoveryPointsApiInstance *api.RecoveryPointsApi\n)\n\
+          \nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    RecoveryPointsApiInstance = api.NewRecoveryPointsApi(ApiClientInstance)\n\n    \n    extId :=\
+          \ \"2FfB581C-1a8E-C3Cc-E2cb-0AAF5c7B9EA1\"\n\n\n    response, error := RecoveryPointsApiInstance.DeleteRecoveryPointById(&extId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.TaskReference)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points/FDc1D9F1-Db91-eDEC-fa32-BAbBF3C1ADb3\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\
+          \n- \"https://{pc-ip}:9440/api/dataprotection/v4.0/config/recovery-points/a9eBe2F1-8DA8-Cda0-FEac-4a6ACeC1059e\"\
+          \n"
+components:
+  schemas:
+    dataprotection.v4.0.config.VolumeGroupRecoveryPoint:
+      title: 'Volume Group recovery point '
+      description: A model that represents volume group recovery point properties.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - volumeGroupExtId
+        type: object
+        properties:
+          consistencyGroupExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: External identifier of the Consistency group which the entity was part of at the time of recovery
+              point creation.
+            readOnly: true
+            example: 3fe6020b-ada3-4286-a5b7-39effadc80d7
+          locationAgnosticId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Location agnostic identifier of the recovery point. This identifier is used to identify the same
+              instances of a recovery point across different sites.
+            readOnly: true
+            example: a188c23c-af4b-4a43-bc85-0a489fe78573
+          volumeGroupExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Volume Group external identifier which is captured as part of this recovery point.
+            example: faecaf67-c2ef-4e20-8690-d76b3fca236c
+          volumeGroupCategories:
+            maxItems: 20
+            minItems: 1
+            type: array
+            description: Category key-value pairs associated with the volume group at the time of recovery point creation.
+              The category key and value are separated by '/'. For example, a category with key 'dept' and value 'hr' will
+              be represented as 'dept/hr'.
+            readOnly: true
+            items:
+              type: string
+              example: dept_1/hr
+          diskRecoveryPoints:
+            maxItems: 1024
+            minItems: 1
+            type: array
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/dataprotection.v4.0.common.DiskRecoveryPoint'
+        additionalProperties: false
+    dataprotection.v4.0.common.RecoveryPointStatus:
+      type: string
+      description: The status of the Recovery point, which indicates whether this Recovery point is fit to be consumed.
+      enum:
+      - COMPLETE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        COMPLETE: The Recovery point is in a complete state and ready to be consumed.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    dataprotection.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/dataprotection.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/dataprotection.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    dataprotection.v4.0.common.DiskRecoveryPoint:
+      title: Disk recovery point model
+      type: object
+      properties:
+        diskRecoveryPointExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Disk recovery point identifier.
+          readOnly: true
+          example: 045b9af6-3e93-4119-ab50-0c35294f1bf3
+        diskExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Disk external identifier which is captured as a part of this recovery point.
+          readOnly: true
+          example: fe0de461-cfee-470b-93c7-dd6e06003fdc
+      additionalProperties: false
+      description: A model that represents the disk recovery point properties.
+    dataprotection.v4.0.config.LocationReference:
+      type: object
+      properties:
+        locationExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: External identifier of the cluster where the recovery point is present.
+          example: 3d03fa82-2727-4f7e-8a43-ab11e7649995
+      additionalProperties: false
+      description: Location reference where the specified recovery point is present.
+    dataprotection.v4.0.common.RecoveryPointType:
+      type: string
+      description: Type of the Recovery point.
+      enum:
+      - CRASH_CONSISTENT
+      - APPLICATION_CONSISTENT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        CRASH_CONSISTENT: Crash-consistent Recovery points capture all the VM and application level details.
+        $REDACTED: 'Redacted value.
+
+          '
+        APPLICATION_CONSISTENT: Application-consistent Recovery points can capture all the data stored in the memory and also
+          the in-progress transaction details.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 12f0e96f-a69b-4ea2-973a-4a8c02b6e1e3
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    dataprotection.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    dataprotection.v4.0.config.VmRecoveryPoint:
+      title: VM recovery point
+      description: A model that represents VM recovery point properties.
+      allOf:
+      - $ref: '#/components/schemas/dataprotection.v4.0.common.BaseVmRecoveryPoint'
+      - type: object
+        additionalProperties: false
+    dataprotection.v4.0.config.RecoveryPoint:
+      title: Recovery point
+      description: Details about the recovery point along with all the captured VM and volume group recovery point(s).
+      allOf:
+      - $ref: '#/components/schemas/dataprotection.v4.0.common.BaseRecoveryPoint'
+      - type: object
+        properties:
+          ownerExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: A read only field inserted into recovery point at the time of recovery point creation, indicating
+              the external identifier of the user who created this recovery point.
+            readOnly: true
+            example: eb711938-8a25-4b05-80df-2aec56413fee
+          locationReferences:
+            maxItems: 1
+            minItems: 1
+            type: array
+            description: List of location references where the VM or volume group recovery point are a part of the specified
+              recovery point.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/dataprotection.v4.0.config.LocationReference'
+          vmRecoveryPoints:
+            title: VM recovery points.
+            maxItems: 30
+            minItems: 1
+            type: array
+            description: List of VM recovery point that are a part of the specified top-level recovery point. Note that a
+              recovery point can contain a maximum number of 30 entities. These entities can be a combination of VM(s) and
+              volume group(s).
+            items:
+              $ref: '#/components/schemas/dataprotection.v4.0.config.VmRecoveryPoint'
+          volumeGroupRecoveryPoints:
+            title: Volume Group recovery points.
+            maxItems: 30
+            minItems: 1
+            type: array
+            description: List of volume group recovery point that are a part of the specified top-level recovery point. Note
+              that a recovery point can contain a maximum number of 30 entities. These entities can be a combination of VM(s)
+              and volume group(s).
+            items:
+              $ref: '#/components/schemas/dataprotection.v4.0.config.VolumeGroupRecoveryPoint'
+        additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: b54de3f3-faa6-4303-b392-323be536da50
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 26
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    dataprotection.v4.0.common.VssProperties:
+      title: Application consistent properties.
+      required:
+      - backupType
+      type: object
+      properties:
+        backupType:
+          $ref: '#/components/schemas/dataprotection.v4.0.common.BackupType'
+        shouldIncludeWriters:
+          type: boolean
+          description: Indicates whether the given set of VSS writers' UUIDs should be included or excluded from the application
+            consistent recovery point. By default, the value is set to false, indicating that all listed VSS writers' UUIDs
+            will be excluded.
+          default: false
+        writers:
+          maxItems: 25
+          minItems: 1
+          type: array
+          description: List of VSS writer UUIDs that are used in an application consistent recovery point. The default values
+            are the system and the registry writer UUIDs.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            example: 376c6e43-0b1f-4490-94f4-fca3adc22e68
+        shouldStoreVssMetadata:
+          type: boolean
+          description: Indicates whether to store the VSS metadata if the user is interested in application-specific backup/restore.
+            The VSS metadata consists of VSS writers and requester metadata details. These are compressed into a cabinet file(.cab
+            file) during a VSS backup operation. This cabinet file must be saved to the backup media during a backup operation,
+            as it is required during the restore operation.
+          default: false
+      additionalProperties: false
+      description: For Windows VMs/agents, application-consistent recovery points are selected using the Windows-specific
+        Volume Shadow Copy Service (VSS). The enclosed properties, also called VSS properties, are used by the Windows platform
+        to decide the type of application-consistent recovery points to consider.
+    dataprotection.v4.0.common.BaseRecoveryPoint:
+      title: Recovery point properties
+      description: A model that represents common properties of a Recovery point resources
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          locationAgnosticId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Location agnostic identifier of the Recovery point.
+            readOnly: true
+            example: 55cda863-26a5-4c5f-bcea-06b50e57e3a8
+          name:
+            maxLength: 256
+            type: string
+            description: The name of the Recovery point.
+            example: RecoveryPoint_1
+          creationTime:
+            type: string
+            description: The UTC date and time in ISO-8601 format when the Recovery point is created.
+            format: date-time
+            readOnly: true
+            example: 2009-09-23 14:30:00-07:00
+          expirationTime:
+            type: string
+            description: The UTC date and time in ISO-8601 format when the current Recovery point expires and will be garbage
+              collected.
+            format: date-time
+            example: 2009-09-23 14:30:00-07:00
+          status:
+            $ref: '#/components/schemas/dataprotection.v4.0.common.RecoveryPointStatus'
+          recoveryPointType:
+            $ref: '#/components/schemas/dataprotection.v4.0.common.RecoveryPointType'
+        additionalProperties: false
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 92
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    dataprotection.v4.0.common.BackupType:
+      title: Backup type for vss snapshot
+      type: string
+      description: 'The backup type specifies the criteria for identifying the files to be backed up. This property should
+        be specified to the application-consistent recovery points for Windows VMs/agents. The following backup types are
+        supported for the application-consistent recovery points:
+
+        1. FULL_BACKUP - All files are backed up irrespective of their last backup date/time and state. Also, this backup
+        type updates the backup history of every file that was involved in the recovery point.
+
+        2. COPY_BACKUP - All files are backed up regardless of their last backup date/time and state. However, this backup
+        type does not update the backup history of individual files involved in the recovery point.'
+      enum:
+      - FULL_BACKUP
+      - COPY_BACKUP
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        FULL_BACKUP: All the files are backed up irrespective of their last backup date/time or state. Also, this backup type
+          updates the backup history of each file that participated in the recovery point. If not explicitly specified, this
+          is the default backup type.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        COPY_BACKUP: All the files are backed up regardless of their last backup date/time and state; however, this backup
+          type does not update the backup history of individual files involved in the recovery point.
+    dataprotection.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 75
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/dataprotection.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    dataprotection.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:84607120-924e-4a0b-a846-894463845452
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    dataprotection.v4.0.common.BaseVmRecoveryPoint:
+      title: VM Recovery point properties
+      description: A model that represents common properties of a VM Recovery point resources
+      allOf:
+      - $ref: '#/components/schemas/dataprotection.v4.0.common.BaseRecoveryPoint'
+      - type: object
+        properties:
+          consistencyGroupExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: External identifier of the Consistency group which the VM was part of at the time of recovery point
+              creation.
+            readOnly: true
+            example: 64d3633f-77a7-40d6-ba98-37d70cd961e0
+          diskRecoveryPoints:
+            maxItems: 1024
+            minItems: 1
+            type: array
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/dataprotection.v4.0.common.DiskRecoveryPoint'
+          vmExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: VM external identifier which is captured as a part of this recovery point.
+            example: e6b27822-f4fc-48e4-8e0f-4fa423e843d5
+          vmCategories:
+            maxItems: 256
+            minItems: 1
+            type: array
+            description: Category key-value pairs associated with the VM at the time of recovery point creation. The category
+              key and value are separated by '/'. For example, a category with key 'dept' and value 'hr' is displayed as 'dept/hr'.
+            readOnly: true
+            example: dept_1/hr
+            items:
+              type: string
+          applicationConsistentProperties:
+            required:
+            - $objectType
+            properties:
+              $objectType:
+                type: string
+                example: dataprotection.v4.common.VssProperties
+            description: User-defined application-consistent properties for the recovery point.
+            oneOf:
+            - $ref: '#/components/schemas/dataprotection.v4.0.common.VssProperties'
+        additionalProperties: false
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

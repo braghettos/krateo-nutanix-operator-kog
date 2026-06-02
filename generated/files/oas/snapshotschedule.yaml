@@ -1,0 +1,1506 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Files APIs
+  description: Manage virtual file servers, create and configure shares for client access, protect them using DR and sync
+    policies, provision storage space and administer security controls.
+  version: '4.0'
+  x-repo-name: files
+  x-logo:
+    altText: Files Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/files/images/files-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules:
+    get:
+      tags:
+      - SnapshotSchedules
+      summary: List snapshot schedules
+      description: Get a paginated list of snapshot schedules.
+      operationId: listSnapshotSchedules
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: d9fb3a0f-dc94-4a1c-b0f2-5b1586591683
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - maxRetentionCount
+
+          - type
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - maxRetentionCount
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - extId
+
+          - maxRetentionCount
+
+          - type
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Snapshot schedule list.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/files.v4.0.config.SnapshotSchedule'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Self Service Restore Snapshot Schedules
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotSchedulesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.ListSnapshotSchedulesApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SnapshotSchedulesApi snapshotSchedulesApi\
+          \ = new SnapshotSchedulesApi(apiClient);\n\n        \n        String fileServerExtId = \"CdBb7EfB-B2dc-B5Ac-DBcb-E9DAEA6fe23A\"\
+          ;\n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListSnapshotSchedulesApiResponse\
+          \ listSnapshotSchedulesApiResponse = snapshotSchedulesApi.listSnapshotSchedules(fileServerExtId, page, limit, null,\
+          \ null, null);\n            System.out.println(listSnapshotSchedulesApiResponse.toString());\n\n        } catch\
+          \ (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotSchedulesApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet snapshotSchedulesApi = new SnapshotSchedulesApi(apiClientInstance);\n\nfunction sample()\
+          \ {\n\n    \n    let fileServerExtId = \"BD2D1a7e-Ef3a-fa49-9Da9-C2D4EceE9Dc2\";\n\n    // Construct Optional Parameters\n\
+          \    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\"\
+          ;\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n \
+          \   snapshotSchedulesApi.listSnapshotSchedules(fileServerExtId, opts).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshot_schedules_api = ntnx_files_py_client.SnapshotSchedulesApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"a9Fbc7D2-BFAF-eCfB-E6aC-3BbB7CcDACCf\"\n    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response\
+          \ = snapshot_schedules_api.list_snapshot_schedules(fileServerExtId=file_server_ext_id, _page=page, _limit=limit)\n\
+          \        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SnapshotSchedulesApiInstance *api.SnapshotSchedulesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  SnapshotSchedulesApiInstance = api.NewSnapshotSchedulesApi(ApiClientInstance)\n\n    \n    fileServerExtId :=\
+          \ \"Cf53Ca0C-F439-AEA3-3bAC-FBE2a1Dd6dFf\"\n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error\
+          \ := SnapshotSchedulesApiInstance.ListSnapshotSchedules(&fileServerExtId, &page_, &limit_, nil, nil, nil)\n    if\
+          \ error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import1.SnapshotSchedule)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/C5aFEBF3-Ac7D-BA84-4b36-dAfcBA6f1aDE/snapshot-schedules?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/3cF3ffBE-c3aA-DDDe-d81b-CDb87a5E4dac/snapshot-schedules?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - SnapshotSchedules
+      summary: Create snapshot schedule
+      description: 'Creates a new snapshot schedule by using the provided request body. Self service restore (SSR) lets you
+        restore a previous version of a file or share.
+
+        With SSR, Files takes snapshots of share data in intervals defined by a snapshot schedule. You can enable SSR during
+        or after share creation as the feature is disabled by default.
+
+
+        The user needs to specify the `maxRetentionCount` and `type` of the
+
+        schedule to be created. User can also provide `daysOfWeek`, `daysOfMonth`, `frequency`
+
+        and the objectType for these shecdules is `files.v4.config.WeeklySchedule`, `files.v4.config.MonthlySchedule`,
+
+        `files.v4.config.DailySchedule` respectively.
+
+        '
+      operationId: createSnapshotSchedule
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 9e350d88-8d97-4ef1-89d0-b4e0ba5376f9
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 6e889063-78d5-46b9-84c3-a774f393f9ae
+      requestBody:
+        description: Snapshot schedule model
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.SnapshotSchedule'
+        required: true
+      responses:
+        '201':
+          description: Response to create snapshot schedule request. This returns the created snapshot schedule.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.config.SnapshotSchedule'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Create File Server Self Service Restore Snapshot Schedules
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotSchedulesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.SnapshotScheduleType;\nimport com.nutanix.dp1.fil.files.v4.config.SnapshotSchedule;\n\
+          import com.nutanix.dp1.fil.files.v4.config.CreateSnapshotScheduleApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SnapshotSchedulesApi snapshotSchedulesApi\
+          \ = new SnapshotSchedulesApi(apiClient);\n\n        SnapshotSchedule snapshotSchedule = new SnapshotSchedule();\n\
+          \n        // SnapshotSchedule object initializations here...\n        snapshotSchedule.setMaxRetentionCount(1);\
+          \  // required field\n        snapshotSchedule.setSchedule(SOME_RAW_DATA);  // required field\n        snapshotSchedule.setType(SnapshotScheduleType.UNKNOWN);\
+          \  // required field\n        \n        String fileServerExtId = \"eBBedFFf-dcaC-15Bb-B9FE-7EBDDA1DEdbe\";\n\n \
+          \       try {\n            CreateSnapshotScheduleApiResponse createSnapshotScheduleApiResponse = snapshotSchedulesApi.createSnapshotSchedule(fileServerExtId,\
+          \ snapshotSchedule);\n            System.out.println(createSnapshotScheduleApiResponse.toString());\n\n        }\
+          \ catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotSchedulesApi, SnapshotScheduleType, SnapshotSchedule } from \"@nutanix-api/files-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet snapshotSchedulesApi = new SnapshotSchedulesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let snapshotSchedule = new SnapshotSchedule();\n\n    // SnapshotSchedule object initializations\
+          \ here...\n    snapshotSchedule.setMaxRetentionCount(1);  // required field\n    snapshotSchedule.setSchedule(SOME_RAW_DATA);\
+          \  // required field\n    snapshotSchedule.setType(SnapshotScheduleType.UNKNOWN);  // required field\n\n    \n \
+          \   let fileServerExtId = \"8B45bf3B-CfaE-6fde-98b3-4A4aBEfBB28B\";\n\n\n\n\n\n    snapshotSchedulesApi.createSnapshotSchedule(fileServerExtId,\
+          \ snapshotSchedule).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshot_schedules_api = ntnx_files_py_client.SnapshotSchedulesApi(api_client=client)\n    snapshotSchedule\
+          \ = ntnx_files_py_client.SnapshotSchedule()\n\n    # SnapshotSchedule object initializations here...\n    snapshotSchedule.max_retention_count\
+          \ = 1  # required field\n    snapshotSchedule.schedule = SOME_RAW_DATA  # required field\n    snapshotSchedule.type\
+          \ = ntnx_files_py_client.SnapshotScheduleType._UNKNOWN  # required field\n    \n    file_server_ext_id = \"c328C5Cc-3DBb-Ceb8-bc4D-5aafA93Caaa7\"\
+          \n\n\n    try:\n        api_response = snapshot_schedules_api.create_snapshot_schedule(fileServerExtId=file_server_ext_id,\
+          \ body=snapshotSchedule)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n\
+          \        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SnapshotSchedulesApiInstance *api.SnapshotSchedulesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  SnapshotSchedulesApiInstance = api.NewSnapshotSchedulesApi(ApiClientInstance)\n\n    snapshotSchedule := import1.NewSnapshotSchedule()\n\
+          \n    // SnapshotSchedule object initializations here...\n\n    \n    fileServerExtId := \"ebbCE03d-EbA5-5360-a0F0-A0C4DdFFfecb\"\
+          \n\n\n    response, error := SnapshotSchedulesApiInstance.CreateSnapshotSchedule(&fileServerExtId, snapshotSchedule)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.SnapshotSchedule)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/8a35dcbD-5a6c-fcBc-79B3-dBcAaadBD769/snapshot-schedules\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n     --header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"type\":\"$UNKNOWN\",\"schedule\"\
+          :{\"frequency\":0,\"$objectType\":\"files.v4.config.DailySchedule\"},\"maxRetentionCount\":0,\"$objectType\":\"\
+          files.v4.config.SnapshotSchedule\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          type\":\"$UNKNOWN\",\"schedule\":{\"frequency\":0,\"$objectType\":\"files.v4.config.DailySchedule\"},\"maxRetentionCount\"\
+          :0,\"$objectType\":\"files.v4.config.SnapshotSchedule\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/dffFB887-4E4F-Aa7F-Cd1c-FCf8eAAebBf0/snapshot-schedules\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: 2022.6
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+  /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}:
+    get:
+      tags:
+      - SnapshotSchedules
+      summary: Get snapshot schedule
+      description: 'Get a snapshot schedule identified by the given external identifier.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and the schedule (`extId`).
+
+        '
+      operationId: getSnapshotScheduleById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: f96c0899-1175-49b9-9e67-5583b53aa6c1
+      - name: extId
+        in: path
+        description: Snapshot schedule external identifier. Example:48f78959-14a6-4c47-b5db-920460c4b668
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 9b809f38-e39d-45f4-8c7c-3d539e4dfd4d
+      responses:
+        '200':
+          description: Details of the queried snapshot schedule.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.config.SnapshotSchedule'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View File Server Self Service Restore Snapshot Schedules
+        roleList:
+        - Files Admin
+        - Files Viewer
+        - Prism Admin
+        - Prism Viewer
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 20
+        timeUnit: seconds
+      - type: small
+        count: 20
+        timeUnit: seconds
+      - type: large
+        count: 20
+        timeUnit: seconds
+      - type: xlarge
+        count: 20
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotSchedulesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetSnapshotScheduleApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SnapshotSchedulesApi snapshotSchedulesApi\
+          \ = new SnapshotSchedulesApi(apiClient);\n\n        \n        String fileServerExtId = \"dBcFF2Bf-EA3c-6e4F-BbcE-F941EB9d2Da8\"\
+          ;\n        \n        String extId = \"aF3A69Cd-DEeE-2fBe-2F40-4A8Dc6BDfBf8\";\n\n        try {\n            GetSnapshotScheduleApiResponse\
+          \ getSnapshotScheduleApiResponse = snapshotSchedulesApi.getSnapshotScheduleById(fileServerExtId, extId);\n     \
+          \       System.out.println(getSnapshotScheduleApiResponse.toString());\n\n        } catch (RestClientException ex)\
+          \ {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotSchedulesApi } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet snapshotSchedulesApi = new SnapshotSchedulesApi(apiClientInstance);\n\nfunction sample()\
+          \ {\n\n    \n    let fileServerExtId = \"AC29Fb89-B34d-1Bb9-dea0-de5deFF63bdc\";\n    \n    let extId = \"BD4B87df-F05B-efc9-fcBa-EEF5ece4cD4d\"\
+          ;\n\n\n\n\n\n    snapshotSchedulesApi.getSnapshotScheduleById(fileServerExtId, extId).then(({data, response}) =>\
+          \ {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshot_schedules_api = ntnx_files_py_client.SnapshotSchedulesApi(api_client=client)\n    \n    file_server_ext_id\
+          \ = \"f9AB9a67-f9d1-E20d-CFEB-E5AdC7AddeBb\"\n    \n    ext_id = \"1fdffBbE-7fE6-e727-9fd4-e6EFfefd05dC\"\n\n\n\
+          \    try:\n        api_response = snapshot_schedules_api.get_snapshot_schedule_by_id(fileServerExtId=file_server_ext_id,\
+          \ extId=ext_id)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n\
+          \n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    SnapshotSchedulesApiInstance *api.SnapshotSchedulesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  SnapshotSchedulesApiInstance = api.NewSnapshotSchedulesApi(ApiClientInstance)\n\n    \n    fileServerExtId :=\
+          \ \"dA7cCB2f-Da35-E5Be-a34d-9a9e56f5c4b3\"\n    \n    extId := \"5BbE3FbE-E8fe-d78b-417B-7Dd054bBE7dC\"\n\n\n  \
+          \  response, error := SnapshotSchedulesApiInstance.GetSnapshotScheduleById(&fileServerExtId, &extId)\n    if error\
+          \ != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.SnapshotSchedule)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/cc86F39f-cbEC-f6bD-bf5c-FCB1B80D67Aa/snapshot-schedules/310B7D3d-4d9F-0868-f7Df-fEf41dFBe91C\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/FF2aeEcc-adA6-8e91-5aB3-ec0DBaea44BA/snapshot-schedules/d664eebD-dfE4-AAfa-ABBC-f1b81beEafC8\"\
+          \n"
+    put:
+      tags:
+      - SnapshotSchedules
+      summary: Update snapshot schedule
+      description: 'Update a snapshot schedule identified by the given external identifier by using the provided request body.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and the schedule(`extId`).
+
+
+        It is always recommended to perform a GET request on a resource before requesting an UPDATE call.
+
+        '
+      operationId: updateSnapshotScheduleById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: ce2fdff2-1bb6-4ce5-a44c-900c11a165ab
+      - name: extId
+        in: path
+        description: Snapshot schedule external identifier. Example:48f78959-14a6-4c47-b5db-920460c4b668
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 0bea919b-1382-40e6-ba78-4d7fa0114b5e
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: a9e27e19-deb7-4cd8-9da4-65e66afaf030
+      requestBody:
+        description: Snapshot schedule model
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/files.v4.0.config.SnapshotSchedule'
+        required: true
+      responses:
+        '200':
+          description: Response to update snapshot schedule request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Update File Server Self Service Restore Snapshot Schedules
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 3
+        timeUnit: seconds
+      - type: small
+        count: 3
+        timeUnit: seconds
+      - type: large
+        count: 3
+        timeUnit: seconds
+      - type: xlarge
+        count: 3
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.fil.java.client.ApiClient;\nimport com.nutanix.fil.java.client.api.SnapshotSchedulesApi;\n\
+          import com.nutanix.dp1.fil.files.v4.config.SnapshotScheduleType;\nimport com.nutanix.dp1.fil.files.v4.config.SnapshotSchedule;\n\
+          import com.nutanix.dp1.fil.files.v4.config.GetSnapshotScheduleApiResponse;\nimport com.nutanix.dp1.fil.files.v4.config.UpdateSnapshotScheduleApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\nimport java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        SnapshotSchedulesApi snapshotSchedulesApi\
+          \ = new SnapshotSchedulesApi(apiClient);\n\n        SnapshotSchedule snapshotSchedule = new SnapshotSchedule();\n\
+          \n        // SnapshotSchedule object initializations here...\n        snapshotSchedule.setMaxRetentionCount(1);\
+          \  // required field\n        snapshotSchedule.setSchedule(SOME_RAW_DATA);  // required field\n        snapshotSchedule.setType(SnapshotScheduleType.UNKNOWN);\
+          \  // required field\n        \n        String fileServerExtId = \"fFbdD784-B12d-07c6-D3a7-dbac3B2B022F\";\n   \
+          \     \n        String extId = \"fC8Cb0Ee-faf0-FcAC-ae41-c1EA29cADfFe\";\n\n        // perform GET call\n      \
+          \  GetSnapshotScheduleApiResponse getResponse = null;\n        try {\n            getResponse = snapshotSchedulesApi.getSnapshotScheduleById(fileServerExtId,\
+          \ extId);\n        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n       \
+          \ }\n        // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdateSnapshotScheduleApiResponse updateSnapshotScheduleApiResponse = snapshotSchedulesApi.updateSnapshotScheduleById(fileServerExtId,\
+          \ extId, snapshotSchedule, opts);\n            System.out.println(updateSnapshotScheduleApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, SnapshotSchedulesApi, SnapshotScheduleType, SnapshotSchedule, GetSnapshotScheduleApiResponse\
+          \ } from \"@nutanix-api/files-js-client\";\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n\
+          // IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port to which to connect\
+          \ to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts\
+          \ = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to\
+          \ connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password\
+          \ = 'password';\n// Please add authorization information here if needed.\nlet snapshotSchedulesApi = new SnapshotSchedulesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let snapshotSchedule = new SnapshotSchedule();\n\n    // SnapshotSchedule object initializations\
+          \ here...\n    snapshotSchedule.setMaxRetentionCount(1);  // required field\n    snapshotSchedule.setSchedule(SOME_RAW_DATA);\
+          \  // required field\n    snapshotSchedule.setType(SnapshotScheduleType.UNKNOWN);  // required field\n\n    \n \
+          \   let fileServerExtId = \"2fCBb5cB-d7C7-aEae-fffc-3AAdFec27fD1\";\n    \n    let extId = \"0b1AbEd8-AfbA-c9F6-1D4b-4ADC6FA00c2c\"\
+          ;\n\n\n    // Perform Get call\n    snapshotSchedulesApi.getSnapshotScheduleById(fileServerExtId, extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        snapshotSchedulesApi.updateSnapshotScheduleById(fileServerExtId,\
+          \ extId, snapshotSchedule, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API\
+          \ returned the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_files_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_files_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_files_py_client.ApiClient(configuration=config)\n\
+          \    snapshot_schedules_api = ntnx_files_py_client.SnapshotSchedulesApi(api_client=client)\n    snapshotSchedule\
+          \ = ntnx_files_py_client.SnapshotSchedule()\n\n    # SnapshotSchedule object initializations here...\n    snapshotSchedule.max_retention_count\
+          \ = 1  # required field\n    snapshotSchedule.schedule = SOME_RAW_DATA  # required field\n    snapshotSchedule.type\
+          \ = ntnx_files_py_client.SnapshotScheduleType._UNKNOWN  # required field\n    \n    file_server_ext_id = \"cfCCEdDa-b158-cA9f-B4Db-CC383B9c47ED\"\
+          \n    \n    ext_id = \"C06C5c7e-776a-7FBf-4AeC-dCBFAfebe2bd\"\n\n    try:\n        api_response = snapshot_schedules_api.get_snapshot_schedule_by_id(fileServerExtId=file_server_ext_id,\
+          \ extId=ext_id)\n    except ntnx_files_py_client.rest.ApiException as e:\n        print(e)\n    # Extract E-Tag\
+          \ Header\n    etag_value = ntnx_files_py_client.ApiClient.get_etag(api_response)\n\n    try:\n        api_response\
+          \ = snapshot_schedules_api.update_snapshot_schedule_by_id(fileServerExtId=file_server_ext_id, extId=ext_id, body=snapshotSchedule,\
+          \ if_match=etag_value)\n        print(api_response)\n    except ntnx_files_py_client.rest.ApiException as e:\n \
+          \       print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/config\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/files-go-client/v4/models/files/v4/error\"\n)\n\nvar\
+          \ (\n    ApiClientInstance *client.ApiClient\n    SnapshotSchedulesApiInstance *api.SnapshotSchedulesApi\n)\n\n\
+          func main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5000\n    // Max retry\
+          \ attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName\
+          \ to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n\
+          \    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n  \
+          \  SnapshotSchedulesApiInstance = api.NewSnapshotSchedulesApi(ApiClientInstance)\n\n    snapshotSchedule := import1.NewSnapshotSchedule()\n\
+          \n    // SnapshotSchedule object initializations here...\n\n    \n    fileServerExtId := \"678ADc46-a8dF-F0E9-58BA-33e7CbcC2d8f\"\
+          \n    \n    extId := \"3cacfB64-BfdD-7D1F-eCc2-dCCd7BabDceF\"\n\n    getResponse, err := SnapshotSchedulesApiInstance.GetSnapshotScheduleById(&fileServerExtId,\
+          \ &extId)\n    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n\
+          \    etagValue := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"\
+          If-Match\"] = etagValue\n\n    response, error := SnapshotSchedulesApiInstance.UpdateSnapshotScheduleById(&fileServerExtId,\
+          \ &extId, snapshotSchedule, args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n  \
+          \  data, _ := response.GetData().([]import2.AppMessage)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/F88d52Ad-19df-CBAE-34d7-Ac1AcA346d7c/snapshot-schedules/Ef1cbEbD-72FD-4D2E-A9CA-FADDa1d9ABcC\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n              --header 'NTNX-Request-Id: 3fa85f64-5717-4562-b3fc-2c963f66afa6'\
+          \ \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"\
+          extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"\
+          }],\"type\":\"$UNKNOWN\",\"schedule\":{\"frequency\":0,\"$objectType\":\"files.v4.config.DailySchedule\"},\"maxRetentionCount\"\
+          :0,\"$objectType\":\"files.v4.config.SnapshotSchedule\"} \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n         --header 'NTNX-Request-Id:\
+          \ 3fa85f64-5717-4562-b3fc-2c963f66afa6' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"type\":\"$UNKNOWN\",\"schedule\":{\"frequency\":0,\"$objectType\":\"files.v4.config.DailySchedule\"\
+          },\"maxRetentionCount\":0,\"$objectType\":\"files.v4.config.SnapshotSchedule\"} \\\n- \"https://{pc-ip}:9440/api/files/v4.0/config/file-servers/eEDCcC6b-FbA3-Df1a-93aE-Cb4fbbBeFfeB/snapshot-schedules/CBfbDBae-eAC1-93E0-9BCC-b5BC9D5B0eBf\"\
+          \n"
+    delete:
+      tags:
+      - SnapshotSchedules
+      summary: Delete snapshot schedule
+      description: 'Deletes a snapshot schedule identified by the given external identifier.
+
+
+        Specify a valid identifier of the file server (`fileServerExtId`) and the schedule (`extId`).
+
+        '
+      operationId: deleteSnapshotScheduleById
+      parameters:
+      - name: fileServerExtId
+        in: path
+        description: The external identifier of the file server.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: aa1121a6-5e62-4913-85c1-6dc75d65b36f
+      - name: extId
+        in: path
+        description: Snapshot schedule external identifier. Example:48f78959-14a6-4c47-b5db-920460c4b668
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 9fc40ba6-a6d2-4714-b39a-f69b9dc160d1
+      - name: If-Match
+        in: header
+        description: 'The If-Match request header makes the request conditional. When not provided the server will respond
+          with an HTTP 428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP 412 (Precondition Failed)
+          response
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: NTNX-Request-Id
+        in: header
+        description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
+          in Universal Unique Identifier (UUID) format. This identifier is also used as an idempotence token for safely retrying
+          requests in case of network errors. All the supported Nutanix API clients add this auto-generated request identifier
+          to each request.
+
+          '
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+          example: 3228b2ff-283d-4746-be65-97eb0e5a7f12
+      responses:
+        '204':
+          description: Delete snapshot schedule successful, no content returned.
+          content:
+            application/json: {}
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/files.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /files/v4.0/config/file-servers/{fileServerExtId}/snapshot-schedules/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: Delete File Server Self Service Restore Snapshot Schedules
+        roleList:
+        - Files Admin
+        - Prism Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: 2022.6
+      - product: Files Manager
+        version: 5.1
+      - product: File Server
+        version: 5.1
+    x-supported-versions:
+    - product: PC
+      version: 2022.6
+    - product: Files Manager
+      version: 5.1
+    - product: File Server
+      version: 5.1
+components:
+  schemas:
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 3
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    files.v4.0.config.MonthlySchedule:
+      title: Monthly schedule
+      required:
+      - daysOfMonth
+      type: object
+      properties:
+        daysOfMonth:
+          maxItems: 31
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: A list of the days of the month on which snapshots should be taken.
+          items:
+            maximum: 31
+            minimum: 1
+            type: integer
+            format: int32
+            example: 26
+      additionalProperties: false
+      description: To repeat the schedule on a per `Month` basis.
+    files.v4.0.config.SnapshotScheduleType:
+      title: Snapshot schedule type
+      type: string
+      description: 'Snapshot schedule type.
+
+        If the user passes this value as WEEKLY, then daysOfWeek becomes a required field.
+
+        If the user passes this value as MONTHLY, then daysOfMonth becomes a required field.
+
+        '
+      enum:
+      - HOURLY
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        WEEKLY: Snapshot schedule type is weekly.
+        DAILY: Snapshot schedule type is daily.
+        MONTHLY: Snapshot schedule type is monthly.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        HOURLY: Snapshot schedule type is hourly.
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.config.WeeklySchedule:
+      title: Weekly schedule
+      required:
+      - daysOfWeek
+      type: object
+      properties:
+        daysOfWeek:
+          maxItems: 7
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: A list of the days of the week on which snapshots should be taken.
+          items:
+            maximum: 7
+            minimum: 1
+            type: integer
+            format: int32
+            example: 4
+      additionalProperties: false
+      description: To repeat the schedule on a per `Week` basis.
+    files.v4.0.config.SnapshotSchedule:
+      title: Snapshot schedule
+      description: Snapshot schedule model
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - maxRetentionCount
+        - schedule
+        - type
+        type: object
+        properties:
+          type:
+            $ref: '#/components/schemas/files.v4.0.config.SnapshotScheduleType'
+          schedule:
+            required:
+            - $objectType
+            properties:
+              $objectType:
+                type: string
+                example: files.v4.config.DailySchedule
+            description: Snapshot schedule details for different type of schedules.
+            oneOf:
+            - $ref: '#/components/schemas/files.v4.0.config.DailySchedule'
+            - $ref: '#/components/schemas/files.v4.0.config.WeeklySchedule'
+            - $ref: '#/components/schemas/files.v4.0.config.MonthlySchedule'
+          maxRetentionCount:
+            maximum: 50
+            minimum: 1
+            type: integer
+            description: The maximum number of snapshots to be kept locally.
+            format: int32
+            example: 27
+        additionalProperties: false
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    files.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 13
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    files.v4.0.config.DailySchedule:
+      title: Daily/Hourly schedule
+      required:
+      - frequency
+      type: object
+      properties:
+        frequency:
+          maximum: 31
+          minimum: 1
+          type: integer
+          description: Frequency of snapshots to be taken daily or hourly.
+          format: int32
+          example: 19
+      additionalProperties: false
+      description: To repeat the schedule on a per `Day` basis.
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 36
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 41
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    files.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

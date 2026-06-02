@@ -1,0 +1,776 @@
+openapi: 3.0.1
+info:
+  title: Nutanix AIOps APIs
+  description: Manage infrastructure on-premises and in the cloud seamlessly through AIOps features such as Analysis, Reporting,
+    Capacity Planning, What if Analysis, VM Rightsizing, Troubleshooting, App Discovery, Broad Observability, and Ops Automation
+    through Playbooks.
+  version: 4.0.2
+  x-repo-name: aiops
+  x-logo:
+    altText: Aiops Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/aiops/images/aiops-logo-img.svg
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors:
+    get:
+      tags:
+      - Metrics
+      summary: Get entity and metrics descriptors
+      description: Returns metadata information available for entity and metrics for given entities.
+      operationId: getEntityDescriptorsV4
+      parameters:
+      - name: sourceExtId
+        in: path
+        description: The UUID of a source.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 09fcc73d-e057-4ac1-be1c-31479b03db22
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: string
+        x-odata-fields:
+        - name: entityType
+          example: https://{pc-ip}:9440/api/aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors?$filter=entityType
+            eq 'string'
+        - name: metrics/name
+          example: https://{pc-ip}:9440/api/aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors?$filter=metrics/any(a:a/name
+            eq 'string')
+      responses:
+        '200':
+          description: Returned all the entity descriptors.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/aiops.v4.0.config.EntityDescriptor'
+                additionalProperties: false
+                description: REST response for all response codes in API path /aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/aiops.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/aiops.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        operationName: View Stats Entity Descriptors
+        roleList:
+        - name: Prism Admin
+        - name: Prism Viewer
+        - name: Internal Super Admin
+        - name: Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.aio.java.client.ApiClient;\nimport com.nutanix.aio.java.client.api.StatsApi;\n\
+          import com.nutanix.dp1.aio.aiops.v4.config.EntityDescriptorListApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        StatsApi statsApi = new StatsApi(apiClient);\n\
+          \n        \n        String sourceExtId = \"Ad3cA55e-Aed1-3eb6-55Af-Ec7bDbE5C1b5\";\n        \n        int page =\
+          \ 0;\n        \n        int limit = 50;\n\n        try {\n            EntityDescriptorListApiResponse entityDescriptorListApiResponse\
+          \ = statsApi.getEntityDescriptorsV4(sourceExtId, page, limit, null);\n            System.out.println(entityDescriptorListApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, StatsApi } from \"@nutanix-api/aiops-js-client\";\n\n// Configure the client\nlet apiClientInstance\
+          \ = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host = 'localhost';\n// Port\
+          \ to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting on a loss of\
+          \ connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\napiClientInstance.retryInterval\
+          \ = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n// Password to connect\
+          \ to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information here if needed.\n\
+          let statsApi = new StatsApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let sourceExtId = \"CcE0dDD6-A5BE-EdB5-cFde-eCBedF2Cf819\"\
+          ;\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] =\
+          \ 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n\n\n\n\n    statsApi.getEntityDescriptorsV4(sourceExtId,\
+          \ opts).then(({data, response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n\
+          \        console.log(data.getData());\n    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n \
+          \   });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_aiops_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config = ntnx_aiops_py_client.Configuration()\n\
+          \    # IPv4/IPv6 address or FQDN of the cluster\n    config.host = \"localhost\"\n    # Port to which to connect\
+          \ to\n    config.port = 9440\n    # Max retry attempts while reconnecting on a loss of connection\n    config.max_retry_attempts\
+          \ = 3\n    # Backoff factor to use during retry attempts\n    config.backoff_factor = 3\n    # UserName to connect\
+          \ to the cluster\n    config.username = \"username\"\n    # Password to connect to the cluster\n    config.password\
+          \ = \"password\"\n    # Please add authorization information here if needed.\n    client = ntnx_aiops_py_client.ApiClient(configuration=config)\n\
+          \    stats_api = ntnx_aiops_py_client.StatsApi(api_client=client)\n    \n    source_ext_id = \"DffDBdDc-b8ec-fcCC-aeCB-51fE691B6DAc\"\
+          \n    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = stats_api.get_entity_descriptors_v4(sourceExtId=source_ext_id,\
+          \ _page=page, _limit=limit)\n        print(api_response)\n    except ntnx_aiops_py_client.rest.ApiException as e:\n\
+          \        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/aiops-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/aiops-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/aiops-go-client/v4/models/aiops/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    StatsApiInstance *api.StatsApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    StatsApiInstance\
+          \ = api.NewStatsApi(ApiClientInstance)\n\n    \n    sourceExtId := \"682eC77d-ABdD-1Dda-B0Bf-adB5aeeb5BDb\"\n  \
+          \  \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error := StatsApiInstance.GetEntityDescriptorsV4(&sourceExtId,\
+          \ &page_, &limit_, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ :=\
+          \ response.GetData().([]import1.EntityDescriptor)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/aiops/v4.0/config/sources/eFF2e1e3-fdfF-6fDd-f3C7-8D41A9df73FB/entity-descriptors?$filter=string_sample_data&$limit=50&$page=0\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/aiops/v4.0/config/sources/bDc4c3AD-E766-fE8b-ecEC-4fB87DDC2BaC/entity-descriptors?$filter=string_sample_data&$limit=50&$page=0\"\
+          \n"
+    x-supported-versions:
+    - product: PC
+      version: '2024.3'
+components:
+  schemas:
+    aiops.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+          example: string
+        message:
+          type: string
+          description: The detailed message for the validation error.
+          example: string
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+          example: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 14096246-84d8-4e4b-af05-7353513f2cd4
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    aiops.v4.0.config.ValueRange:
+      type: object
+      properties:
+        min:
+          type: number
+          description: Minimum value in the value range.
+          format: double
+          example: 75.22889863581844
+        max:
+          type: number
+          description: Maximum value in the value range.
+          format: double
+          example: 99.585755757256
+      additionalProperties: false
+      description: Range of the values for the metric.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+          example: string
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+          example: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this ID to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 0f003c5f-5136-475b-9063-1adea5558409
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.stats.DownSamplingOperator:
+      type: string
+      description: 'The operator to use while performing down-sampling on stats data. Allowed values are SUM, MIN, MAX, AVG,
+        COUNT and LAST.
+
+        '
+      enum:
+      - SUM
+      - MIN
+      - MAX
+      - AVG
+      - COUNT
+      - LAST
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        AVG: 'Aggregation indicating mean or average of all values.
+
+          '
+        MIN: 'Aggregation containing lowest of all values.
+
+          '
+        MAX: 'Aggregation containing highest of all values.
+
+          '
+        LAST: 'Aggregation containing only the last recorded value.
+
+          '
+        SUM: 'Aggregation with sum of all values.
+
+          '
+        COUNT: 'Aggregation containing total count of values.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    aiops.v4.0.config.EntityDescriptor:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          entityType:
+            type: string
+            description: Entity type of the data supported for a given source. For example VM, cluster etc.
+            example: string
+          source:
+            type: string
+            description: Source name for the vendors. For example 'Nutanix'.
+            example: string
+          displayName:
+            maxLength: 50
+            type: string
+            description: Readable name for the entity.
+            example: string
+          parents:
+            maxItems: 5
+            minItems: 0
+            type: array
+            description: Parent entity types for the given entity.
+            items:
+              $ref: '#/components/schemas/aiops.v4.0.config.EntityDescriptor'
+          metrics:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Metrics data for the entity.
+            items:
+              $ref: '#/components/schemas/aiops.v4.0.config.MetricDescriptor'
+        additionalProperties: false
+    aiops.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/aiops.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/aiops.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+          example: string
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+          example: string
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+          example: string
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    aiops.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+          example: string
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
+            the endpoint belongs. For example: VMM-40000'
+          example: string
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+          example: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    aiops.v4.0.config.MetricDescriptor:
+      type: object
+      properties:
+        isAttribute:
+          type: boolean
+          description: Indicates whether it is an attribute or not.
+          example: true
+        isAttributePersistedAsTimeSeries:
+          type: boolean
+          description: Indicator to specify whether the attribute should be persisted as time series data or not.
+          example: false
+        name:
+          maxLength: 50
+          type: string
+          description: Name of the metric.
+          example: string
+        displayName:
+          maxLength: 50
+          type: string
+          description: Readable name for the entity.
+          example: string
+        valueType:
+          $ref: '#/components/schemas/aiops.v4.0.config.ValueType'
+        valueRange:
+          $ref: '#/components/schemas/aiops.v4.0.config.ValueRange'
+        defaultValue:
+          type: string
+          description: Default value of the metric.
+          example: string
+        unit:
+          type: string
+          description: Unit for the metric.
+          example: string
+        samplingIntervalSecs:
+          type: integer
+          description: The interval value is used to resample the queried time series data by using down_sampling_operator
+            operator. The default is 86400 seconds.
+          example: 87
+        downsamplingOperator:
+          $ref: '#/components/schemas/common.v1.0.stats.DownSamplingOperator'
+        additionalProperties:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Additional properties for metric descriptor definition. Like anomaly metric, alert metric and search
+            UI metric.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+    aiops.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 71
+        error:
+          type: string
+          description: The generic error message for the response.
+          example: string
+        path:
+          type: string
+          description: API path on which the request was made.
+          example: string
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/aiops.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+          example: string
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+            example: string
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 60
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: true
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+              example: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 84
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    aiops.v4.0.config.ValueType:
+      type: string
+      description: Data type of the values for the metric.
+      enum:
+      - BOOL
+      - INT
+      - DOUBLE
+      - STRING
+      - BOOL_LIST
+      - INT_LIST
+      - DOUBLE_LIST
+      - STRING_LIST
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        STRING_LIST: Value is a list of strings.
+        BOOL: Value is boolean.
+        STRING: Value is string.
+        DOUBLE_LIST: Value is a list of doubles.
+        DOUBLE: Value is double.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        INT: Value is integer.
+        $REDACTED: 'Redacted value.
+
+          '
+        BOOL_LIST: Value is a list of booleans.
+        INT_LIST: Value is a list of integers.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 72
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

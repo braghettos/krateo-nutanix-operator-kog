@@ -1,0 +1,1609 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Monitoring APIs
+  description: Manage Alerts, Alert policies, Events and Audits
+  version: '4.0'
+  x-logo:
+    altText: Monitoring Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/monitoring/images/monitoring-logo-img.svg
+  x-repo-name: monitoring
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+paths:
+  /monitoring/v4.0/serviceability/alerts/user-defined-policies:
+    get:
+      tags:
+      - UserDefinedPolicies
+      summary: List User-Defined Alert policies
+      description: Fetches a list of User-Defined Alert policies.
+      operationId: listUdaPolicies
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - createdBy
+
+          - entityType
+
+          - extId
+
+          - title
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - lastUpdatedTime
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - createdBy
+
+          - description
+
+          - entityType
+
+          - extId
+
+          - filters
+
+          - impactTypes
+
+          - isAutoResolved
+
+          - isEnabled
+
+          - lastUpdatedTime
+
+          - links
+
+          - policiesToOverride
+
+          - relatedPolicies
+
+          - tenantId
+
+          - title
+
+          - triggerConditions
+
+          - triggerWaitPeriod
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Retrieved the requested User-Defined Alert policy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/monitoring.v4.0.serviceability.UserDefinedPolicy'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View User Defined Alert Policy
+        roleList:
+        - Prism Viewer
+        - Prism Admin
+        - Files Admin
+        - Files Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Monitoring Viewer
+        - Monitoring Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: NCC
+        version: 5.1.0
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.mon.java.client.ApiClient;\nimport com.nutanix.mon.java.client.api.UserDefinedPoliciesApi;\n\
+          import com.nutanix.dp1.mon.monitoring.v4.serviceability.ListUdaPoliciesApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        UserDefinedPoliciesApi userDefinedPoliciesApi\
+          \ = new UserDefinedPoliciesApi(apiClient);\n\n        \n        int page = 0;\n        \n        int limit = 50;\n\
+          \n        try {\n            ListUdaPoliciesApiResponse listUdaPoliciesApiResponse = userDefinedPoliciesApi.listUdaPolicies(page,\
+          \ limit, null, null, null);\n            System.out.println(listUdaPoliciesApiResponse.toString());\n\n        }\
+          \ catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, UserDefinedPoliciesApi } from \"@nutanix-api/monitoring-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet userDefinedPoliciesApi = new UserDefinedPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n\n    // Construct Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n\
+          \    opts[\"$limit\"] = 50;\n    opts[\"$filter\"] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\"\
+          ;\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    userDefinedPoliciesApi.listUdaPolicies(opts).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_monitoring_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_monitoring_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_monitoring_py_client.ApiClient(configuration=config)\n    user_defined_policies_api\
+          \ = ntnx_monitoring_py_client.UserDefinedPoliciesApi(api_client=client)\n    \n    page = 0\n    \n    limit = 50\n\
+          \n\n    try:\n        api_response = user_defined_policies_api.list_uda_policies(_page=page, _limit=limit)\n   \
+          \     print(api_response)\n    except ntnx_monitoring_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/models/monitoring/v4/serviceability\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    UserDefinedPoliciesApiInstance *api.UserDefinedPoliciesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    UserDefinedPoliciesApiInstance = api.NewUserDefinedPoliciesApi(ApiClientInstance)\n\n    \n  \
+          \  page_ := 0\n    \n    limit_ := 50\n\n\n    response, error := UserDefinedPoliciesApiInstance.ListUdaPolicies(&page_,\
+          \ &limit_, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _\
+          \ := response.GetData().([]import1.UserDefinedPolicy)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+    post:
+      tags:
+      - UserDefinedPolicies
+      summary: Create a User-Defined Alert policy
+      description: Creates a new User-Defined Alert policy.
+      operationId: createUdaPolicy
+      requestBody:
+        description: User-Defined Alert policy sent as a part of the request body to create a new User-Defined Alert policy.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/monitoring.v4.0.serviceability.UserDefinedPolicy'
+        required: true
+      responses:
+        '201':
+          description: User-Defined Alert policy created.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.serviceability.UserDefinedPolicy'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies
+                  Post operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies
+                  Post operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies
+                  Post operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Create User Defined Alert Policy
+        roleList:
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Monitoring Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 3
+        timeUnit: seconds
+      - type: small
+        count: 3
+        timeUnit: seconds
+      - type: large
+        count: 3
+        timeUnit: seconds
+      - type: xlarge
+        count: 3
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: NCC
+        version: 5.1.0
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.mon.java.client.ApiClient;\nimport com.nutanix.mon.java.client.api.UserDefinedPoliciesApi;\n\
+          import com.nutanix.dp1.mon.monitoring.v4.serviceability.UserDefinedPolicy;\nimport com.nutanix.dp1.mon.monitoring.v4.serviceability.CreateUdaPolicyApiResponse;\n\
+          import org.springframework.web.client.RestClientException;\n\npublic class JavaSdkSample {\n    public static void\
+          \ main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n     \
+          \   // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port to which\
+          \ to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n    \
+          \    apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        UserDefinedPoliciesApi userDefinedPoliciesApi = new UserDefinedPoliciesApi(apiClient);\n\
+          \n        UserDefinedPolicy userDefinedPolicy = new UserDefinedPolicy();\n\n        // UserDefinedPolicy object\
+          \ initializations here...\n        userDefinedPolicy.setEntityType(\"vm\");  // required field\n        userDefinedPolicy.setTitle(\"\
+          VM CPU Usage\");  // required field\n        userDefinedPolicy.setTriggerConditions(new ArrayList<>());  // required\
+          \ field\n\n        try {\n            CreateUdaPolicyApiResponse createUdaPolicyApiResponse = userDefinedPoliciesApi.createUdaPolicy(userDefinedPolicy);\n\
+          \            System.out.println(createUdaPolicyApiResponse.toString());\n\n        } catch (RestClientException\
+          \ ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, UserDefinedPoliciesApi, UserDefinedPolicy } from \"@nutanix-api/monitoring-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet userDefinedPoliciesApi = new UserDefinedPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let userDefinedPolicy = new UserDefinedPolicy();\n\n    // UserDefinedPolicy object initializations\
+          \ here...\n    userDefinedPolicy.setEntityType(\"vm\");  // required field\n    userDefinedPolicy.setTitle(\"VM\
+          \ CPU Usage\");  // required field\n    userDefinedPolicy.setTriggerConditions([]);  // required field\n\n\n\n\n\
+          \n\n    userDefinedPoliciesApi.createUdaPolicy(userDefinedPolicy).then(({data, response}) => {\n        console.log(`API\
+          \ returned the following status code: ${response.status}`);\n        console.log(data.getData());\n    }).catch((error)\
+          \ => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_monitoring_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_monitoring_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_monitoring_py_client.ApiClient(configuration=config)\n    user_defined_policies_api\
+          \ = ntnx_monitoring_py_client.UserDefinedPoliciesApi(api_client=client)\n    userDefinedPolicy = ntnx_monitoring_py_client.UserDefinedPolicy()\n\
+          \n    # UserDefinedPolicy object initializations here...\n    userDefinedPolicy.entity_type = \"vm\"  # required\
+          \ field\n    userDefinedPolicy.title = \"VM CPU Usage\"  # required field\n    userDefinedPolicy.trigger_conditions\
+          \ = []  # required field\n\n\n    try:\n        api_response = user_defined_policies_api.create_uda_policy(body=userDefinedPolicy)\n\
+          \        print(api_response)\n    except ntnx_monitoring_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/models/monitoring/v4/serviceability\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    UserDefinedPoliciesApiInstance *api.UserDefinedPoliciesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    UserDefinedPoliciesApiInstance = api.NewUserDefinedPoliciesApi(ApiClientInstance)\n\n    userDefinedPolicy\
+          \ := import1.NewUserDefinedPolicy()\n\n    // UserDefinedPolicy object initializations here...\n\n\n\n    response,\
+          \ error := UserDefinedPoliciesApiInstance.CreateUdaPolicy(userDefinedPolicy)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().(import1.UserDefinedPolicy)\n    fmt.Println(data)\n\n\
+          }\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n              --data {\"tenantId\":\"string\",\"extId\"\
+          :\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"\
+          title\":\"VMCPUUsage\",\"description\":\"CPUresourcesutilizationbyaVM\",\"isEnabled\":false,\"isAutoResolved\":true,\"\
+          filters\":[{\"extId\":\"string\",\"$objectType\":\"monitoring.v4.serviceability.EntityFilter\"}],\"triggerConditions\"\
+          :[{\"conditionType\":\"$UNKNOWN\",\"condition\":{\"metricName\":\"hypervisor_cpu_usage_ppm\",\"operator\":\"$UNKNOWN\"\
+          ,\"thresholdValue\":{\"doubleValue\":1.100000023841858,\"$objectType\":\"monitoring.v4.common.DoubleValue\"},\"\
+          $objectType\":\"monitoring.v4.serviceability.Condition\"},\"severityLevel\":\"$UNKNOWN\",\"$objectType\":\"monitoring.v4.serviceability.TriggerCondition\"\
+          }],\"impactTypes\":[\"$UNKNOWN\"],\"createdBy\":\"user123\",\"lastUpdatedTime\":\"2015-07-20T15:49:04-07:00\",\"\
+          isExpectedToErrorOnConflict\":true,\"policiesToOverride\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"],\"triggerWaitPeriod\"\
+          :0,\"relatedPolicies\":[{\"entityUuid\":\"string\",\"policyIds\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"],\"$objectType\"\
+          :\"monitoring.v4.serviceability.RelatedPolicy\"}],\"entityType\":\"vm\",\"$objectType\":\"monitoring.v4.serviceability.UserDefinedPolicy\"\
+          } \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n--header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n         --body-data\
+          \ {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\"\
+          :\"common.v1.response.ApiLink\"}],\"title\":\"VMCPUUsage\",\"description\":\"CPUresourcesutilizationbyaVM\",\"isEnabled\"\
+          :false,\"isAutoResolved\":true,\"filters\":[{\"extId\":\"string\",\"$objectType\":\"monitoring.v4.serviceability.EntityFilter\"\
+          }],\"triggerConditions\":[{\"conditionType\":\"$UNKNOWN\",\"condition\":{\"metricName\":\"hypervisor_cpu_usage_ppm\"\
+          ,\"operator\":\"$UNKNOWN\",\"thresholdValue\":{\"doubleValue\":1.100000023841858,\"$objectType\":\"monitoring.v4.common.DoubleValue\"\
+          },\"$objectType\":\"monitoring.v4.serviceability.Condition\"},\"severityLevel\":\"$UNKNOWN\",\"$objectType\":\"\
+          monitoring.v4.serviceability.TriggerCondition\"}],\"impactTypes\":[\"$UNKNOWN\"],\"createdBy\":\"user123\",\"lastUpdatedTime\"\
+          :\"2015-07-20T15:49:04-07:00\",\"isExpectedToErrorOnConflict\":true,\"policiesToOverride\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"\
+          ],\"triggerWaitPeriod\":0,\"relatedPolicies\":[{\"entityUuid\":\"string\",\"policyIds\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"\
+          ],\"$objectType\":\"monitoring.v4.serviceability.RelatedPolicy\"}],\"entityType\":\"vm\",\"$objectType\":\"monitoring.v4.serviceability.UserDefinedPolicy\"\
+          } \\\n- \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies\"\n"
+  /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}:
+    get:
+      tags:
+      - UserDefinedPolicies
+      summary: Get User-Defined Alert policy details
+      description: Fetches the details of a User-Defined Alert policy identified by external identifier.
+      operationId: getUdaPolicyById
+      parameters:
+      - name: extId
+        in: path
+        description: Entity UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 0b940d0c-e72d-4772-b150-eb2ebda917fa
+      responses:
+        '200':
+          description: Retrieved the requested User-Defined Alert policy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.serviceability.UserDefinedPolicy'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View User Defined Alert Policy
+        roleList:
+        - Prism Viewer
+        - Prism Admin
+        - Files Admin
+        - Files Viewer
+        - Self-Service Admin
+        - Super Admin
+        - Monitoring Viewer
+        - Monitoring Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: NCC
+        version: 5.1.0
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.mon.java.client.ApiClient;\nimport com.nutanix.mon.java.client.api.UserDefinedPoliciesApi;\n\
+          import com.nutanix.dp1.mon.monitoring.v4.serviceability.GetUdaPolicyApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        UserDefinedPoliciesApi userDefinedPoliciesApi\
+          \ = new UserDefinedPoliciesApi(apiClient);\n\n        \n        String extId = \"De1DaEA3-0bde-6abc-560E-BbC31ffbd1d3\"\
+          ;\n\n        try {\n            GetUdaPolicyApiResponse getUdaPolicyApiResponse = userDefinedPoliciesApi.getUdaPolicyById(extId);\n\
+          \            System.out.println(getUdaPolicyApiResponse.toString());\n\n        } catch (RestClientException ex)\
+          \ {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, UserDefinedPoliciesApi } from \"@nutanix-api/monitoring-js-client\";\n\n// Configure\
+          \ the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host\
+          \ = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while\
+          \ reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during\
+          \ retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username\
+          \ = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add\
+          \ authorization information here if needed.\nlet userDefinedPoliciesApi = new UserDefinedPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n\n    \n    let extId = \"a8Ba2D58-b0E2-Cb3A-4baa-efCDE13dDc85\";\n\n\n\n\n\n    userDefinedPoliciesApi.getUdaPolicyById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_monitoring_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_monitoring_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_monitoring_py_client.ApiClient(configuration=config)\n    user_defined_policies_api\
+          \ = ntnx_monitoring_py_client.UserDefinedPoliciesApi(api_client=client)\n    \n    ext_id = \"0BFFB3Df-fFff-2Afe-0fE8-EeEd2e5dFccF\"\
+          \n\n\n    try:\n        api_response = user_defined_policies_api.get_uda_policy_by_id(extId=ext_id)\n        print(api_response)\n\
+          \    except ntnx_monitoring_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/models/monitoring/v4/serviceability\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    UserDefinedPoliciesApiInstance *api.UserDefinedPoliciesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    UserDefinedPoliciesApiInstance = api.NewUserDefinedPoliciesApi(ApiClientInstance)\n\n    \n  \
+          \  extId := \"C98f1f4C-FBFb-70d2-0Fd2-1CfdCDE638D9\"\n\n\n    response, error := UserDefinedPoliciesApiInstance.GetUdaPolicyById(&extId)\n\
+          \    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().(import1.UserDefinedPolicy)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies/CbB26Bf7-0bd8-aEfC-BaFE-FeB1ABbf6bCe\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies/f4CAED4C-7DF0-A31F-E8d1-d8f1A3AbbEFe\"\
+          \n"
+    put:
+      tags:
+      - UserDefinedPolicies
+      summary: Update a User-Defined Alert policy
+      description: Updates a User-Defined Alert policy identified by external identifier.
+      operationId: updateUdaPolicyById
+      parameters:
+      - name: extId
+        in: path
+        description: Entity UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: d1f2021c-9e71-4f28-9716-a8b0760e4a13
+      - name: If-Match
+        in: header
+        description: The If-Match request header makes the request conditional. When not provided, the server will respond
+          with  an HTTP-428 (Precondition Required) response code indicating that the server requires the request to be conditional.
+          The server will allow the successful completion of PUT and PATCH operations, if the resource matches the ETag value
+          returned to the response of a GET operation. If the conditional does not match, then an HTTP-412 (Precondition Failed)
+          response will be returned.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: User-Defined Alert policy sent as a part of the request body to update a User-Defined Alert policy.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/monitoring.v4.0.serviceability.UserDefinedPolicy'
+        required: true
+      responses:
+        '200':
+          description: Requested User-Defined Alert policy updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/monitoring.v4.0.error.AppMessage'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Put operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Put operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Put operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Update User Defined Alert Policy
+        roleList:
+        - Prism Admin
+        - Files Admin
+        - Self-Service Admin
+        - Super Admin
+        - Monitoring Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 2
+        timeUnit: seconds
+      - type: small
+        count: 2
+        timeUnit: seconds
+      - type: large
+        count: 2
+        timeUnit: seconds
+      - type: xlarge
+        count: 2
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: NCC
+        version: 5.1.0
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.mon.java.client.ApiClient;\nimport com.nutanix.mon.java.client.api.UserDefinedPoliciesApi;\n\
+          import com.nutanix.dp1.mon.monitoring.v4.serviceability.UserDefinedPolicy;\nimport com.nutanix.dp1.mon.monitoring.v4.serviceability.GetUdaPolicyApiResponse;\n\
+          import com.nutanix.dp1.mon.monitoring.v4.serviceability.UpdateUdaPolicyApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          import java.util.HashMap;\nimport org.apache.http.HttpHeaders;\n\npublic class JavaSdkSample {\n    public static\
+          \ void main(String[] args) {\n        // Configure the client\n        ApiClient apiClient = new ApiClient();\n\
+          \        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"localhost\");\n        // Port\
+          \ to which to connect to\n        apiClient.setPort(9440);\n        // Interval in ms to use during retry attempts\n\
+          \        apiClient.setRetryInterval(5000);\n        // Max retry attempts while reconnecting on a loss of connection\n\
+          \        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect to the cluster\n        String username\
+          \ = \"username\";\n        // Password to connect to the cluster\n        String password = \"password\";\n    \
+          \    apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\n        // Please add authorization\
+          \ information here if needed.\n        UserDefinedPoliciesApi userDefinedPoliciesApi = new UserDefinedPoliciesApi(apiClient);\n\
+          \n        UserDefinedPolicy userDefinedPolicy = new UserDefinedPolicy();\n\n        // UserDefinedPolicy object\
+          \ initializations here...\n        userDefinedPolicy.setEntityType(\"vm\");  // required field\n        userDefinedPolicy.setTitle(\"\
+          VM CPU Usage\");  // required field\n        userDefinedPolicy.setTriggerConditions(new ArrayList<>());  // required\
+          \ field\n        \n        String extId = \"5A7ebff3-a42f-0DA1-CdC5-6aBAe2e8dCbb\";\n\n        // perform GET call\n\
+          \        GetUdaPolicyApiResponse getResponse = null;\n        try {\n            getResponse = userDefinedPoliciesApi.getUdaPolicyById(extId);\n\
+          \        } catch(RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n      \
+          \  // Extract E-Tag Header\n        String eTag = ApiClient.getEtag(getResponse);\n        // initialize/change\
+          \ parameters for update\n        HashMap<String, Object> opts = new HashMap<>();\n        opts.put(HttpHeaders.IF_MATCH,\
+          \ eTag);\n        try {\n            UpdateUdaPolicyApiResponse updateUdaPolicyApiResponse = userDefinedPoliciesApi.updateUdaPolicyById(extId,\
+          \ userDefinedPolicy, opts);\n            System.out.println(updateUdaPolicyApiResponse.toString());\n\n        }\
+          \ catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n}\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, UserDefinedPoliciesApi, UserDefinedPolicy, GetUdaPolicyApiResponse } from \"@nutanix-api/monitoring-js-client\"\
+          ;\n\n// Configure the client\nlet apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\n\
+          apiClientInstance.host = 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max\
+          \ retry attempts while reconnecting on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval\
+          \ in ms to use during retry attempts\napiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\n\
+          apiClientInstance.username = 'username';\n// Password to connect to the cluster\napiClientInstance.password = 'password';\n\
+          // Please add authorization information here if needed.\nlet userDefinedPoliciesApi = new UserDefinedPoliciesApi(apiClientInstance);\n\
+          \nfunction sample() {\n    let userDefinedPolicy = new UserDefinedPolicy();\n\n    // UserDefinedPolicy object initializations\
+          \ here...\n    userDefinedPolicy.setEntityType(\"vm\");  // required field\n    userDefinedPolicy.setTitle(\"VM\
+          \ CPU Usage\");  // required field\n    userDefinedPolicy.setTriggerConditions([]);  // required field\n\n    \n\
+          \    let extId = \"FF49dddA-Bac0-5a7A-F6DC-46f3D16FAA81\";\n\n\n    // Perform Get call\n    userDefinedPoliciesApi.getUdaPolicyById(extId).then(({data,\
+          \ response}) => {\n        console.log(`API returned the following status code: ${response.status}`);\n        //\
+          \ Extract E-Tag Header\n        let etagValue = ApiClient.getEtag(data);\n\n        userDefinedPoliciesApi.updateUdaPolicyById(extId,\
+          \ userDefinedPolicy, {\"If-Match\" : etagValue}).then(({data, response}) => {\n            console.log(`API returned\
+          \ the following status code: ${response.status}`);\n            console.log(data.getData());\n        }).catch((error)\
+          \ => {\n            console.log(`Error is: ${error}`);\n        });\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_monitoring_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_monitoring_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host =\
+          \ \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_monitoring_py_client.ApiClient(configuration=config)\n    user_defined_policies_api\
+          \ = ntnx_monitoring_py_client.UserDefinedPoliciesApi(api_client=client)\n    userDefinedPolicy = ntnx_monitoring_py_client.UserDefinedPolicy()\n\
+          \n    # UserDefinedPolicy object initializations here...\n    userDefinedPolicy.entity_type = \"vm\"  # required\
+          \ field\n    userDefinedPolicy.title = \"VM CPU Usage\"  # required field\n    userDefinedPolicy.trigger_conditions\
+          \ = []  # required field\n    \n    ext_id = \"EE4aFF64-3eFF-3DAB-cA1B-635139Faa12b\"\n\n    try:\n        api_response\
+          \ = user_defined_policies_api.get_uda_policy_by_id(extId=ext_id)\n    except ntnx_monitoring_py_client.rest.ApiException\
+          \ as e:\n        print(e)\n    # Extract E-Tag Header\n    etag_value = ntnx_monitoring_py_client.ApiClient.get_etag(api_response)\n\
+          \n    try:\n        api_response = user_defined_policies_api.update_uda_policy_by_id(extId=ext_id, body=userDefinedPolicy,\
+          \ if_match=etag_value)\n        print(api_response)\n    except ntnx_monitoring_py_client.rest.ApiException as e:\n\
+          \        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/models/monitoring/v4/serviceability\"\
+          \n    import2 \"github.com/nutanix/ntnx-api-golang-clients/monitoring-go-client/v4/models/monitoring/v4/error\"\n\
+          )\n\nvar (\n    ApiClientInstance *client.ApiClient\n    UserDefinedPoliciesApiInstance *api.UserDefinedPoliciesApi\n\
+          )\n\nfunc main() {\n    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n\
+          \    ApiClientInstance.Host = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n\
+          \    // Interval in ms to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n   \
+          \ // Max retry attempts while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n\
+          \    // UserName to connect to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect\
+          \ to the cluster\n    ApiClientInstance.Password = \"password\"\n    // Please add authorization information here\
+          \ if needed.\n    UserDefinedPoliciesApiInstance = api.NewUserDefinedPoliciesApi(ApiClientInstance)\n\n    userDefinedPolicy\
+          \ := import1.NewUserDefinedPolicy()\n\n    // UserDefinedPolicy object initializations here...\n\n    \n    extId\
+          \ := \"eeBC66FB-eaff-7f8d-6Fea-9eaE6dD35AFe\"\n\n    getResponse, err := UserDefinedPoliciesApiInstance.GetUdaPolicyById(&extId)\n\
+          \    if err != nil {\n        fmt.Println(err)\n        return\n    }\n\n    // Extract E-Tag Header\n    etagValue\
+          \ := ApiClientInstance.GetEtag(getResponse)\n\n    args := make(map[string] interface{})\n    args[\"If-Match\"\
+          ] = etagValue\n\n    response, error := UserDefinedPoliciesApiInstance.UpdateUdaPolicyById(&extId, userDefinedPolicy,\
+          \ args)\n    if error != nil {\n        fmt.Println(error)\n        return\n    }\n    data, _ := response.GetData().([]import2.AppMessage)\n\
+          \    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PUT \\\n     --url \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies/DcEE8b6C-eF3D-A4cd-4Dfc-BcBCAA86Aa66\"\
+          \ \\\n     --header 'Accept: application/json' \\\n              --header 'Content-Type: application/json' \\\n\
+          \              --header 'If-Match: string_sample_data' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN'\
+          \ \\\n              --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\"\
+          :\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"title\":\"VMCPUUsage\",\"description\":\"CPUresourcesutilizationbyaVM\"\
+          ,\"isEnabled\":false,\"isAutoResolved\":true,\"filters\":[{\"extId\":\"string\",\"$objectType\":\"monitoring.v4.serviceability.EntityFilter\"\
+          }],\"triggerConditions\":[{\"conditionType\":\"$UNKNOWN\",\"condition\":{\"metricName\":\"hypervisor_cpu_usage_ppm\"\
+          ,\"operator\":\"$UNKNOWN\",\"thresholdValue\":{\"doubleValue\":1.100000023841858,\"$objectType\":\"monitoring.v4.common.DoubleValue\"\
+          },\"$objectType\":\"monitoring.v4.serviceability.Condition\"},\"severityLevel\":\"$UNKNOWN\",\"$objectType\":\"\
+          monitoring.v4.serviceability.TriggerCondition\"}],\"impactTypes\":[\"$UNKNOWN\"],\"createdBy\":\"user123\",\"lastUpdatedTime\"\
+          :\"2015-07-20T15:49:04-07:00\",\"isExpectedToErrorOnConflict\":true,\"policiesToOverride\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"\
+          ],\"triggerWaitPeriod\":0,\"relatedPolicies\":[{\"entityUuid\":\"string\",\"policyIds\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"\
+          ],\"$objectType\":\"monitoring.v4.serviceability.RelatedPolicy\"}],\"entityType\":\"vm\",\"$objectType\":\"monitoring.v4.serviceability.UserDefinedPolicy\"\
+          } \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method PUT \\\n     --header 'Accept: application/json' \\\n         --header\
+          \ 'Content-Type: application/json' \\\n         --header 'If-Match: string_sample_data' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n         --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\"\
+          :\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"title\":\"VMCPUUsage\",\"description\"\
+          :\"CPUresourcesutilizationbyaVM\",\"isEnabled\":false,\"isAutoResolved\":true,\"filters\":[{\"extId\":\"string\"\
+          ,\"$objectType\":\"monitoring.v4.serviceability.EntityFilter\"}],\"triggerConditions\":[{\"conditionType\":\"$UNKNOWN\"\
+          ,\"condition\":{\"metricName\":\"hypervisor_cpu_usage_ppm\",\"operator\":\"$UNKNOWN\",\"thresholdValue\":{\"doubleValue\"\
+          :1.100000023841858,\"$objectType\":\"monitoring.v4.common.DoubleValue\"},\"$objectType\":\"monitoring.v4.serviceability.Condition\"\
+          },\"severityLevel\":\"$UNKNOWN\",\"$objectType\":\"monitoring.v4.serviceability.TriggerCondition\"}],\"impactTypes\"\
+          :[\"$UNKNOWN\"],\"createdBy\":\"user123\",\"lastUpdatedTime\":\"2015-07-20T15:49:04-07:00\",\"isExpectedToErrorOnConflict\"\
+          :true,\"policiesToOverride\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"],\"triggerWaitPeriod\":0,\"relatedPolicies\"\
+          :[{\"entityUuid\":\"string\",\"policyIds\":[\"32c3bc02-bd4c-4bbc-9648-c7a7399ac555\"],\"$objectType\":\"monitoring.v4.serviceability.RelatedPolicy\"\
+          }],\"entityType\":\"vm\",\"$objectType\":\"monitoring.v4.serviceability.UserDefinedPolicy\"} \\\n- \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/user-defined-policies/AAdaaccc-Aa4E-d745-1c0f-B1Edc78Dd7FB\"\
+          \n"
+    delete:
+      tags:
+      - UserDefinedPolicies
+      summary: Delete a User-Defined Alert policy
+      description: Delete a User-Defined Alert policy identified by external identifier.
+      operationId: deleteUdaPolicyById
+      parameters:
+      - name: extId
+        in: path
+        description: Entity UUID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: b19d7f4c-bc8d-4a4c-b819-144ce917f2f1
+      responses:
+        '204':
+          description: Requested User-Defined Alert policy deleted.
+          content:
+            application/json: {}
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Delete operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/monitoring.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /monitoring/v4.0/serviceability/alerts/user-defined-policies/{extId}
+                  Delete operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete User Defined Alert Policy
+        roleList:
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Monitoring Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 5
+        timeUnit: seconds
+      - type: small
+        count: 5
+        timeUnit: seconds
+      - type: large
+        count: 5
+        timeUnit: seconds
+      - type: xlarge
+        count: 5
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: NCC
+        version: 5.1.0
+components:
+  schemas:
+    monitoring.v4.0.common.IntValue:
+      required:
+      - intValue
+      type: object
+      properties:
+        intValue:
+          type: integer
+          description: Denotes a value of type integer.
+          format: int64
+          example: 0
+      additionalProperties: false
+      description: Denotes a value of type integer.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    monitoring.v4.0.serviceability.TriggerCondition:
+      required:
+      - condition
+      - conditionType
+      - severityLevel
+      type: object
+      properties:
+        conditionType:
+          $ref: '#/components/schemas/monitoring.v4.0.common.ConditionType'
+        condition:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.Condition'
+        severityLevel:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.PolicySeverityLevel'
+      additionalProperties: false
+    monitoring.v4.0.serviceability.PolicySeverityLevel:
+      type: string
+      description: Severity of an alert.
+      enum:
+      - WARNING
+      - CRITICAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: Indicates that the severity of the alert is a warning. This means an actionable issue has been detected,
+          and user intervention is required. A more serious issue may develop if this is not resolved soon.
+        CRITICAL: Indicates that the severity of the alert is critical. This means an actionable critical situation has been
+          detected, and action is required immediately. The cluster may have the potential to stop running or run into irreparable
+          issues.
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.serviceability.Condition:
+      required:
+      - metricName
+      - operator
+      - thresholdValue
+      type: object
+      properties:
+        metricName:
+          maxLength: 150
+          minLength: 1
+          type: string
+          description: The metric key. Allowed values of the metrics list can be found at https://portal.nutanix.com/page/documents/details?targetId=Prism-Central-Guide-vpc_2022_9:mul-alerts-user-created-metrics-r.html.
+          example: hypervisor_cpu_usage_ppm
+        operator:
+          $ref: '#/components/schemas/monitoring.v4.0.common.ComparisonOperator'
+        thresholdValue:
+          required:
+          - $objectType
+          type: object
+          properties:
+            $objectType:
+              type: string
+              example: monitoring.v4.common.DoubleValue
+          description: The threshold value that was used for the condition evaluation.
+          oneOf:
+          - $ref: '#/components/schemas/monitoring.v4.0.common.DoubleValue'
+          - $ref: '#/components/schemas/monitoring.v4.0.common.IntValue'
+      additionalProperties: false
+      description: Conditions to be met to trigger the alert. Conditions are expressed in FIQL.
+    monitoring.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 28
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: cdd59c7a-4bdb-4cea-9597-0cbc94bc703d
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    monitoring.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    monitoring.v4.0.serviceability.UserDefinedPolicy:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - entityType
+        - title
+        - triggerConditions
+        type: object
+        properties:
+          title:
+            maxLength: 150
+            minLength: 1
+            type: string
+            description: Title of the policy.
+            example: VM CPU Usage
+          description:
+            maxLength: 500
+            type: string
+            description: Description of the policy.
+            example: CPU resources utilization by a VM
+          isEnabled:
+            type: boolean
+            description: Enable/Disable flag for the policy.
+            default: false
+          isAutoResolved:
+            type: boolean
+            description: Indicates whether the auto-resolve feature is enabled for this policy.
+            default: true
+          filters:
+            description: Filter criteria for narrowing down the entities on which User-Defined Alert policies can be set up.
+            oneOf:
+            - maxItems: 1
+              minItems: 0
+              type: array
+              items:
+                $ref: '#/components/schemas/monitoring.v4.0.serviceability.EntityFilter'
+            - maxItems: 1
+              minItems: 0
+              type: array
+              items:
+                $ref: '#/components/schemas/monitoring.v4.0.serviceability.GroupFilter'
+          triggerConditions:
+            maxItems: 4
+            minItems: 1
+            type: array
+            description: Trigger conditions for the policy. If there are multiple trigger conditions, all of them will be
+              considered during the operation.
+            items:
+              $ref: '#/components/schemas/monitoring.v4.0.serviceability.TriggerCondition'
+          impactTypes:
+            maxItems: 8
+            minItems: 0
+            type: array
+            description: Impact types for the associated resulting alert.
+            items:
+              $ref: '#/components/schemas/monitoring.v4.0.common.ImpactType'
+          createdBy:
+            type: string
+            description: Username of the user who created the policy.
+            readOnly: true
+            example: user123
+          lastUpdatedTime:
+            type: string
+            description: Last updated time of the policy in ISO 8601 format. This value will be used as the CAS value during
+              updates.
+            format: date-time
+            readOnly: true
+            example: 2009-09-23 14:30:00-07:00
+          isExpectedToErrorOnConflict:
+            type: boolean
+            description: Error when conflicting alert policies are found.
+            writeOnly: true
+            default: true
+          policiesToOverride:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: List of IDs of the alert policies that should be overridden.
+            items:
+              type: string
+              example: 32c3bc02-bd4c-4bbc-9648-c7a7399ac555
+          triggerWaitPeriod:
+            type: integer
+            description: Waiting duration in seconds before triggering the alert, when the specified condition is met. It
+              is set to 600s by default.
+            format: int64
+            example: 24
+          relatedPolicies:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: List of alert policies that are related to the entities of the current policy.
+            items:
+              $ref: '#/components/schemas/monitoring.v4.0.serviceability.RelatedPolicy'
+          entityType:
+            maxLength: 10
+            minLength: 1
+            type: string
+            description: Entity type associated with the User-Defined Alert policy. Allowed values are VM, node and cluster.
+            example: vm
+        additionalProperties: false
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: 75ae5d6e-79e5-4eaf-8fd8-b9cc27e3b815
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    monitoring.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/monitoring.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    monitoring.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 99
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 36
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    monitoring.v4.0.common.ComparisonOperator:
+      type: string
+      description: The comparison operator used for the condition evaluation.
+      enum:
+      - EQUAL_TO
+      - GREATER_THAN
+      - GREATER_THAN_OR_EQUAL_TO
+      - LESS_THAN
+      - LESS_THAN_OR_EQUAL_TO
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        GREATER_THAN: Indicates a > operator used in conjunction with a metric in a condition. An alert may be generated when
+          the metric value equals the static threshold set depending on the trigger condition set.
+        LESS_THAN_OR_EQUAL_TO: Indicates a <= operator used in conjunction with a metric in a condition. An alert may be generated
+          when the metric value is less than or equal to the static threshold set depending on the trigger condition set.
+        EQUAL_TO: Indicates an = operator used in conjunction with a metric in a condition. An alert may be generated when
+          the metric value equals the static threshold set depending on the trigger condition set.
+        GREATER_THAN_OR_EQUAL_TO: Indicates a >= operator used in conjunction with a metric in a condition. An alert may be
+          generated when the metric value is greater than or equal to the static threshold set depending on the trigger condition
+          set.
+        LESS_THAN: Indicates a < operator used in conjunction with a metric in a condition. An alert may be generated when
+          the metric value is less than the static threshold set depending on the trigger condition set.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.serviceability.RelatedPolicy:
+      required:
+      - entityUuid
+      - policyIds
+      type: object
+      properties:
+        entityUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the entity the User-Defined Alert policy is associated with.
+          example: 200d5bc0-10f0-458e-9c51-646f916f495d
+        policyIds:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Policy IDs associated with the specified entity.
+          items:
+            type: string
+            example: 32c3bc02-bd4c-4bbc-9648-c7a7399ac555
+      additionalProperties: false
+      description: An alert policy that is related to the entities of the current policy.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 31
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    monitoring.v4.0.common.ImpactType:
+      type: string
+      description: The impact this alert or event will have on the system. For example, availability, performance, or capacity.
+      enum:
+      - AVAILABILITY
+      - CAPACITY
+      - CONFIGURATION
+      - PERFORMANCE
+      - SYSTEM_INDICATOR
+      - CPU_CAPACITY
+      - MEMORY_CAPACITY
+      - STORAGE_CAPACITY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CAPACITY: Indicates that there may be storage or memory issues in the system.
+        SYSTEM_INDICATOR: Indicates that certain operations in the system may fail or be interrupted.
+        MEMORY_CAPACITY: Indicates that the system may have memory issues.
+        AVAILABILITY: Impacts availability of certain services, data, or functionality in the system.
+        PERFORMANCE: Indicates that there might be performance issues in the system.
+        CONFIGURATION: Indicates that there may be connectivity issues between different entities due to incorrect configurations.
+        CPU_CAPACITY: Indicates that there may be issues with CPU capacity.
+        STORAGE_CAPACITY: Indicates that there may be storage issues in the system.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.serviceability.GroupFilter:
+      required:
+      - extId
+      - type
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Entity UUID of the group entity type on which the User-Defined Alert policy should be set up.
+          example: 5caff495-ad97-4ed9-9260-740d57b7cb77
+        type:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.GroupEntityType'
+      additionalProperties: false
+      description: Group of entities on which the User-Defined Alert policy should be set up.
+    monitoring.v4.0.serviceability.EntityFilter:
+      required:
+      - extId
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Entity UUID on which the User-Defined Alert policy should be set up.
+          example: f21b6f8c-13fd-423b-bd73-e5de6d0792f8
+      additionalProperties: false
+      description: Entity UUID on which the User-Defined Alert policy should be set up.
+    monitoring.v4.0.common.ConditionType:
+      type: string
+      description: Indicating if this symptom is caused by a static threshold or anomaly (dynamic threshold) evaluation.  If
+        an indicator is raised, there may have another indicator indicating the safeguard zone value.
+      enum:
+      - STATIC_THRESHOLD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        STATIC_THRESHOLD: Indicates that the condition for when the policy should generate an alert based on a static threshold
+          value.
+    monitoring.v4.0.common.DoubleValue:
+      required:
+      - doubleValue
+      type: object
+      properties:
+        doubleValue:
+          type: number
+          description: Denotes a value of type double.
+          format: double
+          example: 37.245896146946436
+      additionalProperties: false
+      description: Denotes a value of type double.
+    monitoring.v4.0.serviceability.GroupEntityType:
+      type: string
+      description: The allowed entity types that can be used to filter the set of entities on which User-Defined Alert policy
+        is set.
+      enum:
+      - CATEGORY
+      - CLUSTER
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CATEGORY: Filter entities based on categories.
+        CLUSTER: Filter entities based on cluster.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header

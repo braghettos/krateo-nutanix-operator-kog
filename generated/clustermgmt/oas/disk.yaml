@@ -1,0 +1,1322 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Cluster Management APIs
+  description: Manage Hosts, Clusters and other Infrastructure.
+  version: 4.0.2
+  x-logo:
+    altText: Clustermgmt Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/clustermgmt/images/clustermgmt-logo-img.svg
+  x-repo-name: clustermgmt
+servers:
+- url: https://{pc-ip}:9440/api
+security:
+- basicAuthScheme: []
+- apiKeyAuthScheme: []
+paths:
+  /clustermgmt/v4.0/config/disks:
+    get:
+      tags:
+      - Disks
+      summary: Get Disks for all the clusters
+      description: Fetches Disk details from all clusters registered with Prism Central.
+      operationId: listDisks
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+          between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+          lead to no results.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
+            between 0 and the maximum number of pages that are available for that resource. Any number out of this range might
+            lead to no results.
+
+            '
+          format: int32
+          default: 0
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
+          a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the limit
+          is not provided, a default value of 50 records will be returned in the result set.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must
+            be a positive integer between 1 and 100. Any number out of this range will lead to a validation error. If the
+            limit is not provided, a default value of 50 records will be returned in the result set.
+
+            '
+          format: int32
+          default: 50
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
+          with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to
+          true are included in the response. Expression specified with the $filter must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions.
+
+          For example, filter ''$filter=name eq ''karbon-ntnx-1.0'' would filter the result on cluster name ''karbon-ntnx1.0'',
+          filter ''$filter=startswith(name, ''C'')'' would filter on cluster name starting with ''C''.
+
+          The filter can be applied to the following fields:
+
+          - clusterName
+
+          - diskAdvanceConfig/isOnline
+
+          - hostName
+
+          - serialNumber
+
+          - status
+
+          - storageTier
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
+          Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified,
+          the resources will be sorted in ascending order by default. For example, ''$orderby=templateName desc'' would get
+          all templates sorted by templateName in descending order.
+
+          The orderby can be applied to the following fields:
+
+          - clusterName
+
+          - diskAdvanceConfig/isOnline
+
+          - extId
+
+          - hostName
+
+          - serialNumber
+
+          - status
+
+          - storageTier
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $apply
+        in: query
+        description: 'A URL query parameter that allows clients to specify a sequence of transformations to the entity set,
+          such as groupby, filter, aggregate etc. As of now only support for groupby exists.For example ''$apply=groupby((templateName))''
+          would get all templates grouped by templateName.
+
+          The groupby can be applied on the following fields:
+
+          - clusterName
+
+          - diskAdvanceConfig/isOnline
+
+          - hostName
+
+          - status
+
+          - storageTier
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $select
+        in: query
+        description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
+          complex type. Expression specified with the $select must conform to the [OData V4.01](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html)
+          URL conventions. If a $select expression consists of a single select item that is an asterisk (i.e., *), then all
+          properties on the matching resource will be returned.
+
+          - clusterExtId
+
+          - clusterName
+
+          - cvmIpAddress
+
+          - diskAdvanceConfig/hasBootPartitionsOnly
+
+          - diskAdvanceConfig/isBootDisk
+
+          - diskAdvanceConfig/isDataMigrated
+
+          - diskAdvanceConfig/isDiagnosticInfoAvailable
+
+          - diskAdvanceConfig/isErrorFoundInLog
+
+          - diskAdvanceConfig/isMarkedForRemoval
+
+          - diskAdvanceConfig/isMounted
+
+          - diskAdvanceConfig/isOnline
+
+          - diskAdvanceConfig/isPasswordProtected
+
+          - diskAdvanceConfig/isPlannedOutage
+
+          - diskAdvanceConfig/isSelfEncryptingDrive
+
+          - diskAdvanceConfig/isSelfManagedNvme
+
+          - diskAdvanceConfig/isSpdkManaged
+
+          - diskAdvanceConfig/isSuspectedUnhealthy
+
+          - diskAdvanceConfig/isUnderDiagnosis
+
+          - diskAdvanceConfig/isUnhealthy
+
+          - diskSizeBytes
+
+          - extId
+
+          - firmwareVersion
+
+          - hostName
+
+          - links
+
+          - location
+
+          - model
+
+          - mountPath
+
+          - nodeExtId
+
+          - nodeIpAddress
+
+          - nvmePciePath
+
+          - physicalCapacityBytes
+
+          - serialNumber
+
+          - serviceVMId
+
+          - status
+
+          - storagePoolExtId
+
+          - storageTier
+
+          - targetFirmwareVersion
+
+          - tenantId
+
+          - vendor
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns a paginated list of Disks from all clusters registered with Prism Central.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/clustermgmt.v4.0.config.Disk'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Disk
+        roleList:
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Cluster Viewer
+        - Cluster Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.5'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.DisksApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.ListDisksApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        DisksApi disksApi = new DisksApi(apiClient);\n\
+          \n        \n        int page = 0;\n        \n        int limit = 50;\n\n        try {\n            ListDisksApiResponse\
+          \ listDisksApiResponse = disksApi.listDisks(page, limit, null, null, null, null);\n            System.out.println(listDisksApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DisksApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet disksApi = new DisksApi(apiClientInstance);\n\nfunction sample() {\n\n\n    // Construct\
+          \ Optional Parameters\n    var opts = {};\n    opts[\"$page\"] = 0;\n    opts[\"$limit\"] = 50;\n    opts[\"$filter\"\
+          ] = \"string_sample_data\";\n    opts[\"$orderby\"] = \"string_sample_data\";\n    opts[\"$apply\"] = \"string_sample_data\"\
+          ;\n    opts[\"$select\"] = \"string_sample_data\";\n\n\n\n\n    disksApi.listDisks(opts).then(({data, response})\
+          \ => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    disks_api = ntnx_clustermgmt_py_client.DisksApi(api_client=client)\n\
+          \    \n    page = 0\n    \n    limit = 50\n\n\n    try:\n        api_response = disks_api.list_disks(_page=page,\
+          \ _limit=limit)\n        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n  \
+          \      print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    DisksApiInstance *api.DisksApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    DisksApiInstance\
+          \ = api.NewDisksApi(ApiClientInstance)\n\n    \n    page_ := 0\n    \n    limit_ := 50\n\n\n    response, error\
+          \ := DisksApiInstance.ListDisks(&page_, &limit_, nil, nil, nil, nil)\n    if error != nil {\n        fmt.Println(error)\n\
+          \        return\n    }\n    data, _ := response.GetData().([]import1.Disk)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/disks?$apply=string_sample_data&$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/disks?$apply=string_sample_data&$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0&$select=string_sample_data\"\
+          \n"
+  /clustermgmt/v4.0/config/disks/{extId}:
+    get:
+      tags:
+      - Disks
+      summary: Get Disk by its external identifier
+      description: Fetch the details of the Disk identified by external identifier.
+      operationId: getDiskById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of the Disk.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 837fa976-cbab-4ffa-bbd9-feae649dbd23
+      responses:
+        '200':
+          description: Returns the details of the requested Disk.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.config.Disk'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks/{extId} Get operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks/{extId} Get operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks/{extId} Get operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: View Disk
+        roleList:
+        - Prism Admin
+        - Prism Viewer
+        - Self-Service Admin
+        - Cluster Viewer
+        - Cluster Admin
+        - Super Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 10
+        timeUnit: seconds
+      - type: small
+        count: 10
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '6.5'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.DisksApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.GetDiskApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        DisksApi disksApi = new DisksApi(apiClient);\n\
+          \n        \n        String extId = \"6ECef8bF-C9F8-e3B4-CEc6-6aBA0aBdFcB2\";\n\n        try {\n            GetDiskApiResponse\
+          \ getDiskApiResponse = disksApi.getDiskById(extId);\n            System.out.println(getDiskApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DisksApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet disksApi = new DisksApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let extId\
+          \ = \"822cD4aA-CAe5-6Eae-Eac5-7caADC9D36a7\";\n\n\n\n\n\n    disksApi.getDiskById(extId).then(({data, response})\
+          \ => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    disks_api = ntnx_clustermgmt_py_client.DisksApi(api_client=client)\n\
+          \    \n    ext_id = \"ECD0c8Ff-dfE0-df6d-fCdE-3F8FDCec1dEb\"\n\n\n    try:\n        api_response = disks_api.get_disk_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/clustermgmt/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    DisksApiInstance *api.DisksApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    DisksApiInstance\
+          \ = api.NewDisksApi(ApiClientInstance)\n\n    \n    extId := \"d49EE45d-ff5e-b890-EBCE-59e5E69Bd4b2\"\n\n\n    response,\
+          \ error := DisksApiInstance.GetDiskById(&extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n\
+          \    }\n    data, _ := response.GetData().(import1.Disk)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/disks/F5e5deec-Eefa-2AAf-DD3D-cA3cD66bB53B\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/disks/f13bB5Da-aEbf-eAFD-60fc-4d2a14EcEcfD\"\
+          \n"
+    delete:
+      tags:
+      - Disks
+      summary: Removes Disk from a cluster
+      description: Marks Disk identified by external identifier for removal.
+      operationId: deleteDiskById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of the Disk.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          example: 37d958a5-8141-409a-a584-e0a8c6dadb91
+      responses:
+        '202':
+          description: Returns the task ID with reference to Disk removal. The task is completed when the Disk is marked for
+            removal.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/prism.v4.0.config.TaskReference'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks/{extId} Delete
+                  operation
+        4XX:
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks/{extId} Delete
+                  operation
+        5XX:
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/common.v1.0.response.ApiResponseMetadata'
+                  data:
+                    $ref: '#/components/schemas/clustermgmt.v4.0.error.ErrorResponse'
+                additionalProperties: false
+                description: REST response for all response codes in API path /clustermgmt/v4.0/config/disks/{extId} Delete
+                  operation
+      x-permissions:
+        deploymentList:
+        - ON_PREM
+        - CLOUD
+        operationName: Delete Disk
+        roleList:
+        - Prism Admin
+        - Self-Service Admin
+        - Super Admin
+        - Cluster Admin
+      x-rate-limit:
+      - type: xsmall
+        count: 2
+        timeUnit: seconds
+      - type: small
+        count: 4
+        timeUnit: seconds
+      - type: large
+        count: 10
+        timeUnit: seconds
+      - type: xlarge
+        count: 10
+        timeUnit: seconds
+      x-supported-versions:
+      - product: PC
+        version: '2024.3'
+      - product: PE
+        version: '7.0'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport com.nutanix.clu.java.client.ApiClient;\nimport com.nutanix.clu.java.client.api.DisksApi;\n\
+          import com.nutanix.dp1.clu.clustermgmt.v4.config.DeleteDiskApiResponse;\nimport org.springframework.web.client.RestClientException;\n\
+          \npublic class JavaSdkSample {\n    public static void main(String[] args) {\n        // Configure the client\n\
+          \        ApiClient apiClient = new ApiClient();\n        // IPv4/IPv6 address or FQDN of the cluster\n        apiClient.setHost(\"\
+          localhost\");\n        // Port to which to connect to\n        apiClient.setPort(9440);\n        // Interval in\
+          \ ms to use during retry attempts\n        apiClient.setRetryInterval(5000);\n        // Max retry attempts while\
+          \ reconnecting on a loss of connection\n        apiClient.setMaxRetryAttempts(5);\n        // UserName to connect\
+          \ to the cluster\n        String username = \"username\";\n        // Password to connect to the cluster\n     \
+          \   String password = \"password\";\n        apiClient.setUsername(username);\n        apiClient.setPassword(password);\n\
+          \n        // Please add authorization information here if needed.\n        DisksApi disksApi = new DisksApi(apiClient);\n\
+          \n        \n        String extId = \"9BbbBe33-f8ce-60e7-Ec65-Ae35AF3135FB\";\n\n        try {\n            DeleteDiskApiResponse\
+          \ deleteDiskApiResponse = disksApi.deleteDiskById(extId);\n            System.out.println(deleteDiskApiResponse.toString());\n\
+          \n        } catch (RestClientException ex) {\n            System.out.println(ex.getMessage());\n        }\n    }\n\
+          }\n"
+      - lang: JavaScript
+        source: "\nimport { ApiClient, DisksApi } from \"@nutanix-api/clustermgmt-js-client\";\n\n// Configure the client\n\
+          let apiClientInstance = new ApiClient();\n// IPv4/IPv6 address or FQDN of the cluster\napiClientInstance.host =\
+          \ 'localhost';\n// Port to which to connect to\napiClientInstance.port = '9440';\n// Max retry attempts while reconnecting\
+          \ on a loss of connection\napiClientInstance.maxRetryAttempts = 5;\n// Interval in ms to use during retry attempts\n\
+          apiClientInstance.retryInterval = 5000;\n// UserName to connect to the cluster\napiClientInstance.username = 'username';\n\
+          // Password to connect to the cluster\napiClientInstance.password = 'password';\n// Please add authorization information\
+          \ here if needed.\nlet disksApi = new DisksApi(apiClientInstance);\n\nfunction sample() {\n\n    \n    let extId\
+          \ = \"7237F2fB-4edc-BFEb-e4dC-beaA8b55dAfA\";\n\n\n\n\n\n    disksApi.deleteDiskById(extId).then(({data, response})\
+          \ => {\n        console.log(`API returned the following status code: ${response.status}`);\n        console.log(data.getData());\n\
+          \    }).catch((error) => {\n        console.log(`Error is: ${error}`);\n    });\n\n}\nsample()\n"
+      - lang: Python
+        source: "\nimport ntnx_clustermgmt_py_client\n\nif __name__ == \"__main__\":\n    # Configure the client\n    config\
+          \ = ntnx_clustermgmt_py_client.Configuration()\n    # IPv4/IPv6 address or FQDN of the cluster\n    config.host\
+          \ = \"localhost\"\n    # Port to which to connect to\n    config.port = 9440\n    # Max retry attempts while reconnecting\
+          \ on a loss of connection\n    config.max_retry_attempts = 3\n    # Backoff factor to use during retry attempts\n\
+          \    config.backoff_factor = 3\n    # UserName to connect to the cluster\n    config.username = \"username\"\n \
+          \   # Password to connect to the cluster\n    config.password = \"password\"\n    # Please add authorization information\
+          \ here if needed.\n    client = ntnx_clustermgmt_py_client.ApiClient(configuration=config)\n    disks_api = ntnx_clustermgmt_py_client.DisksApi(api_client=client)\n\
+          \    \n    ext_id = \"49A6aea4-EBed-b5FA-CBbF-AEcec7bcb721\"\n\n\n    try:\n        api_response = disks_api.delete_disk_by_id(extId=ext_id)\n\
+          \        print(api_response)\n    except ntnx_clustermgmt_py_client.rest.ApiException as e:\n        print(e)\n\n"
+      - lang: Go
+        source: "\npackage main\n\nimport (\n    \"fmt\"\n    \"time\"\n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/api\"\
+          \n    \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/client\"\n    import1 \"github.com/nutanix/ntnx-api-golang-clients/clustermgmt-go-client/v4/models/prism/v4/config\"\
+          \n)\n\nvar (\n    ApiClientInstance *client.ApiClient\n    DisksApiInstance *api.DisksApi\n)\n\nfunc main() {\n\
+          \    ApiClientInstance = client.NewApiClient()\n    // IPv4/IPv6 address or FQDN of the cluster\n    ApiClientInstance.Host\
+          \ = \"localhost\"\n    // Port to which to connect to\n    ApiClientInstance.Port = 9440\n    // Interval in ms\
+          \ to use during retry attempts\n    ApiClientInstance.RetryInterval = 5 * time.Second\n    // Max retry attempts\
+          \ while reconnecting on a loss of connection\n    ApiClientInstance.MaxRetryAttempts = 5\n    // UserName to connect\
+          \ to the cluster\n    ApiClientInstance.Username = \"username\"\n    // Password to connect to the cluster\n   \
+          \ ApiClientInstance.Password = \"password\"\n    // Please add authorization information here if needed.\n    DisksApiInstance\
+          \ = api.NewDisksApi(ApiClientInstance)\n\n    \n    extId := \"AdFA0fed-84FE-e5bf-ffF5-Bd0a027a8Ede\"\n\n\n    response,\
+          \ error := DisksApiInstance.DeleteDiskById(&extId)\n    if error != nil {\n        fmt.Println(error)\n        return\n\
+          \    }\n    data, _ := response.GetData().(import1.TaskReference)\n    fmt.Println(data)\n\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/disks/aEA57efa-1C0C-2CAc-E47f-2c1FA7F6cEE3\"\
+          \ \\\n     --header 'Accept: application/json' \\\n     --header 'Authorization:Basic $APP_ACCESS_TOKEN' \\\n\n"
+      - lang: Wget
+        source: "\n\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n--header 'Authorization:Basic\
+          \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/clustermgmt/v4.0/config/disks/aDcfEB5A-bb1e-A84E-3Dda-BC9cfcba64Ec\"\
+          \n"
+components:
+  schemas:
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+          default: false
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.config.IPAddress:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    clustermgmt.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+          example: 2009-09-23 14:30:00-07:00
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+          example: 22
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+          example: 9d4ffa56-91af-4dfb-99b2-ab3df07628fa
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.DiskStatus:
+      type: string
+      description: Indicates the status of the Disk.
+      enum:
+      - NORMAL
+      - MARKED_FOR_REMOVAL_BUT_NOT_DETACHABLE
+      - DETACHABLE
+      - DATA_MIGRATION_INITIATED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        MARKED_FOR_REMOVAL_BUT_NOT_DETACHABLE: Indicates that the Disk is marked for removal but is in a detachable state.
+        DATA_MIGRATION_INITIATED: Indicates that the data migration has been initiated for the Disk.
+        DETACHABLE: Indicates that the Disk is detachable.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        NORMAL: Indicates that the Disk is normal.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    clustermgmt.v4.0.config.Disk:
+      title: Disk model object.
+      description: A model that represents the Disk resources.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          clusterName:
+            maxLength: 256
+            type: string
+            description: Cluster name of the Disk it belongs to.
+            readOnly: true
+          clusterExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of the cluster on which Disk will be added.
+            readOnly: true
+            example: 69621eb1-953b-4de4-ab38-12f6e54698d2
+          status:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.DiskStatus'
+          storageTier:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.StorageTier'
+          storagePoolExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of a storage pool.
+            readOnly: true
+            example: 7df8c47b-77ee-46a3-a5f0-d78c035b5fdf
+          serviceVMId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}::[0-9]{1,}$
+            type: string
+            description: The service VM ID of the node.
+            readOnly: true
+            example: ecafe717-9914-4337-84eb-724c79214963::341
+          nodeExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of the node.
+            readOnly: true
+            example: 4fa79217-b236-4b22-8145-ae4428f6efc6
+          cvmIpAddress:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+          nodeIpAddress:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+          mountPath:
+            pattern: ^/home/nutanix/data/stargate-storage/disks/[A-Z0-9]{8}$
+            type: string
+            description: Represents the mount path of the Disk.
+            readOnly: true
+          location:
+            type: integer
+            description: Indicates the location of the Disk in a node.
+            format: int64
+            readOnly: true
+            example: 81
+          serialNumber:
+            maxLength: 256
+            type: string
+            description: Represents the Disk serial number.
+            readOnly: true
+          diskSizeBytes:
+            minimum: 524288
+            type: integer
+            description: Size of the Disk in bytes.
+            format: int64
+            readOnly: true
+            example: 2284933324866931968
+          physicalCapacityBytes:
+            minimum: 524288
+            type: integer
+            description: Physical capacity of the Disk in bytes.
+            format: int64
+            readOnly: true
+            example: 2082147717527645696
+          model:
+            maxLength: 256
+            type: string
+            description: Represents the Disk model.
+            readOnly: true
+          vendor:
+            maxLength: 256
+            type: string
+            description: Represents the Disk vendor.
+            readOnly: true
+          nvmePciePath:
+            type: string
+            description: Indicates the PCIe path of NVMe devices.
+            readOnly: true
+          firmwareVersion:
+            maxLength: 256
+            type: string
+            description: Represents the current firmware version.
+            readOnly: true
+          targetFirmwareVersion:
+            maxLength: 256
+            type: string
+            description: Represents the target firmware version.
+            readOnly: true
+          hostName:
+            maxLength: 256
+            type: string
+            description: Host name of the Disk to which it belongs.
+            readOnly: true
+          diskAdvanceConfig:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.DiskAdvanceConfig'
+        additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+            example: acf0fa40-7920-4a1c-8555-445a56268e96
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+          default: en_US
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    clustermgmt.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+          default: en_US
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+            example: 66
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+            example: false
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+              example: 56
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    clustermgmt.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    clustermgmt.v4.0.config.DiskAdvanceConfig:
+      title: Disk advance configuration object.
+      type: object
+      properties:
+        isSelfEncryptingDrive:
+          type: boolean
+          description: Indicates whether the Disk has self-encryption enabled.
+          example: false
+        isSelfManagedNvme:
+          type: boolean
+          description: Indicates if the NVMe Disk is self-managed and does not require a host/CVM reboot.
+          example: false
+        isPasswordProtected:
+          type: boolean
+          description: Indicates whether the Disk is password protected.
+          example: true
+        isBootDisk:
+          type: boolean
+          description: Indicates if the Disk is a boot Disk.
+          example: true
+        hasBootPartitionsOnly:
+          type: boolean
+          description: Indicates if the Disk is for boot only and no Disk operations will be performed on it.
+          example: false
+        isSpdkManaged:
+          type: boolean
+          description: Indicates if NVMe device is managed by storage performance development kit(SPDK).
+          example: false
+        isOnline:
+          type: boolean
+          description: Indicates whether the Disk is online or offline.
+          example: false
+        isMarkedForRemoval:
+          type: boolean
+          description: Indicates if the Disk is marked for removal.
+          example: false
+        isDataMigrated:
+          type: boolean
+          description: Indicates if data migration is completed for the Disk.
+          example: false
+        isUnhealthy:
+          type: boolean
+          description: Indicates if the Disk is unhealthy.
+          example: true
+        isSuspectedUnhealthy:
+          type: boolean
+          description: Indicates if the Disk is suspected to be unhealthy.
+          example: false
+        isMounted:
+          type: boolean
+          description: Indicates if the Disk is mounted.
+          example: false
+        isUnderDiagnosis:
+          type: boolean
+          description: Indicates if the Disk is under diagnosis.
+          example: false
+        isDiagnosticInfoAvailable:
+          type: boolean
+          description: Indicates the Disk diagnostic information along with the device-related statistics are present.
+          example: true
+        isErrorFoundInLog:
+          type: boolean
+          description: Indicates whether or not the Disk error is seen in the kernel logs.
+          example: true
+        isPlannedOutage:
+          type: boolean
+          description: Indicates if diagnostics are running on the Disk.
+          example: true
+      additionalProperties: false
+      description: A model that represents Disk advance configuration properties.
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+          example: 2cd8:0415:e91d:2cb3:386f:e395:8af4:dcb8
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+          default: 128
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+          example: 74
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+          example: QmFzZTY0RW5jb2RlZA==:8637ae89-6d88-4345-bd2d-682dfad61b73
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    clustermgmt.v4.0.config.StorageTier:
+      type: string
+      description: Represents the Disk storage tier.
+      enum:
+      - SSD_PCIE
+      - SSD_SATA
+      - DAS_SATA
+      - CLOUD
+      - SSD_MEM_NVME
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CLOUD: Represents the Disk cloud storage tier.
+        SSD_SATA: Represents the Disk SSD_SATA storage tier.
+        SSD_MEM_NVME: Represents the Disk SSD_MEM_NVME storage tier.
+        SSD_PCIE: Represents the Disk SSD_PCIE storage tier.
+        DAS_SATA: Represents the Disk DAS_SATA storage tier.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+          example: 39.47.28.212
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+          default: 32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    clustermgmt.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header
