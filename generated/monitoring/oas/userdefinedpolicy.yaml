@@ -39,7 +39,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -60,7 +59,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -486,7 +484,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 0b940d0c-e72d-4772-b150-eb2ebda917fa
       responses:
         '200':
           description: Retrieved the requested User-Defined Alert policy.
@@ -637,7 +634,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: d1f2021c-9e71-4f28-9716-a8b0760e4a13
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -855,7 +851,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: b19d7f4c-bc8d-4a4c-b819-144ce917f2f1
       responses:
         '204':
           description: Requested User-Defined Alert policy deleted.
@@ -919,175 +914,25 @@ paths:
         version: 5.1.0
 components:
   schemas:
-    monitoring.v4.0.common.IntValue:
+    monitoring.v4.0.serviceability.RelatedPolicy:
       required:
-      - intValue
+      - entityUuid
+      - policyIds
       type: object
       properties:
-        intValue:
-          type: integer
-          description: Denotes a value of type integer.
-          format: int64
-          example: 0
-      additionalProperties: false
-      description: Denotes a value of type integer.
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    monitoring.v4.0.serviceability.TriggerCondition:
-      required:
-      - condition
-      - conditionType
-      - severityLevel
-      type: object
-      properties:
-        conditionType:
-          $ref: '#/components/schemas/monitoring.v4.0.common.ConditionType'
-        condition:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.Condition'
-        severityLevel:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.PolicySeverityLevel'
-      additionalProperties: false
-    monitoring.v4.0.serviceability.PolicySeverityLevel:
-      type: string
-      description: Severity of an alert.
-      enum:
-      - WARNING
-      - CRITICAL
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: Indicates that the severity of the alert is a warning. This means an actionable issue has been detected,
-          and user intervention is required. A more serious issue may develop if this is not resolved soon.
-        CRITICAL: Indicates that the severity of the alert is critical. This means an actionable critical situation has been
-          detected, and action is required immediately. The cluster may have the potential to stop running or run into irreparable
-          issues.
-        $REDACTED: 'Redacted value.
-
-          '
-    monitoring.v4.0.serviceability.Condition:
-      required:
-      - metricName
-      - operator
-      - thresholdValue
-      type: object
-      properties:
-        metricName:
-          maxLength: 150
-          minLength: 1
-          type: string
-          description: The metric key. Allowed values of the metrics list can be found at https://portal.nutanix.com/page/documents/details?targetId=Prism-Central-Guide-vpc_2022_9:mul-alerts-user-created-metrics-r.html.
-          example: hypervisor_cpu_usage_ppm
-        operator:
-          $ref: '#/components/schemas/monitoring.v4.0.common.ComparisonOperator'
-        thresholdValue:
-          required:
-          - $objectType
-          type: object
-          properties:
-            $objectType:
-              type: string
-              example: monitoring.v4.common.DoubleValue
-          description: The threshold value that was used for the condition evaluation.
-          oneOf:
-          - $ref: '#/components/schemas/monitoring.v4.0.common.DoubleValue'
-          - $ref: '#/components/schemas/monitoring.v4.0.common.IntValue'
-      additionalProperties: false
-      description: Conditions to be met to trigger the alert. Conditions are expressed in FIQL.
-    monitoring.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 28
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
+        entityUuid:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: cdd59c7a-4bdb-4cea-9597-0cbc94bc703d
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    monitoring.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
+          description: UUID of the entity the User-Defined Alert policy is associated with.
+        policyIds:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Policy IDs associated with the specified entity.
+          items:
             type: string
-          description: The map of argument name to value.
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
+      description: An alert policy that is related to the entities of the current policy.
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1115,39 +960,254 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ApiLink:
+    monitoring.v4.0.common.DoubleValue:
+      required:
+      - doubleValue
       type: object
       properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
+        doubleValue:
+          type: number
+          description: Denotes a value of type double.
+          format: double
       additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    common.v1.0.config.MapOfStringWrapper:
+      description: Denotes a value of type double.
+    monitoring.v4.0.error.AppMessage:
       type: object
       properties:
-        map:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
           type: object
           additionalProperties:
             type: string
-          description: 'A map with string keys and values.
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    monitoring.v4.0.common.ComparisonOperator:
+      type: string
+      description: The comparison operator used for the condition evaluation.
+      enum:
+      - EQUAL_TO
+      - GREATER_THAN
+      - GREATER_THAN_OR_EQUAL_TO
+      - LESS_THAN
+      - LESS_THAN_OR_EQUAL_TO
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        GREATER_THAN: Indicates a > operator used in conjunction with a metric in a condition. An alert may be generated when
+          the metric value equals the static threshold set depending on the trigger condition set.
+        LESS_THAN_OR_EQUAL_TO: Indicates a <= operator used in conjunction with a metric in a condition. An alert may be generated
+          when the metric value is less than or equal to the static threshold set depending on the trigger condition set.
+        EQUAL_TO: Indicates an = operator used in conjunction with a metric in a condition. An alert may be generated when
+          the metric value equals the static threshold set depending on the trigger condition set.
+        GREATER_THAN_OR_EQUAL_TO: Indicates a >= operator used in conjunction with a metric in a condition. An alert may be
+          generated when the metric value is greater than or equal to the static threshold set depending on the trigger condition
+          set.
+        LESS_THAN: Indicates a < operator used in conjunction with a metric in a condition. An alert may be generated when
+          the metric value is less than the static threshold set depending on the trigger condition set.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.serviceability.Condition:
+      required:
+      - metricName
+      - operator
+      - thresholdValue
+      type: object
+      properties:
+        metricName:
+          maxLength: 150
+          minLength: 1
+          type: string
+          description: The metric key. Allowed values of the metrics list can be found at https://portal.nutanix.com/page/documents/details?targetId=Prism-Central-Guide-vpc_2022_9:mul-alerts-user-created-metrics-r.html.
+        operator:
+          $ref: '#/components/schemas/monitoring.v4.0.common.ComparisonOperator'
+        thresholdValue:
+          required: []
+          type: object
+          properties: {}
+          description: The threshold value that was used for the condition evaluation.
+          oneOf:
+          - $ref: '#/components/schemas/monitoring.v4.0.common.DoubleValue'
+          - $ref: '#/components/schemas/monitoring.v4.0.common.IntValue'
+      additionalProperties: false
+      description: Conditions to be met to trigger the alert. Conditions are expressed in FIQL.
+    monitoring.v4.0.common.ImpactType:
+      type: string
+      description: The impact this alert or event will have on the system. For example, availability, performance, or capacity.
+      enum:
+      - AVAILABILITY
+      - CAPACITY
+      - CONFIGURATION
+      - PERFORMANCE
+      - SYSTEM_INDICATOR
+      - CPU_CAPACITY
+      - MEMORY_CAPACITY
+      - STORAGE_CAPACITY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CAPACITY: Indicates that there may be storage or memory issues in the system.
+        SYSTEM_INDICATOR: Indicates that certain operations in the system may fail or be interrupted.
+        MEMORY_CAPACITY: Indicates that the system may have memory issues.
+        AVAILABILITY: Impacts availability of certain services, data, or functionality in the system.
+        PERFORMANCE: Indicates that there might be performance issues in the system.
+        CONFIGURATION: Indicates that there may be connectivity issues between different entities due to incorrect configurations.
+        CPU_CAPACITY: Indicates that there may be issues with CPU capacity.
+        STORAGE_CAPACITY: Indicates that there may be storage issues in the system.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
 
             '
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
 
         '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    monitoring.v4.0.common.IntValue:
+      required:
+      - intValue
+      type: object
+      properties:
+        intValue:
+          type: integer
+          description: Denotes a value of type integer.
+          format: int64
+      additionalProperties: false
+      description: Denotes a value of type integer.
+    monitoring.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
     monitoring.v4.0.serviceability.UserDefinedPolicy:
       allOf:
       - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
@@ -1162,20 +1222,16 @@ components:
             minLength: 1
             type: string
             description: Title of the policy.
-            example: VM CPU Usage
           description:
             maxLength: 500
             type: string
             description: Description of the policy.
-            example: CPU resources utilization by a VM
           isEnabled:
             type: boolean
             description: Enable/Disable flag for the policy.
-            default: false
           isAutoResolved:
             type: boolean
             description: Indicates whether the auto-resolve feature is enabled for this policy.
-            default: true
           filters:
             description: Filter criteria for narrowing down the entities on which User-Defined Alert policies can be set up.
             oneOf:
@@ -1208,19 +1264,16 @@ components:
             type: string
             description: Username of the user who created the policy.
             readOnly: true
-            example: user123
           lastUpdatedTime:
             type: string
             description: Last updated time of the policy in ISO 8601 format. This value will be used as the CAS value during
               updates.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           isExpectedToErrorOnConflict:
             type: boolean
             description: Error when conflicting alert policies are found.
             writeOnly: true
-            default: true
           policiesToOverride:
             maxItems: 100
             minItems: 0
@@ -1228,13 +1281,11 @@ components:
             description: List of IDs of the alert policies that should be overridden.
             items:
               type: string
-              example: 32c3bc02-bd4c-4bbc-9648-c7a7399ac555
           triggerWaitPeriod:
             type: integer
             description: Waiting duration in seconds before triggering the alert, when the specified condition is met. It
               is set to 600s by default.
             format: int64
-            example: 24
           relatedPolicies:
             maxItems: 100
             minItems: 0
@@ -1247,8 +1298,135 @@ components:
             minLength: 1
             type: string
             description: Entity type associated with the User-Defined Alert policy. Allowed values are VM, node and cluster.
-            example: vm
         additionalProperties: false
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    monitoring.v4.0.serviceability.EntityFilter:
+      required:
+      - extId
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Entity UUID on which the User-Defined Alert policy should be set up.
+      additionalProperties: false
+      description: Entity UUID on which the User-Defined Alert policy should be set up.
+    monitoring.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/monitoring.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    monitoring.v4.0.serviceability.GroupEntityType:
+      type: string
+      description: The allowed entity types that can be used to filter the set of entities on which User-Defined Alert policy
+        is set.
+      enum:
+      - CATEGORY
+      - CLUSTER
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CATEGORY: Filter entities based on categories.
+        CLUSTER: Filter entities based on cluster.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.common.ConditionType:
+      type: string
+      description: Indicating if this symptom is caused by a static threshold or anomaly (dynamic threshold) evaluation.  If
+        an indicator is raised, there may have another indicator indicating the safeguard zone value.
+      enum:
+      - STATIC_THRESHOLD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        STATIC_THRESHOLD: Indicates that the condition for when the policy should generate an alert based on a static threshold
+          value.
+    monitoring.v4.0.serviceability.PolicySeverityLevel:
+      type: string
+      description: Severity of an alert.
+      enum:
+      - WARNING
+      - CRITICAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: Indicates that the severity of the alert is a warning. This means an actionable issue has been detected,
+          and user intervention is required. A more serious issue may develop if this is not resolved soon.
+        CRITICAL: Indicates that the severity of the alert is critical. This means an actionable critical situation has been
+          detected, and action is required immediately. The cluster may have the potential to stop running or run into irreparable
+          issues.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    monitoring.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -1267,7 +1445,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 75ae5d6e-79e5-4eaf-8fd8-b9cc27e3b815
           links:
             maxItems: 20
             minItems: 0
@@ -1280,57 +1457,38 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
-    monitoring.v4.0.error.ErrorResponse:
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    monitoring.v4.0.serviceability.GroupFilter:
+      required:
+      - extId
+      - type
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/monitoring.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationError'
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Entity UUID of the group entity type on which the User-Defined Alert policy should be set up.
+        type:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.GroupEntityType'
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    monitoring.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
+      description: Group of entities on which the User-Defined Alert policy should be set up.
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1352,12 +1510,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 99
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -1388,217 +1544,24 @@ components:
               '
             items:
               type: integer
-              example: 36
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    monitoring.v4.0.common.ComparisonOperator:
-      type: string
-      description: The comparison operator used for the condition evaluation.
-      enum:
-      - EQUAL_TO
-      - GREATER_THAN
-      - GREATER_THAN_OR_EQUAL_TO
-      - LESS_THAN
-      - LESS_THAN_OR_EQUAL_TO
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        GREATER_THAN: Indicates a > operator used in conjunction with a metric in a condition. An alert may be generated when
-          the metric value equals the static threshold set depending on the trigger condition set.
-        LESS_THAN_OR_EQUAL_TO: Indicates a <= operator used in conjunction with a metric in a condition. An alert may be generated
-          when the metric value is less than or equal to the static threshold set depending on the trigger condition set.
-        EQUAL_TO: Indicates an = operator used in conjunction with a metric in a condition. An alert may be generated when
-          the metric value equals the static threshold set depending on the trigger condition set.
-        GREATER_THAN_OR_EQUAL_TO: Indicates a >= operator used in conjunction with a metric in a condition. An alert may be
-          generated when the metric value is greater than or equal to the static threshold set depending on the trigger condition
-          set.
-        LESS_THAN: Indicates a < operator used in conjunction with a metric in a condition. An alert may be generated when
-          the metric value is less than the static threshold set depending on the trigger condition set.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    monitoring.v4.0.serviceability.RelatedPolicy:
+    monitoring.v4.0.serviceability.TriggerCondition:
       required:
-      - entityUuid
-      - policyIds
+      - condition
+      - conditionType
+      - severityLevel
       type: object
       properties:
-        entityUuid:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: UUID of the entity the User-Defined Alert policy is associated with.
-          example: 200d5bc0-10f0-458e-9c51-646f916f495d
-        policyIds:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Policy IDs associated with the specified entity.
-          items:
-            type: string
-            example: 32c3bc02-bd4c-4bbc-9648-c7a7399ac555
+        conditionType:
+          $ref: '#/components/schemas/monitoring.v4.0.common.ConditionType'
+        condition:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.Condition'
+        severityLevel:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.PolicySeverityLevel'
       additionalProperties: false
-      description: An alert policy that is related to the entities of the current policy.
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 31
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    monitoring.v4.0.common.ImpactType:
-      type: string
-      description: The impact this alert or event will have on the system. For example, availability, performance, or capacity.
-      enum:
-      - AVAILABILITY
-      - CAPACITY
-      - CONFIGURATION
-      - PERFORMANCE
-      - SYSTEM_INDICATOR
-      - CPU_CAPACITY
-      - MEMORY_CAPACITY
-      - STORAGE_CAPACITY
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        CAPACITY: Indicates that there may be storage or memory issues in the system.
-        SYSTEM_INDICATOR: Indicates that certain operations in the system may fail or be interrupted.
-        MEMORY_CAPACITY: Indicates that the system may have memory issues.
-        AVAILABILITY: Impacts availability of certain services, data, or functionality in the system.
-        PERFORMANCE: Indicates that there might be performance issues in the system.
-        CONFIGURATION: Indicates that there may be connectivity issues between different entities due to incorrect configurations.
-        CPU_CAPACITY: Indicates that there may be issues with CPU capacity.
-        STORAGE_CAPACITY: Indicates that there may be storage issues in the system.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    monitoring.v4.0.serviceability.GroupFilter:
-      required:
-      - extId
-      - type
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Entity UUID of the group entity type on which the User-Defined Alert policy should be set up.
-          example: 5caff495-ad97-4ed9-9260-740d57b7cb77
-        type:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.GroupEntityType'
-      additionalProperties: false
-      description: Group of entities on which the User-Defined Alert policy should be set up.
-    monitoring.v4.0.serviceability.EntityFilter:
-      required:
-      - extId
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Entity UUID on which the User-Defined Alert policy should be set up.
-          example: f21b6f8c-13fd-423b-bd73-e5de6d0792f8
-      additionalProperties: false
-      description: Entity UUID on which the User-Defined Alert policy should be set up.
-    monitoring.v4.0.common.ConditionType:
-      type: string
-      description: Indicating if this symptom is caused by a static threshold or anomaly (dynamic threshold) evaluation.  If
-        an indicator is raised, there may have another indicator indicating the safeguard zone value.
-      enum:
-      - STATIC_THRESHOLD
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-        STATIC_THRESHOLD: Indicates that the condition for when the policy should generate an alert based on a static threshold
-          value.
-    monitoring.v4.0.common.DoubleValue:
-      required:
-      - doubleValue
-      type: object
-      properties:
-        doubleValue:
-          type: number
-          description: Denotes a value of type double.
-          format: double
-          example: 37.245896146946436
-      additionalProperties: false
-      description: Denotes a value of type double.
-    monitoring.v4.0.serviceability.GroupEntityType:
-      type: string
-      description: The allowed entity types that can be used to filter the set of entities on which User-Defined Alert policy
-        is set.
-      enum:
-      - CATEGORY
-      - CLUSTER
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        CATEGORY: Filter entities based on categories.
-        CLUSTER: Filter entities based on cluster.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
   securitySchemes:
     basicAuthScheme:
       type: http

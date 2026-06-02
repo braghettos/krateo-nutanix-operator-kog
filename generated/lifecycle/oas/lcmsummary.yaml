@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -287,7 +285,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 54097099-2934-4116-b6d9-34e01fa83922
       responses:
         '200':
           description: Detailed summary of LCM cluster.
@@ -419,42 +416,6 @@ paths:
           \n"
 components:
   schemas:
-    lifecycle.v4.0.common.OperationType:
-      title: LCM operation type.
-      type: string
-      description: Type of the operation tracked by the task.
-      enum:
-      - INVENTORY
-      - PRECHECKS
-      - UPGRADE
-      - NONE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PRECHECKS: Perform LCM prechecks for the intended update operation.
-        INVENTORY: Perform an LCM inventory operation.
-        UPGRADE: Perform upgrade operation to a specific target version for discovered LCM entity/entities.
-        NONE: Indicates that no operation is currently ongoing.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -482,6 +443,74 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    lifecycle.v4.0.common.InProgressOpDetails:
+      title: In progress LCM operation details.
+      type: object
+      properties:
+        taskExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Task ext id of the in progress LCM operation.
+        operationType:
+          $ref: '#/components/schemas/lifecycle.v4.0.common.OperationType'
+      additionalProperties: false
+      description: Details of the in progress LCM operation.
+    lifecycle.v4.0.resources.Capability:
+      title: Cluster capability
+      type: string
+      description: Details of a cluster capability.
+      enum:
+      - MCL_INVENTORY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        MCL_INVENTORY: Capability that specifies whether the cluster supports MCL inventory.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -500,7 +529,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: d95188be-5a20-4b56-a35f-c4fc189a3738
           links:
             maxItems: 20
             minItems: 0
@@ -529,28 +557,58 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
-    common.v1.0.config.Message:
+    common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
 
             '
-        locale:
-          type: string
-          description: 'The locale for the message description.
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
 
             '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
       additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
     common.v1.0.config.TenantAwareModel:
       type: object
       properties:
@@ -564,53 +622,59 @@ components:
 
             '
           readOnly: true
-          example: 12ce1b92-1a2a-48ba-b86b-b68a6aa69dc1
       additionalProperties: false
       description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
         base model class that it extends and is automatically set by the server.
 
         '
-    common.v1.0.config.Flag:
+    lifecycle.v4.0.common.OperationType:
+      title: LCM operation type.
+      type: string
+      description: Type of the operation tracked by the task.
+      enum:
+      - INVENTORY
+      - PRECHECKS
+      - UPGRADE
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PRECHECKS: Perform LCM prechecks for the intended update operation.
+        INVENTORY: Perform an LCM inventory operation.
+        UPGRADE: Perform upgrade operation to a specific target version for discovered LCM entity/entities.
+        NONE: Indicates that no operation is currently ongoing.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    lifecycle.v4.0.error.AppMessage:
       type: object
       properties:
-        name:
-          maxLength: 128
-          minLength: 3
+        message:
           type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
       additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -632,12 +696,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 72
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -668,53 +730,10 @@ components:
               '
             items:
               type: integer
-              example: 60
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    lifecycle.v4.0.common.InProgressOpDetails:
-      title: In progress LCM operation details.
-      type: object
-      properties:
-        taskExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Task ext id of the in progress LCM operation.
-          example: 91be9f3a-b666-462b-91e7-3e9d94eeb0d1
-        operationType:
-          $ref: '#/components/schemas/lifecycle.v4.0.common.OperationType'
-      additionalProperties: false
-      description: Details of the in progress LCM operation.
-    lifecycle.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/lifecycle.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    lifecycle.v4.0.resources.Capability:
-      title: Cluster capability
-      type: string
-      description: Details of a cluster capability.
-      enum:
-      - MCL_INVENTORY
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        MCL_INVENTORY: Capability that specifies whether the cluster supports MCL inventory.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
     lifecycle.v4.0.error.SchemaValidationError:
       type: object
       properties:
@@ -722,11 +741,9 @@ components:
           type: string
           description: Timestamp of the response.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
         statusCode:
           type: integer
           description: The HTTP status code of the response.
-          example: 84
         error:
           type: string
           description: The generic error message for the response.
@@ -741,86 +758,27 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
-    lifecycle.v4.0.error.AppMessage:
+    common.v1.0.config.Message:
       type: object
       properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
         code:
           type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
         locale:
           type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 71
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
     lifecycle.v4.0.resources.LcmSummary:
       title: Summary of LCM state on a cluster
       description: Summary of LCM state on a cluster.
@@ -833,19 +791,16 @@ components:
             minLength: 1
             type: string
             description: Current LCM Version.
-            example: 3.0.45678
           availableVersion:
             maxLength: 128
             minLength: 1
             type: string
             description: LCM framework version present in the LCM URL.
-            example: 3.1.45568
           hardwareVendor:
             maxLength: 256
             minLength: 1
             type: string
             description: Hardware vendor information.
-            example: Dell
           capabilities:
             maxItems: 7
             minItems: 0
@@ -860,8 +815,34 @@ components:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: Cluster uuid on which the resource is present or operation is being performed.
-            example: 04890101-67d1-4ae4-b26e-0df8b4e7ccf5
         additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    lifecycle.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/lifecycle.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
   securitySchemes:
     basicAuthScheme:
       type: http

@@ -32,7 +32,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 09fcc73d-e057-4ac1-be1c-31479b03db22
       - name: $page
         in: query
         description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
@@ -52,7 +51,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -73,7 +71,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -88,14 +85,9 @@ paths:
         explode: true
         schema:
           type: string
-          example: string
         x-odata-fields:
         - name: entityType
-          example: https://{pc-ip}:9440/api/aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors?$filter=entityType
-            eq 'string'
         - name: metrics/name
-          example: https://{pc-ip}:9440/api/aiops/v4.0/config/sources/{sourceExtId}/entity-descriptors?$filter=metrics/any(a:a/name
-            eq 'string')
       responses:
         '200':
           description: Returned all the entity descriptors.
@@ -233,155 +225,6 @@ paths:
       version: '2024.3'
 components:
   schemas:
-    aiops.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-          example: string
-        message:
-          type: string
-          description: The detailed message for the validation error.
-          example: string
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-          example: string
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.config.MessageSeverity:
-      type: string
-      description: 'The message severity.
-
-        '
-      enum:
-      - INFO
-      - WARNING
-      - ERROR
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ERROR: 'Error indicating failed completion.
-
-          '
-        INFO: 'Information about successful completion.
-
-          '
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: 'Warning indicating future error.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 14096246-84d8-4e4b-af05-7353513f2cd4
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    aiops.v4.0.config.ValueRange:
-      type: object
-      properties:
-        min:
-          type: number
-          description: Minimum value in the value range.
-          format: double
-          example: 75.22889863581844
-        max:
-          type: number
-          description: Maximum value in the value range.
-          format: double
-          example: 99.585755757256
-      additionalProperties: false
-      description: Range of the values for the metric.
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-          example: string
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-          example: string
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this ID to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 0f003c5f-5136-475b-9063-1adea5558409
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.stats.DownSamplingOperator:
       type: string
       description: 'The operator to use while performing down-sampling on stats data. Allowed values are SUM, MIN, MAX, AVG,
@@ -422,39 +265,52 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    aiops.v4.0.config.EntityDescriptor:
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          entityType:
-            type: string
-            description: Entity type of the data supported for a given source. For example VM, cluster etc.
-            example: string
-          source:
-            type: string
-            description: Source name for the vendors. For example 'Nutanix'.
-            example: string
-          displayName:
-            maxLength: 50
-            type: string
-            description: Readable name for the entity.
-            example: string
-          parents:
-            maxItems: 5
-            minItems: 0
-            type: array
-            description: Parent entity types for the given entity.
-            items:
-              $ref: '#/components/schemas/aiops.v4.0.config.EntityDescriptor'
-          metrics:
-            maxItems: 100
-            minItems: 0
-            type: array
-            description: Metrics data for the entity.
-            items:
-              $ref: '#/components/schemas/aiops.v4.0.config.MetricDescriptor'
-        additionalProperties: false
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
     aiops.v4.0.error.ErrorResponse:
       type: object
       properties:
@@ -468,6 +324,32 @@ components:
       description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
         Please look at the HTTP status code and namespace specific error code and error message for further details.
       x-platform-generated: true
+    aiops.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
+            the endpoint belongs. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
     common.v1.0.config.Flag:
       type: object
       properties:
@@ -478,212 +360,47 @@ components:
           description: 'Name of the flag.
 
             '
-          example: string
         value:
           type: boolean
           description: 'Value of the flag.
 
             '
-          default: false
       additionalProperties: false
       description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
         entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
         that tells which flags are actually present for that entity.
 
         '
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-          example: string
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-          example: string
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
 
         '
-    aiops.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-          example: string
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
-            the endpoint belongs. For example: VMM-40000'
-          example: string
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-          example: string
-        argumentsMap:
-          type: object
-          additionalProperties:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    aiops.v4.0.config.MetricDescriptor:
-      type: object
-      properties:
-        isAttribute:
-          type: boolean
-          description: Indicates whether it is an attribute or not.
-          example: true
-        isAttributePersistedAsTimeSeries:
-          type: boolean
-          description: Indicator to specify whether the attribute should be persisted as time series data or not.
-          example: false
-        name:
-          maxLength: 50
-          type: string
-          description: Name of the metric.
-          example: string
-        displayName:
-          maxLength: 50
-          type: string
-          description: Readable name for the entity.
-          example: string
-        valueType:
-          $ref: '#/components/schemas/aiops.v4.0.config.ValueType'
-        valueRange:
-          $ref: '#/components/schemas/aiops.v4.0.config.ValueRange'
-        defaultValue:
-          type: string
-          description: Default value of the metric.
-          example: string
-        unit:
-          type: string
-          description: Unit for the metric.
-          example: string
-        samplingIntervalSecs:
-          type: integer
-          description: The interval value is used to resample the queried time series data by using down_sampling_operator
-            operator. The default is 86400 seconds.
-          example: 87
-        downsamplingOperator:
-          $ref: '#/components/schemas/common.v1.0.stats.DownSamplingOperator'
-        additionalProperties:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Additional properties for metric descriptor definition. Like anomaly metric, alert metric and search
-            UI metric.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-    aiops.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 71
-        error:
-          type: string
-          description: The generic error message for the response.
-          example: string
-        path:
-          type: string
-          description: API path on which the request was made.
-          example: string
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/aiops.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-          example: string
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
 
               '
-            example: string
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 60
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
             minItems: 0
             type: array
-            description: 'A value in a key-value pair that represents a list of strings.
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
 
               '
+            readOnly: true
             items:
-              type: string
-              example: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 84
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
     aiops.v4.0.config.ValueType:
       type: string
       description: Data type of the values for the metric.
@@ -741,7 +458,6 @@ components:
 
             '
           format: int32
-          example: 72
         messages:
           maxItems: 20
           minItems: 0
@@ -766,6 +482,243 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this ID to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    aiops.v4.0.config.EntityDescriptor:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          entityType:
+            type: string
+            description: Entity type of the data supported for a given source. For example VM, cluster etc.
+          source:
+            type: string
+            description: Source name for the vendors. For example 'Nutanix'.
+          displayName:
+            maxLength: 50
+            type: string
+            description: Readable name for the entity.
+          parents:
+            maxItems: 5
+            minItems: 0
+            type: array
+            description: Parent entity types for the given entity.
+            items:
+              $ref: '#/components/schemas/aiops.v4.0.config.EntityDescriptor'
+          metrics:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Metrics data for the entity.
+            items:
+              $ref: '#/components/schemas/aiops.v4.0.config.MetricDescriptor'
+        additionalProperties: false
+    aiops.v4.0.config.MetricDescriptor:
+      type: object
+      properties:
+        isAttribute:
+          type: boolean
+          description: Indicates whether it is an attribute or not.
+        isAttributePersistedAsTimeSeries:
+          type: boolean
+          description: Indicator to specify whether the attribute should be persisted as time series data or not.
+        name:
+          maxLength: 50
+          type: string
+          description: Name of the metric.
+        displayName:
+          maxLength: 50
+          type: string
+          description: Readable name for the entity.
+        valueType:
+          $ref: '#/components/schemas/aiops.v4.0.config.ValueType'
+        valueRange:
+          $ref: '#/components/schemas/aiops.v4.0.config.ValueRange'
+        defaultValue:
+          type: string
+          description: Default value of the metric.
+        unit:
+          type: string
+          description: Unit for the metric.
+        samplingIntervalSecs:
+          type: integer
+          description: The interval value is used to resample the queried time series data by using down_sampling_operator
+            operator. The default is 86400 seconds.
+        downsamplingOperator:
+          $ref: '#/components/schemas/common.v1.0.stats.DownSamplingOperator'
+        additionalProperties:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Additional properties for metric descriptor definition. Like anomaly metric, alert metric and search
+            UI metric.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    aiops.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/aiops.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    aiops.v4.0.config.ValueRange:
+      type: object
+      properties:
+        min:
+          type: number
+          description: Minimum value in the value range.
+          format: double
+        max:
+          type: number
+          description: Maximum value in the value range.
+          format: double
+      additionalProperties: false
+      description: Range of the values for the metric.
+    aiops.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
   securitySchemes:
     basicAuthScheme:
       type: http

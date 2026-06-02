@@ -205,7 +205,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: e33177d0-57e9-4a15-8022-367dadbc82aa
       responses:
         '200':
           description: 'Returns the restore source configuration and external Identifier to the user.
@@ -358,7 +357,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: e1ab3b67-2f04-47de-b368-632c52969165
       - name: If-Match
         in: header
         description: 'The If-Match request header makes the request conditional. When not provided the server will respond
@@ -434,86 +432,6 @@ paths:
         version: '7.0'
 components:
   schemas:
-    prism.v4.0.management.S3Config:
-      required:
-      - bucketName
-      type: object
-      properties:
-        bucketName:
-          maxLength: 63
-          minLength: 3
-          type: string
-          description: 'The bucket name of the object store endpoint where backup data of domain manager
-
-            is to be stored.
-
-            '
-          example: pc-bucket-name
-        region:
-          maxLength: 63
-          type: string
-          description: 'The region name of the object store endpoint where backup data of domain manager
-
-            is stored.
-
-            '
-          default: us-east-1
-      additionalProperties: false
-      description: 'The endpoint of the object store s3 where domain manager is backed up.
-
-        '
-    prism.v4.0.management.ClusterLocation:
-      required:
-      - config
-      type: object
-      properties:
-        config:
-          $ref: '#/components/schemas/prism.v4.0.management.ClusterReference'
-      additionalProperties: false
-      description: 'Model which contains the information of backup cluster.
-
-        '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: d568ff06-a6dc-480f-868c-b85b52f447ba
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -541,19 +459,133 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    prism.v4.0.error.ErrorResponse:
+    prism.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationError'
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    prism.v4.0.management.ClusterReference:
+      required:
+      - extId
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Cluster UUID of a remote cluster.
+        name:
+          maxLength: 80
+          minLength: 1
+          type: string
+          description: Name of the cluster.
+          readOnly: true
+      additionalProperties: false
+      description: Cluster reference of the remote cluster to be connected.
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -573,48 +605,54 @@ components:
         an address for retrieving the particular resource.
 
         '
-    prism.v4.0.management.ClusterReference:
+    prism.v4.0.management.S3Config:
       required:
-      - extId
+      - bucketName
       type: object
       properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        bucketName:
+          maxLength: 63
+          minLength: 3
           type: string
-          description: Cluster UUID of a remote cluster.
-          example: 5f9c6fef-a851-439c-a150-58f8b76e074c
-        name:
-          maxLength: 80
-          minLength: 1
+          description: 'The bucket name of the object store endpoint where backup data of domain manager
+
+            is to be stored.
+
+            '
+        region:
+          maxLength: 63
           type: string
-          description: Name of the cluster.
-          readOnly: true
+          description: 'The region name of the object store endpoint where backup data of domain manager
+
+            is stored.
+
+            '
       additionalProperties: false
-      description: Cluster reference of the remote cluster to be connected.
-    prism.v4.0.management.RestoreSource:
+      description: 'The endpoint of the object store s3 where domain manager is backed up.
+
+        '
+    prism.v4.0.management.ObjectStoreLocation:
       required:
-      - location
-      description: 'The backup target for the domain manager, which can be either a cluster or an object store.
+      - providerConfig
+      type: object
+      properties:
+        providerConfig:
+          $ref: '#/components/schemas/prism.v4.0.management.AWSS3Config'
+        backupPolicy:
+          $ref: '#/components/schemas/prism.v4.0.management.BackupPolicy'
+      additionalProperties: false
+      description: "Model which contains the information of the object store endpoint where \nbackup is present. It contains\
+        \ information like objectstore \nendpoint address, endpoint flavour and last sync timestamp.\n"
+    prism.v4.0.management.AWSS3Config:
+      description: 'The base model of S3 object store endpoint where domain manager is backed up.
 
         '
       allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - $ref: '#/components/schemas/prism.v4.0.management.S3Config'
       - type: object
         properties:
-          location:
-            required:
-            - $objectType
-            type: object
-            properties:
-              $objectType:
-                type: string
-                example: prism.v4.management.ClusterLocation
-            description: 'Location of the backup target. For example, a cluster or an object store endpoint, such as AWS s3.
-
-              '
-            oneOf:
-            - $ref: '#/components/schemas/prism.v4.0.management.ClusterLocation'
-            - $ref: '#/components/schemas/prism.v4.0.management.ObjectStoreLocation'
+          credentials:
+            $ref: '#/components/schemas/prism.v4.0.management.AccessKeyCredentials'
         additionalProperties: false
     common.v1.0.config.MapOfStringWrapper:
       type: object
@@ -630,6 +668,80 @@ components:
       description: 'A wrapper schema containing a map with string keys and values.
 
         '
+    prism.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    prism.v4.0.management.ClusterLocation:
+      required:
+      - config
+      type: object
+      properties:
+        config:
+          $ref: '#/components/schemas/prism.v4.0.management.ClusterReference'
+      additionalProperties: false
+      description: 'Model which contains the information of backup cluster.
+
+        '
+    prism.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    prism.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -648,7 +760,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 0562e12d-543d-4030-9271-20ba8e72fcb2
           links:
             maxItems: 20
             minItems: 0
@@ -661,55 +772,24 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
-    prism.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -731,12 +811,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 3
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -767,129 +845,30 @@ components:
               '
             items:
               type: integer
-              example: 3
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    prism.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 41
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    prism.v4.0.management.AWSS3Config:
-      description: 'The base model of S3 object store endpoint where domain manager is backed up.
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/prism.v4.0.management.S3Config'
-      - type: object
-        properties:
-          credentials:
-            $ref: '#/components/schemas/prism.v4.0.management.AccessKeyCredentials'
-        additionalProperties: false
-    prism.v4.0.management.ObjectStoreLocation:
+    prism.v4.0.management.AccessKeyCredentials:
       required:
-      - providerConfig
+      - accessKeyId
+      - secretAccessKey
       type: object
       properties:
-        providerConfig:
-          $ref: '#/components/schemas/prism.v4.0.management.AWSS3Config'
-        backupPolicy:
-          $ref: '#/components/schemas/prism.v4.0.management.BackupPolicy'
+        accessKeyId:
+          maxLength: 128
+          minLength: 16
+          type: string
+          description: Access key Id for the object store provided for backup target.
+        secretAccessKey:
+          maxLength: 1024
+          type: string
+          description: 'Secret access key for the object store provided for backup target.
+
+            '
+          format: password
       additionalProperties: false
-      description: "Model which contains the information of the object store endpoint where \nbackup is present. It contains\
-        \ information like objectstore \nendpoint address, endpoint flavour and last sync timestamp.\n"
-    prism.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 36
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
+      description: Secret credentials model for the object store containing access key ID and secret access key.
     prism.v4.0.management.BackupPolicy:
       required:
       - rpoInMinutes
@@ -903,31 +882,29 @@ components:
 
             '
           format: int32
-          example: 86
       additionalProperties: false
       description: Backup policy for the object store provided.
-    prism.v4.0.management.AccessKeyCredentials:
+    prism.v4.0.management.RestoreSource:
       required:
-      - accessKeyId
-      - secretAccessKey
-      type: object
-      properties:
-        accessKeyId:
-          maxLength: 128
-          minLength: 16
-          type: string
-          description: Access key Id for the object store provided for backup target.
-          example: AKIAZ26UIJS6DRKHPPF4
-        secretAccessKey:
-          maxLength: 1024
-          type: string
-          description: 'Secret access key for the object store provided for backup target.
+      - location
+      description: 'The backup target for the domain manager, which can be either a cluster or an object store.
 
-            '
-          format: password
-          example: L1feKeOuNErB0SCULU1XrGKS5gWAGb1RQp/Lxc3y
-      additionalProperties: false
-      description: Secret credentials model for the object store containing access key ID and secret access key.
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          location:
+            required: []
+            type: object
+            properties: {}
+            description: 'Location of the backup target. For example, a cluster or an object store endpoint, such as AWS s3.
+
+              '
+            oneOf:
+            - $ref: '#/components/schemas/prism.v4.0.management.ClusterLocation'
+            - $ref: '#/components/schemas/prism.v4.0.management.ObjectStoreLocation'
+        additionalProperties: false
   securitySchemes:
     basicAuthScheme:
       type: http

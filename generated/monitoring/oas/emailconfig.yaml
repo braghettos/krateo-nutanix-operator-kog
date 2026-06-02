@@ -386,222 +386,6 @@ paths:
           } \\\n- \"https://{pc-ip}:9440/api/monitoring/v4.0/serviceability/alerts/email-config\"\n"
 components:
   schemas:
-    monitoring.v4.0.serviceability.AlertEmailConfiguration:
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          defaultNutanixEmail:
-            pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-            type: string
-            description: The default Nutanix email ID to which alert emails are sent.
-            example: john.doe@example.com
-          isEnabled:
-            type: boolean
-            description: Indicates whether alert emails are enabled or not.
-            default: false
-          hasDefaultNutanixEmail:
-            type: boolean
-            description: Indicates whether alert emails are enabled or not on default Nutanix email ID.
-            default: false
-          isEmailDigestEnabled:
-            type: boolean
-            description: Indicates whether alert email digest is enabled or not.
-            default: false
-          isEmptyAlertEmailDigestSkipped:
-            type: boolean
-            description: Send alert email digest only if there are one or more alerts.
-            default: false
-          emailConfigRules:
-            maxItems: 100
-            minItems: 0
-            type: array
-            description: Rules for email configuration.
-            items:
-              $ref: '#/components/schemas/monitoring.v4.0.serviceability.EmailConfigurationRule'
-          emailContactList:
-            maxItems: 100
-            minItems: 0
-            type: array
-            description: List of email contacts.
-            items:
-              pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-              type: string
-              example: john.doe@example.com
-          emailTemplate:
-            $ref: '#/components/schemas/monitoring.v4.0.serviceability.EmailTemplate'
-          tunnelDetails:
-            $ref: '#/components/schemas/monitoring.v4.0.serviceability.RemoteTunnelDetails'
-          alertEmailDigestSendTime:
-            type: string
-            description: Time in HH:mm format when the alert email digest is sent daily.
-            example: 600
-          alertEmailDigestSendTimezone:
-            type: string
-            description: Timezone for the time at which the alert email digest is sent daily.
-            example: GMT
-        additionalProperties: false
-    monitoring.v4.0.serviceability.ConnectionStatus:
-      type: string
-      description: Connection status.
-      enum:
-      - SUCCESS
-      - FAILED
-      - RETRYING
-      - DISABLED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        DISABLED: Indicates that the connection to the remote tunnel is disabled.
-        SUCCESS: Indicates that the connection to the remote tunnel was successful.
-        FAILED: Indicates that the connection to the remote tunnel has failed.
-        RETRYING: Indicates that the connection to the remote tunnel is retried.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.FQDN:
-      type: object
-      properties:
-        value:
-          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
-          type: string
-          description: 'The fully qualified domain name of the host.
-
-            '
-          example: www.example-corp.com
-      additionalProperties: false
-      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
-        System.
-
-        '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    monitoring.v4.0.serviceability.RemoteTunnelDetails:
-      type: object
-      properties:
-        httpProxy:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.HttpProxy'
-        serviceCenter:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.ServiceCenter'
-        connectionStatus:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.CommunicationStatus'
-        transportStatus:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.CommunicationStatus'
-      additionalProperties: false
-      description: Remote tunnel details associated with the email configuration.
-    monitoring.v4.0.serviceability.ProxyType:
-      type: string
-      enum:
-      - HTTP
-      - HTTPS
-      - SOCKS
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        HTTPS: Indicates an HTTPS proxy.
-        SOCKS: Indicates a SOCKS proxy.
-        HTTP: Indicates an HTTP proxy.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    monitoring.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 28
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: cdd59c7a-4bdb-4cea-9597-0cbc94bc703d
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    monitoring.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -629,6 +413,434 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    monitoring.v4.0.serviceability.AlertEmailConfiguration:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          defaultNutanixEmail:
+            pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+            type: string
+            description: The default Nutanix email ID to which alert emails are sent.
+          isEnabled:
+            type: boolean
+            description: Indicates whether alert emails are enabled or not.
+          hasDefaultNutanixEmail:
+            type: boolean
+            description: Indicates whether alert emails are enabled or not on default Nutanix email ID.
+          isEmailDigestEnabled:
+            type: boolean
+            description: Indicates whether alert email digest is enabled or not.
+          isEmptyAlertEmailDigestSkipped:
+            type: boolean
+            description: Send alert email digest only if there are one or more alerts.
+          emailConfigRules:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Rules for email configuration.
+            items:
+              $ref: '#/components/schemas/monitoring.v4.0.serviceability.EmailConfigurationRule'
+          emailContactList:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: List of email contacts.
+            items:
+              pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+              type: string
+          emailTemplate:
+            $ref: '#/components/schemas/monitoring.v4.0.serviceability.EmailTemplate'
+          tunnelDetails:
+            $ref: '#/components/schemas/monitoring.v4.0.serviceability.RemoteTunnelDetails'
+          alertEmailDigestSendTime:
+            type: string
+            description: Time in HH:mm format when the alert email digest is sent daily.
+          alertEmailDigestSendTimezone:
+            type: string
+            description: Timezone for the time at which the alert email digest is sent daily.
+        additionalProperties: false
+    common.v1.0.config.FQDN:
+      type: object
+      properties:
+        value:
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
+          type: string
+          description: 'The fully qualified domain name of the host.
+
+            '
+      additionalProperties: false
+      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
+        System.
+
+        '
+    monitoring.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    monitoring.v4.0.serviceability.EmailConfigurationRule:
+      type: object
+      properties:
+        clusterUuids:
+          maxItems: 50
+          minItems: 0
+          type: array
+          description: Cluster UUIDs to which this rule applies.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        impactTypes:
+          maxItems: 8
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/monitoring.v4.0.common.ImpactType'
+        hasGlobalEmailContactList:
+          type: boolean
+          description: Indicates whether to include a global email contact list.
+        matchPhrases:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: List of phrases to match the alert.
+          items:
+            type: string
+        recipients:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: List of recipients who will receive emails.
+          items:
+            pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+            type: string
+        severities:
+          maxItems: 3
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/monitoring.v4.0.common.Severity'
+        isEnabled:
+          type: boolean
+          description: Indicates whether the configuration rule is enabled or not.
+      additionalProperties: false
+      description: Status of the remote tunnel that is used to send alert emails.
+    monitoring.v4.0.serviceability.EmailTemplate:
+      type: object
+      properties:
+        bodySuffix:
+          type: string
+          description: Suffix for the email body.
+        subjectPrefix:
+          maxLength: 256
+          type: string
+          description: Prefix for the email subject.
+      additionalProperties: false
+      description: Email template.
+    monitoring.v4.0.serviceability.ConnectionStatus:
+      type: string
+      description: Connection status.
+      enum:
+      - SUCCESS
+      - FAILED
+      - RETRYING
+      - DISABLED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DISABLED: Indicates that the connection to the remote tunnel is disabled.
+        SUCCESS: Indicates that the connection to the remote tunnel was successful.
+        FAILED: Indicates that the connection to the remote tunnel has failed.
+        RETRYING: Indicates that the connection to the remote tunnel is retried.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.common.ImpactType:
+      type: string
+      description: The impact this alert or event will have on the system. For example, availability, performance, or capacity.
+      enum:
+      - AVAILABILITY
+      - CAPACITY
+      - CONFIGURATION
+      - PERFORMANCE
+      - SYSTEM_INDICATOR
+      - CPU_CAPACITY
+      - MEMORY_CAPACITY
+      - STORAGE_CAPACITY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CAPACITY: Indicates that there may be storage or memory issues in the system.
+        SYSTEM_INDICATOR: Indicates that certain operations in the system may fail or be interrupted.
+        MEMORY_CAPACITY: Indicates that the system may have memory issues.
+        AVAILABILITY: Impacts availability of certain services, data, or functionality in the system.
+        PERFORMANCE: Indicates that there might be performance issues in the system.
+        CONFIGURATION: Indicates that there may be connectivity issues between different entities due to incorrect configurations.
+        CPU_CAPACITY: Indicates that there may be issues with CPU capacity.
+        STORAGE_CAPACITY: Indicates that there may be storage issues in the system.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.serviceability.ProxyType:
+      type: string
+      enum:
+      - HTTP
+      - HTTPS
+      - SOCKS
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        HTTPS: Indicates an HTTPS proxy.
+        SOCKS: Indicates a SOCKS proxy.
+        HTTP: Indicates an HTTP proxy.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    monitoring.v4.0.serviceability.CommunicationStatus:
+      type: object
+      properties:
+        lastCheckedTime:
+          type: string
+          description: Last checked time.
+          format: date-time
+        lastChangedTime:
+          type: string
+          description: Last changed time.
+          format: date-time
+        lastSuccessfulTransmissionTime:
+          type: string
+          description: Last successful transmission time.
+          format: date-time
+        status:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.ConnectionStatus'
+        message:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.ParameterizedMessage'
+      additionalProperties: false
+      description: Status of the remote tunnel or service that is running on top of the remote tunnel. For example, pulse
+        or alert email.
+    monitoring.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    monitoring.v4.0.serviceability.ServiceCenter:
+      type: object
+      properties:
+        name:
+          maxLength: 1000
+          type: string
+          description: Name of service center.
+        ipAddress:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: IP address of the service center.
+        username:
+          maxLength: 255
+          type: string
+          description: Username.
+        port:
+          maximum: 65536
+          minimum: 0
+          type: integer
+          description: Port number.
+          format: int32
+      additionalProperties: false
+      description: Service center to which remote tunnel is connected at Nutanix's end.
+    monitoring.v4.0.serviceability.ParameterizedMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message.
+        attributes:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Attributes.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVStringPair'
+      additionalProperties: false
+      description: To store any custom message and attributes.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.0.config.FQDN'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+
+        '
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -648,19 +860,86 @@ components:
         an address for retrieving the particular resource.
 
         '
-    common.v1.0.config.KVStringPair:
+    monitoring.v4.0.serviceability.HttpProxy:
       type: object
       properties:
         name:
-          maxLength: 128
-          minLength: 3
+          maxLength: 1000
           type: string
-          description: The key of this key-value string pair
-        value:
+          description: Proxy name.
+        addressValue:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        port:
+          maximum: 65536
+          minimum: 0
+          type: integer
+          description: Port on which proxy is binding.
+          format: int32
+        username:
+          maxLength: 255
           type: string
-          description: The value associated with the key for this key-value string pair
-          default: ''
+          description: User name for proxy authentication.
+        password:
+          type: string
+          description: Password for proxy authentication.
+        proxyTypes:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Proxy types to send applicable traffic.
+          items:
+            $ref: '#/components/schemas/monitoring.v4.0.serviceability.ProxyType'
       additionalProperties: false
+      description: HTTP proxy used to establish the remote tunnel.
+    monitoring.v4.0.common.Severity:
+      type: string
+      description: Severity of an alert.
+      enum:
+      - INFO
+      - WARNING
+      - CRITICAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        INFO: Indicates that the severity of the alert is informational. This means that an actionable minor problem has been
+          detected. It should be resolved relatively soon and should not be ignored.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: Indicates that the severity of the alert is a warning. This means an actionable issue has been detected,
+          and user intervention is required. A more serious issue may develop if this is not resolved soon.
+        CRITICAL: Indicates that the severity of the alert is critical. This means an actionable critical situation has been
+          detected, and action is required immediately. The cluster may have the potential to stop running or run into irreparable
+          issues.
+        $REDACTED: 'Redacted value.
+
+          '
+    monitoring.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/monitoring.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    monitoring.v4.0.serviceability.RemoteTunnelDetails:
+      type: object
+      properties:
+        httpProxy:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.HttpProxy'
+        serviceCenter:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.ServiceCenter'
+        connectionStatus:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.CommunicationStatus'
+        transportStatus:
+          $ref: '#/components/schemas/monitoring.v4.0.serviceability.CommunicationStatus'
+      additionalProperties: false
+      description: Remote tunnel details associated with the email configuration.
     common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
@@ -673,6 +952,45 @@ components:
             '
       additionalProperties: false
       description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    monitoring.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
 
         '
     common.v1.0.response.ExternalizableAbstractModel:
@@ -693,7 +1011,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 75ae5d6e-79e5-4eaf-8fd8-b9cc27e3b815
           links:
             maxItems: 20
             minItems: 0
@@ -706,57 +1023,36 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.KVStringPair:
       type: object
       properties:
-        code:
+        name:
+          maxLength: 128
+          minLength: 3
           type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
+          description: The key of this key-value string pair
+        value:
           type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          description: The value associated with the key for this key-value string pair
       additionalProperties: false
-    monitoring.v4.0.error.ErrorResponse:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/monitoring.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/monitoring.v4.0.error.SchemaValidationError'
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    monitoring.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -778,12 +1074,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 99
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -814,348 +1108,10 @@ components:
               '
             items:
               type: integer
-              example: 36
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    monitoring.v4.0.serviceability.EmailConfigurationRule:
-      type: object
-      properties:
-        clusterUuids:
-          maxItems: 50
-          minItems: 0
-          type: array
-          description: Cluster UUIDs to which this rule applies.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: c0845ff0-a25b-465d-825a-4e6acc9d3b6a
-        impactTypes:
-          maxItems: 8
-          minItems: 0
-          type: array
-          items:
-            $ref: '#/components/schemas/monitoring.v4.0.common.ImpactType'
-        hasGlobalEmailContactList:
-          type: boolean
-          description: Indicates whether to include a global email contact list.
-          default: false
-        matchPhrases:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: List of phrases to match the alert.
-          items:
-            type: string
-            example: infrastructure
-        recipients:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: List of recipients who will receive emails.
-          items:
-            pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-            type: string
-            example: john.doe@example.com
-        severities:
-          maxItems: 3
-          minItems: 0
-          type: array
-          items:
-            $ref: '#/components/schemas/monitoring.v4.0.common.Severity'
-        isEnabled:
-          type: boolean
-          description: Indicates whether the configuration rule is enabled or not.
-          default: true
-      additionalProperties: false
-      description: Status of the remote tunnel that is used to send alert emails.
-    monitoring.v4.0.common.Severity:
-      type: string
-      description: Severity of an alert.
-      enum:
-      - INFO
-      - WARNING
-      - CRITICAL
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        INFO: Indicates that the severity of the alert is informational. This means that an actionable minor problem has been
-          detected. It should be resolved relatively soon and should not be ignored.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: Indicates that the severity of the alert is a warning. This means an actionable issue has been detected,
-          and user intervention is required. A more serious issue may develop if this is not resolved soon.
-        CRITICAL: Indicates that the severity of the alert is critical. This means an actionable critical situation has been
-          detected, and action is required immediately. The cluster may have the potential to stop running or run into irreparable
-          issues.
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.IPv6Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: 60b8:6004:7361:1a7d:9a64:df8d:dfd8:39c6
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
-          format: int32
-          default: 128
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
-    monitoring.v4.0.serviceability.ServiceCenter:
-      type: object
-      properties:
-        name:
-          maxLength: 1000
-          type: string
-          description: Name of service center.
-          example: Nutanix
-        ipAddress:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: IP address of the service center.
-          example: 201.221.176.109
-        username:
-          maxLength: 255
-          type: string
-          description: Username.
-          example: user123
-        port:
-          maximum: 65536
-          minimum: 0
-          type: integer
-          description: Port number.
-          format: int32
-          example: 25
-      additionalProperties: false
-      description: Service center to which remote tunnel is connected at Nutanix's end.
-    monitoring.v4.0.serviceability.CommunicationStatus:
-      type: object
-      properties:
-        lastCheckedTime:
-          type: string
-          description: Last checked time.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        lastChangedTime:
-          type: string
-          description: Last changed time.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        lastSuccessfulTransmissionTime:
-          type: string
-          description: Last successful transmission time.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        status:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.ConnectionStatus'
-        message:
-          $ref: '#/components/schemas/monitoring.v4.0.serviceability.ParameterizedMessage'
-      additionalProperties: false
-      description: Status of the remote tunnel or service that is running on top of the remote tunnel. For example, pulse
-        or alert email.
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 31
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    monitoring.v4.0.common.ImpactType:
-      type: string
-      description: The impact this alert or event will have on the system. For example, availability, performance, or capacity.
-      enum:
-      - AVAILABILITY
-      - CAPACITY
-      - CONFIGURATION
-      - PERFORMANCE
-      - SYSTEM_INDICATOR
-      - CPU_CAPACITY
-      - MEMORY_CAPACITY
-      - STORAGE_CAPACITY
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        CAPACITY: Indicates that there may be storage or memory issues in the system.
-        SYSTEM_INDICATOR: Indicates that certain operations in the system may fail or be interrupted.
-        MEMORY_CAPACITY: Indicates that the system may have memory issues.
-        AVAILABILITY: Impacts availability of certain services, data, or functionality in the system.
-        PERFORMANCE: Indicates that there might be performance issues in the system.
-        CONFIGURATION: Indicates that there may be connectivity issues between different entities due to incorrect configurations.
-        CPU_CAPACITY: Indicates that there may be issues with CPU capacity.
-        STORAGE_CAPACITY: Indicates that there may be storage issues in the system.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    monitoring.v4.0.serviceability.EmailTemplate:
-      type: object
-      properties:
-        bodySuffix:
-          type: string
-          description: Suffix for the email body.
-          example: Sent from example.com
-        subjectPrefix:
-          maxLength: 256
-          type: string
-          description: Prefix for the email subject.
-          example: 'URGENT: Immediate Action Required'
-      additionalProperties: false
-      description: Email template.
-    common.v1.0.config.IPAddressOrFQDN:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-        fqdn:
-          $ref: '#/components/schemas/common.v1.0.config.FQDN'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
-        Fully Qualified Domain Name.
-
-        '
-    monitoring.v4.0.serviceability.HttpProxy:
-      type: object
-      properties:
-        name:
-          maxLength: 1000
-          type: string
-          description: Proxy name.
-          example: http-proxy-123
-        addressValue:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
-        port:
-          maximum: 65536
-          minimum: 0
-          type: integer
-          description: Port on which proxy is binding.
-          format: int32
-          example: 16
-        username:
-          maxLength: 255
-          type: string
-          description: User name for proxy authentication.
-          example: user123
-        password:
-          type: string
-          description: Password for proxy authentication.
-          example: password123
-        proxyTypes:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Proxy types to send applicable traffic.
-          items:
-            $ref: '#/components/schemas/monitoring.v4.0.serviceability.ProxyType'
-      additionalProperties: false
-      description: HTTP proxy used to establish the remote tunnel.
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 137.167.21.40
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    monitoring.v4.0.serviceability.ParameterizedMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Message.
-          example: Tunnel is stable and secure.
-        attributes:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Attributes.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVStringPair'
-      additionalProperties: false
-      description: To store any custom message and attributes.
   securitySchemes:
     basicAuthScheme:
       type: http

@@ -30,7 +30,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 183040b6-2e77-4067-9e71-d82198eb50fd
       - name: $page
         in: query
         description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer
@@ -52,7 +51,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -72,7 +70,6 @@ paths:
 
             '
           format: int32
-          default: 50
       responses:
         '200':
           description: Paginated list of category details associated with the Volume Group.
@@ -131,30 +128,38 @@ paths:
           \n"
 components:
   schemas:
-    storage.v4.r0.a3.error.AppMessage:
+    common.v1.r0.a3.response.ApiLink:
       type: object
       properties:
-        message:
+        href:
           type: string
-          example: string
-        severity:
-          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
-        code:
+          description: 'The URL at which the entity described by this link can be accessed.
+
+            '
+        rel:
           type: string
-          example: string
-        locale:
-          type: string
-          description: The locale for the message description.
-          default: en_US
-        errorGroup:
-          type: string
-          example: string
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
+          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
+            special value of "self" identifies the URL for the object.
+
+            '
       additionalProperties: false
-      description: This schema is generated from AppMessage.java
+      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.r0.a3.config.Flag:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: boolean
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
     common.v1.r0.a3.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -166,24 +171,6 @@ components:
       - ERROR
       - $UNKNOWN
       - $REDACTED
-    common.v1.r0.a3.config.KVPair:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The key of this key value pair
-          example: string
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            example: string
-          - type: integer
-            example: 6
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
     common.v1.r0.a3.config.EntityType:
       type: string
       enum:
@@ -211,24 +198,17 @@ components:
       - VTEP_GATEWAY
       - $UNKNOWN
       - $REDACTED
-    common.v1.r0.a3.config.EntityReference:
+    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        location:
           type: string
-          example: 748b06b3-b3a0-45c1-8c81-6b5b019cecde
-        name:
+        message:
           type: string
-          example: string
-        uris:
-          type: array
-          items:
-            type: string
-            example: string
-        entityType:
-          $ref: '#/components/schemas/common.v1.r0.a3.config.EntityType'
+        attributePath:
+          type: string
       additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
     common.v1.r0.a3.config.Message:
       type: object
       properties:
@@ -237,54 +217,68 @@ components:
           description: 'A code that uniquely identifies a message.
 
             '
-          example: string
         message:
           type: string
-          example: string
         locale:
           type: string
           description: 'The locale for the message description.
 
             '
-          default: en_US
         severity:
           $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
       additionalProperties: false
-    storage.v4.r0.a3.config.GetCategoryAssociationsApiResponse:
+    storage.v4.r0.a3.error.SchemaValidationError:
       type: object
       properties:
-        metadata:
-          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
-        data:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/storage.v4.r0.a3.config.CategoryDetails'
-          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+        timestamp:
+          type: string
+        statusCode:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
+        validationErrorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
       additionalProperties: false
-      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/category-associations
-        Get operation
-    common.v1.r0.a3.response.ApiLink:
+      description: This schema is generated from SchemaValidationError.java
+    common.v1.r0.a3.config.EntityReference:
       type: object
       properties:
-        href:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'The URL at which the entity described by this link can be accessed.
-
-            '
-          example: string
-        rel:
+        name:
           type: string
-          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
-            special value of "self" identifies the URL for the object.
-
-            '
-          example: string
+        uris:
+          type: array
+          items:
+            type: string
+        entityType:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.EntityType'
       additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
+    storage.v4.r0.a3.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+        code:
+          type: string
+        locale:
+          type: string
+          description: The locale for the message description.
+        errorGroup:
+          type: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+      description: This schema is generated from AppMessage.java
     storage.v4.r0.a3.error.ErrorResponse:
       type: object
       properties:
@@ -296,27 +290,10 @@ components:
           - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
       additionalProperties: false
       description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
-    storage.v4.r0.a3.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          example: string
-        statusCode:
-          type: integer
-          example: 25
-        error:
-          type: string
-          example: string
-        path:
-          type: string
-          example: string
-        validationErrorMessages:
-          type: array
-          items:
-            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
+    storage.v4.r0.a3.config.CategoryDetails:
+      description: An existing category detail associated with the Volume Group.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.config.EntityReference'
     common.v1.r0.a3.response.ApiResponseMetadata:
       type: object
       properties:
@@ -331,7 +308,6 @@ components:
         totalAvailableResults:
           type: integer
           format: int32
-          example: 50
         messages:
           type: array
           items:
@@ -346,39 +322,35 @@ components:
         the API request that produced this response.  Also contains pagination data for paginated requests.
 
         '
-    storage.v4.r0.a3.config.CategoryDetails:
-      description: An existing category detail associated with the Volume Group.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.r0.a3.config.EntityReference'
-    common.v1.r0.a3.config.Flag:
+    storage.v4.r0.a3.config.GetCategoryAssociationsApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.CategoryDetails'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{volumeGroupExtId}/category-associations
+        Get operation
+    common.v1.r0.a3.config.KVPair:
       type: object
       properties:
         name:
           type: string
-          example: string
+          description: The key of this key value pair
         value:
-          type: boolean
-          default: false
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+          - type: integer
       additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
+      description: 'A map describing a set of keys and their corresponding values.
 
         '
-    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          example: string
-        message:
-          type: string
-          example: string
-        attributePath:
-          type: string
-          example: string
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
   securitySchemes:
     basicAuthScheme:
       type: http

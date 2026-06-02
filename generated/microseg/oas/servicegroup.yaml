@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -298,7 +296,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 8824a892-073f-42d3-9b76-469d7e99dd4b
       requestBody:
         content:
           application/json:
@@ -475,7 +472,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 07167778-266d-4052-9992-f30cbfd52e83
       responses:
         '200':
           description: Details of queried Service Group.
@@ -622,7 +618,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 1831b39f-6ff5-4563-8130-76e71c2455bf
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -649,7 +644,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 703cc573-25a6-4cca-a229-d5494862db2a
       requestBody:
         description: Updates the Service Group with the provided ExtID.
         content:
@@ -845,7 +839,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 59c69468-2cdb-4ca6-9e15-daf802d30022
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -860,7 +853,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: de18d189-d7fd-421c-a965-9620ada7c787
       responses:
         '202':
           description: ExtID of the task corresponding to Service Group delete request.
@@ -1000,33 +992,26 @@ paths:
           \n- \"https://{pc-ip}:9440/api/microseg/v4.0/config/service-groups/eBC819ae-a716-AC00-29fC-285c789C619e\"\n"
 components:
   schemas:
-    microseg.v4.0.error.ErrorResponse:
+    microseg.v4.0.config.TcpPortRangeSpec:
+      required:
+      - endPort
+      - startPort
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/microseg.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationError'
+        startPort:
+          maximum: 65535
+          minimum: 0
+          type: integer
+          description: The beginning of the port number of the TCP/UDP port range.
+          format: int32
+        endPort:
+          maximum: 65535
+          minimum: 0
+          type: integer
+          description: The end of the port number of the TCP/UDP port range.
+          format: int32
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
+      description: Range of TCP/UDP ports.
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1054,6 +1039,46 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -1072,7 +1097,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: a4603870-f903-4371-b958-63d554923eb6
           links:
             maxItems: 20
             minItems: 0
@@ -1085,28 +1109,58 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
 
             '
-        locale:
-          type: string
-          description: 'The locale for the message description.
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
 
             '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
       additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
     common.v1.0.config.TenantAwareModel:
       type: object
       properties:
@@ -1120,116 +1174,44 @@ components:
 
             '
           readOnly: true
-          example: 7f8a8927-10dc-4107-8fd6-2b2b89c7ac4f
       additionalProperties: false
       description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
         base model class that it extends and is automatically set by the server.
 
         '
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:9ee7c799-84b5-4e0b-9aea-e0a19141c84a
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    microseg.v4.0.config.UdpPortRangeSpec:
-      required:
-      - endPort
-      - startPort
-      type: object
-      properties:
-        startPort:
-          maximum: 65535
-          minimum: 0
-          type: integer
-          description: The beginning of the port number of the TCP/UDP port range.
-          format: int32
-          example: 17
-        endPort:
-          maximum: 65535
-          minimum: 0
-          type: integer
-          description: The end of the port number of the TCP/UDP port range.
-          format: int32
-          example: 92
-      additionalProperties: false
-      description: Range of TCP/UDP ports.
     microseg.v4.0.config.IcmpTypeCodeSpec:
       type: object
       properties:
         isAllAllowed:
           type: boolean
           description: Set this field to true if both Type and Code is ANY.
-          default: false
         type:
           maximum: 43
           minimum: 0
           type: integer
           description: ICMP service Type. Ignore this field if Type has to be ANY.
           format: int32
-          example: 24
         code:
           maximum: 15
           minimum: 0
           type: integer
           description: ICMP service Code. Ignore this field if Code has to be ANY.
           format: int32
-          example: 7
       additionalProperties: false
       description: ICMP Type Code Object. This object contains values for Icmp type and Icmp code.
-    microseg.v4.0.error.SchemaValidationError:
+    microseg.v4.0.error.ErrorResponse:
       type: object
       properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 6
         error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationErrorMessage'
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/microseg.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationError'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
       x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
     microseg.v4.0.config.ServiceGroup:
       allOf:
       - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
@@ -1242,18 +1224,15 @@ components:
             pattern: ^\s*[a-zA-Z0-9]([a-zA-Z0-9-_ \\.]*[a-zA-Z0-9])?\s*$
             type: string
             description: A short identifier for a Service Group.
-            example: Service-Group_2024.v1
           description:
             maxLength: 1000
             pattern: ^\s*([a-zA-Z0-9 _:.()-]*)\s*$
             type: string
             description: A user defined annotation for a Service Group.
-            example: 'Cluster-1 (Primary): Service Group for VPC_2024'
           isSystemDefined:
             type: boolean
             description: Service Group is system defined or not.
             readOnly: true
-            example: true
           tcpServices:
             maxItems: 250
             minItems: 1
@@ -1284,60 +1263,62 @@ components:
             items:
               pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
               type: string
-              example: f34dd221-5078-45ad-bfe6-64f9a92eeca2
           createdBy:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: The external identifier of the user responsible for creating the Service Group.
             readOnly: true
-            example: 39de86df-87ec-475b-a527-535e8522c8b7
         additionalProperties: false
         description: Service Group.
-    common.v1.0.response.ApiLink:
+    prism.v4.0.config.TaskReference:
       type: object
       properties:
-        href:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
           type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
+          description: A globally unique identifier of a task.
       additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    microseg.v4.0.error.AppMessage:
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    microseg.v4.0.error.SchemaValidationError:
       type: object
       properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    microseg.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
         message:
           type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
+          description: The detailed message for the validation error.
+        attributePath:
           type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
+      description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
     common.v1.0.config.KVPair:
       type: object
@@ -1360,12 +1341,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 68
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1396,28 +1375,58 @@ components:
               '
             items:
               type: integer
-              example: 30
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    microseg.v4.0.error.SchemaValidationErrorMessage:
+    common.v1.0.config.Message:
       type: object
       properties:
-        location:
+        code:
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
+          description: 'A code that uniquely identifies a message.
+
+            '
         message:
           type: string
-          description: The detailed message for the validation error.
-        attributePath:
+          description: 'The description of the message.
+
+            '
+        locale:
           type: string
-          description: The path of the attribute that failed validation in the schema.
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
+    microseg.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
-    microseg.v4.0.config.TcpPortRangeSpec:
+    microseg.v4.0.config.UdpPortRangeSpec:
       required:
       - endPort
       - startPort
@@ -1429,67 +1438,26 @@ components:
           type: integer
           description: The beginning of the port number of the TCP/UDP port range.
           format: int32
-          example: 22
         endPort:
           maximum: 65535
           minimum: 0
           type: integer
           description: The end of the port number of the TCP/UDP port range.
           format: int32
-          example: 26
       additionalProperties: false
       description: Range of TCP/UDP ports.
-    common.v1.0.response.ApiResponseMetadata:
+    common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
 
             '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 51
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
       additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+      description: 'A wrapper schema containing a map with string keys and values.
 
         '
   securitySchemes:

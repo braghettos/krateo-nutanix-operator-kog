@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -366,7 +364,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 0f2ee18f-63f3-45d1-8444-2223ce7511cf
       requestBody:
         content:
           application/json:
@@ -553,7 +550,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 0d717fa1-21da-4ccc-a719-92d51489c0f9
       responses:
         '200':
           description: Details of queried Network Security Policy.
@@ -696,7 +692,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 30a9aaf3-f524-45db-85be-dd3c0b69bfa1
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -723,7 +718,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 3f74907d-4fa3-49bf-95a4-3d4a4b89c782
       requestBody:
         description: Updates the Network Security Policy with the provided ExtID.
         content:
@@ -928,7 +922,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: bbc0e12e-4c8c-4820-8443-233d08bf33db
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -943,7 +936,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 7e2aca8b-215e-4104-90fe-449014171e6b
       responses:
         '202':
           description: ExtID of the task corresponding to Network Security Policy delete request.
@@ -1083,171 +1075,6 @@ paths:
           \n- \"https://{pc-ip}:9440/api/microseg/v4.0/config/policies/BCAa438A-a093-5BE8-DcEC-B7dCf8aa0d8B\"\n"
 components:
   schemas:
-    microseg.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/microseg.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    microseg.v4.0.config.NetworkSecurityPolicyRule:
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - spec
-        - type
-        type: object
-        properties:
-          description:
-            maxLength: 64
-            type: string
-            description: A user defined annotation for a rule.
-            example: The rule to allow traffic from VMs in VPC_2024 to VMs in VPC_2025
-          type:
-            $ref: '#/components/schemas/microseg.v4.0.config.RuleType'
-          spec:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: microseg.v4.config.TwoEnvIsolationRuleSpec
-            description: The type of the Flow Network Security policy rule spec.
-            oneOf:
-            - $ref: '#/components/schemas/microseg.v4.0.config.TwoEnvIsolationRuleSpec'
-            - $ref: '#/components/schemas/microseg.v4.0.config.ApplicationRuleSpec'
-            - $ref: '#/components/schemas/microseg.v4.0.config.IntraEntityGroupRuleSpec'
-            - $ref: '#/components/schemas/microseg.v4.0.config.MultiEnvIsolationRuleSpec'
-        additionalProperties: false
-    microseg.v4.0.config.IcmpTypeCodeSpec:
-      type: object
-      properties:
-        isAllAllowed:
-          type: boolean
-          description: Set this field to true if both Type and Code is ANY.
-          default: false
-        type:
-          maximum: 43
-          minimum: 0
-          type: integer
-          description: ICMP service Type. Ignore this field if Type has to be ANY.
-          format: int32
-          example: 24
-        code:
-          maximum: 15
-          minimum: 0
-          type: integer
-          description: ICMP service Code. Ignore this field if Code has to be ANY.
-          format: int32
-          example: 7
-      additionalProperties: false
-      description: ICMP Type Code Object. This object contains values for Icmp type and Icmp code.
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    microseg.v4.0.config.MultiEnvIsolationRuleSpec:
-      required:
-      - spec
-      type: object
-      properties:
-        spec:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: microseg.v4.config.AllToAllIsolationGroup
-          description: Multi environment isolation rule spec.
-          oneOf:
-          - $ref: '#/components/schemas/microseg.v4.0.config.AllToAllIsolationGroup'
-      additionalProperties: false
-      description: A rule for specifying that multiple environments should be isolated from each other.
-    microseg.v4.0.config.UdpPortRangeSpec:
-      required:
-      - endPort
-      - startPort
-      type: object
-      properties:
-        startPort:
-          maximum: 65535
-          minimum: 0
-          type: integer
-          description: The beginning of the port number of the TCP/UDP port range.
-          format: int32
-          example: 17
-        endPort:
-          maximum: 65535
-          minimum: 0
-          type: integer
-          description: The end of the port number of the TCP/UDP port range.
-          format: int32
-          example: 92
-      additionalProperties: false
-      description: Range of TCP/UDP ports.
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 7f8a8927-10dc-4107-8fd6-2b2b89c7ac4f
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    microseg.v4.0.config.SecurityPolicyScope:
-      type: string
-      description: Defines the scope of the policy. Currently, only ALL_VLAN and VPC_LIST are supported. If scope is not provided,
-        the default is set based on whether vpcReferences field is provided or not.
-      enum:
-      - ALL_VLAN
-      - ALL_VPC
-      - VPC_LIST
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ALL_VLAN: Policy is scoped to all the VLANs.
-        ALL_VPC: Policy is scoped to all the VPCs. This value is not supported in this release.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        VPC_LIST: Policy is scoped to the list of VPCs specified in vpcReferences.
-        $REDACTED: 'Redacted value.
-
-          '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1275,179 +1102,50 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    microseg.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 6
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    microseg.v4.0.config.SecurityPolicyState:
+    microseg.v4.0.config.NetworkSecurityPolicyRule:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - spec
+        - type
+        type: object
+        properties:
+          description:
+            maxLength: 64
+            type: string
+            description: A user defined annotation for a rule.
+          type:
+            $ref: '#/components/schemas/microseg.v4.0.config.RuleType'
+          spec:
+            required: []
+            properties: {}
+            description: The type of the Flow Network Security policy rule spec.
+            oneOf:
+            - $ref: '#/components/schemas/microseg.v4.0.config.TwoEnvIsolationRuleSpec'
+            - $ref: '#/components/schemas/microseg.v4.0.config.ApplicationRuleSpec'
+            - $ref: '#/components/schemas/microseg.v4.0.config.IntraEntityGroupRuleSpec'
+            - $ref: '#/components/schemas/microseg.v4.0.config.MultiEnvIsolationRuleSpec'
+        additionalProperties: false
+    microseg.v4.0.config.SecurityPolicyScope:
       type: string
-      description: Whether the policy is applied or monitored; can be omitted or set null to save the policy without applying
-        or monitoring it.
+      description: Defines the scope of the policy. Currently, only ALL_VLAN and VPC_LIST are supported. If scope is not provided,
+        the default is set based on whether vpcReferences field is provided or not.
       enum:
-      - SAVE
-      - MONITOR
-      - ENFORCE
+      - ALL_VLAN
+      - ALL_VPC
+      - VPC_LIST
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        ENFORCE: Policy is enforced and the traffic from/to specified inbounds/outbounds is allowed and rest is dropped.
-        MONITOR: Monitors the flow and doesn't drop the traffic.
-        SAVE: Policy is just created and saved in DB.
+        ALL_VLAN: Policy is scoped to all the VLANs.
+        ALL_VPC: Policy is scoped to all the VPCs. This value is not supported in this release.
         $UNKNOWN: 'Unknown value.
 
           '
+        VPC_LIST: Policy is scoped to the list of VPCs specified in vpcReferences.
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    microseg.v4.0.config.TwoEnvIsolationRuleSpec:
-      required:
-      - firstIsolationGroup
-      - secondIsolationGroup
-      type: object
-      properties:
-        firstIsolationGroup:
-          maxItems: 10
-          minItems: 1
-          type: array
-          description: Denotes the first group of category uuids that will be used in an isolation policy.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 11862b4d-d4a3-405b-8633-adbb7e953de8
-        secondIsolationGroup:
-          maxItems: 10
-          minItems: 1
-          type: array
-          description: Denotes the second group of category uuids that will be used in an isolation policy.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: c3a711fd-4f0c-4068-935d-aff636199778
-      additionalProperties: false
-      description: A rule for specifying that two environments should be isolated from each other. Specify both 'firstIsolationGroup'
-        and 'secondIsolationGroup'.
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: a4603870-f903-4371-b958-63d554923eb6
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    microseg.v4.0.config.AllToAllIsolationGroup:
-      required:
-      - isolationGroups
-      type: object
-      properties:
-        isolationGroups:
-          maxItems: 32
-          minItems: 2
-          type: array
-          description: Denotes the list of secured groups that will be used in All to All mutual isolation.
-          items:
-            $ref: '#/components/schemas/microseg.v4.0.config.IsolationGroup'
-      additionalProperties: false
-      description: Denotes the isolation groups that will be used in All to All mutual isolation.
     microseg.v4.0.config.IntraEntityGroupRuleAction:
       type: string
       description: A specification to whether traffic between intra secured group entities should be allowed or denied.
@@ -1465,284 +1163,25 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    microseg.v4.0.config.ApplicationRuleSpec:
-      required:
-      - securedGroupCategoryReferences
-      type: object
-      properties:
-        securedGroupCategoryReferences:
-          maxItems: 10
-          minItems: 1
-          type: array
-          description: A set of network endpoints which is protected by a Network Security Policy and defined as a list of
-            categories.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 932c8b58-980c-455e-be6d-9eccc3332cae
-        srcAllowSpec:
-          $ref: '#/components/schemas/microseg.v4.0.config.AllowType'
-        destAllowSpec:
-          $ref: '#/components/schemas/microseg.v4.0.config.AllowType'
-        srcCategoryReferences:
-          maxItems: 10
-          minItems: 1
-          type: array
-          description: List of categories that define a set of network endpoints as inbound.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 5a7aff15-9aeb-4981-bd7b-3f0155d62025
-        destCategoryReferences:
-          maxItems: 10
-          minItems: 1
-          type: array
-          description: List of categories that define a set of network endpoints as outbound.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: f6cac298-3c57-4fc1-be9c-c66bb7a85ec3
-        srcSubnet:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        destSubnet:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        srcAddressGroupReferences:
-          maxItems: 1
-          minItems: 1
-          type: array
-          description: A list of address group references.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 8201025c-6f2f-4ef2-af50-b0edc42556d6
-        destAddressGroupReferences:
-          maxItems: 1
-          minItems: 1
-          type: array
-          description: A list of address group references.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 5b88db54-f664-44f4-b304-a3af7544d4c5
-        serviceGroupReferences:
-          maxItems: 160
-          minItems: 0
-          type: array
-          description: A list of service group references.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 92607af0-ddc3-46b6-ae07-0d8f762bea16
-        isAllProtocolAllowed:
-          type: boolean
-          description: Denotes whether the rule allows traffic for all protocols. If set to true, the rule allows traffic
-            for all protocols. If set to false or not specified, specifying at least one protocol service or service group
-            is mandatory.
-          example: false
-        tcpServices:
-          maxItems: 160
-          minItems: 0
-          type: array
-          items:
-            $ref: '#/components/schemas/microseg.v4.0.config.TcpPortRangeSpec'
-        udpServices:
-          maxItems: 160
-          minItems: 0
-          type: array
-          items:
-            $ref: '#/components/schemas/microseg.v4.0.config.UdpPortRangeSpec'
-        icmpServices:
-          maxItems: 160
-          minItems: 0
-          type: array
-          description: ICMP Type Code List.
-          items:
-            $ref: '#/components/schemas/microseg.v4.0.config.IcmpTypeCodeSpec'
-        networkFunctionChainReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A reference to the network function chain in the rule.
-          example: f9b0e354-2959-49ba-97fa-a438b95bfc7a
-      additionalProperties: false
-      description: A rule for specifying allowed traffic for an application.
-    microseg.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    microseg.v4.0.config.NetworkSecurityPolicy:
-      description: A policy that contains rules for specifying security posture.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - title: Network Security Policy.
-        required:
-        - name
-        - type
-        type: object
-        properties:
-          name:
-            maxLength: 63
-            pattern: ^\s*[a-zA-Z0-9]([a-zA-Z0-9-_ \\.]*[a-zA-Z0-9])?\s*$
-            type: string
-            description: 'Name of the Flow Network Security Policy.<br>
-
-              It can have a maximum length of 63 characters.
-
-              '
-            example: Network-Security-Policy_2024.v1
-          type:
-            $ref: '#/components/schemas/microseg.v4.0.config.SecurityPolicyType'
-          description:
-            maxLength: 512
-            pattern: ^\s*([a-zA-Z0-9 _:.()-]*)\s*$
-            type: string
-            description: A user defined annotation for a policy.
-            example: 'Cluster-1 (Primary): Network Security Policy for VPC_2024'
-          state:
-            $ref: '#/components/schemas/microseg.v4.0.config.SecurityPolicyState'
-          rules:
-            maxItems: 150
-            minItems: 1
-            type: array
-            description: A list of rules that form a policy. For isolation policies, use isolation rules; for application
-              or quarantine policies, use application rules.
-            items:
-              $ref: '#/components/schemas/microseg.v4.0.config.NetworkSecurityPolicyRule'
-          isIpv6TrafficAllowed:
-            type: boolean
-            description: If Ipv6 Traffic is allowed.
-            example: true
-          isHitlogEnabled:
-            type: boolean
-            description: If Hitlog is enabled.
-            example: true
-          scope:
-            $ref: '#/components/schemas/microseg.v4.0.config.SecurityPolicyScope'
-          vpcReferences:
-            maxItems: 1
-            minItems: 1
-            type: array
-            description: A list of external ids for VPCs, used only when the scope of policy is a list of VPCs.
-            items:
-              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-              type: string
-              example: d90eba81-debc-4481-8e1c-423e6af4677b
-          securedGroups:
-            maxItems: 1000
-            minItems: 1
-            type: array
-            description: Uuids of the secured groups in the NSP.
-            readOnly: true
-            items:
-              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-              type: string
-              example: 30a97a6f-d0b2-428e-b17a-485337ca2e93
-          lastUpdateTime:
-            type: string
-            description: The timestamp when the Flow Network Security policy was last updated.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          creationTime:
-            type: string
-            description: The timestamp when the Flow Network Security policy was created.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          isSystemDefined:
-            type: boolean
-            description: A flag indicating whether the Flow Network Security policy is system-defined or not.
-            readOnly: true
-            example: true
-          createdBy:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The extId of the user responsible for creating the Network Security Policy.
-            readOnly: true
-            example: 1a2fde1c-b346-419e-9125-77dc73174351
-        additionalProperties: false
-    common.v1.0.config.KVPair:
+    common.v1.0.config.Flag:
       type: object
       properties:
         name:
           maxLength: 128
           minLength: 3
           type: string
-          description: 'The key of the key-value pair.
+          description: 'Name of the flag.
 
             '
         value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
+          type: boolean
+          description: 'Value of the flag.
 
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 68
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 30
+            '
       additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
 
         '
     common.v1.0.response.ApiResponseMetadata:
@@ -1773,7 +1212,6 @@ components:
 
             '
           format: int32
-          example: 51
         messages:
           maxItems: 20
           minItems: 0
@@ -1798,6 +1236,162 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
+    microseg.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    microseg.v4.0.config.NetworkSecurityPolicy:
+      description: A policy that contains rules for specifying security posture.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - title: Network Security Policy.
+        required:
+        - name
+        - type
+        type: object
+        properties:
+          name:
+            maxLength: 63
+            pattern: ^\s*[a-zA-Z0-9]([a-zA-Z0-9-_ \\.]*[a-zA-Z0-9])?\s*$
+            type: string
+            description: 'Name of the Flow Network Security Policy.<br>
+
+              It can have a maximum length of 63 characters.
+
+              '
+          type:
+            $ref: '#/components/schemas/microseg.v4.0.config.SecurityPolicyType'
+          description:
+            maxLength: 512
+            pattern: ^\s*([a-zA-Z0-9 _:.()-]*)\s*$
+            type: string
+            description: A user defined annotation for a policy.
+          state:
+            $ref: '#/components/schemas/microseg.v4.0.config.SecurityPolicyState'
+          rules:
+            maxItems: 150
+            minItems: 1
+            type: array
+            description: A list of rules that form a policy. For isolation policies, use isolation rules; for application
+              or quarantine policies, use application rules.
+            items:
+              $ref: '#/components/schemas/microseg.v4.0.config.NetworkSecurityPolicyRule'
+          isIpv6TrafficAllowed:
+            type: boolean
+            description: If Ipv6 Traffic is allowed.
+          isHitlogEnabled:
+            type: boolean
+            description: If Hitlog is enabled.
+          scope:
+            $ref: '#/components/schemas/microseg.v4.0.config.SecurityPolicyScope'
+          vpcReferences:
+            maxItems: 1
+            minItems: 1
+            type: array
+            description: A list of external ids for VPCs, used only when the scope of policy is a list of VPCs.
+            items:
+              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+              type: string
+          securedGroups:
+            maxItems: 1000
+            minItems: 1
+            type: array
+            description: Uuids of the secured groups in the NSP.
+            readOnly: true
+            items:
+              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+              type: string
+          lastUpdateTime:
+            type: string
+            description: The timestamp when the Flow Network Security policy was last updated.
+            format: date-time
+            readOnly: true
+          creationTime:
+            type: string
+            description: The timestamp when the Flow Network Security policy was created.
+            format: date-time
+            readOnly: true
+          isSystemDefined:
+            type: boolean
+            description: A flag indicating whether the Flow Network Security policy is system-defined or not.
+            readOnly: true
+          createdBy:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The extId of the user responsible for creating the Network Security Policy.
+            readOnly: true
+        additionalProperties: false
+    microseg.v4.0.config.MultiEnvIsolationRuleSpec:
+      required:
+      - spec
+      type: object
+      properties:
+        spec:
+          required: []
+          properties: {}
+          description: Multi environment isolation rule spec.
+          oneOf:
+          - $ref: '#/components/schemas/microseg.v4.0.config.AllToAllIsolationGroup'
+      additionalProperties: false
+      description: A rule for specifying that multiple environments should be isolated from each other.
+    microseg.v4.0.config.AllowType:
+      type: string
+      description: A specification to how allow mode traffic should be applied, either ALL or NONE.
+      enum:
+      - ALL
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ALL: Allow All Traffic.
+        NONE: Allow No Traffic.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
     microseg.v4.0.config.RuleType:
       type: string
       description: The type for a rule - the value chosen here restricts which specification can be chosen.
@@ -1822,6 +1416,267 @@ components:
           '
         TWO_ENV_ISOLATION: A rule for specifying that two environments should be isolated from each other. Specify both 'firstIsolationGroup'
           and 'secondIsolationGroup'.
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    microseg.v4.0.config.TwoEnvIsolationRuleSpec:
+      required:
+      - firstIsolationGroup
+      - secondIsolationGroup
+      type: object
+      properties:
+        firstIsolationGroup:
+          maxItems: 10
+          minItems: 1
+          type: array
+          description: Denotes the first group of category uuids that will be used in an isolation policy.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        secondIsolationGroup:
+          maxItems: 10
+          minItems: 1
+          type: array
+          description: Denotes the second group of category uuids that will be used in an isolation policy.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+      additionalProperties: false
+      description: A rule for specifying that two environments should be isolated from each other. Specify both 'firstIsolationGroup'
+        and 'secondIsolationGroup'.
+    microseg.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    microseg.v4.0.config.SecurityPolicyState:
+      type: string
+      description: Whether the policy is applied or monitored; can be omitted or set null to save the policy without applying
+        or monitoring it.
+      enum:
+      - SAVE
+      - MONITOR
+      - ENFORCE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ENFORCE: Policy is enforced and the traffic from/to specified inbounds/outbounds is allowed and rest is dropped.
+        MONITOR: Monitors the flow and doesn't drop the traffic.
+        SAVE: Policy is just created and saved in DB.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    microseg.v4.0.config.TcpPortRangeSpec:
+      required:
+      - endPort
+      - startPort
+      type: object
+      properties:
+        startPort:
+          maximum: 65535
+          minimum: 0
+          type: integer
+          description: The beginning of the port number of the TCP/UDP port range.
+          format: int32
+        endPort:
+          maximum: 65535
+          minimum: 0
+          type: integer
+          description: The end of the port number of the TCP/UDP port range.
+          format: int32
+      additionalProperties: false
+      description: Range of TCP/UDP ports.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    microseg.v4.0.config.IntraEntityGroupRuleSpec:
+      required:
+      - securedGroupAction
+      - securedGroupCategoryReferences
+      type: object
+      properties:
+        securedGroupCategoryReferences:
+          maxItems: 10
+          minItems: 1
+          type: array
+          description: A set of network endpoints which is protected by a Network Security Policy and defined as a list of
+            categories.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        securedGroupAction:
+          $ref: '#/components/schemas/microseg.v4.0.config.IntraEntityGroupRuleAction'
+      additionalProperties: false
+      description: A rule for specifying allowed traffic inside of a secured entity group.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    microseg.v4.0.config.AllToAllIsolationGroup:
+      required:
+      - isolationGroups
+      type: object
+      properties:
+        isolationGroups:
+          maxItems: 32
+          minItems: 2
+          type: array
+          description: Denotes the list of secured groups that will be used in All to All mutual isolation.
+          items:
+            $ref: '#/components/schemas/microseg.v4.0.config.IsolationGroup'
+      additionalProperties: false
+      description: Denotes the isolation groups that will be used in All to All mutual isolation.
+    microseg.v4.0.config.IcmpTypeCodeSpec:
+      type: object
+      properties:
+        isAllAllowed:
+          type: boolean
+          description: Set this field to true if both Type and Code is ANY.
+        type:
+          maximum: 43
+          minimum: 0
+          type: integer
+          description: ICMP service Type. Ignore this field if Type has to be ANY.
+          format: int32
+        code:
+          maximum: 15
+          minimum: 0
+          type: integer
+          description: ICMP service Code. Ignore this field if Code has to be ANY.
+          format: int32
+      additionalProperties: false
+      description: ICMP Type Code Object. This object contains values for Icmp type and Icmp code.
+    microseg.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/microseg.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/microseg.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
     microseg.v4.0.config.SecurityPolicyType:
       type: string
       description: Defines the type of rules that can be used in a policy.
@@ -1841,117 +1696,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:9ee7c799-84b5-4e0b-9aea-e0a19141c84a
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    microseg.v4.0.config.IntraEntityGroupRuleSpec:
-      required:
-      - securedGroupAction
-      - securedGroupCategoryReferences
-      type: object
-      properties:
-        securedGroupCategoryReferences:
-          maxItems: 10
-          minItems: 1
-          type: array
-          description: A set of network endpoints which is protected by a Network Security Policy and defined as a list of
-            categories.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 3b44ad9c-eaa0-43d3-a162-792b8878585d
-        securedGroupAction:
-          $ref: '#/components/schemas/microseg.v4.0.config.IntraEntityGroupRuleAction'
-      additionalProperties: false
-      description: A rule for specifying allowed traffic inside of a secured entity group.
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 15.134.219.248
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    microseg.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    microseg.v4.0.config.TcpPortRangeSpec:
-      required:
-      - endPort
-      - startPort
-      type: object
-      properties:
-        startPort:
-          maximum: 65535
-          minimum: 0
-          type: integer
-          description: The beginning of the port number of the TCP/UDP port range.
-          format: int32
-          example: 22
-        endPort:
-          maximum: 65535
-          minimum: 0
-          type: integer
-          description: The end of the port number of the TCP/UDP port range.
-          format: int32
-          example: 26
-      additionalProperties: false
-      description: Range of TCP/UDP ports.
-    microseg.v4.0.config.AllowType:
-      type: string
-      description: A specification to how allow mode traffic should be applied, either ALL or NONE.
-      enum:
-      - ALL
-      - NONE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ALL: Allow All Traffic.
-        NONE: Allow No Traffic.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
     microseg.v4.0.config.IsolationGroup:
       required:
       - groupCategoryReferences
@@ -1965,9 +1709,205 @@ components:
           items:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
-            example: daf866a6-244c-4bc9-822f-47cbc33da9cd
       additionalProperties: false
       description: A set of network endpoints which is protected by an Isolation policy and defined as a list of categories.
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    microseg.v4.0.config.ApplicationRuleSpec:
+      required:
+      - securedGroupCategoryReferences
+      type: object
+      properties:
+        securedGroupCategoryReferences:
+          maxItems: 10
+          minItems: 1
+          type: array
+          description: A set of network endpoints which is protected by a Network Security Policy and defined as a list of
+            categories.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        srcAllowSpec:
+          $ref: '#/components/schemas/microseg.v4.0.config.AllowType'
+        destAllowSpec:
+          $ref: '#/components/schemas/microseg.v4.0.config.AllowType'
+        srcCategoryReferences:
+          maxItems: 10
+          minItems: 1
+          type: array
+          description: List of categories that define a set of network endpoints as inbound.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        destCategoryReferences:
+          maxItems: 10
+          minItems: 1
+          type: array
+          description: List of categories that define a set of network endpoints as outbound.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        srcSubnet:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        destSubnet:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        srcAddressGroupReferences:
+          maxItems: 1
+          minItems: 1
+          type: array
+          description: A list of address group references.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        destAddressGroupReferences:
+          maxItems: 1
+          minItems: 1
+          type: array
+          description: A list of address group references.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        serviceGroupReferences:
+          maxItems: 160
+          minItems: 0
+          type: array
+          description: A list of service group references.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        isAllProtocolAllowed:
+          type: boolean
+          description: Denotes whether the rule allows traffic for all protocols. If set to true, the rule allows traffic
+            for all protocols. If set to false or not specified, specifying at least one protocol service or service group
+            is mandatory.
+        tcpServices:
+          maxItems: 160
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/microseg.v4.0.config.TcpPortRangeSpec'
+        udpServices:
+          maxItems: 160
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/microseg.v4.0.config.UdpPortRangeSpec'
+        icmpServices:
+          maxItems: 160
+          minItems: 0
+          type: array
+          description: ICMP Type Code List.
+          items:
+            $ref: '#/components/schemas/microseg.v4.0.config.IcmpTypeCodeSpec'
+        networkFunctionChainReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A reference to the network function chain in the rule.
+      additionalProperties: false
+      description: A rule for specifying allowed traffic for an application.
+    microseg.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    microseg.v4.0.config.UdpPortRangeSpec:
+      required:
+      - endPort
+      - startPort
+      type: object
+      properties:
+        startPort:
+          maximum: 65535
+          minimum: 0
+          type: integer
+          description: The beginning of the port number of the TCP/UDP port range.
+          format: int32
+        endPort:
+          maximum: 65535
+          minimum: 0
+          type: integer
+          description: The end of the port number of the TCP/UDP port range.
+          format: int32
+      additionalProperties: false
+      description: Range of TCP/UDP ports.
   securitySchemes:
     basicAuthScheme:
       type: http

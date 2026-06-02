@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -313,7 +311,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 16ee9c88-7e58-4e54-ac0b-bf5f88311c00
       requestBody:
         description: Request schema to create the load balancer session.
         content:
@@ -521,7 +518,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: efae0fcb-1fd2-45a9-aa2b-b317b0ba38e1
       - name: $select
         in: query
         description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
@@ -710,7 +706,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: d6259705-d325-49be-8b0c-59495cb1abb9
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -737,7 +732,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: b3ab45c7-0fcf-44b3-937a-11bf13ea7567
       requestBody:
         description: Request schema to update the specified load balancer session.
         content:
@@ -963,7 +957,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 75a7be80-c719-478b-8b43-6e9d6e540f87
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -978,7 +971,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 6ce78537-3a4e-440f-8699-901b510dba44
       responses:
         '202':
           description: Task ID corresponding to delete load balancer session request.
@@ -1120,201 +1112,6 @@ paths:
           \n"
 components:
   schemas:
-    networking.v4.0.config.NetworkingBaseModel:
-      description: Networking common base object
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          metadata:
-            $ref: '#/components/schemas/common.v1.0.config.Metadata'
-        additionalProperties: false
-    networking.v4.0.config.LoadBalancerSessionType:
-      type: string
-      description: Type of load balancer session.
-      enum:
-      - NETWORK_LOAD_BALANCER
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NETWORK_LOAD_BALANCER: Network (layer-4) load balancer session.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.IPAddress:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
-
-        '
-    networking.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    networking.v4.0.config.Algorithm:
-      type: string
-      description: Load balancing algorithm configured for the session.
-      enum:
-      - FIVE_TUPLE_HASH
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        FIVE_TUPLE_HASH: 'Five Tuple hash algorithm for load balancing. Hash is calculated based on source IP address, destination
-          IP address, source TCP/UDP port, destination TCP/UDP port and protocol fields of the packet.
-
-          '
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    networking.v4.0.config.NicTarget:
-      type: object
-      properties:
-        virtualNicReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Reference to the virtual NIC of the load balancer session target.
-          example: 52f2b4ee-0eef-47fc-8ba4-9d2b830697c5
-        port:
-          maximum: 65535
-          minimum: 1
-          type: integer
-          description: The port value of the load balancer session target.
-          format: uint16
-        vmReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Reference to the VM of the load balancer session target.
-          readOnly: true
-          example: c1a2abdb-1b06-45e7-9d50-58680d321749
-        health:
-          $ref: '#/components/schemas/networking.v4.0.config.TargetHealth'
-      additionalProperties: false
-      description: Targets that are associated with the load balancer using virtual NIC.
-    networking.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    networking.v4.0.config.Protocol:
-      type: string
-      description: L3/L4 protocol.
-      enum:
-      - TCP
-      - UDP
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        TCP: Transmission Control Protocol.
-        UDP: User Datagram Protocol.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 250be642-1b1b-4687-bf88-af93fc7abf59
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    networking.v4.0.config.Listener:
-      required:
-      - portRanges
-      - protocol
-      - virtualIP
-      type: object
-      properties:
-        virtualIP:
-          $ref: '#/components/schemas/networking.v4.0.config.VirtualIP'
-        protocol:
-          $ref: '#/components/schemas/networking.v4.0.config.Protocol'
-        portRanges:
-          maxItems: 10
-          minItems: 0
-          type: array
-          description: Doc(LoadBalancerSessionPortRange)
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.PortRange'
-      additionalProperties: false
-      description: Listener configuration for the load balancer session.
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1342,17 +1139,333 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    networking.v4.0.config.Target:
+    common.v1.0.config.IPAddress:
       type: object
       properties:
-        nicTargets:
-          maxItems: 32
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    networking.v4.0.config.LoadBalancerSessionType:
+      type: string
+      description: Type of load balancer session.
+      enum:
+      - NETWORK_LOAD_BALANCER
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NETWORK_LOAD_BALANCER: Network (layer-4) load balancer session.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    networking.v4.0.config.TargetHealth:
+      type: string
+      description: Health status of the load balancer session target.
+      enum:
+      - HEALTHY
+      - UNHEALTHY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        HEALTHY: Load balancer target is healthy.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        UNHEALTHY: Load balancer target is unhealthy.
+    networking.v4.0.config.LoadBalancerSession:
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
+      - title: load balancer session object.
+        required:
+        - description
+        - healthCheckConfig
+        - listener
+        - name
+        - targetsConfig
+        - vpcReference
+        type: object
+        properties:
+          name:
+            maxLength: 128
+            type: string
+            description: Name of the load balancer session.
+          description:
+            maxLength: 1000
+            type: string
+            description: Description of the load balancer session.
+          type:
+            $ref: '#/components/schemas/networking.v4.0.config.LoadBalancerSessionType'
+          vpcReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: UUID of the Virtual Private Cloud this load balancer session belongs to.
+          listener:
+            $ref: '#/components/schemas/networking.v4.0.config.Listener'
+          algorithm:
+            $ref: '#/components/schemas/networking.v4.0.config.Algorithm'
+          targetsConfig:
+            $ref: '#/components/schemas/networking.v4.0.config.Target'
+          healthCheckConfig:
+            $ref: '#/components/schemas/networking.v4.0.config.HealthCheck'
+        additionalProperties: false
+        description: API schema for load balancer session.
+    networking.v4.0.config.NicTarget:
+      type: object
+      properties:
+        virtualNicReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Reference to the virtual NIC of the load balancer session target.
+        port:
+          maximum: 65535
+          minimum: 1
+          type: integer
+          description: The port value of the load balancer session target.
+          format: uint16
+        vmReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Reference to the VM of the load balancer session target.
+          readOnly: true
+        health:
+          $ref: '#/components/schemas/networking.v4.0.config.TargetHealth'
+      additionalProperties: false
+      description: Targets that are associated with the load balancer using virtual NIC.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
           minItems: 0
           type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
           items:
-            $ref: '#/components/schemas/networking.v4.0.config.NicTarget'
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
       additionalProperties: false
-      description: Target configuration for the load balancer session.
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    networking.v4.0.config.VirtualIP:
+      required:
+      - assignmentType
+      - subnetReference
+      type: object
+      properties:
+        subnetReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Reference to the subnet from which the virtual IP address is allocated.
+        assignmentType:
+          $ref: '#/components/schemas/networking.v4.0.config.AssignmentType'
+        ipAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+      additionalProperties: false
+      description: Virtual IP configuration for the load balancer session listener.
+    networking.v4.0.config.Protocol:
+      type: string
+      description: L3/L4 protocol.
+      enum:
+      - TCP
+      - UDP
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        TCP: Transmission Control Protocol.
+        UDP: User Datagram Protocol.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    networking.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    networking.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    networking.v4.0.config.Listener:
+      required:
+      - portRanges
+      - protocol
+      - virtualIP
+      type: object
+      properties:
+        virtualIP:
+          $ref: '#/components/schemas/networking.v4.0.config.VirtualIP'
+        protocol:
+          $ref: '#/components/schemas/networking.v4.0.config.Protocol'
+        portRanges:
+          maxItems: 10
+          minItems: 0
+          type: array
+          description: Doc(LoadBalancerSessionPortRange)
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.PortRange'
+      additionalProperties: false
+      description: Listener configuration for the load balancer session.
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -1372,6 +1485,60 @@ components:
         an address for retrieving the particular resource.
 
         '
+    networking.v4.0.config.Target:
+      type: object
+      properties:
+        nicTargets:
+          maxItems: 32
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.NicTarget'
+      additionalProperties: false
+      description: Target configuration for the load balancer session.
+    networking.v4.0.config.NetworkingBaseModel:
+      description: Networking common base object
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          metadata:
+            $ref: '#/components/schemas/common.v1.0.config.Metadata'
+        additionalProperties: false
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    networking.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
     networking.v4.0.config.HealthCheck:
       type: object
       properties:
@@ -1381,47 +1548,26 @@ components:
           type: integer
           description: The interval, in seconds, between health checks.
           format: uint16
-          default: 5
         timeoutSecs:
           maximum: 65535
           minimum: 1
           type: integer
           description: The time, in seconds, after which a health check times out.
           format: uint16
-          default: 2
         successThreshold:
           maximum: 64
           minimum: 1
           type: integer
           description: The number of successful checks after which the target is considered healthy.
           format: uint16
-          default: 3
         failureThreshold:
           maximum: 64
           minimum: 1
           type: integer
           description: The number of failure checks after which the target is considered unhealthy.
           format: uint16
-          default: 3
       additionalProperties: false
       description: Health check configuration for the load balancer session.
-    networking.v4.0.config.VirtualIP:
-      required:
-      - assignmentType
-      - subnetReference
-      type: object
-      properties:
-        subnetReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Reference to the subnet from which the virtual IP address is allocated.
-          example: 84254123-cfeb-4e6a-87e7-eda4cc402a9c
-        assignmentType:
-          $ref: '#/components/schemas/networking.v4.0.config.AssignmentType'
-        ipAddress:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-      additionalProperties: false
-      description: Virtual IP configuration for the load balancer session listener.
     networking.v4.0.config.AssignmentType:
       type: string
       description: Assignment method for load balancer Virtual IP.
@@ -1453,6 +1599,29 @@ components:
       description: 'A wrapper schema containing a map with string keys and values.
 
         '
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -1471,7 +1640,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 870ef0a7-1d70-4ba5-839b-436e2c69e445
           links:
             maxItems: 20
             minItems: 0
@@ -1484,68 +1652,66 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
-    networking.v4.0.config.LoadBalancerSession:
-      allOf:
-      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
-      - title: load balancer session object.
-        required:
-        - description
-        - healthCheckConfig
-        - listener
-        - name
-        - targetsConfig
-        - vpcReference
-        type: object
-        properties:
-          name:
-            maxLength: 128
-            type: string
-            description: Name of the load balancer session.
-            example: tcp-load-balancer-session
-          description:
-            maxLength: 1000
-            type: string
-            description: Description of the load balancer session.
-            example: TCP Load Balancer Session
-          type:
-            $ref: '#/components/schemas/networking.v4.0.config.LoadBalancerSessionType'
-          vpcReference:
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.Metadata:
+      type: object
+      properties:
+        ownerReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the owner of this resource.
+
+            '
+        ownerUserName:
+          maxLength: 128
+          type: string
+          description: 'The userName of the owner of this resource.
+
+            '
+        projectReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the project this resource belongs to.
+
+            '
+        projectName:
+          maxLength: 128
+          type: string
+          description: 'The name of the project this resource belongs to.
+
+            '
+        categoryIds:
+          maxItems: 256
+          minItems: 1
+          type: array
+          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
+            with.
+
+            '
+          items:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
-            description: UUID of the Virtual Private Cloud this load balancer session belongs to.
-            example: ccc7b97a-9b6e-4ee3-91fa-3ead6cd1ca20
-          listener:
-            $ref: '#/components/schemas/networking.v4.0.config.Listener'
-          algorithm:
-            $ref: '#/components/schemas/networking.v4.0.config.Algorithm'
-          targetsConfig:
-            $ref: '#/components/schemas/networking.v4.0.config.Target'
-          healthCheckConfig:
-            $ref: '#/components/schemas/networking.v4.0.config.HealthCheck'
-        additionalProperties: false
-        description: API schema for load balancer session.
+      additionalProperties: false
+      description: 'Metadata associated with this resource.
+
+        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1567,12 +1733,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 52
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1603,87 +1767,8 @@ components:
               '
             items:
               type: integer
-              example: 28
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
-
-        '
-    common.v1.0.config.IPv6Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: eff4:180b:7f8b:7a40:8c4e:ea2c:d804:15e9
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
-          format: int32
-          default: 128
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 92
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
     networking.v4.0.config.PortRange:
@@ -1698,156 +1783,32 @@ components:
           type: integer
           description: Start port of TCP/UDP port range.
           format: uint16
-          example: 80
         endPort:
           maximum: 65535
           minimum: 0
           type: integer
           description: End port of TCP/UDP port range.
           format: uint16
-          example: 443
       additionalProperties: false
       description: Range of TCP/UDP ports.
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:9bf9c2d8-1857-4824-8f55-cbb6ab4eb85e
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    networking.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 17
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 59.225.95.31
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    common.v1.0.config.Metadata:
-      type: object
-      properties:
-        ownerReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the owner of this resource.
-
-            '
-          example: 88c007ec-0157-4901-a28a-c93e6cd73adc
-        ownerUserName:
-          maxLength: 128
-          type: string
-          description: 'The userName of the owner of this resource.
-
-            '
-        projectReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the project this resource belongs to.
-
-            '
-          example: 3e2a7199-b4d8-481c-a4d1-446470c8d864
-        projectName:
-          maxLength: 128
-          type: string
-          description: 'The name of the project this resource belongs to.
-
-            '
-        categoryIds:
-          maxItems: 256
-          minItems: 1
-          type: array
-          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
-            with.
-
-            '
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 61bf1201-334e-4002-a9da-0ad47bd7fa2e
-      additionalProperties: false
-      description: 'Metadata associated with this resource.
-
-        '
-    networking.v4.0.config.TargetHealth:
+    networking.v4.0.config.Algorithm:
       type: string
-      description: Health status of the load balancer session target.
+      description: Load balancing algorithm configured for the session.
       enum:
-      - HEALTHY
-      - UNHEALTHY
+      - FIVE_TUPLE_HASH
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        HEALTHY: Load balancer target is healthy.
+        FIVE_TUPLE_HASH: 'Five Tuple hash algorithm for load balancing. Hash is calculated based on source IP address, destination
+          IP address, source TCP/UDP port, destination TCP/UDP port and protocol fields of the packet.
+
+          '
         $UNKNOWN: 'Unknown value.
 
           '
         $REDACTED: 'Redacted value.
 
           '
-        UNHEALTHY: Load balancer target is unhealthy.
-    networking.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
   securitySchemes:
     basicAuthScheme:
       type: http

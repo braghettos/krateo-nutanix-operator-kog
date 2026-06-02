@@ -31,7 +31,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 334ece79-3c7f-4e6a-b617-4ebdc24b1f7c
       - name: $page
         in: query
         description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
@@ -51,7 +50,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -72,7 +70,6 @@ paths:
 
             '
           format: int32
-          default: 50
       responses:
         '200':
           description: Returns a list of requested complaince states of VMs.
@@ -216,123 +213,6 @@ paths:
           \n"
 components:
   schemas:
-    vmm.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    vmm.v4.0.ahv.policies.CategoryReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external ID (UUID) of the category.
-          example: b09dbf82-681a-403b-8e36-805087b515e5
-      additionalProperties: false
-      description: Reference to a category.
-    vmm.v4.0.ahv.policies.NotEnoughHostsForVmAntiAffinity:
-      type: object
-      properties: {}
-      additionalProperties: false
-      description: The VM-VM anti-affinity policy cannot be made compliant for the VM as the number of VMs in the policy are
-        more than the number of hosts on the cluster which is hosting the current VM.
-    vmm.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 24
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    vmm.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    vmm.v4.0.ahv.policies.OtherVmAntiAffinityPolicyNonComplianceReason:
-      type: object
-      properties: {}
-      additionalProperties: false
-      description: The VM-VM anti-affinity policy cannot be made compliant for the VM due to some other issue.
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 58c42276-2fd7-49bc-9bf7-67d18ba54f14
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -360,6 +240,143 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    vmm.v4.0.ahv.policies.ClusterReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external ID (UUID) of the cluster.
+      additionalProperties: false
+      description: Reference to a cluster.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    vmm.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    vmm.v4.0.ahv.policies.ConflictingLegacyVmAntiAffinityPolicy:
+      type: object
+      properties:
+        legacyVmAntiAffinityPolicyExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external ID of the legacy VM Group which the VM is the part of.
+      additionalProperties: false
+      description: The current VM-VM anti-affinity policy is not applied on the VM as the VM is already part of a legacy VM
+        Group.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    vmm.v4.0.ahv.policies.NotEnoughResourcesForVmAntiAffinity:
+      type: object
+      properties: {}
+      additionalProperties: false
+      description: The VM-VM anti-affinity policy cannot be made compliant for the VM as there are not enough resources on
+        the cluster to enforce the policy. This may be related to pinned VMs, VM-Host affinity policies, etc.
+    vmm.v4.0.ahv.policies.PendingVmAntiAffinityPolicy:
+      type: object
+      properties: {}
+      additionalProperties: false
+      description: The compliance status of the VM is PendingVmAntiAffinityPolicy. Policy enforcement is still in progress.
     vmm.v4.0.ahv.policies.CompliantVmAntiAffinityPolicy:
       type: object
       properties: {}
@@ -384,6 +401,173 @@ components:
         an address for retrieving the particular resource.
 
         '
+    vmm.v4.0.ahv.policies.ConflictingVmAntiAffinityPolicy:
+      type: object
+      properties:
+        conflictingVmAntiAffinityPolicyExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external ID of the conflicting VM-VM anti-affinity policy which is applied on the VM.
+      additionalProperties: false
+      description: The current VM-VM anti-affinity policy is not applied on the VM as another conflicting policy has already
+        been applied to the VM.
+    vmm.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    vmm.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    vmm.v4.0.ahv.policies.NonCompliantVmAntiAffinityPolicy:
+      type: object
+      properties:
+        nonComplianceReason:
+          required: []
+          properties: {}
+          description: The reason for non-compliance of the VM-VM anti-affinity policy for the VM.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.ClusterNotSupportedForVmAntiAffinity'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.ConflictingVmAntiAffinityPolicy'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.ConflictingLegacyVmAntiAffinityPolicy'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.NotEnoughHostsForVmAntiAffinity'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.NotEnoughResourcesForVmAntiAffinity'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.OtherVmAntiAffinityPolicyNonComplianceReason'
+      additionalProperties: false
+      description: The compliance status of the VM is non-compliant.
+    vmm.v4.0.ahv.policies.OtherVmAntiAffinityPolicyNonComplianceReason:
+      type: object
+      properties: {}
+      additionalProperties: false
+      description: The VM-VM anti-affinity policy cannot be made compliant for the VM due to some other issue.
+    vmm.v4.0.ahv.policies.NotEnoughHostsForVmAntiAffinity:
+      type: object
+      properties: {}
+      additionalProperties: false
+      description: The VM-VM anti-affinity policy cannot be made compliant for the VM as the number of VMs in the policy are
+        more than the number of hosts on the cluster which is hosting the current VM.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    vmm.v4.0.ahv.policies.CategoryReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external ID (UUID) of the category.
+      additionalProperties: false
+      description: Reference to a category.
+    vmm.v4.0.ahv.policies.HostReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external ID (UUID) of the host.
+      additionalProperties: false
+      description: Reference to a host.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
     vmm.v4.0.ahv.policies.VmAntiAffinityPolicyVmComplianceState:
       description: Compliance information of a VM which is part of the VM-VM anti-affinity policy.
       allOf:
@@ -403,12 +587,8 @@ components:
             items:
               $ref: '#/components/schemas/vmm.v4.0.ahv.policies.CategoryReference'
           complianceStatus:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: vmm.v4.ahv.policies.CompliantVmAntiAffinityPolicy
+            required: []
+            properties: {}
             description: The compliance status of the VM.
             readOnly: true
             oneOf:
@@ -416,83 +596,6 @@ components:
             - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.NonCompliantVmAntiAffinityPolicy'
             - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.PendingVmAntiAffinityPolicy'
         additionalProperties: false
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 6c335c2e-8b41-4973-b7d4-08fefbe88680
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    vmm.v4.0.ahv.policies.HostReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external ID (UUID) of the host.
-          example: ca0e7341-49ab-4cff-ba15-cfe3a9ece01a
-      additionalProperties: false
-      description: Reference to a host.
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -514,12 +617,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 31
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -550,160 +651,32 @@ components:
               '
             items:
               type: integer
-              example: 99
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    vmm.v4.0.ahv.policies.ConflictingVmAntiAffinityPolicy:
-      type: object
-      properties:
-        conflictingVmAntiAffinityPolicyExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external ID of the conflicting VM-VM anti-affinity policy which is applied on the VM.
-          example: 9d5b9093-be87-43e9-8a30-3d9e8e47b436
-      additionalProperties: false
-      description: The current VM-VM anti-affinity policy is not applied on the VM as another conflicting policy has already
-        been applied to the VM.
-    vmm.v4.0.ahv.policies.ClusterReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external ID (UUID) of the cluster.
-          example: 59bd7e0f-99e9-432f-a0a1-6be6e2973581
-      additionalProperties: false
-      description: Reference to a cluster.
-    vmm.v4.0.ahv.policies.ConflictingLegacyVmAntiAffinityPolicy:
-      type: object
-      properties:
-        legacyVmAntiAffinityPolicyExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external ID of the legacy VM Group which the VM is the part of.
-          example: 51ae0353-7d78-4338-adf5-db8ec63787d1
-      additionalProperties: false
-      description: The current VM-VM anti-affinity policy is not applied on the VM as the VM is already part of a legacy VM
-        Group.
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 25
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    vmm.v4.0.ahv.policies.NonCompliantVmAntiAffinityPolicy:
-      type: object
-      properties:
-        nonComplianceReason:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.policies.ClusterNotSupportedForVmAntiAffinity
-          description: The reason for non-compliance of the VM-VM anti-affinity policy for the VM.
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.ClusterNotSupportedForVmAntiAffinity'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.ConflictingVmAntiAffinityPolicy'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.ConflictingLegacyVmAntiAffinityPolicy'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.NotEnoughHostsForVmAntiAffinity'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.NotEnoughResourcesForVmAntiAffinity'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.policies.OtherVmAntiAffinityPolicyNonComplianceReason'
-      additionalProperties: false
-      description: The compliance status of the VM is non-compliant.
-    vmm.v4.0.ahv.policies.NotEnoughResourcesForVmAntiAffinity:
-      type: object
-      properties: {}
-      additionalProperties: false
-      description: The VM-VM anti-affinity policy cannot be made compliant for the VM as there are not enough resources on
-        the cluster to enforce the policy. This may be related to pinned VMs, VM-Host affinity policies, etc.
-    vmm.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
     vmm.v4.0.ahv.policies.ClusterNotSupportedForVmAntiAffinity:
       type: object
       properties: {}
       additionalProperties: false
       description: The VM-VM anti-affinity policy is not compliant for the VM as the cluster hosting the VM is not running
         on a supported AOS version.
-    vmm.v4.0.ahv.policies.PendingVmAntiAffinityPolicy:
+    vmm.v4.0.error.SchemaValidationErrorMessage:
       type: object
-      properties: {}
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
-      description: The compliance status of the VM is PendingVmAntiAffinityPolicy. Policy enforcement is still in progress.
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
   securitySchemes:
     basicAuthScheme:
       type: http

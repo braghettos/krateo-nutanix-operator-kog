@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       responses:
         '200':
           description: List of license configurations
@@ -190,116 +188,48 @@ paths:
           \ $APP_ACCESS_TOKEN' \\\n- \"https://{pc-ip}:9440/api/licensing/v4.0/config/settings?$limit=50&$page=0\"\n"
 components:
   schemas:
-    licensing.v4.0.config.EnforcementPolicy:
-      title: Defines different enforcement policy values.
+    licensing.v4.0.config.ConsumptionType:
+      title: Defines different types of consumption.
       type: string
-      description: Possible values are All or None.
+      description: Possible values are HYBRID and others
       enum:
-      - ALL
-      - NONE
+      - HYBRID
+      - UTILITY
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        ALL: Enforces all licensing constraints.
-        NONE: Does not enforce any licensing constraint.
         $UNKNOWN: 'Unknown value.
 
           '
+        UTILITY: Indicates all consumption is billed.
+        HYBRID: Indicates some consumption is covered by actual licenses while rest is billed.
         $REDACTED: 'Redacted value.
 
           '
-    licensing.v4.0.error.SchemaValidationErrorMessage:
+    licensing.v4.0.error.SchemaValidationError:
       type: object
       properties:
-        location:
+        timestamp:
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
           type: string
-          description: The detailed message for the validation error.
-        attributePath:
+          description: The generic error message for the response.
+        path:
           type: string
-          description: The path of the attribute that failed validation in the schema.
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationErrorMessage'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
+      description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
-    licensing.v4.0.config.Setting:
-      description: Response object containing setting details.
-      allOf:
-      - $ref: '#/components/schemas/licensing.v4.0.config.BaseClusterInfo'
-      - type: object
-        properties:
-          logicalVersion:
-            $ref: '#/components/schemas/licensing.v4.0.config.LogicalVersion'
-          isStandby:
-            type: boolean
-            description: True value indicates that cluster summary file is downloaded but license summary file is not uplaoded.
-            example: true
-          hasNonCompliantFeatures:
-            type: boolean
-            description: True value indicates that user is allowed to use non compliant features.
-            default: false
-          isLicenseCheckDisabled:
-            type: boolean
-            description: Used to enable and disable NCC license checks.
-            default: false
-          licenseClass:
-            $ref: '#/components/schemas/licensing.v4.0.config.LicenseClass'
-          enforcementPolicy:
-            $ref: '#/components/schemas/licensing.v4.0.config.EnforcementPolicy'
-          licenseKey:
-            maxLength: 100
-            type: string
-            description: License key applied to dark site clusters.
-          hasUltimateTrialEnded:
-            type: boolean
-            description: Indicates whether ultimate trial is active or not.
-            example: false
-          postPaidConfig:
-            $ref: '#/components/schemas/licensing.v4.0.config.PostPaidConfig'
-        additionalProperties: false
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 68bb7679-88c1-4538-9f64-2bbc4025272d
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -327,6 +257,224 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    licensing.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    licensing.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/licensing.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    licensing.v4.0.config.PostPaidConfig:
+      type: object
+      properties:
+        id:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Attribute for postpaid configuration identifier.
+        category:
+          $ref: '#/components/schemas/licensing.v4.0.config.PostPaidCategory'
+        isPulseRequired:
+          type: boolean
+          description: Indicates whether pulse data collection is required.
+        billingPlan:
+          $ref: '#/components/schemas/licensing.v4.0.config.BillingPlan'
+        consumptionType:
+          $ref: '#/components/schemas/licensing.v4.0.config.ConsumptionType'
+      additionalProperties: false
+      description: Model for capturing postpaid configuration.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    licensing.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    licensing.v4.0.config.LogicalVersion:
+      type: object
+      properties:
+        clusterVersion:
+          type: integer
+          description: Indicates cluster logical version. This is used to keep cluster and license portal in sync.
+          format: int32
+        licenseVersion:
+          type: integer
+          description: Indicates license logical version. This is also used to keep cluster and license portal in sync.
+          format: int32
+      additionalProperties: false
+      description: Model representing license and cluster logical versions.
+    licensing.v4.0.config.BillingPlan:
+      title: Defines different types of billing plans.
+      type: string
+      description: Possible values are PAY_AS_YOU_GO and others.
+      enum:
+      - FREE_TRIAL
+      - PAY_AS_YOU_GO
+      - CLOUD_COMMIT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        FREE_TRIAL: Trial period for free.
+        CLOUD_COMMIT: Cloud commit billing plan.
+        PAY_AS_YOU_GO: Pay as you go billing plan.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    licensing.v4.0.config.PostPaidCategory:
+      title: Defines different types of postpaid categories.
+      type: string
+      description: Possible values are MSP and others.
+      enum:
+      - MSP
+      - NC2
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        MSP: Managed Service Provider.
+        NC2: Nutanix Cloud Cluster.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -346,26 +494,37 @@ components:
         an address for retrieving the particular resource.
 
         '
-    licensing.v4.0.config.PostPaidConfig:
-      type: object
-      properties:
-        id:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Attribute for postpaid configuration identifier.
-          example: 6f15f8a6-d647-4d6c-b3eb-c3c37be0198c
-        category:
-          $ref: '#/components/schemas/licensing.v4.0.config.PostPaidCategory'
-        isPulseRequired:
-          type: boolean
-          description: Indicates whether pulse data collection is required.
-          example: false
-        billingPlan:
-          $ref: '#/components/schemas/licensing.v4.0.config.BillingPlan'
-        consumptionType:
-          $ref: '#/components/schemas/licensing.v4.0.config.ConsumptionType'
-      additionalProperties: false
-      description: Model for capturing postpaid configuration.
+    licensing.v4.0.config.Setting:
+      description: Response object containing setting details.
+      allOf:
+      - $ref: '#/components/schemas/licensing.v4.0.config.BaseClusterInfo'
+      - type: object
+        properties:
+          logicalVersion:
+            $ref: '#/components/schemas/licensing.v4.0.config.LogicalVersion'
+          isStandby:
+            type: boolean
+            description: True value indicates that cluster summary file is downloaded but license summary file is not uplaoded.
+          hasNonCompliantFeatures:
+            type: boolean
+            description: True value indicates that user is allowed to use non compliant features.
+          isLicenseCheckDisabled:
+            type: boolean
+            description: Used to enable and disable NCC license checks.
+          licenseClass:
+            $ref: '#/components/schemas/licensing.v4.0.config.LicenseClass'
+          enforcementPolicy:
+            $ref: '#/components/schemas/licensing.v4.0.config.EnforcementPolicy'
+          licenseKey:
+            maxLength: 100
+            type: string
+            description: License key applied to dark site clusters.
+          hasUltimateTrialEnded:
+            type: boolean
+            description: Indicates whether ultimate trial is active or not.
+          postPaidConfig:
+            $ref: '#/components/schemas/licensing.v4.0.config.PostPaidConfig'
+        additionalProperties: false
     licensing.v4.0.config.BaseClusterInfo:
       description: Model containing cluster identifier and a boolean attribute representing whether it is a PC or PE.
       allOf:
@@ -376,7 +535,6 @@ components:
             type: boolean
             description: True value indicates cluster UUID represents Prism Central otherwise Prism Element.
             readOnly: true
-            example: false
         additionalProperties: false
     common.v1.0.config.MapOfStringWrapper:
       type: object
@@ -392,6 +550,72 @@ components:
       description: 'A wrapper schema containing a map with string keys and values.
 
         '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    licensing.v4.0.config.EnforcementPolicy:
+      title: Defines different enforcement policy values.
+      type: string
+      description: Possible values are All or None.
+      enum:
+      - ALL
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ALL: Enforces all licensing constraints.
+        NONE: Does not enforce any licensing constraint.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
     licensing.v4.0.config.LicenseClass:
       title: Defines different types of license classes.
       type: string
@@ -412,127 +636,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: f6d37db9-0917-4c7c-bfbc-c252a9b24282
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    licensing.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 84
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    licensing.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    licensing.v4.0.config.LogicalVersion:
-      type: object
-      properties:
-        clusterVersion:
-          type: integer
-          description: Indicates cluster logical version. This is used to keep cluster and license portal in sync.
-          format: int32
-          example: 26
-        licenseVersion:
-          type: integer
-          description: Indicates license logical version. This is also used to keep cluster and license portal in sync.
-          format: int32
-          example: 17
-      additionalProperties: false
-      description: Model representing license and cluster logical versions.
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -554,12 +657,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 78
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -590,133 +691,10 @@ components:
               '
             items:
               type: integer
-              example: 45
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    licensing.v4.0.config.BillingPlan:
-      title: Defines different types of billing plans.
-      type: string
-      description: Possible values are PAY_AS_YOU_GO and others.
-      enum:
-      - FREE_TRIAL
-      - PAY_AS_YOU_GO
-      - CLOUD_COMMIT
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        FREE_TRIAL: Trial period for free.
-        CLOUD_COMMIT: Cloud commit billing plan.
-        PAY_AS_YOU_GO: Pay as you go billing plan.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 71
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    licensing.v4.0.config.ConsumptionType:
-      title: Defines different types of consumption.
-      type: string
-      description: Possible values are HYBRID and others
-      enum:
-      - HYBRID
-      - UTILITY
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        UTILITY: Indicates all consumption is billed.
-        HYBRID: Indicates some consumption is covered by actual licenses while rest is billed.
-        $REDACTED: 'Redacted value.
-
-          '
-    licensing.v4.0.config.PostPaidCategory:
-      title: Defines different types of postpaid categories.
-      type: string
-      description: Possible values are MSP and others.
-      enum:
-      - MSP
-      - NC2
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        MSP: Managed Service Provider.
-        NC2: Nutanix Cloud Cluster.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    licensing.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/licensing.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
   securitySchemes:
     basicAuthScheme:
       type: http

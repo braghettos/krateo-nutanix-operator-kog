@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -474,7 +472,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: f224d99c-0d8f-45e3-a5c9-f3def85e505a
       responses:
         '200':
           description: Returns directory service.
@@ -621,7 +618,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 4243c4f9-5595-4b1d-9a3a-3a920d302a52
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -824,7 +820,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: bce3f5fa-fb05-448b-a739-a3668ee51d71
       - name: If-Match
         in: header
         description: 'The If-Match request header makes the request conditional. When not provided the server will respond
@@ -897,63 +892,19 @@ paths:
         version: '2024.3'
 components:
   schemas:
-    iam.v4.0.error.SchemaValidationErrorMessage:
+    iam.v4.0.error.ErrorResponse:
       type: object
       properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/iam.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationError'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
       x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 89fb8492-86d4-43cb-ac1a-bc51ae0dff45
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -981,82 +932,198 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    iam.v4.0.authn.DirectoryService:
+    iam.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    iam.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    iam.v4.0.authn.DsServiceAccount:
       required:
-      - directoryType
-      - domainName
-      - name
-      - serviceAccount
-      - url
-      description: Information of a directory service.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 255
-            minLength: 1
-            pattern: ^[^<>;'()&+%\/\\"`]*$
-            type: string
-            description: Name for the directory service.
-            example: AD1
-          url:
-            maxLength: 2000
-            minLength: 3
-            type: string
-            description: URL for the directory service.
-            example: ldap://{{host_name}}
-          secondaryUrls:
-            maxItems: 5
-            minItems: 0
-            type: array
-            description: Secondary URL for the directory service.
-            items:
-              maxLength: 2000
-              minLength: 3
-              type: string
-              example: ldap://{{secondary_host_name}}
-          domainName:
-            maxLength: 255
-            minLength: 3
-            pattern: ^[^<>;'()&+%\/\\"`]*$
-            type: string
-            description: Domain name for the directory service.
-            example: domain1.com
-          directoryType:
-            $ref: '#/components/schemas/iam.v4.0.authn.DirectoryType'
-          serviceAccount:
-            $ref: '#/components/schemas/iam.v4.0.authn.DsServiceAccount'
-          openLdapConfiguration:
-            $ref: '#/components/schemas/iam.v4.0.authn.OpenLdapConfig'
-          groupSearchType:
-            $ref: '#/components/schemas/iam.v4.0.authn.GroupSearchType'
-          whiteListedGroups:
-            maxItems: 1000
-            minItems: 0
-            type: array
-            description: List of allowed user groups for the directory service.
-            items:
-              type: string
-              example: group1
-          createdTime:
-            type: string
-            description: Creation time of the directory service.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          lastUpdatedTime:
-            type: string
-            description: Last updated time of the directory service.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          createdBy:
-            type: string
-            description: User or service who created the directory service.
-            readOnly: true
-            example: 390b7801-7a80-5c94-8a07-8de63651b27b
-        additionalProperties: false
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          maxLength: 512
+          type: string
+          description: Username to connect to the directory service.
+        password:
+          type: string
+          description: Password to connect to the directory service.
+      additionalProperties: false
+      description: Information on the service account to connect to the directory service.
+    iam.v4.0.authn.GroupSearchType:
+      type: string
+      description: Group membership search type for the directory service.
+      enum:
+      - NON_RECURSIVE
+      - RECURSIVE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NON_RECURSIVE: Doesn't search recursively within groups.
+        RECURSIVE: Searches recursively within groups.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    iam.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -1076,6 +1143,23 @@ components:
         an address for retrieving the particular resource.
 
         '
+    iam.v4.0.authn.DirectoryType:
+      type: string
+      description: Type of directory service.
+      enum:
+      - ACTIVE_DIRECTORY
+      - OPEN_LDAP
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ACTIVE_DIRECTORY: Directory service type is Active Directory.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        OPEN_LDAP: Directory service type is Open LDAP.
+        $REDACTED: 'Redacted value.
+
+          '
     iam.v4.0.authn.UserConfiguration:
       required:
       - userObjectClass
@@ -1087,19 +1171,42 @@ components:
           maxLength: 64
           type: string
           description: Object class in the OpenLDAP system that corresponds to the users.
-          example: inetOrgPerson
         userSearchBase:
           maxLength: 200
           type: string
           description: Base DN for user search.
-          example: ou=ldap_search_ou,dc=domain1,dc=com
         usernameAttribute:
           maxLength: 64
           type: string
           description: Unique identifier for each user that can be used in authentication.
-          example: uid
       additionalProperties: false
       description: User configuration for OpenLDAP directory service.
+    iam.v4.0.authn.UserGroupConfiguration:
+      required:
+      - groupMemberAttribute
+      - groupMemberAttributeValue
+      - groupObjectClass
+      - groupSearchBase
+      type: object
+      properties:
+        groupObjectClass:
+          maxLength: 64
+          type: string
+          description: Object class in the OpenLDAP system that corresponds to groups.
+        groupSearchBase:
+          maxLength: 200
+          type: string
+          description: Base DN for group search.
+        groupMemberAttribute:
+          maxLength: 64
+          type: string
+          description: Attribute in a group that associates users to the group.
+        groupMemberAttributeValue:
+          maxLength: 64
+          type: string
+          description: User attribute value that will be used in group entity to associate user to the group.
+      additionalProperties: false
+      description: User Group configuration for OpenLDAP directory service.
     common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
@@ -1114,23 +1221,6 @@ components:
       description: 'A wrapper schema containing a map with string keys and values.
 
         '
-    iam.v4.0.authn.GroupSearchType:
-      type: string
-      description: Group membership search type for the directory service.
-      enum:
-      - NON_RECURSIVE
-      - RECURSIVE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NON_RECURSIVE: Doesn't search recursively within groups.
-        RECURSIVE: Searches recursively within groups.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -1149,7 +1239,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: afa17ed1-36c0-4cc0-9fec-c15178ad9aab
           links:
             maxItems: 20
             minItems: 0
@@ -1162,40 +1251,92 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    iam.v4.0.authn.OpenLdapConfig:
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    iam.v4.0.authn.DirectoryService:
       required:
-      - userConfiguration
-      - userGroupConfiguration
-      type: object
-      properties:
-        userConfiguration:
-          $ref: '#/components/schemas/iam.v4.0.authn.UserConfiguration'
-        userGroupConfiguration:
-          $ref: '#/components/schemas/iam.v4.0.authn.UserGroupConfiguration'
-      additionalProperties: false
-      description: Configuration for OpenLDAP directory service.
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
+      - directoryType
+      - domainName
+      - name
+      - serviceAccount
+      - url
+      description: Information of a directory service.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 255
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: Name for the directory service.
+          url:
+            maxLength: 2000
+            minLength: 3
+            type: string
+            description: URL for the directory service.
+          secondaryUrls:
+            maxItems: 5
+            minItems: 0
+            type: array
+            description: Secondary URL for the directory service.
+            items:
+              maxLength: 2000
+              minLength: 3
+              type: string
+          domainName:
+            maxLength: 255
+            minLength: 3
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: Domain name for the directory service.
+          directoryType:
+            $ref: '#/components/schemas/iam.v4.0.authn.DirectoryType'
+          serviceAccount:
+            $ref: '#/components/schemas/iam.v4.0.authn.DsServiceAccount'
+          openLdapConfiguration:
+            $ref: '#/components/schemas/iam.v4.0.authn.OpenLdapConfig'
+          groupSearchType:
+            $ref: '#/components/schemas/iam.v4.0.authn.GroupSearchType'
+          whiteListedGroups:
+            maxItems: 1000
+            minItems: 0
+            type: array
+            description: List of allowed user groups for the directory service.
+            items:
+              type: string
+          createdTime:
+            type: string
+            description: Creation time of the directory service.
+            format: date-time
+            readOnly: true
+          lastUpdatedTime:
+            type: string
+            description: Last updated time of the directory service.
+            format: date-time
+            readOnly: true
+          createdBy:
+            type: string
+            description: User or service who created the directory service.
+            readOnly: true
+        additionalProperties: false
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1217,12 +1358,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 52
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1253,194 +1392,22 @@ components:
               '
             items:
               type: integer
-              example: 28
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    iam.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/iam.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    iam.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 72
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    iam.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 60
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    iam.v4.0.authn.DirectoryType:
-      type: string
-      description: Type of directory service.
-      enum:
-      - ACTIVE_DIRECTORY
-      - OPEN_LDAP
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ACTIVE_DIRECTORY: Directory service type is Active Directory.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        OPEN_LDAP: Directory service type is Open LDAP.
-        $REDACTED: 'Redacted value.
-
-          '
-    iam.v4.0.authn.UserGroupConfiguration:
+    iam.v4.0.authn.OpenLdapConfig:
       required:
-      - groupMemberAttribute
-      - groupMemberAttributeValue
-      - groupObjectClass
-      - groupSearchBase
+      - userConfiguration
+      - userGroupConfiguration
       type: object
       properties:
-        groupObjectClass:
-          maxLength: 64
-          type: string
-          description: Object class in the OpenLDAP system that corresponds to groups.
-          example: posixGroup
-        groupSearchBase:
-          maxLength: 200
-          type: string
-          description: Base DN for group search.
-          example: ou=ldap_search_ou,dc=domain1,dc=com
-        groupMemberAttribute:
-          maxLength: 64
-          type: string
-          description: Attribute in a group that associates users to the group.
-          example: memberUid
-        groupMemberAttributeValue:
-          maxLength: 64
-          type: string
-          description: User attribute value that will be used in group entity to associate user to the group.
-          example: uid
+        userConfiguration:
+          $ref: '#/components/schemas/iam.v4.0.authn.UserConfiguration'
+        userGroupConfiguration:
+          $ref: '#/components/schemas/iam.v4.0.authn.UserGroupConfiguration'
       additionalProperties: false
-      description: User Group configuration for OpenLDAP directory service.
-    iam.v4.0.authn.DsServiceAccount:
-      required:
-      - password
-      - username
-      type: object
-      properties:
-        username:
-          maxLength: 512
-          type: string
-          description: Username to connect to the directory service.
-          example: Administrator@domain1.com
-        password:
-          type: string
-          description: Password to connect to the directory service.
-          example: Pa*******rd
-      additionalProperties: false
-      description: Information on the service account to connect to the directory service.
+      description: Configuration for OpenLDAP directory service.
   securitySchemes:
     basicAuthScheme:
       type: http

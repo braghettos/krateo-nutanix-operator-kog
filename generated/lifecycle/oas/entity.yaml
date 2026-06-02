@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -283,7 +281,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 7cd5d1d2-701e-4b4a-aded-343afdaadb21
       responses:
         '200':
           description: Details of the queried LCM entity.
@@ -414,129 +411,6 @@ paths:
           \n"
 components:
   schemas:
-    lifecycle.v4.0.resources.DependentEntity:
-      title: LCM available version dependency.
-      description: Dependency of an LCM entity available version.
-      allOf:
-      - $ref: '#/components/schemas/lifecycle.v4.0.common.EntityBaseModel'
-      - type: object
-        properties:
-          dependentVersions:
-            maxItems: 100
-            minItems: 0
-            type: array
-            description: Information of the dependent entity versions for this available entity.
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.KVPair'
-        additionalProperties: false
-    lifecycle.v4.0.common.EntityType:
-      title: LCM entity type.
-      type: string
-      description: Type of an LCM entity.
-      enum:
-      - SOFTWARE
-      - FIRMWARE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        FIRMWARE: LCM entity type firmware.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SOFTWARE: LCM entity type software.
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    lifecycle.v4.0.common.EntityBaseModel:
-      title: LCM Entity base model.
-      description: The list of properties that can be expanded on the LCM entity.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          entityClass:
-            maxLength: 256
-            minLength: 1
-            type: string
-            description: LCM entity class.
-            example: Core Cluster
-          entityModel:
-            maxLength: 256
-            minLength: 1
-            type: string
-            description: LCM entity model.
-            example: AOS
-          entityType:
-            $ref: '#/components/schemas/lifecycle.v4.0.common.EntityType'
-          entityVersion:
-            maxLength: 128
-            minLength: 1
-            type: string
-            description: Current version of an LCM entity.
-            example: 5.20.0
-          hardwareFamily:
-            maxLength: 256
-            minLength: 1
-            type: string
-            description: A hardware family for a LCM entity.
-            example: dell_gen_12
-        additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 12ce1b92-1a2a-48ba-b86b-b68a6aa69dc1
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    lifecycle.v4.0.common.LocationInfo:
-      title: Details about the location of an entity.
-      type: object
-      properties:
-        uuid:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Location UUID of the resource.
-          readOnly: true
-          example: e941136d-776d-48ec-a30b-7d1e93616404
-        locationType:
-          $ref: '#/components/schemas/lifecycle.v4.0.common.LocationType'
-      additionalProperties: false
-      description: Location info corresponds to a tuple of location type (either node/cluster) and ExtID
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -564,22 +438,125 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    lifecycle.v4.0.error.SchemaValidationErrorMessage:
+    lifecycle.v4.0.resources.DependentEntity:
+      title: LCM available version dependency.
+      description: Dependency of an LCM entity available version.
+      allOf:
+      - $ref: '#/components/schemas/lifecycle.v4.0.common.EntityBaseModel'
+      - type: object
+        properties:
+          dependentVersions:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Information of the dependent entity versions for this available entity.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.KVPair'
+        additionalProperties: false
+    common.v1.0.config.Flag:
       type: object
       properties:
-        location:
+        name:
+          maxLength: 128
+          minLength: 3
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    lifecycle.v4.0.common.EntityBaseModel:
+      title: LCM Entity base model.
+      description: The list of properties that can be expanded on the LCM entity.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          entityClass:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: LCM entity class.
+          entityModel:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: LCM entity model.
+          entityType:
+            $ref: '#/components/schemas/lifecycle.v4.0.common.EntityType'
+          entityVersion:
+            maxLength: 128
+            minLength: 1
+            type: string
+            description: Current version of an LCM entity.
+          hardwareFamily:
+            maxLength: 256
+            minLength: 1
+            type: string
+            description: A hardware family for a LCM entity.
+        additionalProperties: false
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
     lifecycle.v4.0.resources.Entity:
       title: LCM entity.
       description: Details of an LCM entity.
@@ -593,7 +570,6 @@ components:
             type: string
             description: Description of an LCM entity.
             readOnly: true
-            example: Entity Description
           locationInfo:
             $ref: '#/components/schemas/lifecycle.v4.0.common.LocationInfo'
           targetVersion:
@@ -602,26 +578,22 @@ components:
             type: string
             description: The requested update version of an LCM entity.
             readOnly: true
-            example: '7.0'
           lastUpdatedTime:
             type: string
             description: UTC date and time in RFC-3339 format when the task was last updated.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           deviceId:
             maxLength: 128
             minLength: 1
             type: string
             description: Unique identifier of an LCM entity e.g. "HDD serial number".
             readOnly: true
-            example: '123456'
           groupUuid:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: UUID of the group that this LCM entity is part of.
             readOnly: true
-            example: d96e4fef-b121-4b69-b509-19c0b2dcc9b8
           entityDetails:
             maxItems: 100
             minItems: 0
@@ -660,33 +632,25 @@ components:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: Cluster uuid on which the resource is present or operation is being performed.
-            example: 66d7ddf0-3be5-44aa-8f42-437c8ea705c0
           hardwareVendor:
             maxLength: 256
             minLength: 1
             type: string
             description: Hardware vendor information.
-            example: Dell
         additionalProperties: false
-    common.v1.0.response.ApiLink:
+    lifecycle.v4.0.common.LocationInfo:
+      title: Details about the location of an entity.
       type: object
       properties:
-        href:
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
+          description: Location UUID of the resource.
+          readOnly: true
+        locationType:
+          $ref: '#/components/schemas/lifecycle.v4.0.common.LocationType'
       additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
+      description: Location info corresponds to a tuple of location type (either node/cluster) and ExtID
     lifecycle.v4.0.error.AppMessage:
       type: object
       properties:
@@ -702,7 +666,6 @@ components:
         locale:
           type: string
           description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
         errorGroup:
           type: string
           description: The error group associated with this message of severity ERROR.
@@ -714,51 +677,6 @@ components:
       additionalProperties: false
       description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: d95188be-5a20-4b56-a35f-c4fc189a3738
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
     common.v1.0.config.Message:
       type: object
       properties:
@@ -777,72 +695,9 @@ components:
           description: 'The locale for the message description.
 
             '
-          default: en_US
         severity:
           $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
-
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 72
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 60
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
     lifecycle.v4.0.common.AvailableVersionStatus:
       title: Available version status.
       type: string
@@ -875,59 +730,189 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ApiResponseMetadata:
+    common.v1.0.response.ApiLink:
       type: object
       properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
 
             '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
 
             '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 71
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
       additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
 
         '
+    lifecycle.v4.0.resources.AvailableVersion:
+      title: LCM available version.
+      type: object
+      properties:
+        version:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: LCM framework version present in the LCM URL.
+        status:
+          $ref: '#/components/schemas/lifecycle.v4.0.common.AvailableVersionStatus'
+        isEnabled:
+          type: boolean
+          description: Indicates if the available update is enabled.
+        availableVersionUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Available version UUID.
+        order:
+          maximum: 10000
+          minimum: 1
+          type: integer
+          description: Order of this available version (1 being the lowest and 6 being the highest) when multiple versions
+            are present with different status.
+          format: int64
+        disablementReason:
+          maxLength: 512
+          minLength: 1
+          type: string
+          description: Reason for disabling the available version.
+        releaseNotes:
+          maxLength: 1024
+          minLength: 1
+          type: string
+          description: Release notes corresponding to the update.
+        releaseDate:
+          type: string
+          description: Release date for the entities that need this information.
+          format: date
+        customMessage:
+          maxLength: 512
+          minLength: 1
+          type: string
+          description: Update custom messages other than release notes to the user about this available version.
+        childEntities:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Component information for the payload based entity.
+          readOnly: true
+          items:
+            maxLength: 1024
+            minLength: 1
+            type: string
+        groupUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the group that this LCM entity is part of.
+        dependencies:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: List of dependencies for the available version.
+          items:
+            $ref: '#/components/schemas/lifecycle.v4.0.resources.DependentEntity'
+      additionalProperties: false
+      description: LCM framework version present in the LCM URL.
+    lifecycle.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    lifecycle.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/lifecycle.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    lifecycle.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
     lifecycle.v4.0.common.LocationType:
       title: Location type of an entity represented in LCM.
       type: string
@@ -948,121 +933,101 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    lifecycle.v4.0.error.SchemaValidationError:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 84
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    lifecycle.v4.0.resources.AvailableVersion:
-      title: LCM available version.
-      type: object
-      properties:
-        version:
-          maxLength: 128
-          minLength: 1
-          type: string
-          description: LCM framework version present in the LCM URL.
-          example: '7.0'
-        status:
-          $ref: '#/components/schemas/lifecycle.v4.0.common.AvailableVersionStatus'
-        isEnabled:
-          type: boolean
-          description: Indicates if the available update is enabled.
-          default: true
-        availableVersionUuid:
+        tenantId:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: Available version UUID.
-          example: b25db722-7b0b-4926-9229-5e16b4bbe533
-        order:
-          maximum: 10000
-          minimum: 1
-          type: integer
-          description: Order of this available version (1 being the lowest and 6 being the highest) when multiple versions
-            are present with different status.
-          format: int64
-          example: 50
-        disablementReason:
-          maxLength: 512
-          minLength: 1
-          type: string
-          description: Reason for disabling the available version.
-          example: This version is disabled because cluster does not meet the requirements
-        releaseNotes:
-          maxLength: 1024
-          minLength: 1
-          type: string
-          description: Release notes corresponding to the update.
-          example: This is a release note
-        releaseDate:
-          type: string
-          description: Release date for the entities that need this information.
-          format: date
-          example: 2009-09-23
-        customMessage:
-          maxLength: 512
-          minLength: 1
-          type: string
-          description: Update custom messages other than release notes to the user about this available version.
-          example: This version is custom version
-        childEntities:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Component information for the payload based entity.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
           readOnly: true
-          items:
-            maxLength: 1024
-            minLength: 1
-            type: string
-        groupUuid:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: UUID of the group that this LCM entity is part of.
-          example: 56e9b813-c5af-4674-a8fd-eff3cc1e4f98
-        dependencies:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: List of dependencies for the available version.
-          items:
-            $ref: '#/components/schemas/lifecycle.v4.0.resources.DependentEntity'
       additionalProperties: false
-      description: LCM framework version present in the LCM URL.
-    lifecycle.v4.0.error.ErrorResponse:
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.KVPair:
       type: object
       properties:
-        error:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
           oneOf:
-          - type: array
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
             items:
-              $ref: '#/components/schemas/lifecycle.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/lifecycle.v4.0.error.SchemaValidationError'
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    lifecycle.v4.0.common.EntityType:
+      title: LCM entity type.
+      type: string
+      description: Type of an LCM entity.
+      enum:
+      - SOFTWARE
+      - FIRMWARE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        FIRMWARE: LCM entity type firmware.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SOFTWARE: LCM entity type software.
+        $REDACTED: 'Redacted value.
+
+          '
   securitySchemes:
     basicAuthScheme:
       type: http

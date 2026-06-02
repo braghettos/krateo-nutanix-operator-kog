@@ -31,7 +31,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 8577441a-5302-48da-87d4-852b010b60d0
       responses:
         '200':
           description: Retrieved report setting information.
@@ -210,7 +209,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: c13fd6b5-9dbe-4fef-bba8-e0c7fe992e8c
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -223,7 +221,6 @@ paths:
         explode: false
         schema:
           type: string
-          example: string
       requestBody:
         description: The request body updates the report setting. Name is the only required field.
         content:
@@ -449,75 +446,6 @@ paths:
       version: '2024.3'
 components:
   schemas:
-    opsmgmt.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 72
-        error:
-          type: string
-          description: The generic error message for the response.
-          example: string
-        path:
-          type: string
-          description: API path on which the request was made.
-          example: string
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/opsmgmt.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    opsmgmt.v4.0.config.Recipient:
-      required:
-      - emailAddress
-      type: object
-      properties:
-        emailAddress:
-          pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-          type: string
-          description: Email address of the recipient.
-          example: john.doe@example.com
-        recipientName:
-          maxLength: 64
-          minLength: 0
-          type: string
-          description: Name of the recipient.
-          example: John Doe
-      additionalProperties: false
-      description: Recipient of the report email.
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-          example: string
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
     opsmgmt.v4.0.config.ReportCustomization:
       type: object
       properties:
@@ -526,77 +454,49 @@ components:
           minItems: 0
           type: string
           description: Custom header HTML for the report.
-          example: Header HTML
         footerHtml:
           maxItems: 500
           minItems: 0
           type: string
           description: Custom footer HTML for the report.
-          example: Footer HTML
         cssStyleSheet:
           maxItems: 500
           minItems: 0
           type: string
           description: Global cascadable style for the report.
-          example: Custom CSS
         logoImageExtId:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
           description: Custom logo for the report as selected by the user. The logo extID can be fetched using report artifact
             list API.
-          example: bde250de-0353-410c-ab5c-89e3b0e7a644
       additionalProperties: false
       description: Report-level customizations.
-    common.v1.0.config.TenantAwareModel:
+    opsmgmt.v4.0.error.AppMessage:
       type: object
       properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        message:
           type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this ID to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: de20ff12-2a25-43b1-b2be-2bde090bbad9
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
+            the endpoint belongs. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
       additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    opsmgmt.v4.0.config.NotificationPolicy:
-      required:
-      - recipients
-      type: object
-      properties:
-        recipientFormats:
-          maxItems: 2
-          minItems: 0
-          type: array
-          description: List specifying the formats in which the report is to be sent.
-          items:
-            $ref: '#/components/schemas/opsmgmt.v4.0.config.ReportFormat'
-        recipients:
-          maxItems: 100
-          minItems: 1
-          type: array
-          description: Email recipients list.
-          items:
-            $ref: '#/components/schemas/opsmgmt.v4.0.config.Recipient'
-        emailSubject:
-          maxLength: 100
-          type: string
-          description: Subject of the email to be sent for the report.
-          example: Sample email subject
-        emailBody:
-          maxLength: 1000
-          type: string
-          description: Content of the email body.
-          example: Sample email body
-      additionalProperties: false
-      description: Notification policy for sending the email of the generated report.
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -624,228 +524,40 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ApiLink:
+    opsmgmt.v4.0.error.ErrorResponse:
       type: object
       properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-          example: string
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-          example: string
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    opsmgmt.v4.0.config.GlobalReportSetting:
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - name
-        type: object
-        properties:
-          name:
-            maxLength: 64
-            minLength: 1
-            type: string
-            description: Name of the global report setting.
-            example: Global Report Setting
-          retentionConfig:
-            $ref: '#/components/schemas/opsmgmt.v4.0.config.RetentionConfig'
-          notificationPolicy:
-            $ref: '#/components/schemas/opsmgmt.v4.0.config.NotificationPolicy'
-          reportCustomization:
-            $ref: '#/components/schemas/opsmgmt.v4.0.config.ReportCustomization'
-        additionalProperties: false
-        description: Global report setting modification specification.
-    opsmgmt.v4.0.config.RetentionConfig:
-      type: object
-      properties:
-        retentionPeriodSeconds:
-          type: integer
-          description: Retention period in seconds for the generated reports.
-          format: int64
-          example: 39
-        retentionCount:
-          type: integer
-          description: Number of reports to be retained.
-          format: int32
-          example: 79
-      additionalProperties: false
-      description: Defines how long to retain a report generated from the report configuration. Only one of the retentionPeriodSeconds
-        and retentionCount should be specified.
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 6ad63a95-fe43-44d7-94bd-1d67fe8b4870
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
+        error:
+          oneOf:
+          - type: array
             items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-          example: string
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-          example: string
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+              $ref: '#/components/schemas/opsmgmt.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/opsmgmt.v4.0.error.SchemaValidationError'
       additionalProperties: false
-    common.v1.0.config.KVPair:
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
       type: object
       properties:
         name:
           maxLength: 128
           minLength: 3
           type: string
-          description: 'The key of the key-value pair.
+          description: 'Name of the flag.
 
             '
-          example: string
         value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
+          type: boolean
+          description: 'Value of the flag.
 
-              '
-            example: string
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 28
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: false
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-              example: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 23
+            '
       additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
 
         '
-    opsmgmt.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-          example: string
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message. This string is typically prefixed with the namespace to which
-            the endpoint belongs. For example: VMM-40000'
-          example: string
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-          example: string
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
     common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
@@ -874,7 +586,6 @@ components:
 
             '
           format: int32
-          example: 60
         messages:
           maxItems: 20
           minItems: 0
@@ -899,6 +610,47 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
+    opsmgmt.v4.0.config.GlobalReportSetting:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - name
+        type: object
+        properties:
+          name:
+            maxLength: 64
+            minLength: 1
+            type: string
+            description: Name of the global report setting.
+          retentionConfig:
+            $ref: '#/components/schemas/opsmgmt.v4.0.config.RetentionConfig'
+          notificationPolicy:
+            $ref: '#/components/schemas/opsmgmt.v4.0.config.NotificationPolicy'
+          reportCustomization:
+            $ref: '#/components/schemas/opsmgmt.v4.0.config.ReportCustomization'
+        additionalProperties: false
+        description: Global report setting modification specification.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
     opsmgmt.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
@@ -906,31 +658,238 @@ components:
           type: string
           description: The part of the request that failed validation. Validation can fail for path, query parameters, and
             request body.
-          example: string
         message:
           type: string
           description: The detailed message for the validation error.
-          example: string
         attributePath:
           type: string
           description: The path of the attribute that failed validation in the schema.
-          example: string
       additionalProperties: false
       description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
-    opsmgmt.v4.0.error.ErrorResponse:
+    common.v1.0.response.ApiLink:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/opsmgmt.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/opsmgmt.v4.0.error.SchemaValidationError'
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    opsmgmt.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/opsmgmt.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
+    opsmgmt.v4.0.config.Recipient:
+      required:
+      - emailAddress
+      type: object
+      properties:
+        emailAddress:
+          pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+          type: string
+          description: Email address of the recipient.
+        recipientName:
+          maxLength: 64
+          minLength: 0
+          type: string
+          description: Name of the recipient.
+      additionalProperties: false
+      description: Recipient of the report email.
+    opsmgmt.v4.0.config.NotificationPolicy:
+      required:
+      - recipients
+      type: object
+      properties:
+        recipientFormats:
+          maxItems: 2
+          minItems: 0
+          type: array
+          description: List specifying the formats in which the report is to be sent.
+          items:
+            $ref: '#/components/schemas/opsmgmt.v4.0.config.ReportFormat'
+        recipients:
+          maxItems: 100
+          minItems: 1
+          type: array
+          description: Email recipients list.
+          items:
+            $ref: '#/components/schemas/opsmgmt.v4.0.config.Recipient'
+        emailSubject:
+          maxLength: 100
+          type: string
+          description: Subject of the email to be sent for the report.
+        emailBody:
+          maxLength: 1000
+          type: string
+          description: Content of the email body.
+      additionalProperties: false
+      description: Notification policy for sending the email of the generated report.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    opsmgmt.v4.0.config.RetentionConfig:
+      type: object
+      properties:
+        retentionPeriodSeconds:
+          type: integer
+          description: Retention period in seconds for the generated reports.
+          format: int64
+        retentionCount:
+          type: integer
+          description: Number of reports to be retained.
+          format: int32
+      additionalProperties: false
+      description: Defines how long to retain a report generated from the report configuration. Only one of the retentionPeriodSeconds
+        and retentionCount should be specified.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this ID to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
     opsmgmt.v4.0.config.ReportFormat:
       type: string
       description: List specifying the formats in which the report will be created.

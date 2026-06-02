@@ -71,6 +71,28 @@ def collect_refs(obj, acc):
             collect_refs(x, acc)
 
 
+def sanitize(obj):
+    """Strip keys that break k8s CRD generation: float `default`s on int fields,
+    bulky `example`s. CRDs don't need them."""
+    if isinstance(obj, dict):
+        for k in ("default", "example", "examples"):
+            obj.pop(k, None)
+        # drop Nutanix's $-prefixed reserved/envelope fields ($reserved, $objectType,
+        # $fv, $REDACTED...) — they generate invalid Go in oasgen's CRD codegen
+        props = obj.get("properties")
+        if isinstance(props, dict):
+            for pk in [k for k in props if k.startswith("$")]:
+                props.pop(pk, None)
+            if isinstance(obj.get("required"), list):
+                obj["required"] = [r for r in obj["required"] if not r.startswith("$")]
+        for v in obj.values():
+            sanitize(v)
+    elif isinstance(obj, list):
+        for x in obj:
+            sanitize(x)
+    return obj
+
+
 def trimmed_spec(spec, paths_subset):
     """Build a minimal valid OAS with only paths_subset + transitively-referenced
     components."""
@@ -221,7 +243,7 @@ def main():
                 subset[cpath] = paths[cpath]
             if ipath:
                 subset[ipath] = paths[ipath]
-            slice_spec = trimmed_spec(spec, subset)
+            slice_spec = sanitize(trimmed_spec(spec, subset))
             # identifiers: prefer name if present in create body
             create_op = cops.get("post")
             id_field = "name" if (create_op and request_has_field(spec, create_op, "name")) else None

@@ -60,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -81,7 +80,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -280,7 +278,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 35e54b81-568f-404a-bdf3-c3aff32ed64d
       requestBody:
         description: A model that represents unified namespace resources.
         content:
@@ -464,7 +461,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 36474835-349b-4d13-a874-f4cea150eba4
       responses:
         '200':
           description: Details of the queried unified namespace.
@@ -626,7 +622,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 259bf505-062a-4d42-96eb-ef5eb5ebc0eb
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -653,7 +648,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 9e524f89-3571-445e-b49a-ac81424d6bba
       requestBody:
         description: A model that represents unified namespace resources.
         content:
@@ -848,7 +842,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 4ef0d2f5-b1cf-4ee5-a393-42cd1481e76e
       - name: If-Match
         in: header
         description: 'The If-Match request header makes the request conditional. When not provided the server will respond
@@ -877,7 +870,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: cf6a6295-171d-42c3-99f2-8722e93a0a9d
       responses:
         '202':
           description: External identifier of the task corresponding to the unified namespace delete operation.
@@ -1042,56 +1034,6 @@ paths:
       version: 5.1
 components:
   schemas:
-    files.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    files.v4.0.config.UnifiedNamespace:
-      title: Unified Namespace
-      description: Unified namespace is a group of file servers across multiple Nutanix clusters and present unified access
-        to the clients through the namespace of the core member of the group. One of the file servers can be designated as
-        a core member. This is primarily used for expanding capacity across Nutanix Clusters.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - namespaceMemberConfigs
-        type: object
-        properties:
-          namespaceMemberConfigs:
-            maxItems: 10
-            minItems: 1
-            type: array
-            description: This contains a list of unified namespace member configurations. Member configuration represents
-              member file server and a flag to indicate whether it is hosting the namespace.
-            items:
-              $ref: '#/components/schemas/files.v4.0.config.NamespaceMemberConfig'
-        additionalProperties: false
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1119,131 +1061,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:d5a5af10-1466-4d38-8d66-465c1e19d1b2
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    files.v4.0.config.NamespaceMemberConfig:
-      title: Unified namespace member configuration
-      required:
-      - fileServerExtId
-      type: object
-      properties:
-        fileServerExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external identifier of the member file server which belongs to unified namespace.
-          example: 4af0e315-f96f-4060-980c-bef2868df0e3
-        isCoreMember:
-          type: boolean
-          description: This flag indicates whether the file server is hosting the namespace in unified namespace. Core member's
-            namespace will be used by the clients to access the shares. Core member cannot be changed once the namespace is
-            created.
-          default: false
-      additionalProperties: false
-      description: Unified namespace member configuration represents a list of member file servers and a flag to indicate
-        whether it is hosting namespace
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
     files.v4.0.error.ErrorResponse:
       type: object
       properties:
@@ -1276,6 +1093,179 @@ components:
         an address for retrieving the particular resource.
 
         '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    files.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
     files.v4.0.error.SchemaValidationError:
       type: object
       properties:
@@ -1283,11 +1273,9 @@ components:
           type: string
           description: Timestamp of the response.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
         statusCode:
           type: integer
           description: The HTTP status code of the response.
-          example: 13
         error:
           type: string
           description: The generic error message for the response.
@@ -1323,12 +1311,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 36
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -1359,91 +1345,83 @@ components:
               '
             items:
               type: integer
-              example: 41
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    files.v4.0.error.AppMessage:
+    common.v1.0.config.Message:
       type: object
       properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
         code:
           type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
         locale:
           type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    files.v4.0.config.UnifiedNamespace:
+      title: Unified Namespace
+      description: Unified namespace is a group of file servers across multiple Nutanix clusters and present unified access
+        to the clients through the namespace of the core member of the group. One of the file servers can be designated as
+        a core member. This is primarily used for expanding capacity across Nutanix Clusters.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - namespaceMemberConfigs
+        type: object
+        properties:
+          namespaceMemberConfigs:
+            maxItems: 10
+            minItems: 1
+            type: array
+            description: This contains a list of unified namespace member configurations. Member configuration represents
+              member file server and a flag to indicate whether it is hosting the namespace.
+            items:
+              $ref: '#/components/schemas/files.v4.0.config.NamespaceMemberConfig'
+        additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
           type: object
           additionalProperties:
             type: string
-          description: The map of argument name to value.
+          description: 'A map with string keys and values.
+
+            '
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 3
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+      description: 'A wrapper schema containing a map with string keys and values.
 
         '
+    files.v4.0.config.NamespaceMemberConfig:
+      title: Unified namespace member configuration
+      required:
+      - fileServerExtId
+      type: object
+      properties:
+        fileServerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the member file server which belongs to unified namespace.
+        isCoreMember:
+          type: boolean
+          description: This flag indicates whether the file server is hosting the namespace in unified namespace. Core member's
+            namespace will be used by the clients to access the shares. Core member cannot be changed once the namespace is
+            created.
+      additionalProperties: false
+      description: Unified namespace member configuration represents a list of member file servers and a flag to indicate
+        whether it is hosting namespace
   securitySchemes:
     basicAuthScheme:
       type: http

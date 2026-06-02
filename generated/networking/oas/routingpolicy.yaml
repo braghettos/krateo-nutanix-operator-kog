@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -318,7 +316,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 24556bb1-9b70-4fa0-8dd5-13823efdc063
       requestBody:
         description: Schema to configure a routing policy.
         content:
@@ -551,7 +548,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 96a22c81-ed58-4bed-96bc-46b488626612
       responses:
         '200':
           description: Routing policy queried.
@@ -699,7 +695,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 15314229-ef0b-4762-a09f-7b80a50c7508
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -726,7 +721,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 4e3969c8-1ddf-4785-9be8-6c7c8f5ba4fe
       requestBody:
         description: Schema to configure a routing policy.
         content:
@@ -976,7 +970,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 2e5d08d6-84c6-4ef8-b074-bc293a828223
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -991,7 +984,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: d507c5ca-4b13-4aef-b5df-14f15a344bad
       responses:
         '202':
           description: Task ID corresponding to the delete routing policy request.
@@ -1132,70 +1124,18 @@ paths:
           \n- \"https://{pc-ip}:9440/api/networking/v4.0/config/routing-policies/45bCdf54-E6aA-CBDC-97aE-Cfd2ff0a9d5a\"\n"
 components:
   schemas:
-    networking.v4.0.config.NetworkingBaseModel:
-      description: Networking common base object
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          metadata:
-            $ref: '#/components/schemas/common.v1.0.config.Metadata'
-        additionalProperties: false
-    common.v1.0.config.Flag:
+    networking.v4.0.config.ProtocolNumberObject:
+      required:
+      - protocolNumber
       type: object
       properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
+        protocolNumber:
+          maximum: 255
+          minimum: 0
+          type: integer
+          description: Routing Policy IP protocol parameter number.
+          format: uint8
       additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.IPAddress:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
-
-        '
-    networking.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    networking.v4.0.config.IPSubnet:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/networking.v4.0.config.IPv4Subnet'
-        ipv6:
-          $ref: '#/components/schemas/networking.v4.0.config.IPv6Subnet'
-      additionalProperties: false
-      description: IP subnet.
     networking.v4.0.config.RoutingPolicyMatchCondition:
       required:
       - destination
@@ -1210,12 +1150,8 @@ components:
         protocolType:
           $ref: '#/components/schemas/networking.v4.0.config.ProtocolType'
         protocolParameters:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: networking.v4.config.LayerFourProtocolObject
+          required: []
+          properties: {}
           description: Protocol parameters of the traffic that is exiting/leaving the VPC.
           oneOf:
           - $ref: '#/components/schemas/networking.v4.0.config.LayerFourProtocolObject'
@@ -1223,69 +1159,6 @@ components:
           - $ref: '#/components/schemas/networking.v4.0.config.ProtocolNumberObject'
       additionalProperties: false
       description: Match condition for the traffic that is entering the VPC.
-    networking.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    networking.v4.0.config.RoutingPolicyRule:
-      required:
-      - policyAction
-      - policyMatch
-      type: object
-      properties:
-        policyMatch:
-          $ref: '#/components/schemas/networking.v4.0.config.RoutingPolicyMatchCondition'
-        policyAction:
-          $ref: '#/components/schemas/networking.v4.0.config.RoutingPolicyAction'
-        isBidirectional:
-          type: boolean
-          description: If True, policies in the reverse direction will be installed with the same action but source and destination
-            will be swapped.
-          default: false
-      additionalProperties: false
-      description: Policy indicating the match rule and the action.
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 250be642-1b1b-4687-bf88-af93fc7abf59
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1313,42 +1186,43 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    networking.v4.0.config.IPv4Subnet:
-      required:
-      - ip
-      - prefixLength
+    common.v1.0.config.IPAddress:
       type: object
       properties:
-        ip:
+        ipv4:
           $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: Prefix length of the IPv4 subnet.
-          format: int32
-          example: 24
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
       additionalProperties: false
-      description: IPv4 subnet.
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
 
         '
+    networking.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
     networking.v4.0.config.VpcName:
       type: object
       properties:
@@ -1356,38 +1230,123 @@ components:
           maxLength: 128
           type: string
           description: VPC name
-          example: VPC1
       additionalProperties: false
       description: VPC name for projections
-    networking.v4.0.config.LayerFourProtocolObject:
+    networking.v4.0.config.ProtocolType:
+      type: string
+      description: Routing Policy IP protocol type.
+      enum:
+      - ANY
+      - ICMP
+      - TCP
+      - UDP
+      - PROTOCOL_NUMBER
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        TCP: Routing policy protocol type is TCP.
+        UDP: Routing policy protocol type is UDP.
+        PROTOCOL_NUMBER: Specify routing policy L4 protocol number.
+        ANY: Routing policy protocol type is Any.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        ICMP: Routing policy protocol type is ICMP.
+    networking.v4.0.config.RoutingPolicyActionType:
+      type: string
+      description: Routing policy action type.
+      enum:
+      - PERMIT
+      - DENY
+      - REROUTE
+      - FORWARD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        REROUTE: Routing policy action type is reroute and need to specify service IP to which traffic is rerouted
+        DENY: Routing policy action type is deny/drop
+        FORWARD: Routing policy action type is forward
+        $UNKNOWN: 'Unknown value.
+
+          '
+        PERMIT: Routing policy action type is permit/allow
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Flag:
       type: object
       properties:
-        sourcePortRanges:
-          maxItems: 20
-          minItems: 0
-          type: array
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.PortRange'
-        destinationPortRanges:
-          maxItems: 20
-          minItems: 0
-          type: array
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.PortRange'
-      additionalProperties: false
-      description: L4 TCP/UDP protocol parameters to be matched in routing policy.
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
 
             '
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
     networking.v4.0.config.AddressType:
@@ -1409,54 +1368,20 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 870ef0a7-1d70-4ba5-839b-436e2c69e445
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    networking.v4.0.config.IPv6Subnet:
-      required:
-      - ip
-      - prefixLength
+    networking.v4.0.config.RerouteParam:
       type: object
       properties:
-        ip:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: Prefix length of the IPv6 subnet.
-          format: int32
-          example: 64
+        serviceIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        rerouteFallbackAction:
+          $ref: '#/components/schemas/networking.v4.0.config.RerouteFallbackAction'
+        ingressServiceIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        egressServiceIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
       additionalProperties: false
-      description: IPv6 subnet.
+      description: Parameters for the reroute action which includes the reroute service IP and the fallback action when the
+        service IP is down.
     common.v1.0.config.Message:
       type: object
       properties:
@@ -1475,10 +1400,47 @@ components:
           description: 'The locale for the message description.
 
             '
-          default: en_US
         severity:
           $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
+    networking.v4.0.config.IPSubnet:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv4Subnet'
+        ipv6:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv6Subnet'
+      additionalProperties: false
+      description: IP subnet.
+    networking.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    networking.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
     networking.v4.0.config.RoutingPolicy:
       description: Schema to configure a routing policy.
       allOf:
@@ -1494,12 +1456,10 @@ components:
             maxLength: 128
             type: string
             description: Name of the routing policy.
-            example: RoutingPolicy1
           description:
             maxLength: 1000
             type: string
             description: A description of the routing policy.
-            example: Routing Policy Description
           priority:
             maximum: 1000
             minimum: 1
@@ -1516,10 +1476,337 @@ components:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: ExtId of the VPC extId to which the routing policy belongs.
-            example: aa34b304-5a2a-4365-856d-4557a1aad35a
           vpc:
             $ref: '#/components/schemas/networking.v4.0.config.VpcName'
         additionalProperties: false
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    networking.v4.0.config.RoutingPolicyAction:
+      required:
+      - actionType
+      type: object
+      properties:
+        actionType:
+          $ref: '#/components/schemas/networking.v4.0.config.RoutingPolicyActionType'
+        rerouteParams:
+          maxItems: 1
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.RerouteParam'
+        nexthopIpAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+      additionalProperties: false
+      description: The action to be taken on the traffic matching the routing policy.
+    networking.v4.0.config.NetworkingBaseModel:
+      description: Networking common base object
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          metadata:
+            $ref: '#/components/schemas/common.v1.0.config.Metadata'
+        additionalProperties: false
+    networking.v4.0.config.AddressTypeObject:
+      required:
+      - addressType
+      type: object
+      properties:
+        addressType:
+          $ref: '#/components/schemas/networking.v4.0.config.AddressType'
+        subnetPrefix:
+          $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
+      additionalProperties: false
+      description: Address Type like "EXTERNAL" or "ANY".
+    networking.v4.0.config.RoutingPolicyRule:
+      required:
+      - policyAction
+      - policyMatch
+      type: object
+      properties:
+        policyMatch:
+          $ref: '#/components/schemas/networking.v4.0.config.RoutingPolicyMatchCondition'
+        policyAction:
+          $ref: '#/components/schemas/networking.v4.0.config.RoutingPolicyAction'
+        isBidirectional:
+          type: boolean
+          description: If True, policies in the reverse direction will be installed with the same action but source and destination
+            will be swapped.
+      additionalProperties: false
+      description: Policy indicating the match rule and the action.
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    networking.v4.0.config.ICMPObject:
+      type: object
+      properties:
+        icmpType:
+          maximum: 255
+          minimum: 0
+          type: integer
+          description: ICMP type for the ICMP param to be matched in routing policy.
+          format: uint8
+        icmpCode:
+          maximum: 255
+          minimum: 0
+          type: integer
+          description: ICMP code for the ICMP param to be matched in routing policy.
+          format: uint8
+      additionalProperties: false
+      description: ICMP parameters to be matched in routing policy.
+    networking.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    networking.v4.0.config.RerouteFallbackAction:
+      type: string
+      description: Type of fallback action in reroute case when service VM is down.
+      enum:
+      - ALLOW
+      - DROP
+      - PASSTHROUGH
+      - NO_ACTION
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PASSTHROUGH: When service vm is down, reroute fallback action is "passthrough". Next higher priority matching rule
+          is applied.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        NO_ACTION: When service vm is down and reroute fallback action is "NO_ACTION". No action is taken and traffic is black-holed.
+        ALLOW: When service vm is down, reroute fallback action is "allowed".
+        $REDACTED: 'Redacted value.
+
+          '
+        DROP: When service vm is down, reroute fallback action is "drop".
+    networking.v4.0.config.IPv4Subnet:
+      required:
+      - ip
+      - prefixLength
+      type: object
+      properties:
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: Prefix length of the IPv4 subnet.
+          format: int32
+      additionalProperties: false
+      description: IPv4 subnet.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    networking.v4.0.config.LayerFourProtocolObject:
+      type: object
+      properties:
+        sourcePortRanges:
+          maxItems: 20
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.PortRange'
+        destinationPortRanges:
+          maxItems: 20
+          minItems: 0
+          type: array
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.PortRange'
+      additionalProperties: false
+      description: L4 TCP/UDP protocol parameters to be matched in routing policy.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.Metadata:
+      type: object
+      properties:
+        ownerReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the owner of this resource.
+
+            '
+        ownerUserName:
+          maxLength: 128
+          type: string
+          description: 'The userName of the owner of this resource.
+
+            '
+        projectReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the project this resource belongs to.
+
+            '
+        projectName:
+          maxLength: 128
+          type: string
+          description: 'The name of the project this resource belongs to.
+
+            '
+        categoryIds:
+          maxItems: 256
+          minItems: 1
+          type: array
+          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
+            with.
+
+            '
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+      additionalProperties: false
+      description: 'Metadata associated with this resource.
+
+        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1541,12 +1828,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 52
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1577,143 +1862,10 @@ components:
               '
             items:
               type: integer
-              example: 28
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    common.v1.0.config.IPv6Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: eff4:180b:7f8b:7a40:8c4e:ea2c:d804:15e9
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
-          format: int32
-          default: 128
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
-    networking.v4.0.config.AddressTypeObject:
-      required:
-      - addressType
-      type: object
-      properties:
-        addressType:
-          $ref: '#/components/schemas/networking.v4.0.config.AddressType'
-        subnetPrefix:
-          $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
-      additionalProperties: false
-      description: Address Type like "EXTERNAL" or "ANY".
-    networking.v4.0.config.ProtocolNumberObject:
-      required:
-      - protocolNumber
-      type: object
-      properties:
-        protocolNumber:
-          maximum: 255
-          minimum: 0
-          type: integer
-          description: Routing Policy IP protocol parameter number.
-          format: uint8
-      additionalProperties: false
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 92
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    networking.v4.0.config.ICMPObject:
-      type: object
-      properties:
-        icmpType:
-          maximum: 255
-          minimum: 0
-          type: integer
-          description: ICMP type for the ICMP param to be matched in routing policy.
-          format: uint8
-        icmpCode:
-          maximum: 255
-          minimum: 0
-          type: integer
-          description: ICMP code for the ICMP param to be matched in routing policy.
-          format: uint8
-      additionalProperties: false
-      description: ICMP parameters to be matched in routing policy.
-    networking.v4.0.config.RerouteParam:
-      type: object
-      properties:
-        serviceIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        rerouteFallbackAction:
-          $ref: '#/components/schemas/networking.v4.0.config.RerouteFallbackAction'
-        ingressServiceIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        egressServiceIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-      additionalProperties: false
-      description: Parameters for the reroute action which includes the reroute service IP and the fallback action when the
-        service IP is down.
     networking.v4.0.config.PortRange:
       required:
       - endPort
@@ -1726,222 +1878,30 @@ components:
           type: integer
           description: Start port of TCP/UDP port range.
           format: uint16
-          example: 80
         endPort:
           maximum: 65535
           minimum: 0
           type: integer
           description: End port of TCP/UDP port range.
           format: uint16
-          example: 443
       additionalProperties: false
       description: Range of TCP/UDP ports.
-    networking.v4.0.config.RoutingPolicyActionType:
-      type: string
-      description: Routing policy action type.
-      enum:
-      - PERMIT
-      - DENY
-      - REROUTE
-      - FORWARD
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        REROUTE: Routing policy action type is reroute and need to specify service IP to which traffic is rerouted
-        DENY: Routing policy action type is deny/drop
-        FORWARD: Routing policy action type is forward
-        $UNKNOWN: 'Unknown value.
-
-          '
-        PERMIT: Routing policy action type is permit/allow
-        $REDACTED: 'Redacted value.
-
-          '
-    networking.v4.0.config.ProtocolType:
-      type: string
-      description: Routing Policy IP protocol type.
-      enum:
-      - ANY
-      - ICMP
-      - TCP
-      - UDP
-      - PROTOCOL_NUMBER
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        TCP: Routing policy protocol type is TCP.
-        UDP: Routing policy protocol type is UDP.
-        PROTOCOL_NUMBER: Specify routing policy L4 protocol number.
-        ANY: Routing policy protocol type is Any.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-        ICMP: Routing policy protocol type is ICMP.
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:9bf9c2d8-1857-4824-8f55-cbb6ab4eb85e
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    networking.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 17
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.IPv4Address:
+    networking.v4.0.config.IPv6Subnet:
       required:
-      - value
+      - ip
+      - prefixLength
       type: object
       properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 59.225.95.31
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
         prefixLength:
-          maximum: 32
+          maximum: 128
           minimum: 0
           type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
+          description: Prefix length of the IPv6 subnet.
           format: int32
-          default: 32
       additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    common.v1.0.config.Metadata:
-      type: object
-      properties:
-        ownerReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the owner of this resource.
-
-            '
-          example: 88c007ec-0157-4901-a28a-c93e6cd73adc
-        ownerUserName:
-          maxLength: 128
-          type: string
-          description: 'The userName of the owner of this resource.
-
-            '
-        projectReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the project this resource belongs to.
-
-            '
-          example: 3e2a7199-b4d8-481c-a4d1-446470c8d864
-        projectName:
-          maxLength: 128
-          type: string
-          description: 'The name of the project this resource belongs to.
-
-            '
-        categoryIds:
-          maxItems: 256
-          minItems: 1
-          type: array
-          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
-            with.
-
-            '
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 61bf1201-334e-4002-a9da-0ad47bd7fa2e
-      additionalProperties: false
-      description: 'Metadata associated with this resource.
-
-        '
-    networking.v4.0.config.RerouteFallbackAction:
-      type: string
-      description: Type of fallback action in reroute case when service VM is down.
-      enum:
-      - ALLOW
-      - DROP
-      - PASSTHROUGH
-      - NO_ACTION
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PASSTHROUGH: When service vm is down, reroute fallback action is "passthrough". Next higher priority matching rule
-          is applied.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        NO_ACTION: When service vm is down and reroute fallback action is "NO_ACTION". No action is taken and traffic is black-holed.
-        ALLOW: When service vm is down, reroute fallback action is "allowed".
-        $REDACTED: 'Redacted value.
-
-          '
-        DROP: When service vm is down, reroute fallback action is "drop".
-    networking.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    networking.v4.0.config.RoutingPolicyAction:
-      required:
-      - actionType
-      type: object
-      properties:
-        actionType:
-          $ref: '#/components/schemas/networking.v4.0.config.RoutingPolicyActionType'
-        rerouteParams:
-          maxItems: 1
-          minItems: 0
-          type: array
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.RerouteParam'
-        nexthopIpAddress:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-      additionalProperties: false
-      description: The action to be taken on the traffic matching the routing policy.
+      description: IPv6 subnet.
   securitySchemes:
     basicAuthScheme:
       type: http

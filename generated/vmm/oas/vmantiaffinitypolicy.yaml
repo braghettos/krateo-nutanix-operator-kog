@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -260,7 +258,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: c8a2f55d-7b2a-4b32-85d9-6b79411fea3d
       requestBody:
         content:
           application/json:
@@ -443,7 +440,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 9e9a1daa-6198-4e09-a452-6cc8c695a15e
       responses:
         '200':
           description: Returns the requested VM-VM anti-affinity policy.
@@ -592,7 +588,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 72e8ef08-e860-4e4e-a5b2-78531fd6d290
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -619,7 +614,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 75006b8f-b77c-4c76-bd96-5980392ee4b9
       requestBody:
         content:
           application/json:
@@ -819,7 +813,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: c6fa9997-913e-40f1-b8e5-3cc043f8c1ba
       - name: If-Match
         in: header
         description: 'The If-Match request header makes the request conditional. When not provided the server will respond
@@ -848,7 +841,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 9f94955d-a986-4ba8-8eb6-a47472ce9784
       responses:
         '202':
           description: The request to delete the policy is accepted.
@@ -1008,18 +1000,114 @@ paths:
           \n"
 components:
   schemas:
-    common.v1.0.config.MapOfStringWrapper:
+    vmm.v4.0.ahv.policies.CategoryReference:
       type: object
       properties:
-        map:
-          type: object
-          additionalProperties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external ID (UUID) of the category.
+      additionalProperties: false
+      description: Reference to a category.
+    vmm.v4.0.ahv.policies.VmAntiAffinityPolicy:
+      description: VM-VM anti-affinity policy configuration.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 80
+            minLength: 1
             type: string
-          description: 'A map with string keys and values.
+            description: VM-VM anti-affinity policy name.
+          description:
+            type: string
+            description: VM-VM anti-affinity policy description.
+          createTime:
+            type: string
+            description: VM-VM anti-affinity policy creation time.
+            format: date-time
+            readOnly: true
+          updateTime:
+            type: string
+            description: VM-VM anti-affinity policy last updated time.
+            format: date-time
+            readOnly: true
+          createdBy:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.policies.UserReference'
+          updatedBy:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.policies.UserReference'
+          categories:
+            maxItems: 20
+            minItems: 1
+            uniqueItems: true
+            type: array
+            description: Categories configured for the VM-VM anti-affinity policy.
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.ahv.policies.CategoryReference'
+          numCompliantVms:
+            type: integer
+            description: Number of compliant VMs which are part of the VM-VM anti-affinity policy.
+            format: int64
+            readOnly: true
+          numNonCompliantVms:
+            type: integer
+            description: Number of non-compliant VMs which are part of the VM-VM anti-affinity policy.
+            format: int64
+            readOnly: true
+          numPendingVms:
+            type: integer
+            description: Number of VMs with compliance state as pending, which are part of the VM-VM anti-affinity policy.
+            format: int64
+            readOnly: true
+        additionalProperties: false
+    vmm.v4.0.ahv.policies.UserReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external ID (UUID) of the user.
+      additionalProperties: false
+      description: Reference to a user.
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
 
             '
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
 
         '
     common.v1.0.config.MessageSeverity:
@@ -1067,7 +1155,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 6c335c2e-8b41-4973-b7d4-08fefbe88680
           links:
             maxItems: 20
             minItems: 0
@@ -1080,54 +1167,58 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    vmm.v4.0.ahv.policies.CategoryReference:
+    common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external ID (UUID) of the category.
-          example: b09dbf82-681a-403b-8e36-805087b515e5
-      additionalProperties: false
-      description: Reference to a category.
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
 
             '
-        locale:
-          type: string
-          description: 'The locale for the message description.
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
 
             '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
       additionalProperties: false
-    vmm.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
     common.v1.0.config.TenantAwareModel:
       type: object
       properties:
@@ -1141,23 +1232,11 @@ components:
 
             '
           readOnly: true
-          example: 58c42276-2fd7-49bc-9bf7-67d18ba54f14
       additionalProperties: false
       description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
         base model class that it extends and is automatically set by the server.
 
         '
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:37269b59-c649-45fd-956e-19134b3208a3
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
     vmm.v4.0.error.AppMessage:
       type: object
       properties:
@@ -1173,7 +1252,6 @@ components:
         locale:
           type: string
           description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
         errorGroup:
           type: string
           description: The error group associated with this message of severity ERROR.
@@ -1185,6 +1263,29 @@ components:
       additionalProperties: false
       description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
+    vmm.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
     vmm.v4.0.error.SchemaValidationError:
       type: object
       properties:
@@ -1192,11 +1293,9 @@ components:
           type: string
           description: Timestamp of the response.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
         statusCode:
           type: integer
           description: The HTTP status code of the response.
-          example: 24
         error:
           type: string
           description: The generic error message for the response.
@@ -1211,47 +1310,6 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1273,12 +1331,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 31
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -1309,144 +1365,59 @@ components:
               '
             items:
               type: integer
-              example: 99
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    vmm.v4.0.error.ErrorResponse:
+    common.v1.0.config.Message:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    vmm.v4.0.ahv.policies.VmAntiAffinityPolicy:
-      description: VM-VM anti-affinity policy configuration.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 80
-            minLength: 1
-            type: string
-            description: VM-VM anti-affinity policy name.
-            example: Test Anti Affinity policy
-          description:
-            type: string
-            description: VM-VM anti-affinity policy description.
-            example: Description for your anti affinity policy
-          createTime:
-            type: string
-            description: VM-VM anti-affinity policy creation time.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          updateTime:
-            type: string
-            description: VM-VM anti-affinity policy last updated time.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          createdBy:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.policies.UserReference'
-          updatedBy:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.policies.UserReference'
-          categories:
-            maxItems: 20
-            minItems: 1
-            uniqueItems: true
-            type: array
-            description: Categories configured for the VM-VM anti-affinity policy.
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.ahv.policies.CategoryReference'
-          numCompliantVms:
-            type: integer
-            description: Number of compliant VMs which are part of the VM-VM anti-affinity policy.
-            format: int64
-            readOnly: true
-            example: 52
-          numNonCompliantVms:
-            type: integer
-            description: Number of non-compliant VMs which are part of the VM-VM anti-affinity policy.
-            format: int64
-            readOnly: true
-            example: 64
-          numPendingVms:
-            type: integer
-            description: Number of VMs with compliance state as pending, which are part of the VM-VM anti-affinity policy.
-            format: int64
-            readOnly: true
-            example: 80
-        additionalProperties: false
-    vmm.v4.0.ahv.policies.UserReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        code:
           type: string
-          description: The external ID (UUID) of the user.
-          example: f114f652-a5e4-4c02-9ab0-7ce6ab5f0d62
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
-      description: Reference to a user.
-    common.v1.0.response.ApiResponseMetadata:
+    vmm.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 25
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
 
         '
   securitySchemes:

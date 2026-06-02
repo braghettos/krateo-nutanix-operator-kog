@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -277,7 +275,6 @@ components:
         isCompliant:
           type: boolean
           description: Attribute for capturing the whether the service is compliant.
-          example: false
         enforcementLevel:
           $ref: '#/components/schemas/licensing.v4.0.config.EnforcementLevel'
         enforcementActions:
@@ -296,116 +293,30 @@ components:
             $ref: '#/components/schemas/licensing.v4.0.config.ServiceViolation'
       additionalProperties: false
       description: Model for capturing Service details.
-    licensing.v4.0.config.ClusterType:
-      title: Defines different types of cluster types.
-      type: string
-      description: Possible values are NUTANIX, NON_NUTANIX and others.
-      enum:
-      - NUTANIX
-      - VMWARE
-      - OTHER_NON_NUTANIX
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        VMWARE: Vmware clusters.
-        OTHER_NON_NUTANIX: Other Non Nutanix clusters except VMWARE.
-        NUTANIX: Nutanix clusters.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    licensing.v4.0.error.SchemaValidationErrorMessage:
+    licensing.v4.0.error.SchemaValidationError:
       type: object
       properties:
-        location:
+        timestamp:
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
           type: string
-          description: The detailed message for the validation error.
-        attributePath:
+          description: The generic error message for the response.
+        path:
           type: string
-          description: The path of the attribute that failed validation in the schema.
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationErrorMessage'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
+      description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    licensing.v4.0.config.Compliance:
-      description: Response object containing cluster and associated compliance details.
-      allOf:
-      - $ref: '#/components/schemas/licensing.v4.0.config.BaseClusterInfo'
-      - type: object
-        properties:
-          clusterExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Attribute for capturing cluster uuid.
-            example: ca115c31-6cae-4ca6-b346-6e40a946b18f
-          type:
-            $ref: '#/components/schemas/licensing.v4.0.config.ClusterType'
-          services:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: Attribute for capturing a collection of service details.
-            items:
-              $ref: '#/components/schemas/licensing.v4.0.config.Service'
-        additionalProperties: false
-    licensing.v4.0.config.ServiceViolation:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/licensing.v4.0.config.ServiceViolationType'
-        startDate:
-          type: string
-          description: Attribute for capturing the start date of violation.
-          format: date
-          example: 2009-09-23
-      additionalProperties: false
-      description: Model for capturing Violation details for compliance.
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 68bb7679-88c1-4538-9f64-2bbc4025272d
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -433,37 +344,22 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ApiLink:
+    licensing.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        href:
+        location:
           type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
           type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    licensing.v4.0.config.BaseClusterInfo:
-      description: Model containing cluster identifier and a boolean attribute representing whether it is a PC or PE.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          isMulticluster:
-            type: boolean
-            description: True value indicates cluster UUID represents Prism Central otherwise Prism Element.
-            readOnly: true
-            example: false
-        additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
     licensing.v4.0.config.ProductName:
       title: Defines different Service names.
       type: string
@@ -492,99 +388,40 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.config.MapOfStringWrapper:
+    licensing.v4.0.error.ErrorResponse:
       type: object
       properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: f6d37db9-0917-4c7c-bfbc-c252a9b24282
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    licensing.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 84
         error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationErrorMessage'
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/licensing.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationError'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
       x-platform-generated: true
-    common.v1.0.config.Message:
+    common.v1.0.config.Flag:
       type: object
       properties:
-        code:
+        name:
+          maxLength: 128
+          minLength: 3
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'Name of the flag.
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
+        value:
+          type: boolean
+          description: 'Value of the flag.
 
             '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
     licensing.v4.0.error.AppMessage:
       type: object
       properties:
@@ -600,7 +437,6 @@ components:
         locale:
           type: string
           description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
         errorGroup:
           type: string
           description: The error group associated with this message of severity ERROR.
@@ -612,68 +448,6 @@ components:
       additionalProperties: false
       description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
-
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 78
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 45
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
     common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
@@ -702,7 +476,6 @@ components:
 
             '
           format: int32
-          example: 71
         messages:
           maxItems: 20
           minItems: 0
@@ -727,6 +500,104 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
+    licensing.v4.0.config.ClusterType:
+      title: Defines different types of cluster types.
+      type: string
+      description: Possible values are NUTANIX, NON_NUTANIX and others.
+      enum:
+      - NUTANIX
+      - VMWARE
+      - OTHER_NON_NUTANIX
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        VMWARE: Vmware clusters.
+        OTHER_NON_NUTANIX: Other Non Nutanix clusters except VMWARE.
+        NUTANIX: Nutanix clusters.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    licensing.v4.0.config.EnforcementLevel:
+      title: Defines different Enforcement Level values.
+      type: string
+      description: Possible values are LEVEL_10 and LEVEL_20.
+      enum:
+      - LEVEL_10
+      - LEVEL_20
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        LEVEL_20: Enforcement actions corresponding to level 20 will be applicable.
+        LEVEL_10: Enforcement actions corresponding to level 10 will be applicable.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    licensing.v4.0.config.ServiceViolationType:
+      title: Defines different types of license violations.
+      type: string
+      description: Possible values are LICENSE-EXPIRED, FEATURE-VIOLATION and CAPACITY-VIOLATION.
+      enum:
+      - LICENSE_EXPIRED
+      - FEATURE_VIOLATION
+      - CAPACITY_VIOLATION
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        LICENSE_EXPIRED: License(s) have expired.
+        FEATURE_VIOLATION: Features being used are not available as per current licensing.
+        CAPACITY_VIOLATION: Capacity used is beyond currently licensed capacity.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
     licensing.v4.0.config.LicenseType:
       title: Defines different license types.
       type: string
@@ -805,37 +676,90 @@ components:
         $UNKNOWN: 'Unknown value.
 
           '
-    licensing.v4.0.config.EnforcementLevel:
-      title: Defines different Enforcement Level values.
-      type: string
-      description: Possible values are LEVEL_10 and LEVEL_20.
-      enum:
-      - LEVEL_10
-      - LEVEL_20
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        LEVEL_20: Enforcement actions corresponding to level 20 will be applicable.
-        LEVEL_10: Enforcement actions corresponding to level 10 will be applicable.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    licensing.v4.0.error.ErrorResponse:
+    licensing.v4.0.config.BaseClusterInfo:
+      description: Model containing cluster identifier and a boolean attribute representing whether it is a PC or PE.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          isMulticluster:
+            type: boolean
+            description: True value indicates cluster UUID represents Prism Central otherwise Prism Element.
+            readOnly: true
+        additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/licensing.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationError'
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    licensing.v4.0.config.ServiceViolation:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/licensing.v4.0.config.ServiceViolationType'
+        startDate:
+          type: string
+          description: Attribute for capturing the start date of violation.
+          format: date
+      additionalProperties: false
+      description: Model for capturing Violation details for compliance.
     licensing.v4.0.config.EnforcementActions:
       title: Defines different Enforcement Action values.
       type: string
@@ -872,26 +796,85 @@ components:
 
           '
         NO_SUPPORT: Support disabled.
-    licensing.v4.0.config.ServiceViolationType:
-      title: Defines different types of license violations.
-      type: string
-      description: Possible values are LICENSE-EXPIRED, FEATURE-VIOLATION and CAPACITY-VIOLATION.
-      enum:
-      - LICENSE_EXPIRED
-      - FEATURE_VIOLATION
-      - CAPACITY_VIOLATION
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        LICENSE_EXPIRED: License(s) have expired.
-        FEATURE_VIOLATION: Features being used are not available as per current licensing.
-        CAPACITY_VIOLATION: Capacity used is beyond currently licensed capacity.
-        $UNKNOWN: 'Unknown value.
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
 
-          '
-        $REDACTED: 'Redacted value.
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
 
-          '
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    licensing.v4.0.config.Compliance:
+      description: Response object containing cluster and associated compliance details.
+      allOf:
+      - $ref: '#/components/schemas/licensing.v4.0.config.BaseClusterInfo'
+      - type: object
+        properties:
+          clusterExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Attribute for capturing cluster uuid.
+          type:
+            $ref: '#/components/schemas/licensing.v4.0.config.ClusterType'
+          services:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: Attribute for capturing a collection of service details.
+            items:
+              $ref: '#/components/schemas/licensing.v4.0.config.Service'
+        additionalProperties: false
   securitySchemes:
     basicAuthScheme:
       type: http

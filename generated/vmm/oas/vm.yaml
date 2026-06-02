@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -438,7 +436,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 89a4939e-a869-4374-a652-16719737580e
       requestBody:
         content:
           application/json:
@@ -731,7 +728,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 12543b00-db8a-4aae-ae9e-f05f16a7d948
       responses:
         '200':
           description: Returns the configuration details for a virtual machine.
@@ -888,7 +884,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 0704ed75-83d7-4081-afdc-fab222922c30
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -915,7 +910,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 3c561b2a-a5c4-4295-8df9-f47a366e99e4
       requestBody:
         content:
           application/json:
@@ -1223,7 +1217,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: c262baab-1517-466b-ae03-9f938e8a3eeb
       - name: If-Match
         in: header
         description: 'The If-Match request header makes the request conditional. When not provided the server will respond
@@ -1252,7 +1245,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 2505d101-8bf7-4d0c-b600-281df4a7f110
       responses:
         '202':
           description: The request to delete a VM is accepted.
@@ -1411,26 +1403,267 @@ paths:
           \n"
 components:
   schemas:
-    vmm.v4.0.ahv.config.Ipv4Config:
+    vmm.v4.0.ahv.config.GpuVendor:
+      type: string
+      description: The vendor of the GPU.
+      enum:
+      - NVIDIA
+      - INTEL
+      - AMD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NVIDIA: The vendor of the GPU is NVIDIA.
+        AMD: The vendor of the GPU is AMD.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        INTEL: The vendor of the GPU is Intel.
+    vmm.v4.0.ahv.config.PcieDevice:
+      description: Indicates the information about the PCIe device.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          assignedDeviceInfo:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.PcieDeviceInfo'
+          backingInfo:
+            required: []
+            properties: {}
+            description: Indicates the way a PCIe device is associated to the VM.
+            oneOf:
+            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.PcieDeviceReference'
+        additionalProperties: false
+    vmm.v4.0.ahv.config.ProtectionPolicyState:
       type: object
       properties:
-        shouldAssignIp:
-          type: boolean
-          description: If set to true (default value), an IP address must be assigned to the VM NIC - either the one explicitly
-            specified by the user or allocated automatically by the IPAM service by not specifying the IP address. If false,
-            then no IP assignment is required for this VM NIC.
-          example: false
-        ipAddress:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        secondaryIpAddressList:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Secondary IP addresses for the NIC.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        policy:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.PolicyReference'
       additionalProperties: false
-      description: The IP address configurations.
+      description: Status of protection policy applied to this VM.
+    vmm.v4.0.ahv.config.CpuModelReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of the CPU model associated with the VM.
+        name:
+          maxLength: 64
+          type: string
+          description: Name of the CPU model associated with the VM.
+      additionalProperties: false
+      description: CPU model associated with the VM if Advanced Processor Compatibility(APC) is enabled. If APC is enabled
+        and no CPU model is explicitly set, a default baseline CPU model is picked by the system. See the APC documentation
+        for more information
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    vmm.v4.0.ahv.config.IsoType:
+      type: string
+      description: Type of ISO image inserted in CD-ROM
+      enum:
+      - OTHER
+      - GUEST_TOOLS
+      - GUEST_CUSTOMIZATION
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        OTHER: The type of ISO is Other.
+        GUEST_TOOLS: The type of ISO is Nutanix Guest Tools.
+        GUEST_CUSTOMIZATION: The type of ISO is Guest Customization.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.NvramDevice:
+      type: object
+      properties:
+        backingStorageInfo:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDisk'
+      additionalProperties: false
+      description: Configuration for NVRAM to be presented to the VM.
+    vmm.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    vmm.v4.0.ahv.config.NetworkFunctionNicType:
+      type: string
+      description: The type of this Network function NIC. Defaults to INGRESS.
+      enum:
+      - INGRESS
+      - EGRESS
+      - TAP
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        TAP: The type of Network-Function NIC is Tap.
+        EGRESS: The type of Network-Function NIC is Egress.
+        INGRESS: The type of Network-Function NIC is Ingress.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.ClusterReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of a cluster type UUID.
+      additionalProperties: false
+      description: Reference to a cluster.
+    vmm.v4.0.ahv.config.SBDF:
+      type: object
+      properties:
+        segment:
+          type: integer
+          description: PCI Segment.
+          readOnly: true
+        bus:
+          type: integer
+          description: PCI Bus number in hexadecimal, often padded using a leading zeros to two or four digits.
+          readOnly: true
+        device:
+          type: integer
+          description: PCI Device number in hexadecimal, often padded using a leading zero to two digits . Sometimes this
+            is also referred to as the slot number.
+          readOnly: true
+        func:
+          type: integer
+          description: PCI Function number in hexadecimal.
+          readOnly: true
+      additionalProperties: false
+      description: The (S)egment:(B)us:(D)evice.(F)unction hardware address. See https://wiki.xen.org/wiki/Bus:Device.Function_(BDF)_Notation
+        for more details.
+    vmm.v4.0.ahv.config.ImageReference:
+      type: object
+      properties:
+        imageExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of an image of type UUID.
+      additionalProperties: false
+      description: Clone a disk from an image.
+    vmm.v4.0.ahv.config.NgtCapability:
+      type: string
+      description: The capabilities of the Nutanix Guest Tools in the VM.
+      enum:
+      - SELF_SERVICE_RESTORE
+      - VSS_SNAPSHOT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        VSS_SNAPSHOT: Enablement status of the Volume Snapshot Service application.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SELF_SERVICE_RESTORE: Enablement status of the Self Service Restore application.
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.VmDisk:
+      type: object
+      properties:
+        diskExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk of type UUID.
+          readOnly: true
+        diskSizeBytes:
+          minimum: 1
+          type: integer
+          description: Size of the disk in bytes.
+          format: int64
+        storageContainer:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskContainerReference'
+        storageConfig:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskStorageConfig'
+        dataSource:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DataSource'
+        isMigrationInProgress:
+          type: boolean
+          description: Indicates if the disk is undergoing migration to another container.
+          readOnly: true
+      additionalProperties: false
+      description: Storage provided by Nutanix ADSF.
+    vmm.v4.0.ahv.config.HostReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of a host type UUID.
+      additionalProperties: false
+      description: Reference to the host, the VM is running on.
+    vmm.v4.0.ahv.config.ADSFVmStorageConfig:
+      type: object
+      properties:
+        isFlashModeEnabled:
+          type: boolean
+          description: Indicates whether the virtual disk is pinned to the hot tier or not.
+        qosConfig:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.QosConfig'
+      additionalProperties: false
+      description: Storage configuration for VM.
+    vmm.v4.0.ahv.config.ApcConfig:
+      type: object
+      properties:
+        isApcEnabled:
+          type: boolean
+          description: If enabled, the selected CPU model will be retained across live and cold migrations of the VM.
+        cpuModel:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CpuModelReference'
+      additionalProperties: false
+      description: Advanced Processor Compatibility configuration for the VM. Enabling this retains the CPU model for the
+        VM across power cycles and migrations.
+    vmm.v4.0.ahv.config.VmDiskReference:
+      type: object
+      properties:
+        diskExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk of type UUID.
+        diskAddress:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
+        vmReference:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmReference'
+      additionalProperties: false
+      description: Reference to an existing VM disk.
     vmm.v4.0.ahv.config.PcieDeviceInfo:
       type: object
       properties:
@@ -1448,7 +1681,6 @@ components:
           type: integer
           description: Device index on the bus. This field is ignored unless the bus details are specified.
           format: int32
-          example: 3
       additionalProperties: false
       description: Disk address.
     vmm.v4.0.error.SchemaValidationError:
@@ -1458,11 +1690,9 @@ components:
           type: string
           description: Timestamp of the response.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
         statusCode:
           type: integer
           description: The HTTP status code of the response.
-          example: 24
         error:
           type: string
           description: The generic error message for the response.
@@ -1477,247 +1707,25 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
-    vmm.v4.0.ahv.config.ImageReference:
+    vmm.v4.0.ahv.config.Ipv4Config:
       type: object
       properties:
-        imageExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of an image of type UUID.
-          example: 2bdbcec9-4333-46c5-a7d1-0b93c9233744
-      additionalProperties: false
-      description: Clone a disk from an image.
-    vmm.v4.0.ahv.config.DataSource:
-      type: object
-      properties:
-        reference:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.config.ImageReference
-          description: A reference to a disk or image that contains the contents of a disk.
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.ImageReference'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskReference'
-      additionalProperties: false
-      description: A reference to a disk or image that contains the contents of a disk.
-    vmm.v4.0.ahv.config.CloudInit:
-      type: object
-      properties:
-        datasourceType:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInitDataSourceType'
-        metadata:
-          maxLength: 32000
-          type: string
-          description: The contents of the meta_data configuration for cloud-init. This can be formatted as YAML or JSON.
-            The value must be base64 encoded.
-        cloudInitScript:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.config.Userdata
-          description: The script to use for cloud-init.
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Userdata'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CustomKeyValues'
-      additionalProperties: false
-      description: If this field is set, the guest will be customized using cloud-init. Either user_data or custom_key_values
-        should be provided. If custom_key_ves are provided then the user data will be generated using these key-value pairs.
-    vmm.v4.0.ahv.config.AvailabilityZoneReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of an availability zone type UUID.
-          example: 4b0240b7-984e-449a-a5e1-b148bdee5264
-      additionalProperties: false
-      description: Reference to an availability zone.
-    vmm.v4.0.ahv.config.Ipv4Info:
-      type: object
-      properties:
-        learnedIpAddresses:
-          maxItems: 256
+        shouldAssignIp:
+          type: boolean
+          description: If set to true (default value), an IP address must be assigned to the VM NIC - either the one explicitly
+            specified by the user or allocated automatically by the IPAM service by not specifying the IP address. If false,
+            then no IP assignment is required for this VM NIC.
+        ipAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        secondaryIpAddressList:
+          maxItems: 100
           minItems: 0
-          uniqueItems: true
           type: array
-          description: The IP addresses as found on the guest VM for the NIC.
-          readOnly: true
+          description: Secondary IP addresses for the NIC.
           items:
             $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
       additionalProperties: false
-      description: The runtime IP address information of the NIC.
-    vmm.v4.0.ahv.config.BootDeviceNic:
-      type: object
-      properties:
-        macAddress:
-          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
-          type: string
-          description: Mac address of the NIC that will be used to boot the VM.
-          example: b6:ec:9e:aa:f1:62
-      additionalProperties: false
-      description: The NIC that will be used to boot the VM.
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    vmm.v4.0.ahv.config.VmDisk:
-      type: object
-      properties:
-        diskExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM disk of type UUID.
-          readOnly: true
-          example: 8fced97a-8296-49f2-913a-6490ab612e49
-        diskSizeBytes:
-          minimum: 1
-          type: integer
-          description: Size of the disk in bytes.
-          format: int64
-          example: 46
-        storageContainer:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskContainerReference'
-        storageConfig:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskStorageConfig'
-        dataSource:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DataSource'
-        isMigrationInProgress:
-          type: boolean
-          description: Indicates if the disk is undergoing migration to another container.
-          readOnly: true
-          example: false
-      additionalProperties: false
-      description: Storage provided by Nutanix ADSF.
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    vmm.v4.0.ahv.config.NetworkFunctionChainReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of a network function chain. It should be of type UUID.
-          example: 493f7732-39dc-411d-8798-864fe3cb44d2
-      additionalProperties: false
-      description: The network function chain associates with the NIC. Only valid if nic_type is NORMAL_NIC.
-    vmm.v4.0.ahv.config.NvramDevice:
-      type: object
-      properties:
-        backingStorageInfo:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDisk'
-      additionalProperties: false
-      description: Configuration for NVRAM to be presented to the VM.
-    vmm.v4.0.ahv.config.ADSFVmStorageConfig:
-      type: object
-      properties:
-        isFlashModeEnabled:
-          type: boolean
-          description: Indicates whether the virtual disk is pinned to the hot tier or not.
-          example: true
-        qosConfig:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.QosConfig'
-      additionalProperties: false
-      description: Storage configuration for VM.
-    vmm.v4.0.ahv.config.LegacyBoot:
-      type: object
-      properties:
-        bootDevice:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.config.BootDeviceDisk
-          description: The boot device used for legacy boot of the VM.
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceDisk'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceNic'
-        bootOrder:
-          maxItems: 3
-          minItems: 0
-          uniqueItems: true
-          type: array
-          description: Indicates the order of device types in which the VM should try to boot from. If the boot device order
-            is not provided the system will decide an appropriate boot device order.
-          items:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceType'
-      additionalProperties: false
-      description: Legacy boot mode and its associated configuration.
-    vmm.v4.0.ahv.config.PowerState:
-      type: string
-      description: The current power state of the VM.
-      enum:
-      - 'ON'
-      - 'OFF'
-      - PAUSED
-      - UNDETERMINED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PAUSED: The VM is paused.
-        UNDETERMINED: The VM power state is currently unknown.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        'OFF': The VM is powered-off.
-        $REDACTED: 'Redacted value.
-
-          '
-        'ON': The VM is powered-on.
-    vmm.v4.0.ahv.config.PcieDevice:
-      description: Indicates the information about the PCIe device.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          assignedDeviceInfo:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.PcieDeviceInfo'
-          backingInfo:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: vmm.v4.ahv.config.PcieDeviceReference
-            description: Indicates the way a PCIe device is associated to the VM.
-            oneOf:
-            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.PcieDeviceReference'
-        additionalProperties: false
+      description: The IP address configurations.
     vmm.v4.0.ahv.config.NicType:
       type: string
       description: NIC type. Defaults to NORMAL_NIC.
@@ -1739,6 +1747,486 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    vmm.v4.0.ahv.config.BootDeviceNic:
+      type: object
+      properties:
+        macAddress:
+          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+          type: string
+          description: Mac address of the NIC that will be used to boot the VM.
+      additionalProperties: false
+      description: The NIC that will be used to boot the VM.
+    vmm.v4.0.ahv.config.ADSFVolumeGroupReference:
+      type: object
+      properties:
+        volumeGroupExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of an ADSF volume group. It should be of type UUID.
+      additionalProperties: false
+      description: Reference to an ADSF Volume Group.
+    vmm.v4.0.ahv.config.NicNetworkInfo:
+      type: object
+      properties:
+        nicType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NicType'
+        networkFunctionChain:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NetworkFunctionChainReference'
+        networkFunctionNicType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NetworkFunctionNicType'
+        subnet:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.SubnetReference'
+        vlanMode:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VlanMode'
+        trunkedVlans:
+          maxItems: 4095
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: List of networks to trunk if VLAN mode is marked as TRUNKED. If empty and VLAN mode is set to TRUNKED,
+            all the VLANs are trunked.
+          items:
+            minimum: 0
+            type: integer
+        shouldAllowUnknownMacs:
+          type: boolean
+          description: Indicates whether an unknown unicast traffic is forwarded to this NIC or not. This is applicable only
+            for the NICs on the overlay subnets.
+        ipv4Config:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.Ipv4Config'
+        ipv4Info:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.Ipv4Info'
+      additionalProperties: false
+      description: Network information for a NIC.
+    vmm.v4.0.ahv.config.PowerState:
+      type: string
+      description: The current power state of the VM.
+      enum:
+      - 'ON'
+      - 'OFF'
+      - PAUSED
+      - UNDETERMINED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PAUSED: The VM is paused.
+        UNDETERMINED: The VM power state is currently unknown.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        'OFF': The VM is powered-off.
+        $REDACTED: 'Redacted value.
+
+          '
+        'ON': The VM is powered-on.
+    vmm.v4.0.ahv.config.AvailabilityZoneReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of an availability zone type UUID.
+      additionalProperties: false
+      description: Reference to an availability zone.
+    vmm.v4.0.ahv.config.VtpmConfig:
+      type: object
+      properties:
+        isVtpmEnabled:
+          type: boolean
+          description: Indicates whether the virtual trusted platform module is enabled for the Guest OS or not.
+        version:
+          type: string
+          description: Virtual trusted platform module version.
+          readOnly: true
+      additionalProperties: false
+      description: Indicates how the vTPM for the VM should be configured.
+    vmm.v4.0.ahv.config.GuestTools:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Version of Nutanix Guest Tools installed on the VM.
+          readOnly: true
+        isInstalled:
+          type: boolean
+          description: Indicates whether Nutanix Guest Tools is installed on the VM or not.
+          readOnly: true
+        isEnabled:
+          type: boolean
+          description: Indicates whether Nutanix Guest Tools is enabled or not.
+        isIsoInserted:
+          type: boolean
+          description: Indicates whether Nutanix Guest Tools ISO is inserted or not.
+          readOnly: true
+        capabilities:
+          maxItems: 2
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: The list of the application names that are enabled on the guest VM.
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.NgtCapability'
+        availableVersion:
+          type: string
+          description: Version of Nutanix Guest Tools available on the cluster.
+          readOnly: true
+        guestOsVersion:
+          type: string
+          description: Version of the operating system on the VM.
+          readOnly: true
+        isReachable:
+          type: boolean
+          description: Indicates whether the communication from VM to CVM is active or not.
+          readOnly: true
+        isVssSnapshotCapable:
+          type: boolean
+          description: Indicates whether the VM is configured to take VSS snapshots through NGT or not.
+          readOnly: true
+        isVmMobilityDriversInstalled:
+          type: boolean
+          description: Indicates whether the VM mobility drivers are installed on the VM or not.
+          readOnly: true
+      additionalProperties: false
+      description: The details about Nutanix Guest Tools for a VM.
+    vmm.v4.0.ahv.config.Nic:
+      description: Virtual Machine NIC.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          backingInfo:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.EmulatedNic'
+          networkInfo:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.NicNetworkInfo'
+        additionalProperties: false
+    vmm.v4.0.ahv.config.Userdata:
+      type: object
+      properties:
+        value:
+          maxLength: 128000
+          type: string
+          description: The value for the cloud-init user_data.
+      additionalProperties: false
+      description: The contents of the user_data configuration for cloud-init. This can be formatted as YAML, JSON, or could
+        be a shell script. The value must be base64 encoded.
+    vmm.v4.0.ahv.config.VmDiskContainerReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk container. It should be of type UUID.
+      additionalProperties: false
+      description: This reference is for disk level storage container preference. This preference specifies the storage container
+        to which this disk belongs.
+    vmm.v4.0.ahv.config.VmDiskStorageConfig:
+      type: object
+      properties:
+        isFlashModeEnabled:
+          type: boolean
+          description: Indicates whether the virtual disk is pinned to the hot tier or not.
+      additionalProperties: false
+      description: Storage configuration for VM disks.
+    vmm.v4.0.ahv.config.VmSourceReference:
+      type: object
+      properties:
+        entityType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmSourceReferenceEntityType'
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM of type UUID.
+          readOnly: true
+      additionalProperties: false
+      description: Reference to an entity from which the VM should be cloned or created.
+    vmm.v4.0.ahv.config.DiskBusType:
+      type: string
+      description: 'Bus type for the device. The acceptable values are: SCSI, IDE, PCI, SATA, SPAPR (only PPC).'
+      enum:
+      - SCSI
+      - IDE
+      - PCI
+      - SATA
+      - SPAPR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SCSI: The type of disk bus is SCSI.
+        SPAPR: The type of disk bus is SPAPR.
+        PCI: The type of disk bus is PCI.
+        IDE: The type of disk bus is IDE.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SATA: The type of disk bus is SATA.
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.QosConfig:
+      type: object
+      properties:
+        throttledIops:
+          type: integer
+          description: Throttled IOPS for the governed entities. The block size for the I/O is 32 kB.
+      additionalProperties: false
+      description: QoS parameters to be enforced.
+    vmm.v4.0.ahv.config.OwnershipInfo:
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.OwnerReference'
+      additionalProperties: false
+      description: Ownership information for the VM.
+    vmm.v4.0.ahv.config.VmSourceReferenceEntityType:
+      type: string
+      description: Reference to an entity from which the VM should be cloned or created.
+      enum:
+      - VM
+      - VM_RECOVERY_POINT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        VM_RECOVERY_POINT: Reference to the recovery point entity from which the VM should be cloned or created.
+        VM: Reference to an entity from which the VM should be cloned or created.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.VlanMode:
+      type: string
+      description: By default, all the virtual NICs are created in ACCESS mode, which permits only one VLAN per virtual network.
+        TRUNKED mode allows multiple VLANs on a single VM NIC for network-aware user VMs.
+      enum:
+      - ACCESS
+      - TRUNK
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        TRUNK: The virtual NIC is created in TRUNKED mode.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        ACCESS: The virtual NIC is created in ACCESS mode.
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.Sysprep:
+      type: object
+      properties:
+        installType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.InstallType'
+        sysprepScript:
+          required: []
+          properties: {}
+          description: The Sysprep script for guest customisation of VM.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Unattendxml'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CustomKeyValues'
+      additionalProperties: false
+      description: If this field is set, the guest will be customized using Sysprep. Either unattend_xml or custom_key_values
+        should be provided. If custom_key_values are provided then the unattended answer file will be generated using these
+        key-value pairs.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    vmm.v4.0.ahv.config.BootDeviceType:
+      type: string
+      description: The type of boot device. Valid values are CDROM, NIC, and DISK.
+      enum:
+      - CDROM
+      - DISK
+      - NETWORK
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NETWORK: The type of boot device is NIC.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DISK: The type of boot device is DISK.
+        $REDACTED: 'Redacted value.
+
+          '
+        CDROM: The type of boot device is CD-ROM.
+    vmm.v4.0.ahv.config.CloudInitDataSourceType:
+      type: string
+      description: 'Type of datasource. Default: CONFIG_DRIVE_V2'
+      enum:
+      - CONFIG_DRIVE_V2
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CONFIG_DRIVE_V2: The type of datasource for cloud-init is Config Drive V2.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.GuestCustomizationParams:
+      type: object
+      properties:
+        config:
+          required: []
+          properties: {}
+          description: The Nutanix Guest Tools customization settings.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Sysprep'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInit'
+      additionalProperties: false
+      description: Stage a Sysprep or cloud-init configuration file to be used by the guest for the next boot. Note that the
+        Sysprep command must be used to generalize the Windows VMs before triggering this API call.
+    vmm.v4.0.ahv.config.PcieDeviceReference:
+      type: object
+      properties:
+        deviceExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Globally unique identifier denoting PCIe device label. It should be of type UUID.
+      additionalProperties: false
+      description: Reference to the PCIe device.
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.CpuFeature:
+      type: string
+      description: 'The list of additional CPU features to be enabled. HardwareVirtualization: Indicates whether hardware
+        assisted virtualization should be enabled for the Guest OS or not. Once enabled, the Guest OS can deploy a nested
+        hypervisor.'
+      enum:
+      - HARDWARE_VIRTUALIZATION
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        HARDWARE_VIRTUALIZATION: Indicates whether hardware assisted virtualization should be enabled for the Guest OS. Once
+          enabled, the Guest OS has the ability to deploy a nested hypervisor.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    vmm.v4.0.ahv.config.GpuMode:
+      type: string
+      description: The mode of this GPU.
+      enum:
+      - PASSTHROUGH_GRAPHICS
+      - PASSTHROUGH_COMPUTE
+      - VIRTUAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PASSTHROUGH_GRAPHICS: The mode of the GPU is Passthrough Graphics.
+        PASSTHROUGH_COMPUTE: The mode of the GPU is Passthrough Compute.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        VIRTUAL: The mode of the GPU is Virtual.
+    vmm.v4.0.ahv.config.SubnetReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of a subnet of type UUID.
+      additionalProperties: false
+      description: Network identifier for this adapter. Only valid if nic_type is NORMAL_NIC or DIRECT_NIC.
     vmm.v4.0.ahv.config.MachineType:
       type: string
       description: Machine type for the VM. Machine type Q35 is required for secure boot and does not support IDE disks.
@@ -1758,6 +2246,209 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    vmm.v4.0.ahv.config.SerialPort:
+      description: Indicates the configuration of serial ports of the VM.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          isConnected:
+            type: boolean
+            description: Indicates whether the serial port is connected or not.
+          index:
+            maximum: 3
+            minimum: 0
+            type: integer
+            description: Index of the serial port. Index 1 is reserved for internal usage.
+        additionalProperties: false
+    vmm.v4.0.ahv.config.UefiBoot:
+      type: object
+      properties:
+        isSecureBootEnabled:
+          type: boolean
+          description: Indicate whether to enable secure boot or not.
+        nvramDevice:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NvramDevice'
+        bootDevice:
+          required: []
+          properties: {}
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceDisk'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceNic'
+        bootOrder:
+          maxItems: 3
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: Indicates the order of device types in which the VM should try to boot from. If the boot device order
+            is not provided the system will decide an appropriate boot device order.
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceType'
+      additionalProperties: false
+      description: UEFI boot mode and its associated configuration.
+    vmm.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    vmm.v4.0.ahv.config.InstallType:
+      type: string
+      description: Indicates whether the guest will be freshly installed using this unattend configuration, or this unattend
+        configuration will be applied to a pre-prepared image. Default is 'PREPARED'.
+      enum:
+      - FRESH
+      - PREPARED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PREPARED: This unattended configuration will be applied to a pre-prepared image.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        FRESH: The guest OS will be freshly installed using this unattended configuration.
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.CloudInit:
+      type: object
+      properties:
+        datasourceType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInitDataSourceType'
+        metadata:
+          maxLength: 32000
+          type: string
+          description: The contents of the meta_data configuration for cloud-init. This can be formatted as YAML or JSON.
+            The value must be base64 encoded.
+        cloudInitScript:
+          required: []
+          properties: {}
+          description: The script to use for cloud-init.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Userdata'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CustomKeyValues'
+      additionalProperties: false
+      description: If this field is set, the guest will be customized using cloud-init. Either user_data or custom_key_values
+        should be provided. If custom_key_ves are provided then the user data will be generated using these key-value pairs.
+    vmm.v4.0.ahv.config.Disk:
+      description: Virtual Machine disk (VM disk).
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          diskAddress:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
+          backingInfo:
+            required: []
+            properties: {}
+            description: Supporting storage to create virtual disk on.
+            oneOf:
+            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDisk'
+            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.ADSFVolumeGroupReference'
+        additionalProperties: false
+    vmm.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    vmm.v4.0.ahv.config.ProtectionType:
+      type: string
+      description: The type of protection applied on a VM. PD_PROTECTED indicates a VM is protected using the Prism Element.
+        RULE_PROTECTED indicates a VM protection using the Prism Central.
+      enum:
+      - UNPROTECTED
+      - PD_PROTECTED
+      - RULE_PROTECTED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PD_PROTECTED: The VM is protected with a protection domain on Prism Element.
+        UNPROTECTED: The VM is not protected.
+        RULE_PROTECTED: The VM is protected with a protection policy on Prism Central.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.ahv.config.PolicyReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of an instance of type UUID.
+      additionalProperties: false
+      description: Reference to the policy object in use.
+    vmm.v4.0.ahv.config.OwnerReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM owner type UUID.
+      additionalProperties: false
+      description: Owner reference.
     vmm.v4.0.ahv.config.Vm:
       description: VM configuration.
       allOf:
@@ -1768,23 +2459,19 @@ components:
             maxLength: 80
             type: string
             description: VM name.
-            example: Test VM
           description:
             type: string
             description: VM description.
-            example: Description for your VM
           createTime:
             type: string
             description: VM creation time.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           updateTime:
             type: string
             description: VM last updated time.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           source:
             $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmSourceReference'
           numSockets:
@@ -1792,39 +2479,32 @@ components:
             type: integer
             description: Number of vCPU sockets.
             format: int32
-            example: 24
           numCoresPerSocket:
             minimum: 1
             type: integer
             description: Number of cores per socket.
             format: int32
-            example: 40
           numThreadsPerCore:
             minimum: 1
             type: integer
             description: Number of threads per core.
             format: int32
-            example: 37
           numNumaNodes:
             type: integer
             description: Number of NUMA nodes. 0 means NUMA is disabled.
             format: int32
-            example: 16
           memorySizeBytes:
             minimum: 1
             type: integer
             description: Memory size in bytes.
             format: int64
-            example: 79
           isVcpuHardPinningEnabled:
             type: boolean
             description: Indicates whether the vCPUs should be hard pinned to specific pCPUs or not.
-            example: false
           isCpuPassthroughEnabled:
             type: boolean
             description: Indicates whether to passthrough the host CPU features to the guest or not. Enabling this will make
               VM incapable of live migration.
-            example: true
           enabledCpuFeatures:
             maxItems: 256
             minItems: 0
@@ -1840,29 +2520,23 @@ components:
             description: Indicates whether the memory overcommit feature should be enabled for the VM or not. If enabled,
               parts of the VM memory may reside outside of the hypervisor physical memory. Once enabled, it should be expected
               that the VM may suffer performance degradation.
-            example: true
           isGpuConsoleEnabled:
             type: boolean
             description: Indicates whether the vGPU console is enabled or not.
-            example: true
           isCpuHotplugEnabled:
             type: boolean
             description: Indicates whether the VM CPU hotplug is enabled.
-            example: false
           isScsiControllerEnabled:
             type: boolean
             description: Indicates whether the VM SCSI controller is enabled.
-            example: false
           generationUuid:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: Generation UUID of the VM of type UUID.
-            example: 574829a1-5b23-4ccc-a6f5-1b573c152d22
           biosUuid:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: BIOS UUID of the VM of type UUID.
-            example: c95aa0dd-c47b-413f-a63c-ed82beee6f1c
           categories:
             maxItems: 256
             minItems: 0
@@ -1886,18 +2560,12 @@ components:
             maxLength: 64
             type: string
             description: VM hardware clock timezone in IANA TZDB format (America/Los_Angeles).
-            default: UTC
           isBrandingEnabled:
             type: boolean
             description: Indicates whether to remove AHV branding from VM firmware tables or not.
-            example: false
           bootConfig:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: vmm.v4.ahv.config.LegacyBoot
+            required: []
+            properties: {}
             description: Indicates the order of device types in which the VM should try to boot from. If the boot device order
               is not provided the system will decide an appropriate boot device order.
             oneOf:
@@ -1906,7 +2574,6 @@ components:
           isVgaConsoleEnabled:
             type: boolean
             description: Indicates whether the VGA console should be disabled or not.
-            example: true
           machineType:
             $ref: '#/components/schemas/vmm.v4.0.ahv.config.MachineType'
           powerState:
@@ -1918,19 +2585,16 @@ components:
             description: Indicates whether the VM is an agent VM or not. When their host enters maintenance mode, once the
               normal VMs are evacuated, the agent VMs are powered off. When the host is restored, agent VMs are powered on
               before the normal VMs are restored. In other words, agent VMs cannot be HA-protected or live migrated.
-            example: false
           apcConfig:
             $ref: '#/components/schemas/vmm.v4.0.ahv.config.ApcConfig'
           isLiveMigrateCapable:
             type: boolean
             description: Indicates whether the VM is capable of live migrating to another host or not, based on its configuration.
             readOnly: true
-            example: true
           isCrossClusterMigrationInProgress:
             type: boolean
             description: Indicates whether the VM is currently undergoing cross cluster migration.
             readOnly: true
-            example: false
           storageConfig:
             $ref: '#/components/schemas/vmm.v4.0.ahv.config.ADSFVmStorageConfig'
           disks:
@@ -1980,129 +2644,187 @@ components:
             items:
               $ref: '#/components/schemas/vmm.v4.0.ahv.config.PcieDevice'
         additionalProperties: false
-    vmm.v4.0.ahv.config.GpuMode:
-      type: string
-      description: The mode of this GPU.
-      enum:
-      - PASSTHROUGH_GRAPHICS
-      - PASSTHROUGH_COMPUTE
-      - VIRTUAL
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PASSTHROUGH_GRAPHICS: The mode of the GPU is Passthrough Graphics.
-        PASSTHROUGH_COMPUTE: The mode of the GPU is Passthrough Compute.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-        VIRTUAL: The mode of the GPU is Virtual.
-    common.v1.0.config.Flag:
+    vmm.v4.0.ahv.config.CategoryReference:
       type: object
       properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    vmm.v4.0.ahv.config.ADSFVolumeGroupReference:
-      type: object
-      properties:
-        volumeGroupExtId:
+        extId:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: The globally unique identifier of an ADSF volume group. It should be of type UUID.
-          example: f2fa96a8-0261-4552-9113-ee2ecda90599
+          description: A globally unique identifier of a VM category of type UUID.
       additionalProperties: false
-      description: Reference to an ADSF Volume Group.
-    vmm.v4.0.ahv.config.SerialPort:
-      description: Indicates the configuration of serial ports of the VM.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          isConnected:
-            type: boolean
-            description: Indicates whether the serial port is connected or not.
-            example: false
-          index:
-            maximum: 3
-            minimum: 0
-            type: integer
-            description: Index of the serial port. Index 1 is reserved for internal usage.
-            example: 3
-        additionalProperties: false
-    vmm.v4.0.ahv.config.OwnershipInfo:
-      type: object
-      properties:
-        owner:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.OwnerReference'
-      additionalProperties: false
-      description: Ownership information for the VM.
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    vmm.v4.0.ahv.config.Nic:
-      description: Virtual Machine NIC.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          backingInfo:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.EmulatedNic'
-          networkInfo:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.NicNetworkInfo'
-        additionalProperties: false
-    vmm.v4.0.ahv.config.VlanMode:
+      description: Reference to a category.
+    vmm.v4.0.ahv.config.CdRomBusType:
       type: string
-      description: By default, all the virtual NICs are created in ACCESS mode, which permits only one VLAN per virtual network.
-        TRUNKED mode allows multiple VLANs on a single VM NIC for network-aware user VMs.
+      description: 'Bus type for the device. The acceptable values are: IDE or SATA.'
       enum:
-      - ACCESS
-      - TRUNK
+      - IDE
+      - SATA
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        TRUNK: The virtual NIC is created in TRUNKED mode.
+        IDE: The type of CD-ROM bus is IDE.
         $UNKNOWN: 'Unknown value.
 
           '
-        ACCESS: The virtual NIC is created in ACCESS mode.
+        SATA: The type of CD-ROM bus is SATA.
         $REDACTED: 'Redacted value.
 
           '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    vmm.v4.0.ahv.config.BootDeviceDisk:
+      type: object
+      properties:
+        diskAddress:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
+      additionalProperties: false
+      description: The disk that will be used to boot the VM.
+    vmm.v4.0.ahv.config.NetworkFunctionChainReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of a network function chain. It should be of type UUID.
+      additionalProperties: false
+      description: The network function chain associates with the NIC. Only valid if nic_type is NORMAL_NIC.
+    vmm.v4.0.ahv.config.DataSource:
+      type: object
+      properties:
+        reference:
+          required: []
+          properties: {}
+          description: A reference to a disk or image that contains the contents of a disk.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.ImageReference'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDiskReference'
+      additionalProperties: false
+      description: A reference to a disk or image that contains the contents of a disk.
+    vmm.v4.0.ahv.config.CdRom:
+      description: Virtual Machine CD-ROM.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          diskAddress:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.CdRomAddress'
+          backingInfo:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDisk'
+          isoType:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.IsoType'
+        additionalProperties: false
+    vmm.v4.0.ahv.config.LegacyBoot:
+      type: object
+      properties:
+        bootDevice:
+          required: []
+          properties: {}
+          description: The boot device used for legacy boot of the VM.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceDisk'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceNic'
+        bootOrder:
+          maxItems: 3
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: Indicates the order of device types in which the VM should try to boot from. If the boot device order
+            is not provided the system will decide an appropriate boot device order.
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceType'
+      additionalProperties: false
+      description: Legacy boot mode and its associated configuration.
+    vmm.v4.0.ahv.config.CustomKeyValues:
+      type: object
+      properties:
+        keyValuePairs:
+          maxItems: 32
+          minItems: 0
+          type: array
+          description: The list of the individual KeyValuePair elements.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: A collection of key/value pairs.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    vmm.v4.0.ahv.config.Ipv4Info:
+      type: object
+      properties:
+        learnedIpAddresses:
+          maxItems: 256
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: The IP addresses as found on the guest VM for the NIC.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+      additionalProperties: false
+      description: The runtime IP address information of the NIC.
+    vmm.v4.0.ahv.config.VmReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM of type UUID.
+      additionalProperties: false
+      description: This is a reference to a VM.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -2121,7 +2843,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 6c335c2e-8b41-4973-b7d4-08fefbe88680
           links:
             maxItems: 20
             minItems: 0
@@ -2134,54 +2855,85 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    vmm.v4.0.ahv.config.VmDiskReference:
+    vmm.v4.0.ahv.config.Gpu:
+      description: Graphics resource information for the virtual machine.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          mode:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.GpuMode'
+          deviceId:
+            type: integer
+            description: The device Id of the GPU.
+            format: int32
+          vendor:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.GpuVendor'
+          pciAddress:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.SBDF'
+          guestDriverVersion:
+            maxLength: 128
+            type: string
+            description: Last determined guest driver version.
+            readOnly: true
+          name:
+            maxLength: 128
+            type: string
+            description: Name of the GPU resource.
+            readOnly: true
+          frameBufferSizeBytes:
+            type: integer
+            description: GPU frame buffer size in bytes.
+            format: int64
+            readOnly: true
+          numVirtualDisplayHeads:
+            type: integer
+            description: Number of supported virtual display heads.
+            format: int32
+            readOnly: true
+          fraction:
+            type: integer
+            description: Fraction of the physical GPU assigned.
+            format: int32
+            readOnly: true
+        additionalProperties: false
+    vmm.v4.0.ahv.config.CdRomAddress:
       type: object
       properties:
-        diskExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM disk of type UUID.
-          example: 52f8951a-012a-4fd7-95cc-243b295a2546
-        diskAddress:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
-        vmReference:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmReference'
+        busType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CdRomBusType'
+        index:
+          type: integer
+          description: Device index on the bus. This field is ignored unless the bus details are specified.
       additionalProperties: false
-      description: Reference to an existing VM disk.
-    vmm.v4.0.ahv.config.NgtCapability:
-      type: string
-      description: The capabilities of the Nutanix Guest Tools in the VM.
-      enum:
-      - SELF_SERVICE_RESTORE
-      - VSS_SNAPSHOT
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        VSS_SNAPSHOT: Enablement status of the Volume Snapshot Service application.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SELF_SERVICE_RESTORE: Enablement status of the Self Service Restore application.
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.VmSourceReferenceEntityType:
-      type: string
-      description: Reference to an entity from which the VM should be cloned or created.
-      enum:
-      - VM
-      - VM_RECOVERY_POINT
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        VM_RECOVERY_POINT: Reference to the recovery point entity from which the VM should be cloned or created.
-        VM: Reference to an entity from which the VM should be cloned or created.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
+      description: Virtual Machine disk (VM disk).
+    vmm.v4.0.ahv.config.Unattendxml:
+      type: object
+      properties:
+        value:
+          maxLength: 32000
+          type: string
+          description: Value of Sysprep unattend xml definition. The value must be base64 encoded.
+      additionalProperties: false
+      description: This field contains a Sysprep unattend xml definition, as a string. The value must be base64 encoded.
+    vmm.v4.0.ahv.config.EmulatedNic:
+      type: object
+      properties:
+        model:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.EmulatedNicModel'
+        macAddress:
+          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+          type: string
+          description: MAC address of the emulated NIC.
+        isConnected:
+          type: boolean
+          description: Indicates whether the NIC is connected or not. Default is True.
+        numQueues:
+          minimum: 1
+          type: integer
+          description: The number of Tx/Rx queue pairs for this NIC.
+      additionalProperties: false
+      description: Defines a NIC emulated by the hypervisor
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -2203,12 +2955,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 31
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -2239,529 +2989,10 @@ components:
               '
             items:
               type: integer
-              example: 99
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    vmm.v4.0.ahv.config.EmulatedNic:
-      type: object
-      properties:
-        model:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.EmulatedNicModel'
-        macAddress:
-          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
-          type: string
-          description: MAC address of the emulated NIC.
-          example: df:8d:df:d8:39:c6
-        isConnected:
-          type: boolean
-          description: Indicates whether the NIC is connected or not. Default is True.
-          default: true
-        numQueues:
-          minimum: 1
-          type: integer
-          description: The number of Tx/Rx queue pairs for this NIC.
-          default: 1
-      additionalProperties: false
-      description: Defines a NIC emulated by the hypervisor
-    vmm.v4.0.ahv.config.BootDeviceDisk:
-      type: object
-      properties:
-        diskAddress:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
-      additionalProperties: false
-      description: The disk that will be used to boot the VM.
-    vmm.v4.0.ahv.config.VmDiskContainerReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM disk container. It should be of type UUID.
-          example: c1a39b16-fd62-41d3-b83e-ff006c19cf6e
-      additionalProperties: false
-      description: This reference is for disk level storage container preference. This preference specifies the storage container
-        to which this disk belongs.
-    vmm.v4.0.ahv.config.Sysprep:
-      type: object
-      properties:
-        installType:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.InstallType'
-        sysprepScript:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.config.Unattendxml
-          description: The Sysprep script for guest customisation of VM.
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Unattendxml'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CustomKeyValues'
-      additionalProperties: false
-      description: If this field is set, the guest will be customized using Sysprep. Either unattend_xml or custom_key_values
-        should be provided. If custom_key_values are provided then the unattended answer file will be generated using these
-        key-value pairs.
-    vmm.v4.0.ahv.config.Disk:
-      description: Virtual Machine disk (VM disk).
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          diskAddress:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.DiskAddress'
-          backingInfo:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: vmm.v4.ahv.config.VmDisk
-            description: Supporting storage to create virtual disk on.
-            oneOf:
-            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDisk'
-            - $ref: '#/components/schemas/vmm.v4.0.ahv.config.ADSFVolumeGroupReference'
-        additionalProperties: false
-    vmm.v4.0.ahv.config.GuestTools:
-      type: object
-      properties:
-        version:
-          type: string
-          description: Version of Nutanix Guest Tools installed on the VM.
-          readOnly: true
-        isInstalled:
-          type: boolean
-          description: Indicates whether Nutanix Guest Tools is installed on the VM or not.
-          readOnly: true
-          example: true
-        isEnabled:
-          type: boolean
-          description: Indicates whether Nutanix Guest Tools is enabled or not.
-          example: true
-        isIsoInserted:
-          type: boolean
-          description: Indicates whether Nutanix Guest Tools ISO is inserted or not.
-          readOnly: true
-          example: true
-        capabilities:
-          maxItems: 2
-          minItems: 0
-          uniqueItems: true
-          type: array
-          description: The list of the application names that are enabled on the guest VM.
-          items:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.NgtCapability'
-        availableVersion:
-          type: string
-          description: Version of Nutanix Guest Tools available on the cluster.
-          readOnly: true
-        guestOsVersion:
-          type: string
-          description: Version of the operating system on the VM.
-          readOnly: true
-        isReachable:
-          type: boolean
-          description: Indicates whether the communication from VM to CVM is active or not.
-          readOnly: true
-          example: false
-        isVssSnapshotCapable:
-          type: boolean
-          description: Indicates whether the VM is configured to take VSS snapshots through NGT or not.
-          readOnly: true
-          example: true
-        isVmMobilityDriversInstalled:
-          type: boolean
-          description: Indicates whether the VM mobility drivers are installed on the VM or not.
-          readOnly: true
-          example: false
-      additionalProperties: false
-      description: The details about Nutanix Guest Tools for a VM.
-    vmm.v4.0.ahv.config.OwnerReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM owner type UUID.
-          example: 820349bc-c59a-46a3-9533-5a29864cec61
-      additionalProperties: false
-      description: Owner reference.
-    vmm.v4.0.ahv.config.CdRomBusType:
-      type: string
-      description: 'Bus type for the device. The acceptable values are: IDE or SATA.'
-      enum:
-      - IDE
-      - SATA
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        IDE: The type of CD-ROM bus is IDE.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SATA: The type of CD-ROM bus is SATA.
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.InstallType:
-      type: string
-      description: Indicates whether the guest will be freshly installed using this unattend configuration, or this unattend
-        configuration will be applied to a pre-prepared image. Default is 'PREPARED'.
-      enum:
-      - FRESH
-      - PREPARED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PREPARED: This unattended configuration will be applied to a pre-prepared image.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        FRESH: The guest OS will be freshly installed using this unattended configuration.
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 58c42276-2fd7-49bc-9bf7-67d18ba54f14
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    vmm.v4.0.ahv.config.CdRomAddress:
-      type: object
-      properties:
-        busType:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CdRomBusType'
-        index:
-          type: integer
-          description: Device index on the bus. This field is ignored unless the bus details are specified.
-          example: 94
-      additionalProperties: false
-      description: Virtual Machine disk (VM disk).
-    vmm.v4.0.ahv.config.SBDF:
-      type: object
-      properties:
-        segment:
-          type: integer
-          description: PCI Segment.
-          readOnly: true
-          example: 90
-        bus:
-          type: integer
-          description: PCI Bus number in hexadecimal, often padded using a leading zeros to two or four digits.
-          readOnly: true
-          example: 78
-        device:
-          type: integer
-          description: PCI Device number in hexadecimal, often padded using a leading zero to two digits . Sometimes this
-            is also referred to as the slot number.
-          readOnly: true
-          example: 79
-        func:
-          type: integer
-          description: PCI Function number in hexadecimal.
-          readOnly: true
-          example: 4
-      additionalProperties: false
-      description: The (S)egment:(B)us:(D)evice.(F)unction hardware address. See https://wiki.xen.org/wiki/Bus:Device.Function_(BDF)_Notation
-        for more details.
-    vmm.v4.0.ahv.config.ApcConfig:
-      type: object
-      properties:
-        isApcEnabled:
-          type: boolean
-          description: If enabled, the selected CPU model will be retained across live and cold migrations of the VM.
-          example: true
-        cpuModel:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CpuModelReference'
-      additionalProperties: false
-      description: Advanced Processor Compatibility configuration for the VM. Enabling this retains the CPU model for the
-        VM across power cycles and migrations.
-    vmm.v4.0.ahv.config.CategoryReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM category of type UUID.
-          example: faa7854f-fc24-444b-a40d-ea56b144c068
-      additionalProperties: false
-      description: Reference to a category.
-    vmm.v4.0.ahv.config.Unattendxml:
-      type: object
-      properties:
-        value:
-          maxLength: 32000
-          type: string
-          description: Value of Sysprep unattend xml definition. The value must be base64 encoded.
-      additionalProperties: false
-      description: This field contains a Sysprep unattend xml definition, as a string. The value must be base64 encoded.
-    vmm.v4.0.ahv.config.PolicyReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of an instance of type UUID.
-          example: de17741c-3dc8-449a-9b31-0038687c07d6
-      additionalProperties: false
-      description: Reference to the policy object in use.
-    vmm.v4.0.ahv.config.Userdata:
-      type: object
-      properties:
-        value:
-          maxLength: 128000
-          type: string
-          description: The value for the cloud-init user_data.
-      additionalProperties: false
-      description: The contents of the user_data configuration for cloud-init. This can be formatted as YAML, JSON, or could
-        be a shell script. The value must be base64 encoded.
-    vmm.v4.0.ahv.config.VtpmConfig:
-      type: object
-      properties:
-        isVtpmEnabled:
-          type: boolean
-          description: Indicates whether the virtual trusted platform module is enabled for the Guest OS or not.
-          example: true
-        version:
-          type: string
-          description: Virtual trusted platform module version.
-          readOnly: true
-      additionalProperties: false
-      description: Indicates how the vTPM for the VM should be configured.
-    vmm.v4.0.ahv.config.PcieDeviceReference:
-      type: object
-      properties:
-        deviceExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Globally unique identifier denoting PCIe device label. It should be of type UUID.
-          example: 57ea3a89-e6c7-4dd1-b132-9aabc00d13e7
-      additionalProperties: false
-      description: Reference to the PCIe device.
-    vmm.v4.0.ahv.config.VmDiskStorageConfig:
-      type: object
-      properties:
-        isFlashModeEnabled:
-          type: boolean
-          description: Indicates whether the virtual disk is pinned to the hot tier or not.
-          example: true
-      additionalProperties: false
-      description: Storage configuration for VM disks.
-    vmm.v4.0.ahv.config.NicNetworkInfo:
-      type: object
-      properties:
-        nicType:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NicType'
-        networkFunctionChain:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NetworkFunctionChainReference'
-        networkFunctionNicType:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NetworkFunctionNicType'
-        subnet:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.SubnetReference'
-        vlanMode:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VlanMode'
-        trunkedVlans:
-          maxItems: 4095
-          minItems: 0
-          uniqueItems: true
-          type: array
-          description: List of networks to trunk if VLAN mode is marked as TRUNKED. If empty and VLAN mode is set to TRUNKED,
-            all the VLANs are trunked.
-          items:
-            minimum: 0
-            type: integer
-            example: 28
-        shouldAllowUnknownMacs:
-          type: boolean
-          description: Indicates whether an unknown unicast traffic is forwarded to this NIC or not. This is applicable only
-            for the NICs on the overlay subnets.
-          example: false
-        ipv4Config:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.Ipv4Config'
-        ipv4Info:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.Ipv4Info'
-      additionalProperties: false
-      description: Network information for a NIC.
-    vmm.v4.0.ahv.config.IsoType:
-      type: string
-      description: Type of ISO image inserted in CD-ROM
-      enum:
-      - OTHER
-      - GUEST_TOOLS
-      - GUEST_CUSTOMIZATION
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        OTHER: The type of ISO is Other.
-        GUEST_TOOLS: The type of ISO is Nutanix Guest Tools.
-        GUEST_CUSTOMIZATION: The type of ISO is Guest Customization.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.CloudInitDataSourceType:
-      type: string
-      description: 'Type of datasource. Default: CONFIG_DRIVE_V2'
-      enum:
-      - CONFIG_DRIVE_V2
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        CONFIG_DRIVE_V2: The type of datasource for cloud-init is Config Drive V2.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    vmm.v4.0.ahv.config.Gpu:
-      description: Graphics resource information for the virtual machine.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          mode:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.GpuMode'
-          deviceId:
-            type: integer
-            description: The device Id of the GPU.
-            format: int32
-            example: 52
-          vendor:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.GpuVendor'
-          pciAddress:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.SBDF'
-          guestDriverVersion:
-            maxLength: 128
-            type: string
-            description: Last determined guest driver version.
-            readOnly: true
-          name:
-            maxLength: 128
-            type: string
-            description: Name of the GPU resource.
-            readOnly: true
-          frameBufferSizeBytes:
-            type: integer
-            description: GPU frame buffer size in bytes.
-            format: int64
-            readOnly: true
-            example: 67
-          numVirtualDisplayHeads:
-            type: integer
-            description: Number of supported virtual display heads.
-            format: int32
-            readOnly: true
-            example: 67
-          fraction:
-            type: integer
-            description: Fraction of the physical GPU assigned.
-            format: int32
-            readOnly: true
-            example: 84
-        additionalProperties: false
-    vmm.v4.0.ahv.config.VmSourceReference:
-      type: object
-      properties:
-        entityType:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmSourceReferenceEntityType'
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM of type UUID.
-          readOnly: true
-          example: f7f35e1a-f88d-405c-8afc-c31f2483161c
-      additionalProperties: false
-      description: Reference to an entity from which the VM should be cloned or created.
-    vmm.v4.0.ahv.config.BootDeviceType:
-      type: string
-      description: The type of boot device. Valid values are CDROM, NIC, and DISK.
-      enum:
-      - CDROM
-      - DISK
-      - NETWORK
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NETWORK: The type of boot device is NIC.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        DISK: The type of boot device is DISK.
-        $REDACTED: 'Redacted value.
-
-          '
-        CDROM: The type of boot device is CD-ROM.
-    vmm.v4.0.ahv.config.SubnetReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of a subnet of type UUID.
-          example: 28a0f367-14d6-4b0d-a567-ff48b590b156
-      additionalProperties: false
-      description: Network identifier for this adapter. Only valid if nic_type is NORMAL_NIC or DIRECT_NIC.
-    vmm.v4.0.ahv.config.QosConfig:
-      type: object
-      properties:
-        throttledIops:
-          type: integer
-          description: Throttled IOPS for the governed entities. The block size for the I/O is 32 kB.
-          example: 75
-      additionalProperties: false
-      description: QoS parameters to be enforced.
-    vmm.v4.0.ahv.config.ProtectionPolicyState:
-      type: object
-      properties:
-        policy:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.PolicyReference'
-      additionalProperties: false
-      description: Status of protection policy applied to this VM.
     vmm.v4.0.ahv.config.EmulatedNicModel:
       type: string
       description: Options for the NIC emulation.
@@ -2779,369 +3010,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    vmm.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    vmm.v4.0.ahv.config.GpuVendor:
-      type: string
-      description: The vendor of the GPU.
-      enum:
-      - NVIDIA
-      - INTEL
-      - AMD
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NVIDIA: The vendor of the GPU is NVIDIA.
-        AMD: The vendor of the GPU is AMD.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-        INTEL: The vendor of the GPU is Intel.
-    vmm.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    vmm.v4.0.ahv.config.GuestCustomizationParams:
-      type: object
-      properties:
-        config:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.config.Sysprep
-          description: The Nutanix Guest Tools customization settings.
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Sysprep'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInit'
-      additionalProperties: false
-      description: Stage a Sysprep or cloud-init configuration file to be used by the guest for the next boot. Note that the
-        Sysprep command must be used to generalize the Windows VMs before triggering this API call.
-    vmm.v4.0.ahv.config.VmReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM of type UUID.
-          example: 3916ccd2-31e5-4cfc-9ee3-a3abb8d5d1be
-      additionalProperties: false
-      description: This is a reference to a VM.
-    common.v1.0.config.MessageSeverity:
-      type: string
-      description: 'The message severity.
-
-        '
-      enum:
-      - INFO
-      - WARNING
-      - ERROR
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ERROR: 'Error indicating failed completion.
-
-          '
-        INFO: 'Information about successful completion.
-
-          '
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: 'Warning indicating future error.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.DiskBusType:
-      type: string
-      description: 'Bus type for the device. The acceptable values are: SCSI, IDE, PCI, SATA, SPAPR (only PPC).'
-      enum:
-      - SCSI
-      - IDE
-      - PCI
-      - SATA
-      - SPAPR
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        SCSI: The type of disk bus is SCSI.
-        SPAPR: The type of disk bus is SPAPR.
-        PCI: The type of disk bus is PCI.
-        IDE: The type of disk bus is IDE.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SATA: The type of disk bus is SATA.
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.CustomKeyValues:
-      type: object
-      properties:
-        keyValuePairs:
-          maxItems: 32
-          minItems: 0
-          type: array
-          description: The list of the individual KeyValuePair elements.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: A collection of key/value pairs.
-    vmm.v4.0.ahv.config.NetworkFunctionNicType:
-      type: string
-      description: The type of this Network function NIC. Defaults to INGRESS.
-      enum:
-      - INGRESS
-      - EGRESS
-      - TAP
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        TAP: The type of Network-Function NIC is Tap.
-        EGRESS: The type of Network-Function NIC is Egress.
-        INGRESS: The type of Network-Function NIC is Ingress.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.HostReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of a host type UUID.
-          example: c85c4c2f-c08a-406f-b934-e462ab3f1344
-      additionalProperties: false
-      description: Reference to the host, the VM is running on.
-    vmm.v4.0.ahv.config.CdRom:
-      description: Virtual Machine CD-ROM.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          diskAddress:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.CdRomAddress'
-          backingInfo:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.VmDisk'
-          isoType:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.IsoType'
-        additionalProperties: false
-    vmm.v4.0.ahv.config.ProtectionType:
-      type: string
-      description: The type of protection applied on a VM. PD_PROTECTED indicates a VM is protected using the Prism Element.
-        RULE_PROTECTED indicates a VM protection using the Prism Central.
-      enum:
-      - UNPROTECTED
-      - PD_PROTECTED
-      - RULE_PROTECTED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PD_PROTECTED: The VM is protected with a protection domain on Prism Element.
-        UNPROTECTED: The VM is not protected.
-        RULE_PROTECTED: The VM is protected with a protection policy on Prism Central.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 25
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    vmm.v4.0.ahv.config.CpuFeature:
-      type: string
-      description: 'The list of additional CPU features to be enabled. HardwareVirtualization: Indicates whether hardware
-        assisted virtualization should be enabled for the Guest OS or not. Once enabled, the Guest OS can deploy a nested
-        hypervisor.'
-      enum:
-      - HARDWARE_VIRTUALIZATION
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        HARDWARE_VIRTUALIZATION: Indicates whether hardware assisted virtualization should be enabled for the Guest OS. Once
-          enabled, the Guest OS has the ability to deploy a nested hypervisor.
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.ClusterReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of a cluster type UUID.
-          example: e0bad15c-f9d1-4347-b251-d76d386e82d4
-      additionalProperties: false
-      description: Reference to a cluster.
-    vmm.v4.0.ahv.config.UefiBoot:
-      type: object
-      properties:
-        isSecureBootEnabled:
-          type: boolean
-          description: Indicate whether to enable secure boot or not.
-          example: false
-        nvramDevice:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.NvramDevice'
-        bootDevice:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.config.BootDeviceDisk
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceDisk'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceNic'
-        bootOrder:
-          maxItems: 3
-          minItems: 0
-          uniqueItems: true
-          type: array
-          description: Indicates the order of device types in which the VM should try to boot from. If the boot device order
-            is not provided the system will decide an appropriate boot device order.
-          items:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.BootDeviceType'
-      additionalProperties: false
-      description: UEFI boot mode and its associated configuration.
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:37269b59-c649-45fd-956e-19134b3208a3
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 248.218.207.162
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    vmm.v4.0.ahv.config.CpuModelReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of the CPU model associated with the VM.
-          example: d2bfd9de-700b-4ddf-8c8e-83f63c3565bc
-        name:
-          maxLength: 64
-          type: string
-          description: Name of the CPU model associated with the VM.
-          example: Haswell
-      additionalProperties: false
-      description: CPU model associated with the VM if Advanced Processor Compatibility(APC) is enabled. If APC is enabled
-        and no CPU model is explicitly set, a default baseline CPU model is picked by the system. See the APC documentation
-        for more information
   securitySchemes:
     basicAuthScheme:
       type: http

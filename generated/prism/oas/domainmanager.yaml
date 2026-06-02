@@ -190,7 +190,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 2c9e96af-7e91-439d-9480-adedff8f4e64
       requestBody:
         description: Request body to deploy a Prism Central.
         content:
@@ -449,7 +448,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: b2782774-4437-47ee-a15c-d31453137bc9
       responses:
         '200':
           description: Returns the requested domain manager (Prism Central) entity.
@@ -580,203 +578,6 @@ paths:
           \n"
 components:
   schemas:
-    prism.v4.0.config.BootstrapConfig:
-      type: object
-      properties:
-        cloudInitConfig:
-          maxItems: 50
-          minItems: 1
-          type: array
-          description: List of cloud-init commands required to bootstrap the domain manager (Prism Central) cluster on a startup.
-          writeOnly: true
-          items:
-            $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInit'
-        environmentInfo:
-          $ref: '#/components/schemas/prism.v4.0.config.EnvironmentInfo'
-      additionalProperties: false
-      description: Bootstrap configuration details for the domain manager (Prism Central).
-    common.v1.0.config.FQDN:
-      type: object
-      properties:
-        value:
-          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
-          type: string
-          description: 'The fully qualified domain name of the host.
-
-            '
-          example: www.example-corp.com
-      additionalProperties: false
-      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
-        System.
-
-        '
-    prism.v4.0.config.ProvisioningType:
-      type: string
-      description: 'Enums denoting the instance type of the cloud PC. It indicates whether the PC is created on bare-metal
-
-        or on a cloud-provisioned VM. Hence, it supports two possible values:
-
-        - NTNX
-
-        - NATIVE
-
-        '
-      enum:
-      - NTNX
-      - NATIVE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NATIVE: Native instance.
-        NTNX: Nutanix instance.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.IPAddress:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
-
-        '
-    clustermgmt.v4.0.config.BuildInfo:
-      type: object
-      properties:
-        version:
-          type: string
-          description: Software version.
-      additionalProperties: false
-      description: Currently representing the build information to be used for the cluster creation.
-    vmm.v4.0.ahv.config.CloudInit:
-      type: object
-      properties:
-        datasourceType:
-          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInitDataSourceType'
-        metadata:
-          maxLength: 32000
-          type: string
-          description: The contents of the meta_data configuration for cloud-init. This can be formatted as YAML or JSON.
-            The value must be base64 encoded.
-        cloudInitScript:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: vmm.v4.ahv.config.Userdata
-          description: The script to use for cloud-init.
-          oneOf:
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Userdata'
-          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CustomKeyValues'
-      additionalProperties: false
-      description: If this field is set, the guest will be customized using cloud-init. Either user_data or custom_key_values
-        should be provided. If custom_key_ves are provided then the user data will be generated using these key-value pairs.
-    prism.v4.0.config.DomainManagerClusterConfig:
-      required:
-      - buildInfo
-      - name
-      - size
-      description: Domain manager (Prism Central) cluster configuration details.
-      allOf:
-      - $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterConfig'
-      - type: object
-        properties:
-          name:
-            maxLength: 80
-            minLength: 1
-            type: string
-            description: Name of the domain manager (Prism Central).
-            example: pc_nutanix_01
-          size:
-            $ref: '#/components/schemas/prism.v4.0.config.Size'
-          bootstrapConfig:
-            $ref: '#/components/schemas/prism.v4.0.config.BootstrapConfig'
-          credentials:
-            maxItems: 5
-            minItems: 1
-            uniqueItems: true
-            type: array
-            description: The credentials consist of a username and password for a particular user like admin. Users can pass
-              the credentials of admin users currently which will be configured in the create domain manager operation.
-            writeOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.BasicAuth'
-          resourceConfig:
-            $ref: '#/components/schemas/prism.v4.0.config.DomainManagerResourceConfig'
-        additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: d568ff06-a6dc-480f-868c-b85b52f447ba
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    prism.v4.0.config.EnvironmentType:
-      type: string
-      description: 'Enums denoting the environment type of the PC, that is, on-prem PC or cloud PC.<br>
-
-        Following are the supported entity types:
-
-        - ONPREM
-
-        - NTNX_CLOUD
-
-        '
-      enum:
-      - ONPREM
-      - NTNX_CLOUD
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NTNX_CLOUD: Nutanix cloud environment.
-        ONPREM: On-prem environment.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -804,269 +605,114 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    prism.v4.0.error.ErrorResponse:
+    common.v1.0.config.IPAddress:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationError'
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    clustermgmt.v4.0.config.ClusterNetwork:
-      type: object
-      properties:
-        externalAddress:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        nameServers:
-          maxItems: 1024
-          minItems: 0
-          uniqueItems: true
-          type: array
-          description: List of name servers on a cluster. This is part of payload for both cluster create & update operations.
-            For create operation, only ipv4 address / fqdn values are supported currently.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
-        ntpServers:
-          maxItems: 1024
-          minItems: 0
-          uniqueItems: true
-          type: array
-          description: List of NTP servers on a cluster. This is part of payload for both cluster create & update operations.
-            For create operation, only ipv4 address / fqdn values are supported currently.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
-        fqdn:
-          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
-          type: string
-          description: Cluster fully qualified domain name. This is part of payload for cluster update operation only.
-          readOnly: true
-          example: www.example-corp.com
-      additionalProperties: false
-      description: Network details of a cluster.
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
 
         '
-    prism.v4.0.config.EnvironmentInfo:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/prism.v4.0.config.EnvironmentType'
-        providerType:
-          $ref: '#/components/schemas/prism.v4.0.config.ProviderType'
-        provisioningType:
-          $ref: '#/components/schemas/prism.v4.0.config.ProvisioningType'
-      additionalProperties: false
-      description: 'An object denoting the environment information of the PC. It contains the following fields:<br>
-
-        - type: Enums denoting the environment type of the PC.<br>
-
-        - providerType: Enums denoting the provider of the cloud PC.<br>
-
-        - instanceObj: Enums denoting the instance type of the cloud PC.<br>
-
-        '
-    prism.v4.0.config.Size:
-      type: string
-      description: Domain manager (Prism Central) size is an enumeration of starter, small, large, or extra large starter
-        values.
-      enum:
-      - STARTER
-      - SMALL
-      - LARGE
-      - EXTRALARGE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        SMALL: Domain manager (Prism Central) of size small.
-        LARGE: Domain manager (Prism Central) of size large.
-        EXTRALARGE: Domain manager (Prism Central) of size extra large.
-        STARTER: Domain manager (Prism Central) of size starter.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.ahv.config.CustomKeyValues:
-      type: object
-      properties:
-        keyValuePairs:
-          maxItems: 32
-          minItems: 0
-          type: array
-          description: The list of the individual KeyValuePair elements.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: A collection of key/value pairs.
-    prism.v4.0.config.DomainManager:
-      description: Domain manager (Prism Central) details.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - config
-        - network
-        type: object
-        properties:
-          config:
-            $ref: '#/components/schemas/prism.v4.0.config.DomainManagerClusterConfig'
-          isRegisteredWithHostingCluster:
-            type: boolean
-            description: Boolean value indicating if the domain manager (Prism Central) is registered with the hosting cluster,
-              that is, Prism Element.
-            readOnly: true
-            example: false
-          network:
-            $ref: '#/components/schemas/prism.v4.0.config.DomainManagerNetwork'
-          hostingClusterExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The external identifier of the cluster hosting the domain manager (Prism Central) instance.
-            readOnly: true
-            example: 5d1d9521-780c-4d6d-8a24-75e8fdd94de1
-          shouldEnableHighAvailability:
-            type: boolean
-            description: This configuration enables Prism Central to be deployed in scale-out mode.
-            default: false
-          nodeExtIds:
-            maxItems: 3
-            minItems: 1
-            uniqueItems: true
-            type: array
-            description: Domain manager (Prism Central) nodes external identifier.
-            readOnly: true
-            items:
-              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-              type: string
-              example: dc590c9d-e0eb-47f5-9649-170f1ee7c9d9
-        additionalProperties: false
-    common.v1.0.config.BasicAuth:
-      required:
-      - password
-      - username
-      type: object
-      properties:
-        username:
-          maxLength: 256
-          minLength: 3
-          type: string
-          description: 'Username required for the basic auth scheme. As per [RFC 2617](https://datatracker.ietf.org/doc/html/rfc2617)
-            usernames might be case sensitive.
-
-            '
-          example: test-user
-        password:
-          maxLength: 256
-          minLength: 3
-          type: string
-          description: 'Password required for the basic auth scheme.
-
-            '
-          format: password
-          example: '***********'
-      additionalProperties: false
-      description: 'An authentication scheme that requires the client to present a username and password. The server will
-        service the request only if it can validate the user-ID and password for the protection space of the Request-URI.
-
-        '
-    vmm.v4.0.ahv.config.Userdata:
+    common.v1.0.config.FQDN:
       type: object
       properties:
         value:
-          maxLength: 128000
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
           type: string
-          description: The value for the cloud-init user_data.
-      additionalProperties: false
-      description: The contents of the user_data configuration for cloud-init. This can be formatted as YAML, JSON, or could
-        be a shell script. The value must be base64 encoded.
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
+          description: 'The fully qualified domain name of the host.
 
             '
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
+      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
+        System.
 
         '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
+    prism.v4.0.config.BaseNetwork:
+      required:
+      - defaultGateway
+      - ipRanges
+      - subnetMask
+      type: object
+      properties:
+        defaultGateway:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        subnetMask:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        ipRanges:
+          maxItems: 15
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: Range of IPs used for Prism Central network setup.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IpRange'
+      additionalProperties: false
+      description: This model would abstract away the common attributes as part of internal and external networks.
+    prism.v4.0.config.ExternalNetwork:
+      description: This configuration is used to manage Prism Central.
       allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
+      - $ref: '#/components/schemas/prism.v4.0.config.BaseNetwork'
+      - required:
+        - networkExtId
+        type: object
         properties:
-          extId:
+          networkExtId:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 0562e12d-543d-4030-9271-20ba8e72fcb2
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+            description: The network external identifier to which Domain Manager (Prism Central) is to be deployed or is already
+              configured.
         additionalProperties: false
-    common.v1.0.config.Message:
+    prism.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        code:
+        location:
           type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
         message:
           type: string
-          description: 'The description of the message.
-
-            '
-        locale:
+          description: The detailed message for the validation error.
+        attributePath:
           type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    prism.v4.0.config.DomainManagerClusterConfig:
+      required:
+      - buildInfo
+      - name
+      - size
+      description: Domain manager (Prism Central) cluster configuration details.
+      allOf:
+      - $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterConfig'
+      - type: object
+        properties:
+          name:
+            maxLength: 80
+            minLength: 1
+            type: string
+            description: Name of the domain manager (Prism Central).
+          size:
+            $ref: '#/components/schemas/prism.v4.0.config.Size'
+          bootstrapConfig:
+            $ref: '#/components/schemas/prism.v4.0.config.BootstrapConfig'
+          credentials:
+            maxItems: 5
+            minItems: 1
+            uniqueItems: true
+            type: array
+            description: The credentials consist of a username and password for a particular user like admin. Users can pass
+              the credentials of admin users currently which will be configured in the create domain manager operation.
+            writeOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.BasicAuth'
+          resourceConfig:
+            $ref: '#/components/schemas/prism.v4.0.config.DomainManagerResourceConfig'
+        additionalProperties: false
     prism.v4.0.config.ProviderType:
       type: string
       description: 'Enums denoting the provider of the cloud, in case of environment type a cloud PC.<br>
@@ -1104,27 +750,521 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    prism.v4.0.config.BaseNetwork:
-      required:
-      - defaultGateway
-      - ipRanges
-      - subnetMask
+    common.v1.0.config.IpRange:
       type: object
       properties:
-        defaultGateway:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
-        subnetMask:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
-        ipRanges:
-          maxItems: 15
+        begin:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        end:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+      additionalProperties: false
+      description: 'Range of consecutive IP addresses that can be assigned to a specific Subnet.The size of the IP range is
+        determined by the subnet mask.
+
+        '
+    prism.v4.0.config.BootstrapConfig:
+      type: object
+      properties:
+        cloudInitConfig:
+          maxItems: 50
+          minItems: 1
+          type: array
+          description: List of cloud-init commands required to bootstrap the domain manager (Prism Central) cluster on a startup.
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInit'
+        environmentInfo:
+          $ref: '#/components/schemas/prism.v4.0.config.EnvironmentInfo'
+      additionalProperties: false
+      description: Bootstrap configuration details for the domain manager (Prism Central).
+    prism.v4.0.config.EnvironmentInfo:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/prism.v4.0.config.EnvironmentType'
+        providerType:
+          $ref: '#/components/schemas/prism.v4.0.config.ProviderType'
+        provisioningType:
+          $ref: '#/components/schemas/prism.v4.0.config.ProvisioningType'
+      additionalProperties: false
+      description: 'An object denoting the environment information of the PC. It contains the following fields:<br>
+
+        - type: Enums denoting the environment type of the PC.<br>
+
+        - providerType: Enums denoting the provider of the cloud PC.<br>
+
+        - instanceObj: Enums denoting the instance type of the cloud PC.<br>
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    vmm.v4.0.ahv.config.Userdata:
+      type: object
+      properties:
+        value:
+          maxLength: 128000
+          type: string
+          description: The value for the cloud-init user_data.
+      additionalProperties: false
+      description: The contents of the user_data configuration for cloud-init. This can be formatted as YAML, JSON, or could
+        be a shell script. The value must be base64 encoded.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    prism.v4.0.config.EnvironmentType:
+      type: string
+      description: 'Enums denoting the environment type of the PC, that is, on-prem PC or cloud PC.<br>
+
+        Following are the supported entity types:
+
+        - ONPREM
+
+        - NTNX_CLOUD
+
+        '
+      enum:
+      - ONPREM
+      - NTNX_CLOUD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NTNX_CLOUD: Nutanix cloud environment.
+        ONPREM: On-prem environment.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.BuildInfo:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Software version.
+      additionalProperties: false
+      description: Currently representing the build information to be used for the cluster creation.
+    prism.v4.0.config.Size:
+      type: string
+      description: Domain manager (Prism Central) size is an enumeration of starter, small, large, or extra large starter
+        values.
+      enum:
+      - STARTER
+      - SMALL
+      - LARGE
+      - EXTRALARGE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SMALL: Domain manager (Prism Central) of size small.
+        LARGE: Domain manager (Prism Central) of size large.
+        EXTRALARGE: Domain manager (Prism Central) of size extra large.
+        STARTER: Domain manager (Prism Central) of size starter.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    prism.v4.0.config.DomainManagerResourceConfig:
+      type: object
+      properties:
+        numVcpus:
+          type: integer
+          description: This property is used for readOnly purposes to display Prism Central number of VCPUs allocation.
+          format: int32
+          readOnly: true
+        memorySizeBytes:
+          type: integer
+          description: This property is used for readOnly purposes to display Prism Central RAM allocation at the cluster
+            level.
+          format: int64
+          readOnly: true
+        dataDiskSizeBytes:
+          type: integer
+          description: This property is used for readOnly purposes to display Prism Central data disk size allocation at a
+            cluster level.
+          format: int64
+          readOnly: true
+        containerExtIds:
+          maxItems: 3
           minItems: 1
           uniqueItems: true
           type: array
-          description: Range of IPs used for Prism Central network setup.
+          description: The external identifier of the container that will be used to create the domain manager (Prism Central)
+            cluster.
           items:
-            $ref: '#/components/schemas/common.v1.0.config.IpRange'
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
       additionalProperties: false
-      description: This model would abstract away the common attributes as part of internal and external networks.
+      description: This configuration is used to provide the resource-related details like container external identifiers,
+        number of VCPUs, memory size, data disk size of the domain manager (Prism Central). In the case of a multi-node setup,
+        the sum of resources like number of VCPUs, memory size and data disk size are provided.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.0.config.FQDN'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+
+        '
+    prism.v4.0.config.DomainManager:
+      description: Domain manager (Prism Central) details.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - config
+        - network
+        type: object
+        properties:
+          config:
+            $ref: '#/components/schemas/prism.v4.0.config.DomainManagerClusterConfig'
+          isRegisteredWithHostingCluster:
+            type: boolean
+            description: Boolean value indicating if the domain manager (Prism Central) is registered with the hosting cluster,
+              that is, Prism Element.
+            readOnly: true
+          network:
+            $ref: '#/components/schemas/prism.v4.0.config.DomainManagerNetwork'
+          hostingClusterExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of the cluster hosting the domain manager (Prism Central) instance.
+            readOnly: true
+          shouldEnableHighAvailability:
+            type: boolean
+            description: This configuration enables Prism Central to be deployed in scale-out mode.
+          nodeExtIds:
+            maxItems: 3
+            minItems: 1
+            uniqueItems: true
+            type: array
+            description: Domain manager (Prism Central) nodes external identifier.
+            readOnly: true
+            items:
+              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+              type: string
+        additionalProperties: false
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.BasicAuth:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          maxLength: 256
+          minLength: 3
+          type: string
+          description: 'Username required for the basic auth scheme. As per [RFC 2617](https://datatracker.ietf.org/doc/html/rfc2617)
+            usernames might be case sensitive.
+
+            '
+        password:
+          maxLength: 256
+          minLength: 3
+          type: string
+          description: 'Password required for the basic auth scheme.
+
+            '
+          format: password
+      additionalProperties: false
+      description: 'An authentication scheme that requires the client to present a username and password. The server will
+        service the request only if it can validate the user-ID and password for the protection space of the Request-URI.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    clustermgmt.v4.0.config.ClusterConfig:
+      type: object
+      properties:
+        shouldEnableLockdownMode:
+          type: boolean
+          description: A boolean value indicating whether to enable lockdown mode for a cluster.
+        buildInfo:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.BuildInfo'
+      additionalProperties: false
+      description: Cluster Configuration required for a cluster to function properly.
+    vmm.v4.0.ahv.config.CustomKeyValues:
+      type: object
+      properties:
+        keyValuePairs:
+          maxItems: 32
+          minItems: 0
+          type: array
+          description: The list of the individual KeyValuePair elements.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: A collection of key/value pairs.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    clustermgmt.v4.0.config.ClusterNetwork:
+      type: object
+      properties:
+        externalAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        nameServers:
+          maxItems: 1024
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: List of name servers on a cluster. This is part of payload for both cluster create & update operations.
+            For create operation, only ipv4 address / fqdn values are supported currently.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        ntpServers:
+          maxItems: 1024
+          minItems: 0
+          uniqueItems: true
+          type: array
+          description: List of NTP servers on a cluster. This is part of payload for both cluster create & update operations.
+            For create operation, only ipv4 address / fqdn values are supported currently.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddressOrFQDN'
+        fqdn:
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
+          type: string
+          description: Cluster fully qualified domain name. This is part of payload for cluster update operation only.
+          readOnly: true
+      additionalProperties: false
+      description: Network details of a cluster.
+    prism.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    vmm.v4.0.ahv.config.CloudInit:
+      type: object
+      properties:
+        datasourceType:
+          $ref: '#/components/schemas/vmm.v4.0.ahv.config.CloudInitDataSourceType'
+        metadata:
+          maxLength: 32000
+          type: string
+          description: The contents of the meta_data configuration for cloud-init. This can be formatted as YAML or JSON.
+            The value must be base64 encoded.
+        cloudInitScript:
+          required: []
+          properties: {}
+          description: The script to use for cloud-init.
+          oneOf:
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.Userdata'
+          - $ref: '#/components/schemas/vmm.v4.0.ahv.config.CustomKeyValues'
+      additionalProperties: false
+      description: If this field is set, the guest will be customized using cloud-init. Either user_data or custom_key_values
+        should be provided. If custom_key_ves are provided then the user data will be generated using these key-value pairs.
+    prism.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
     prism.v4.0.error.AppMessage:
       type: object
       properties:
@@ -1140,7 +1280,6 @@ components:
         locale:
           type: string
           description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
         errorGroup:
           type: string
           description: The error group associated with this message of severity ERROR.
@@ -1152,72 +1291,79 @@ components:
       additionalProperties: false
       description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
-    prism.v4.0.config.DomainManagerResourceConfig:
-      type: object
-      properties:
-        numVcpus:
-          type: integer
-          description: This property is used for readOnly purposes to display Prism Central number of VCPUs allocation.
-          format: int32
-          readOnly: true
-          example: 3
-        memorySizeBytes:
-          type: integer
-          description: This property is used for readOnly purposes to display Prism Central RAM allocation at the cluster
-            level.
-          format: int64
-          readOnly: true
-          example: 45
-        dataDiskSizeBytes:
-          type: integer
-          description: This property is used for readOnly purposes to display Prism Central data disk size allocation at a
-            cluster level.
-          format: int64
-          readOnly: true
-          example: 23
-        containerExtIds:
-          maxItems: 3
-          minItems: 1
-          uniqueItems: true
-          type: array
-          description: The external identifier of the container that will be used to create the domain manager (Prism Central)
-            cluster.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: dfac66e7-050f-4d87-acbc-7a0e96c0f904
-      additionalProperties: false
-      description: This configuration is used to provide the resource-related details like container external identifiers,
-        number of VCPUs, memory size, data disk size of the domain manager (Prism Central). In the case of a multi-node setup,
-        the sum of resources like number of VCPUs, memory size and data disk size are provided.
-    prism.v4.0.config.DomainManagerNetwork:
-      required:
-      - externalNetworks
-      - nameServers
-      - ntpServers
-      description: Domain manager (Prism Central) network configuration details.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
       allOf:
-      - $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterNetwork'
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
       - type: object
         properties:
-          internalNetworks:
-            maxItems: 1
-            minItems: 1
-            uniqueItems: true
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
             type: array
-            description: This configuration is used to internally manage Prism Central network.
-            writeOnly: true
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
             items:
-              $ref: '#/components/schemas/prism.v4.0.config.BaseNetwork'
-          externalNetworks:
-            maxItems: 1
-            minItems: 1
-            uniqueItems: true
-            type: array
-            description: This configuration is used to manage Prism Central.
-            items:
-              $ref: '#/components/schemas/prism.v4.0.config.ExternalNetwork'
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    prism.v4.0.config.ProvisioningType:
+      type: string
+      description: 'Enums denoting the instance type of the cloud PC. It indicates whether the PC is created on bare-metal
+
+        or on a cloud-provisioned VM. Hence, it supports two possible values:
+
+        - NTNX
+
+        - NATIVE
+
+        '
+      enum:
+      - NTNX
+      - NATIVE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NATIVE: Native instance.
+        NTNX: Nutanix instance.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1239,12 +1385,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 3
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1275,128 +1419,8 @@ components:
               '
             items:
               type: integer
-              example: 3
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
-
-        '
-    prism.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.config.IPv6Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: 839c:6c4e:ae35:c0ba:4eae:b6ec:9eaa:f162
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
-          format: int32
-          default: 128
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 41
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    clustermgmt.v4.0.config.ClusterConfig:
-      type: object
-      properties:
-        shouldEnableLockdownMode:
-          type: boolean
-          description: A boolean value indicating whether to enable lockdown mode for a cluster.
-          example: false
-        buildInfo:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.BuildInfo'
-      additionalProperties: false
-      description: Cluster Configuration required for a cluster to function properly.
-    common.v1.0.config.IPAddressOrFQDN:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-        fqdn:
-          $ref: '#/components/schemas/common.v1.0.config.FQDN'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
-        Fully Qualified Domain Name.
 
         '
     vmm.v4.0.ahv.config.CloudInitDataSourceType:
@@ -1414,94 +1438,33 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.config.IpRange:
-      type: object
-      properties:
-        begin:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        end:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-      additionalProperties: false
-      description: 'Range of consecutive IP addresses that can be assigned to a specific Subnet.The size of the IP range is
-        determined by the subnet mask.
-
-        '
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:09d280be-8aed-4ed0-b8a9-99d064663278
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    common.v1.0.config.IPv4Address:
+    prism.v4.0.config.DomainManagerNetwork:
       required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 167.125.234.35
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    prism.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 36
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    prism.v4.0.config.ExternalNetwork:
-      description: This configuration is used to manage Prism Central.
+      - externalNetworks
+      - nameServers
+      - ntpServers
+      description: Domain manager (Prism Central) network configuration details.
       allOf:
-      - $ref: '#/components/schemas/prism.v4.0.config.BaseNetwork'
-      - required:
-        - networkExtId
-        type: object
+      - $ref: '#/components/schemas/clustermgmt.v4.0.config.ClusterNetwork'
+      - type: object
         properties:
-          networkExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The network external identifier to which Domain Manager (Prism Central) is to be deployed or is already
-              configured.
-            example: bb63edde-0ea7-4bde-8924-daf7a3ec7717
+          internalNetworks:
+            maxItems: 1
+            minItems: 1
+            uniqueItems: true
+            type: array
+            description: This configuration is used to internally manage Prism Central network.
+            writeOnly: true
+            items:
+              $ref: '#/components/schemas/prism.v4.0.config.BaseNetwork'
+          externalNetworks:
+            maxItems: 1
+            minItems: 1
+            uniqueItems: true
+            type: array
+            description: This configuration is used to manage Prism Central.
+            items:
+              $ref: '#/components/schemas/prism.v4.0.config.ExternalNetwork'
         additionalProperties: false
   securitySchemes:
     basicAuthScheme:

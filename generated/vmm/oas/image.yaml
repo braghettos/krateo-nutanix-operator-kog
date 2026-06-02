@@ -45,7 +45,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -66,7 +65,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -306,7 +304,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: bde07838-c6f9-43cf-92dc-563215f5fd14
       requestBody:
         description: Request to create an image.
         content:
@@ -490,7 +487,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 4c9b519e-423d-4856-b257-fdf10a14b78b
       responses:
         '200':
           description: Returns the requested image.
@@ -634,7 +630,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 1a1e4e3e-2823-47fe-9599-a622491b7576
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -661,7 +656,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 94b7a2dd-59de-464e-be8b-5e32be4fcd47
       requestBody:
         description: Updated image request.
         content:
@@ -858,7 +852,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: e8b031e4-7112-4754-ade0-c0f33017b178
       responses:
         '202':
           description: The request to delete an image is accepted.
@@ -990,171 +983,6 @@ paths:
           \n"
 components:
   schemas:
-    vmm.v4.0.content.ImagePlacementStatus:
-      required:
-      - complianceStatus
-      - enforcementMode
-      - placementPolicyExtId
-      type: object
-      properties:
-        placementPolicyExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external identifier of image placement policy.
-          example: ca4c58ba-28ab-485a-9d9f-1623c425fa2e
-        complianceStatus:
-          $ref: '#/components/schemas/vmm.v4.0.content.ComplianceStatus'
-        enforcementMode:
-          $ref: '#/components/schemas/vmm.v4.0.content.EnforcementMode'
-        policyClusterExtIds:
-          maxItems: 200
-          minItems: 0
-          type: array
-          description: List of cluster external identifiers of the image location for the enforced placement policy.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 64317e41-253d-4c3a-9c70-ef4956072107
-        enforcedClusterExtIds:
-          maxItems: 200
-          minItems: 0
-          type: array
-          description: List of cluster external identifiers for the enforced placement policy.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 8d124f05-21ce-4d52-bbc5-8f2c7ec0d495
-        conflictingPolicyExtIds:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: List of image placement policy external identifiers that conflict with the current one.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: e91e00bb-0b5c-47bf-9d13-2c7c437d3ac7
-      additionalProperties: false
-      description: Status of an image placement policy.
-    vmm.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    vmm.v4.0.content.ImageSha256Checksum:
-      required:
-      - hexDigest
-      type: object
-      properties:
-        hexDigest:
-          pattern: ^([a-fA-F0-9]{64})$
-          type: string
-          description: The SHA256 digest of an image file in hexadecimal format.
-          example: 241eCE73aDcbbAf565f54AeAAaf6fdbb5EccCCc63bcBC90DedceE06Cdd5e0d70
-      additionalProperties: false
-      description: The SHA256 checksum of an image.
-    vmm.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 24
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    vmm.v4.0.content.ImageSha1Checksum:
-      required:
-      - hexDigest
-      type: object
-      properties:
-        hexDigest:
-          pattern: ^([a-fA-F0-9]{40})$
-          type: string
-          description: The SHA1 digest of an image file in hexadecimal format.
-          example: 0ca725DAbdec3Fa5eDEcCEa2aB98eC5DFD7e29fb
-      additionalProperties: false
-      description: The SHA1 checksum of an image.
-    vmm.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 58c42276-2fd7-49bc-9bf7-67d18ba54f14
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1182,23 +1010,171 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    vmm.v4.0.content.ComplianceStatus:
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    vmm.v4.0.content.EnforcementMode:
       type: string
-      description: Compliance status for a placement policy.
+      description: Indicates whether the placement policy enforcement is ongoing or has failed.
       enum:
-      - COMPLIANT
-      - NON_COMPLIANT
+      - ENFORCING
+      - ENFORCEMENT_FAILED
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        COMPLIANT: The image placement policy is compliant, and there are no conflicting policies.
-        NON_COMPLIANT: The image placement policy is not compliant, and there might be some conflicting policies.
+        ENFORCEMENT_FAILED: The image placement policy enforcement by the backend service has failed.
+        ENFORCING: The image placement policy is being enforced by the backend service.
         $UNKNOWN: 'Unknown value.
 
           '
         $REDACTED: 'Redacted value.
 
           '
+    vmm.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    vmm.v4.0.content.ImagePlacementStatus:
+      required:
+      - complianceStatus
+      - enforcementMode
+      - placementPolicyExtId
+      type: object
+      properties:
+        placementPolicyExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of image placement policy.
+        complianceStatus:
+          $ref: '#/components/schemas/vmm.v4.0.content.ComplianceStatus'
+        enforcementMode:
+          $ref: '#/components/schemas/vmm.v4.0.content.EnforcementMode'
+        policyClusterExtIds:
+          maxItems: 200
+          minItems: 0
+          type: array
+          description: List of cluster external identifiers of the image location for the enforced placement policy.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        enforcedClusterExtIds:
+          maxItems: 200
+          minItems: 0
+          type: array
+          description: List of cluster external identifiers for the enforced placement policy.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        conflictingPolicyExtIds:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: List of image placement policy external identifiers that conflict with the current one.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+      additionalProperties: false
+      description: Status of an image placement policy.
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -1218,20 +1194,94 @@ components:
         an address for retrieving the particular resource.
 
         '
-    common.v1.0.config.MapOfStringWrapper:
+    vmm.v4.0.content.ImageType:
+      type: string
+      description: The type of an image.
+      enum:
+      - DISK_IMAGE
+      - ISO_IMAGE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DISK_IMAGE: A flat disk image.
+        ISO_IMAGE: An image of type ISO that can only be attached as a CDROM.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.error.AppMessage:
       type: object
       properties:
-        map:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
           type: object
           additionalProperties:
             type: string
-          description: 'A map with string keys and values.
-
-            '
+          description: The map of argument name to value.
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    vmm.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    vmm.v4.0.content.VmDiskSource:
+      required:
+      - extId
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of a VM disk.
+      additionalProperties: false
+      description: VM disk to create an image. VM disk external identifier is available from the `disks` list in VMs APIs.
     vmm.v4.0.content.Image:
       allOf:
       - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
@@ -1246,21 +1296,15 @@ components:
             minLength: 1
             type: string
             description: The user-defined name of an image.
-            example: LinuxInstaller.iso
           description:
             maxLength: 1000
             type: string
             description: The user-defined description of an image.
-            example: Installer with updated kernel
           type:
             $ref: '#/components/schemas/vmm.v4.0.content.ImageType'
           checksum:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: vmm.v4.content.ImageSha1Checksum
+            required: []
+            properties: {}
             description: The checksum of an image.
             oneOf:
             - $ref: '#/components/schemas/vmm.v4.0.content.ImageSha1Checksum'
@@ -1270,14 +1314,9 @@ components:
             description: The size of an image in bytes.
             format: int64
             readOnly: true
-            example: 55
           source:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: vmm.v4.content.UrlSource
+            required: []
+            properties: {}
             description: The source of an image, which can be a VM disk, a URL, or an Objects Lite key.
             oneOf:
             - $ref: '#/components/schemas/vmm.v4.0.content.UrlSource'
@@ -1291,7 +1330,6 @@ components:
             items:
               pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
               type: string
-              example: cb777c15-0adc-4b3b-94e0-0e561469ba7b
           clusterLocationExtIds:
             maxItems: 200
             minItems: 0
@@ -1300,25 +1338,21 @@ components:
             items:
               pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
               type: string
-              example: 460270a4-e608-4016-ac85-0e520bce9712
           createTime:
             type: string
             description: Image creation time.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           lastUpdateTime:
             type: string
             description: Last updated time of an image.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           ownerExtId:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: External identifier of the owner of the image.
             readOnly: true
-            example: 97482c6e-281e-4c2b-9892-eeafb3d099de
           placementPolicyStatus:
             maxItems: 100
             minItems: 0
@@ -1332,6 +1366,65 @@ components:
       x-required-by-operation:
         create:
         - source
+    vmm.v4.0.content.UrlBasicAuth:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          maxLength: 1000
+          minLength: 1
+          type: string
+          description: Username for basic authentication.
+        password:
+          type: string
+          description: Password for basic authentication.
+      additionalProperties: false
+      description: Basic authentication credentials for image source HTTP/S URL.
+    vmm.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    vmm.v4.0.content.ObjectsLiteSource:
+      required:
+      - key
+      type: object
+      properties:
+        key:
+          maxLength: 1024
+          minLength: 1
+          type: string
+          description: Key that identifies the source object in the bucket. The resource implies the bucket, 'vmm-images'
+            for Image and 'vmm-ovas' for OVA.
+      additionalProperties: false
+      description: The object details for creating an image or OVA.
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -1350,7 +1443,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 6c335c2e-8b41-4973-b7d4-08fefbe88680
           links:
             maxItems: 20
             minItems: 0
@@ -1363,28 +1455,63 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    vmm.v4.0.content.ComplianceStatus:
+      type: string
+      description: Compliance status for a placement policy.
+      enum:
+      - COMPLIANT
+      - NON_COMPLIANT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        COMPLIANT: The image placement policy is compliant, and there are no conflicting policies.
+        NON_COMPLIANT: The image placement policy is not compliant, and there might be some conflicting policies.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    vmm.v4.0.content.ImageSha1Checksum:
+      required:
+      - hexDigest
+      type: object
+      properties:
+        hexDigest:
+          pattern: ^([a-fA-F0-9]{40})$
+          type: string
+          description: The SHA1 digest of an image file in hexadecimal format.
+      additionalProperties: false
+      description: The SHA1 checksum of an image.
+    vmm.v4.0.content.ImageSha256Checksum:
+      required:
+      - hexDigest
+      type: object
+      properties:
+        hexDigest:
+          pattern: ^([a-fA-F0-9]{64})$
+          type: string
+          description: The SHA256 digest of an image file in hexadecimal format.
+      additionalProperties: false
+      description: The SHA256 checksum of an image.
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1406,12 +1533,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 31
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -1442,132 +1567,10 @@ components:
               '
             items:
               type: integer
-              example: 99
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    vmm.v4.0.content.VmDiskSource:
-      required:
-      - extId
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external identifier of a VM disk.
-          example: dce014cb-1130-412e-a862-947012858240
-      additionalProperties: false
-      description: VM disk to create an image. VM disk external identifier is available from the `disks` list in VMs APIs.
-    vmm.v4.0.content.UrlBasicAuth:
-      required:
-      - password
-      - username
-      type: object
-      properties:
-        username:
-          maxLength: 1000
-          minLength: 1
-          type: string
-          description: Username for basic authentication.
-          example: test_user
-        password:
-          type: string
-          description: Password for basic authentication.
-          example: test_password
-      additionalProperties: false
-      description: Basic authentication credentials for image source HTTP/S URL.
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 25
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:37269b59-c649-45fd-956e-19134b3208a3
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    vmm.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
     vmm.v4.0.content.UrlSource:
       required:
       - url
@@ -1577,64 +1580,14 @@ components:
           pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
           type: string
           description: The URL for creating an image.
-          example: https://example.com/images/linux_installer.iso
         shouldAllowInsecureUrl:
           type: boolean
           description: Ignore the certificate errors if the value is true. Default is false.
           writeOnly: true
-          default: false
         basicAuth:
           $ref: '#/components/schemas/vmm.v4.0.content.UrlBasicAuth'
       additionalProperties: false
       description: The source URL details for creating an image.
-    vmm.v4.0.content.ObjectsLiteSource:
-      required:
-      - key
-      type: object
-      properties:
-        key:
-          maxLength: 1024
-          minLength: 1
-          type: string
-          description: Key that identifies the source object in the bucket. The resource implies the bucket, 'vmm-images'
-            for Image and 'vmm-ovas' for OVA.
-          example: object_key
-      additionalProperties: false
-      description: The object details for creating an image or OVA.
-    vmm.v4.0.content.ImageType:
-      type: string
-      description: The type of an image.
-      enum:
-      - DISK_IMAGE
-      - ISO_IMAGE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        DISK_IMAGE: A flat disk image.
-        ISO_IMAGE: An image of type ISO that can only be attached as a CDROM.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.content.EnforcementMode:
-      type: string
-      description: Indicates whether the placement policy enforcement is ongoing or has failed.
-      enum:
-      - ENFORCING
-      - ENFORCEMENT_FAILED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ENFORCEMENT_FAILED: The image placement policy enforcement by the backend service has failed.
-        ENFORCING: The image placement policy is being enforced by the backend service.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
   securitySchemes:
     basicAuthScheme:
       type: http

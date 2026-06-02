@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       responses:
         '200':
           description: Paginated list of network controllers
@@ -214,7 +212,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 02f20989-4df8-47ae-aa27-d0e1f2d49d0d
       requestBody:
         description: Network controller to create
         content:
@@ -389,7 +386,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 4982deaa-e0f7-4e20-93fc-c6a4c12c7d26
       responses:
         '200':
           description: Network controller object
@@ -532,7 +528,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 9e36755c-572f-4d78-801f-759037d17869
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -559,7 +554,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: a356fe87-8d9e-49a8-abf0-ab2febd5b700
       requestBody:
         description: Network controller to update
         content:
@@ -751,7 +745,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 9f028a7e-a261-4dd9-9daf-cb2cabfba69f
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -766,7 +759,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 0283f3fb-861f-4c41-8af5-7fdf07a72c16
       responses:
         '202':
           description: Task ID corresponding to the delete operation
@@ -903,143 +895,6 @@ paths:
           \n- \"https://{pc-ip}:9440/api/networking/v4.0/config/controllers/a28cEDf3-d12D-254F-0ba5-afF5D7fAdFAB\"\n"
 components:
   schemas:
-    networking.v4.0.config.NetworkingBaseModel:
-      description: Networking common base object
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          metadata:
-            $ref: '#/components/schemas/common.v1.0.config.Metadata'
-        additionalProperties: false
-    networking.v4.0.config.NetworkController:
-      allOf:
-      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
-      - title: Network controller
-        type: object
-        properties:
-          controllerStatus:
-            $ref: '#/components/schemas/networking.v4.0.config.ControllerStatus'
-          controllerVersion:
-            type: string
-            description: Network controller software version.
-            readOnly: true
-            example: 5.0.0
-          minimumAHVVersion:
-            type: string
-            description: Minimum AHV version that this network controller supports.
-            readOnly: true
-            example: '10.0'
-          minimumNOSVersion:
-            type: string
-            description: Minimum NOS version that this network controller supports.
-            readOnly: true
-            example: '7.0'
-          cloudSubstrate:
-            $ref: '#/components/schemas/networking.v4.0.config.CloudSubstrate'
-          defaultVlanStack:
-            $ref: '#/components/schemas/networking.v4.0.config.DefaultVlanStack'
-        additionalProperties: false
-        description: Network controller that provides advanced networking capabilities.
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    networking.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    networking.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    networking.v4.0.config.DefaultVlanStack:
-      title: Default VLAN Stack
-      type: string
-      description: Default VLAN stack(Legacy or Advanced) to instatiate VLAN-backed subnets on if advanced networking is enabled
-      enum:
-      - ADVANCED
-      - LEGACY
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        LEGACY: Legacy networking stack.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-        ADVANCED: Advanced networking stack.
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 250be642-1b1b-4687-bf88-af93fc7abf59
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1067,6 +922,201 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    networking.v4.0.config.NetworkController:
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
+      - title: Network controller
+        type: object
+        properties:
+          controllerStatus:
+            $ref: '#/components/schemas/networking.v4.0.config.ControllerStatus'
+          controllerVersion:
+            type: string
+            description: Network controller software version.
+            readOnly: true
+          minimumAHVVersion:
+            type: string
+            description: Minimum AHV version that this network controller supports.
+            readOnly: true
+          minimumNOSVersion:
+            type: string
+            description: Minimum NOS version that this network controller supports.
+            readOnly: true
+          cloudSubstrate:
+            $ref: '#/components/schemas/networking.v4.0.config.CloudSubstrate'
+          defaultVlanStack:
+            $ref: '#/components/schemas/networking.v4.0.config.DefaultVlanStack'
+        additionalProperties: false
+        description: Network controller that provides advanced networking capabilities.
+    networking.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    networking.v4.0.config.ControllerStatus:
+      title: Network controller status
+      type: string
+      description: Current status of the network controller.
+      enum:
+      - UP
+      - DEGRADED
+      - DOWN
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DOWN: Network controller is down.
+        DEGRADED: Network controller is unhealthy and operating in degraded state.
+        UP: Network controller healthy and status is up.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    networking.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -1086,24 +1136,67 @@ components:
         an address for retrieving the particular resource.
 
         '
-    networking.v4.0.config.CloudSubstrate:
-      title: Network controller cloud substrate
+    networking.v4.0.config.NetworkingBaseModel:
+      description: Networking common base object
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          metadata:
+            $ref: '#/components/schemas/common.v1.0.config.Metadata'
+        additionalProperties: false
+    networking.v4.0.config.DefaultVlanStack:
+      title: Default VLAN Stack
       type: string
-      description: Cloud substrate of the network controller, for e.g. Azure.
+      description: Default VLAN stack(Legacy or Advanced) to instatiate VLAN-backed subnets on if advanced networking is enabled
       enum:
-      - AZURE
-      - AWS
+      - ADVANCED
+      - LEGACY
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        AZURE: Network controller substrate is Azure.
+        LEGACY: Legacy networking stack.
         $UNKNOWN: 'Unknown value.
 
           '
-        AWS: Network controller substrate is AWS.
         $REDACTED: 'Redacted value.
 
           '
+        ADVANCED: Advanced networking stack.
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    networking.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
     common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
@@ -1136,7 +1229,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 870ef0a7-1d70-4ba5-839b-436e2c69e445
           links:
             maxItems: 20
             minItems: 0
@@ -1149,28 +1241,66 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.Metadata:
+      type: object
+      properties:
+        ownerReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the owner of this resource.
+
+            '
+        ownerUserName:
+          maxLength: 128
+          type: string
+          description: 'The userName of the owner of this resource.
+
+            '
+        projectReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the project this resource belongs to.
+
+            '
+        projectName:
+          maxLength: 128
+          type: string
+          description: 'The name of the project this resource belongs to.
+
+            '
+        categoryIds:
+          maxItems: 256
+          minItems: 1
+          type: array
+          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
+            with.
+
+            '
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+      additionalProperties: false
+      description: 'Metadata associated with this resource.
+
+        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1192,12 +1322,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 52
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1228,182 +1356,28 @@ components:
               '
             items:
               type: integer
-              example: 28
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 92
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    networking.v4.0.config.ControllerStatus:
-      title: Network controller status
+    networking.v4.0.config.CloudSubstrate:
+      title: Network controller cloud substrate
       type: string
-      description: Current status of the network controller.
+      description: Cloud substrate of the network controller, for e.g. Azure.
       enum:
-      - UP
-      - DEGRADED
-      - DOWN
+      - AZURE
+      - AWS
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        DOWN: Network controller is down.
-        DEGRADED: Network controller is unhealthy and operating in degraded state.
-        UP: Network controller healthy and status is up.
+        AZURE: Network controller substrate is Azure.
         $UNKNOWN: 'Unknown value.
 
           '
+        AWS: Network controller substrate is AWS.
         $REDACTED: 'Redacted value.
 
           '
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:9bf9c2d8-1857-4824-8f55-cbb6ab4eb85e
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    networking.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 17
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.Metadata:
-      type: object
-      properties:
-        ownerReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the owner of this resource.
-
-            '
-          example: 88c007ec-0157-4901-a28a-c93e6cd73adc
-        ownerUserName:
-          maxLength: 128
-          type: string
-          description: 'The userName of the owner of this resource.
-
-            '
-        projectReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the project this resource belongs to.
-
-            '
-          example: 3e2a7199-b4d8-481c-a4d1-446470c8d864
-        projectName:
-          maxLength: 128
-          type: string
-          description: 'The name of the project this resource belongs to.
-
-            '
-        categoryIds:
-          maxItems: 256
-          minItems: 1
-          type: array
-          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
-            with.
-
-            '
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 61bf1201-334e-4002-a9da-0ad47bd7fa2e
-      additionalProperties: false
-      description: 'Metadata associated with this resource.
-
-        '
-    networking.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
   securitySchemes:
     basicAuthScheme:
       type: http

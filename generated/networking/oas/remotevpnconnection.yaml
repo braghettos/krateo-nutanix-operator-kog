@@ -30,7 +30,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: cd86db9e-5a89-4f7c-a8d5-d5dff8372107
       - name: $page
         in: query
         description: 'A URL query parameter that specifies the page number of the result set. It must be a positive integer
@@ -50,7 +49,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -71,7 +69,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -264,7 +261,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 130d4302-cd4f-4293-a7e2-58ffaf657442
       - name: extId
         in: path
         description: The specified remote VPN connection external identifier.
@@ -274,7 +270,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: f85f5c98-c2df-49cb-9469-e04409d54cae
       responses:
         '200':
           description: Returns the requested remote VPN connection.
@@ -412,150 +407,6 @@ paths:
           \n"
 components:
   schemas:
-    networking.v4.0.config.NetworkingBaseModel:
-      description: Networking common base object
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          metadata:
-            $ref: '#/components/schemas/common.v1.0.config.Metadata'
-        additionalProperties: false
-    networking.v4.0.config.QosConfig:
-      title: Quality of Service configuration for the site-to-site VPN tunnel
-      type: object
-      properties:
-        ingressLimitMbps:
-          type: integer
-          description: Ingress traffic limit (Mbps)
-          format: int64
-          example: 64
-        egressLimitMbps:
-          type: integer
-          description: Egress traffic limit (Mbps)
-          format: int64
-          example: 12
-      additionalProperties: false
-      description: Quality of Service configuration for the VPN IPSec tunnel
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.IPAddress:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
-
-        '
-    networking.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    networking.v4.0.config.IPSubnet:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/networking.v4.0.config.IPv4Subnet'
-        ipv6:
-          $ref: '#/components/schemas/networking.v4.0.config.IPv6Subnet'
-      additionalProperties: false
-      description: IP subnet.
-    networking.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    networking.v4.0.config.GatewayRole:
-      title: Local gateway role
-      type: string
-      description: Local gateway role (acceptor or initiator) in the connection
-      enum:
-      - INITIATOR
-      - ACCEPTOR
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-        INITIATOR: Gateway role to initiate connection.
-        ACCEPTOR: Gateway role to accept connection.
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 250be642-1b1b-4687-bf88-af93fc7abf59
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -583,72 +434,17 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    networking.v4.0.config.Status:
+    common.v1.0.config.IPAddress:
       type: object
       properties:
-        message:
-          type: string
-          description: Detailed message of component status.
-          example: Entity is healthy
-        state:
-          $ref: '#/components/schemas/networking.v4.0.config.State'
-      additionalProperties: false
-      description: Up/Down status of component and message.
-    networking.v4.0.config.IPv4Subnet:
-      required:
-      - ip
-      - prefixLength
-      type: object
-      properties:
-        ip:
+        ipv4:
           $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: Prefix length of the IPv4 subnet.
-          format: int32
-          example: 24
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
       additionalProperties: false
-      description: IPv4 subnet.
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
 
         '
-    networking.v4.0.config.DpdOperation:
-      type: string
-      description: Operation to be performed on detecting a dead peer. The default is HOLD.
-      enum:
-      - RESTART
-      - CLEAR
-      - HOLD
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        RESTART: Attempt to re-negotiate the connection.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        CLEAR: Close the connection.
-        HOLD: Queue traffic while waiting for the connection to be re-established.
-        $REDACTED: 'Redacted value.
-
-          '
     networking.v4.0.config.AuthenticationAlgorithm:
       type: string
       description: Authentication algorithm.
@@ -672,28 +468,443 @@ components:
 
           '
         MD5: Authentication algorithm is md5.
-    networking.v4.0.config.DpdConfig:
-      title: DPD configuration
+    networking.v4.0.error.AppMessage:
       type: object
       properties:
-        operation:
-          $ref: '#/components/schemas/networking.v4.0.config.DpdOperation'
-        intervalSecs:
-          type: integer
-          description: 'The amount of time the peer waits for traffic before sending a DPD request
-
-            '
-          format: int64
-          example: 15
-        timeoutSecs:
-          type: integer
-          description: 'The maximum amount of time to wait for a DPD response before marking the peer as dead
-
-            '
-          format: int64
-          example: 60
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
       additionalProperties: false
-      description: Dead peer detection configuration for the VPN connection
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    networking.v4.0.config.RemoteVpnConnection:
+      title: Remote VPN connection information.
+      description: Information about a VPN connection from the specified Prism Central cluster.
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.VpnConnection'
+      - type: object
+        properties:
+          clusterReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Reference to the remote Prism Element cluster where the VPN connection's gateway is located.
+          clusterName:
+            maxLength: 128
+            type: string
+            description: Name of the remote Prism Element cluster where the VPN connection's gateway is located.
+          vpcReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Reference to the VPC associated with the VPN connection.
+          vpcName:
+            maxLength: 128
+            type: string
+            description: Name of the VPC associated with the VPN connection.
+        additionalProperties: false
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    networking.v4.0.config.IpsecConfig:
+      title: IPSec Configuration
+      required:
+      - preSharedKey
+      type: object
+      properties:
+        preSharedKey:
+          type: string
+          description: Shared secret for authentication between gateway peers
+        localVtiIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        remoteVtiIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        localAuthenticationId:
+          type: string
+          description: Local IKE authentication Id used for this connection
+        remoteAuthenticationId:
+          type: string
+          description: IKE authentication Id of the remote peer
+        ikeLifetimeSecs:
+          type: integer
+          description: IKE lifetime (seconds)
+          format: int64
+        ipsecLifetimeSecs:
+          type: integer
+          description: IPSec lifetime (seconds)
+          format: int64
+        espPfsDhGroupNumber:
+          type: integer
+          description: 'Diffie-Hellman group value of 14, 19 or 20 to be used for Perfect Forward Secrecy (PFS)
+
+            '
+          format: int16
+        ikeEncryptionAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.EncryptionAlgorithm'
+        ikeAuthenticationAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationAlgorithm'
+        ipsecEncryptionAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.EncryptionAlgorithm'
+        ipsecAuthenticationAlgorithm:
+          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationAlgorithm'
+      additionalProperties: false
+      description: IPSec configuration
+    networking.v4.0.config.IPSubnet:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv4Subnet'
+        ipv6:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv6Subnet'
+      additionalProperties: false
+      description: IP subnet.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    networking.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    networking.v4.0.config.DpdOperation:
+      type: string
+      description: Operation to be performed on detecting a dead peer. The default is HOLD.
+      enum:
+      - RESTART
+      - CLEAR
+      - HOLD
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        RESTART: Attempt to re-negotiate the connection.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        CLEAR: Close the connection.
+        HOLD: Queue traffic while waiting for the connection to be re-established.
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    networking.v4.0.config.NetworkingBaseModel:
+      description: Networking common base object
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          metadata:
+            $ref: '#/components/schemas/common.v1.0.config.Metadata'
+        additionalProperties: false
+    networking.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    networking.v4.0.config.State:
+      type: string
+      description: Up/Down status of component.
+      enum:
+      - UP
+      - DOWN
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DOWN: Component is not functional and down.
+        UP: Component is up and running.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.config.IPv4Subnet:
+      required:
+      - ip
+      - prefixLength
+      type: object
+      properties:
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: Prefix length of the IPv4 subnet.
+          format: int32
+      additionalProperties: false
+      description: IPv4 subnet.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    networking.v4.0.config.GatewayRole:
+      title: Local gateway role
+      type: string
+      description: Local gateway role (acceptor or initiator) in the connection
+      enum:
+      - INITIATOR
+      - ACCEPTOR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+        INITIATOR: Gateway role to initiate connection.
+        ACCEPTOR: Gateway role to accept connection.
     networking.v4.0.config.EncryptionAlgorithm:
       type: string
       description: Encryption algorithm.
@@ -715,135 +926,96 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    networking.v4.0.config.RemoteVpnConnection:
-      title: Remote VPN connection information.
-      description: Information about a VPN connection from the specified Prism Central cluster.
-      allOf:
-      - $ref: '#/components/schemas/networking.v4.0.config.VpnConnection'
-      - type: object
-        properties:
-          clusterReference:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Reference to the remote Prism Element cluster where the VPN connection's gateway is located.
-            example: 2e02704c-8745-46c5-b43b-8623368f8c15
-          clusterName:
-            maxLength: 128
-            type: string
-            description: Name of the remote Prism Element cluster where the VPN connection's gateway is located.
-            example: vargas
-          vpcReference:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Reference to the VPC associated with the VPN connection.
-            example: f08e7156-019d-445c-9d36-266e67d461b3
-          vpcName:
-            maxLength: 128
-            type: string
-            description: Name of the VPC associated with the VPN connection.
-            example: vpc-a
-        additionalProperties: false
-    common.v1.0.config.MapOfStringWrapper:
+    common.v1.0.config.Metadata:
       type: object
       properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    networking.v4.0.config.State:
-      type: string
-      description: Up/Down status of component.
-      enum:
-      - UP
-      - DOWN
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        DOWN: Component is not functional and down.
-        UP: Component is up and running.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 870ef0a7-1d70-4ba5-839b-436e2c69e445
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
+        ownerReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the owner of this resource.
 
             '
+        ownerUserName:
+          maxLength: 128
+          type: string
+          description: 'The userName of the owner of this resource.
+
+            '
+        projectReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the project this resource belongs to.
+
+            '
+        projectName:
+          maxLength: 128
+          type: string
+          description: 'The name of the project this resource belongs to.
+
+            '
+        categoryIds:
+          maxItems: 256
+          minItems: 1
+          type: array
+          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
+            with.
+
+            '
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+      additionalProperties: false
+      description: 'Metadata associated with this resource.
+
+        '
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    networking.v4.0.config.Status:
+      type: object
+      properties:
         message:
           type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          description: Detailed message of component status.
+        state:
+          $ref: '#/components/schemas/networking.v4.0.config.State'
       additionalProperties: false
-    networking.v4.0.config.IPv6Subnet:
-      required:
-      - ip
-      - prefixLength
+      description: Up/Down status of component and message.
+    networking.v4.0.config.DpdConfig:
+      title: DPD configuration
       type: object
       properties:
-        ip:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-        prefixLength:
-          maximum: 128
-          minimum: 0
+        operation:
+          $ref: '#/components/schemas/networking.v4.0.config.DpdOperation'
+        intervalSecs:
           type: integer
-          description: Prefix length of the IPv6 subnet.
-          format: int32
-          example: 64
+          description: 'The amount of time the peer waits for traffic before sending a DPD request
+
+            '
+          format: int64
+        timeoutSecs:
+          type: integer
+          description: 'The maximum amount of time to wait for a DPD response before marking the peer as dead
+
+            '
+          format: int64
       additionalProperties: false
-      description: IPv6 subnet.
+      description: Dead peer detection configuration for the VPN connection
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -865,12 +1037,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 52
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -901,36 +1071,26 @@ components:
               '
             items:
               type: integer
-              example: 28
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    common.v1.0.config.IPv6Address:
+    networking.v4.0.config.IPv6Subnet:
       required:
-      - value
+      - ip
+      - prefixLength
       type: object
       properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: eff4:180b:7f8b:7a40:8c4e:ea2c:d804:15e9
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
         prefixLength:
           maximum: 128
           minimum: 0
           type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
+          description: Prefix length of the IPv6 subnet.
           format: int32
-          default: 128
       additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
+      description: IPv6 subnet.
     networking.v4.0.config.VpnConnection:
       title: VPN connection
       description: VPN connection
@@ -948,22 +1108,18 @@ components:
             maxLength: 128
             type: string
             description: VPN connection name
-            example: vpn-connection-1
           description:
             maxLength: 1000
             type: string
             description: VPN connection description
-            example: Example connection description
           localGatewayReference:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: The local VPN gateway reference
-            example: 558755c6-0733-4d8e-9556-6afb33dc34be
           remoteGatewayReference:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: The remote VPN gateway reference
-            example: 887b7750-4783-49b6-9de2-f3ed2ecc373a
           ipsecConfig:
             $ref: '#/components/schemas/networking.v4.0.config.IpsecConfig'
           dpdConfig:
@@ -981,7 +1137,6 @@ components:
 
               '
             format: int16
-            example: 123
           advertisedPrefixes:
             maxItems: 250
             minItems: 0
@@ -1003,217 +1158,20 @@ components:
           ebgpStatus:
             $ref: '#/components/schemas/networking.v4.0.config.Status'
         additionalProperties: false
-    common.v1.0.response.ApiResponseMetadata:
+    networking.v4.0.config.QosConfig:
+      title: Quality of Service configuration for the site-to-site VPN tunnel
       type: object
       properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
+        ingressLimitMbps:
           type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 92
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    networking.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 17
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 59.225.95.31
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    networking.v4.0.config.IpsecConfig:
-      title: IPSec Configuration
-      required:
-      - preSharedKey
-      type: object
-      properties:
-        preSharedKey:
-          type: string
-          description: Shared secret for authentication between gateway peers
-        localVtiIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        remoteVtiIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        localAuthenticationId:
-          type: string
-          description: Local IKE authentication Id used for this connection
-        remoteAuthenticationId:
-          type: string
-          description: IKE authentication Id of the remote peer
-        ikeLifetimeSecs:
-          type: integer
-          description: IKE lifetime (seconds)
+          description: Ingress traffic limit (Mbps)
           format: int64
-          example: 30
-        ipsecLifetimeSecs:
+        egressLimitMbps:
           type: integer
-          description: IPSec lifetime (seconds)
+          description: Egress traffic limit (Mbps)
           format: int64
-          example: 30
-        espPfsDhGroupNumber:
-          type: integer
-          description: 'Diffie-Hellman group value of 14, 19 or 20 to be used for Perfect Forward Secrecy (PFS)
-
-            '
-          format: int16
-          example: 7
-        ikeEncryptionAlgorithm:
-          $ref: '#/components/schemas/networking.v4.0.config.EncryptionAlgorithm'
-        ikeAuthenticationAlgorithm:
-          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationAlgorithm'
-        ipsecEncryptionAlgorithm:
-          $ref: '#/components/schemas/networking.v4.0.config.EncryptionAlgorithm'
-        ipsecAuthenticationAlgorithm:
-          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationAlgorithm'
       additionalProperties: false
-      description: IPSec configuration
-    common.v1.0.config.Metadata:
-      type: object
-      properties:
-        ownerReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the owner of this resource.
-
-            '
-          example: 88c007ec-0157-4901-a28a-c93e6cd73adc
-        ownerUserName:
-          maxLength: 128
-          type: string
-          description: 'The userName of the owner of this resource.
-
-            '
-        projectReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the project this resource belongs to.
-
-            '
-          example: 3e2a7199-b4d8-481c-a4d1-446470c8d864
-        projectName:
-          maxLength: 128
-          type: string
-          description: 'The name of the project this resource belongs to.
-
-            '
-        categoryIds:
-          maxItems: 256
-          minItems: 1
-          type: array
-          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
-            with.
-
-            '
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 61bf1201-334e-4002-a9da-0ad47bd7fa2e
-      additionalProperties: false
-      description: 'Metadata associated with this resource.
-
-        '
-    networking.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
+      description: Quality of Service configuration for the VPN IPSec tunnel
   securitySchemes:
     basicAuthScheme:
       type: http

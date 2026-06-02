@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -283,7 +281,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: e1d6456d-f4e6-448e-ac61-b1cb95226fc7
       requestBody:
         description: A protection policy automates the process of creating and replicating recovery points. When a protection
           policy is configured to create local recovery points, the request includes:<br> - The recovery point objective<br>
@@ -483,7 +480,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: cd71d88e-29f1-4755-bb6c-d260a9420024
       responses:
         '200':
           description: Returns the requested protection policy.
@@ -631,7 +627,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 02da9cec-b6ec-4f2a-9323-e3c4ed63921d
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -658,7 +653,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: dcbbdbe7-268b-4591-821e-9c9d114e9275
       requestBody:
         description: Updated protection policy identified by an external identifier.
         content:
@@ -871,7 +865,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 8e620006-a551-4c25-ac24-72abb7ff82c8
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -886,7 +879,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 1d65a224-36f2-41ae-b343-ccc6507c45de
       responses:
         '202':
           description: Returns task ID corresponding to the protection policy delete request.
@@ -1030,236 +1022,6 @@ paths:
           \n"
 components:
   schemas:
-    datapolicies.v4.0.config.ReplicationConfiguration:
-      title: Replication configuration.
-      required:
-      - schedule
-      - sourceLocationLabel
-      type: object
-      properties:
-        sourceLocationLabel:
-          maxLength: 1000
-          type: string
-          description: Label of the source location from the replication locations list, where the entity is running. The
-            location of type MST can not be specified as the replication source.
-          example: location_pc1
-        remoteLocationLabel:
-          maxLength: 1000
-          type: string
-          description: Label of the source location from the replication locations list, where the entity will be replicated.
-          example: location_pc2
-        schedule:
-          $ref: '#/components/schemas/datapolicies.v4.0.config.Schedule'
-      additionalProperties: false
-      description: Specifies the connections between various replication locations and its schedule. Connections from both
-        source-to-target and target-to-source should be specified.
-    datapolicies.v4.0.config.Schedule:
-      title: Schedule for protection.
-      required:
-      - recoveryPointObjectiveTimeSeconds
-      type: object
-      properties:
-        recoveryPointType:
-          $ref: '#/components/schemas/dataprotection.v4.0.common.RecoveryPointType'
-        recoveryPointObjectiveTimeSeconds:
-          minimum: 0
-          type: integer
-          description: 'The Recovery point objective of the schedule in seconds and specified in multiple of 60 seconds. Only
-            following RPO values can be provided for rollup retention type:<br> Minute(s): 1, 2, 3, 4, 5, 6, 10, 12, 15 <br>
-            Hour(s): 1, 2, 3, 4, 6, 8, 12 <br> Day(s): 1 <br> Week(s): 1, 2'
-          example: 44
-        retention:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: datapolicies.v4.config.LinearRetention
-          description: Specifies the retention policy for the recovery point schedule.
-          oneOf:
-          - $ref: '#/components/schemas/datapolicies.v4.0.config.LinearRetention'
-          - $ref: '#/components/schemas/datapolicies.v4.0.config.AutoRollupRetention'
-        startTime:
-          pattern: ^(0[0-9]|1[0-9]|2[0-3])h:[0-5][0-9]m$
-          type: string
-          description: Represents the protection start time for the new entities added to the policy after the policy is created
-            in h:m format. The values must be between 00h:00m and 23h:59m and in UTC timezone. It specifies the time when
-            the first snapshot is taken and replicated for any entity added to the policy. If this is not specified, the snapshot
-            is taken immediately and replicated for any new entity added to the policy.
-          example: 01h:00m
-        syncReplicationAutoSuspendTimeoutSeconds:
-          maximum: 300
-          type: integer
-          description: Auto suspend timeout if there is a connection failure between locations for synchronous replication.
-            If this value is not set, then the policy will not be suspended.
-          example: 87
-      additionalProperties: false
-      description: Schedule for protection. The schedule specifies the recovery point objective and the retention policy for
-        the participating locations.
-    datapolicies.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 41
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/datapolicies.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    datapolicies.v4.0.config.AutoRollupRetention:
-      title: Auto rollup retention.
-      required:
-      - local
-      type: object
-      properties:
-        local:
-          $ref: '#/components/schemas/datapolicies.v4.0.config.AutoRollupRetentionDetails'
-        remote:
-          $ref: '#/components/schemas/datapolicies.v4.0.config.AutoRollupRetentionDetails'
-      additionalProperties: false
-      description: Maintains a rolling window of recovery points for every schedule, starting with the hourly schedule and
-        ending with the schedule created for the specified retention period. For example, if the retention period is 4 weeks,
-        at any given time, you will have 24 of the latest hourly recovery points, 7 of the latest daily recovery points, and
-        4 of the latest weekly recovery points.
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    datapolicies.v4.0.config.ProtectionPolicy:
-      title: Protection policy.
-      description: A protection policy automates the process of creating and replicating recovery points. When a protection
-        policy is configured to create local recovery points, the request includes:<br> - The recovery point objective<br>
-        - The retention policy<br> - The entities that need to be protected by specifying the categories in which they are
-        tagged.<br> To automate recovery point replication, you can also specify the replication location(s). Only users with
-        legacy roles, such as admin, can create a Cross-AZ protection policy.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - name
-        - replicationConfigurations
-        - replicationLocations
-        type: object
-        properties:
-          name:
-            maxLength: 256
-            type: string
-            description: Name of the protection policy.
-            example: Protection_Policy_1
-          description:
-            maxLength: 1000
-            type: string
-            description: Description of the protection policy.
-            example: Protection policy with linear retention and replication
-          replicationLocations:
-            maxItems: 3
-            minItems: 1
-            type: array
-            description: Indicates all the locations participating in the protection policy. You can specify up to 3 replication
-              locations.
-            items:
-              $ref: '#/components/schemas/datapolicies.v4.0.config.ReplicationLocation'
-          replicationConfigurations:
-            maxItems: 6
-            minItems: 1
-            type: array
-            description: Specifies the connections between various replication locations and its schedule. Connections from
-              both source-to-target and target-to-source should be specified.
-            items:
-              $ref: '#/components/schemas/datapolicies.v4.0.config.ReplicationConfiguration'
-          categoryIds:
-            maxItems: 10
-            minItems: 1
-            type: array
-            description: Specifies the list of external identifiers of categories that must be added to the protection policy.
-              This policy will protect any VM or volume group associated with this category.
-            items:
-              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-              type: string
-              example: f0f57e6a-8999-4cbc-9137-cd9269744292
-          isApprovalPolicyNeeded:
-            type: boolean
-            description: Manual deletion of recovery points created by this policy can be driven through a multi-party authorization
-              workflow. Hence, multiple approvers would be required to grant approvals for the delete operation.
-            readOnly: true
-            example: true
-          ownerExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: External identifier of the owner of the protection policy.
-            readOnly: true
-            example: c7fe41eb-45d0-4927-80cf-149713adc2f5
-        additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 057bca40-e1ab-4b12-b37b-f2c9c051742b
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    dataprotection.v4.0.common.RecoveryPointType:
-      type: string
-      description: Type of the Recovery point.
-      enum:
-      - CRASH_CONSISTENT
-      - APPLICATION_CONSISTENT
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        CRASH_CONSISTENT: Crash-consistent Recovery points capture all the VM and application level details.
-        $REDACTED: 'Redacted value.
-
-          '
-        APPLICATION_CONSISTENT: Application-consistent Recovery points can capture all the data stored in the memory and also
-          the in-progress transaction details.
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1287,6 +1049,331 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    dataprotection.v4.0.common.RecoveryPointType:
+      type: string
+      description: Type of the Recovery point.
+      enum:
+      - CRASH_CONSISTENT
+      - APPLICATION_CONSISTENT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        CRASH_CONSISTENT: Crash-consistent Recovery points capture all the VM and application level details.
+        $REDACTED: 'Redacted value.
+
+          '
+        APPLICATION_CONSISTENT: Application-consistent Recovery points can capture all the data stored in the memory and also
+          the in-progress transaction details.
+    datapolicies.v4.0.config.ReplicationConfiguration:
+      title: Replication configuration.
+      required:
+      - schedule
+      - sourceLocationLabel
+      type: object
+      properties:
+        sourceLocationLabel:
+          maxLength: 1000
+          type: string
+          description: Label of the source location from the replication locations list, where the entity is running. The
+            location of type MST can not be specified as the replication source.
+        remoteLocationLabel:
+          maxLength: 1000
+          type: string
+          description: Label of the source location from the replication locations list, where the entity will be replicated.
+        schedule:
+          $ref: '#/components/schemas/datapolicies.v4.0.config.Schedule'
+      additionalProperties: false
+      description: Specifies the connections between various replication locations and its schedule. Connections from both
+        source-to-target and target-to-source should be specified.
+    datapolicies.v4.0.config.ProtectionPolicy:
+      title: Protection policy.
+      description: A protection policy automates the process of creating and replicating recovery points. When a protection
+        policy is configured to create local recovery points, the request includes:<br> - The recovery point objective<br>
+        - The retention policy<br> - The entities that need to be protected by specifying the categories in which they are
+        tagged.<br> To automate recovery point replication, you can also specify the replication location(s). Only users with
+        legacy roles, such as admin, can create a Cross-AZ protection policy.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - name
+        - replicationConfigurations
+        - replicationLocations
+        type: object
+        properties:
+          name:
+            maxLength: 256
+            type: string
+            description: Name of the protection policy.
+          description:
+            maxLength: 1000
+            type: string
+            description: Description of the protection policy.
+          replicationLocations:
+            maxItems: 3
+            minItems: 1
+            type: array
+            description: Indicates all the locations participating in the protection policy. You can specify up to 3 replication
+              locations.
+            items:
+              $ref: '#/components/schemas/datapolicies.v4.0.config.ReplicationLocation'
+          replicationConfigurations:
+            maxItems: 6
+            minItems: 1
+            type: array
+            description: Specifies the connections between various replication locations and its schedule. Connections from
+              both source-to-target and target-to-source should be specified.
+            items:
+              $ref: '#/components/schemas/datapolicies.v4.0.config.ReplicationConfiguration'
+          categoryIds:
+            maxItems: 10
+            minItems: 1
+            type: array
+            description: Specifies the list of external identifiers of categories that must be added to the protection policy.
+              This policy will protect any VM or volume group associated with this category.
+            items:
+              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+              type: string
+          isApprovalPolicyNeeded:
+            type: boolean
+            description: Manual deletion of recovery points created by this policy can be driven through a multi-party authorization
+              workflow. Hence, multiple approvers would be required to grant approvals for the delete operation.
+            readOnly: true
+          ownerExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: External identifier of the owner of the protection policy.
+            readOnly: true
+        additionalProperties: false
+    datapolicies.v4.0.config.ReplicationLocation:
+      title: Replication locations.
+      required:
+      - domainManagerExtId
+      - label
+      type: object
+      properties:
+        label:
+          maxLength: 1000
+          type: string
+          description: This is a unique user defined label of the replication location. It is used to identify the location
+            in the replication configurations.
+        domainManagerExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: External identifier of the domain manager.
+        replicationSubLocation:
+          required: []
+          properties: {}
+          description: Specifies the replication sublocations where recovery points can be created or replicated.
+          oneOf:
+          - $ref: '#/components/schemas/datapolicies.v4.0.config.NutanixCluster'
+        isPrimary:
+          type: boolean
+          description: One of the locations must be specified as the primary location. All the other locations must be connected
+            to the primary location.
+      additionalProperties: false
+      description: Indicates all the locations participating in the protection policy. You can specify up to 3 replication
+        locations.
+    datapolicies.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    datapolicies.v4.0.config.LinearRetention:
+      title: Linear retention.
+      required:
+      - local
+      type: object
+      properties:
+        local:
+          type: integer
+          description: Specifies the number of recovery points to retain on the local location.
+        remote:
+          type: integer
+          description: Specifies the number of recovery points to retain on the remote location.
+      additionalProperties: false
+      description: A simple retention scheme for the policy. If you set the retention number to n, the policy retains the
+        n recent recovery points.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    datapolicies.v4.0.config.Schedule:
+      title: Schedule for protection.
+      required:
+      - recoveryPointObjectiveTimeSeconds
+      type: object
+      properties:
+        recoveryPointType:
+          $ref: '#/components/schemas/dataprotection.v4.0.common.RecoveryPointType'
+        recoveryPointObjectiveTimeSeconds:
+          minimum: 0
+          type: integer
+          description: 'The Recovery point objective of the schedule in seconds and specified in multiple of 60 seconds. Only
+            following RPO values can be provided for rollup retention type:<br> Minute(s): 1, 2, 3, 4, 5, 6, 10, 12, 15 <br>
+            Hour(s): 1, 2, 3, 4, 6, 8, 12 <br> Day(s): 1 <br> Week(s): 1, 2'
+        retention:
+          required: []
+          properties: {}
+          description: Specifies the retention policy for the recovery point schedule.
+          oneOf:
+          - $ref: '#/components/schemas/datapolicies.v4.0.config.LinearRetention'
+          - $ref: '#/components/schemas/datapolicies.v4.0.config.AutoRollupRetention'
+        startTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3])h:[0-5][0-9]m$
+          type: string
+          description: Represents the protection start time for the new entities added to the policy after the policy is created
+            in h:m format. The values must be between 00h:00m and 23h:59m and in UTC timezone. It specifies the time when
+            the first snapshot is taken and replicated for any entity added to the policy. If this is not specified, the snapshot
+            is taken immediately and replicated for any new entity added to the policy.
+        syncReplicationAutoSuspendTimeoutSeconds:
+          maximum: 300
+          type: integer
+          description: Auto suspend timeout if there is a connection failure between locations for synchronous replication.
+            If this value is not set, then the policy will not be suspended.
+      additionalProperties: false
+      description: Schedule for protection. The schedule specifies the recovery point objective and the retention policy for
+        the participating locations.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    datapolicies.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/datapolicies.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/datapolicies.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    datapolicies.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/datapolicies.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -1306,46 +1393,52 @@ components:
         an address for retrieving the particular resource.
 
         '
-    datapolicies.v4.0.error.AppMessage:
+    datapolicies.v4.0.config.NutanixCluster:
+      title: Cluster ExtIds.
       type: object
       properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
+        clusterExtIds:
+          maxItems: 200
+          minItems: 1
+          type: array
+          description: List of Prism Element cluster external identifiers whose associated VMs and volume groups are protected.
+            Only the primary location can have multiple clusters configured, while the other locations can specify only one
+            cluster. Clusters must be specified for replication within the same Prism Central and cannot be specified for
+            an MST type location. All clusters are considered if the cluster external identifier list is empty.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
-          description: The map of argument name to value.
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    datapolicies.v4.0.error.ErrorResponse:
+      description: List of Prism Element cluster external identifiers whose associated VMs and volume groups are protected.
+        Only the primary location can have multiple clusters configured, while the other locations can specify only one cluster.
+        Clusters must be specified for replication within the same Prism Central and cannot be specified for an MST type location.
+        All clusters are considered if the cluster external identifier list is empty.
+    prism.v4.0.config.TaskReference:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/datapolicies.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/datapolicies.v4.0.error.SchemaValidationError'
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    datapolicies.v4.0.config.AutoRollupRetentionDetails:
+      required:
+      - frequency
+      - snapshotIntervalType
+      type: object
+      properties:
+        snapshotIntervalType:
+          $ref: '#/components/schemas/datapolicies.v4.0.config.SnapshotIntervalType'
+        frequency:
+          maximum: 24
+          minimum: 1
+          type: integer
+          description: Multiplier to 'snapshotIntervalType'. For example, if 'snapshotIntervalType' is 'YEARLY' and 'multiple'
+            is 5, then 5 years worth of rollup snapshots will be retained.
+      additionalProperties: false
+      description: Specifies the auto rollup retention details.
     common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
@@ -1402,7 +1495,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 3c5e8ea2-b877-4caa-8f78-88afdb6782e9
           links:
             maxItems: 20
             minItems: 0
@@ -1415,45 +1507,24 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
-    datapolicies.v4.0.config.LinearRetention:
-      title: Linear retention.
-      required:
-      - local
-      type: object
-      properties:
-        local:
-          type: integer
-          description: Specifies the number of recovery points to retain on the local location.
-          example: 3
-        remote:
-          type: integer
-          description: Specifies the number of recovery points to retain on the remote location.
-          example: 3
-      additionalProperties: false
-      description: A simple retention scheme for the policy. If you set the retention number to n, the policy retains the
-        n recent recovery points.
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1475,12 +1546,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 79
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1511,165 +1580,51 @@ components:
               '
             items:
               type: integer
-              example: 22
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    common.v1.0.response.ApiResponseMetadata:
+    datapolicies.v4.0.error.AppMessage:
       type: object
       properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 74
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    datapolicies.v4.0.config.ReplicationLocation:
-      title: Replication locations.
-      required:
-      - domainManagerExtId
-      - label
-      type: object
-      properties:
-        label:
-          maxLength: 1000
-          type: string
-          description: This is a unique user defined label of the replication location. It is used to identify the location
-            in the replication configurations.
-          example: location_pc1
-        domainManagerExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: External identifier of the domain manager.
-          example: 08533bd5-5cf4-4cb9-b565-064fec63bfa6
-        replicationSubLocation:
-          required:
-          - $objectType
-          properties:
-            $objectType:
-              type: string
-              example: datapolicies.v4.config.NutanixCluster
-          description: Specifies the replication sublocations where recovery points can be created or replicated.
-          oneOf:
-          - $ref: '#/components/schemas/datapolicies.v4.0.config.NutanixCluster'
-        isPrimary:
-          type: boolean
-          description: One of the locations must be specified as the primary location. All the other locations must be connected
-            to the primary location.
-          example: true
-      additionalProperties: false
-      description: Indicates all the locations participating in the protection policy. You can specify up to 3 replication
-        locations.
-    datapolicies.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
         message:
           type: string
-          description: The detailed message for the validation error.
-        attributePath:
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
           type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
           type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:a2e08eaa-3fed-4991-bf16-38ac655e2df1
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    datapolicies.v4.0.config.NutanixCluster:
-      title: Cluster ExtIds.
-      type: object
-      properties:
-        clusterExtIds:
-          maxItems: 200
-          minItems: 1
-          type: array
-          description: List of Prism Element cluster external identifiers whose associated VMs and volume groups are protected.
-            Only the primary location can have multiple clusters configured, while the other locations can specify only one
-            cluster. Clusters must be specified for replication within the same Prism Central and cannot be specified for
-            an MST type location. All clusters are considered if the cluster external identifier list is empty.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
             type: string
-            example: c017e6d1-5d76-4c8c-82ff-a5e40b151acd
+          description: The map of argument name to value.
       additionalProperties: false
-      description: List of Prism Element cluster external identifiers whose associated VMs and volume groups are protected.
-        Only the primary location can have multiple clusters configured, while the other locations can specify only one cluster.
-        Clusters must be specified for replication within the same Prism Central and cannot be specified for an MST type location.
-        All clusters are considered if the cluster external identifier list is empty.
-    datapolicies.v4.0.config.AutoRollupRetentionDetails:
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    datapolicies.v4.0.config.AutoRollupRetention:
+      title: Auto rollup retention.
       required:
-      - frequency
-      - snapshotIntervalType
+      - local
       type: object
       properties:
-        snapshotIntervalType:
-          $ref: '#/components/schemas/datapolicies.v4.0.config.SnapshotIntervalType'
-        frequency:
-          maximum: 24
-          minimum: 1
-          type: integer
-          description: Multiplier to 'snapshotIntervalType'. For example, if 'snapshotIntervalType' is 'YEARLY' and 'multiple'
-            is 5, then 5 years worth of rollup snapshots will be retained.
-          example: 13
+        local:
+          $ref: '#/components/schemas/datapolicies.v4.0.config.AutoRollupRetentionDetails'
+        remote:
+          $ref: '#/components/schemas/datapolicies.v4.0.config.AutoRollupRetentionDetails'
       additionalProperties: false
-      description: Specifies the auto rollup retention details.
+      description: Maintains a rolling window of recovery points for every schedule, starting with the hourly schedule and
+        ending with the schedule created for the specified retention period. For example, if the retention period is 4 weeks,
+        at any given time, you will have 24 of the latest hourly recovery points, 7 of the latest daily recovery points, and
+        4 of the latest weekly recovery points.
   securitySchemes:
     basicAuthScheme:
       type: http

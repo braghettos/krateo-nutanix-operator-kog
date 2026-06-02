@@ -43,7 +43,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -64,7 +63,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -305,7 +303,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 19b737b6-1fa1-4e19-9016-361ce80999a5
       requestBody:
         description: A model that represents a Volume Group resource.
         content:
@@ -498,7 +495,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: d09aeec9-5bb7-4bfd-9717-a051178f6e7c
       responses:
         '200':
           description: Details of the queried Volume Group.
@@ -649,7 +645,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 2eb3971e-7d53-4f3d-b046-8cc9c0e72845
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -676,7 +671,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 1dd2f8cf-772a-41ac-b3b9-fa41f7316a75
       requestBody:
         description: A model that represents a Volume Group resource.
         content:
@@ -884,7 +878,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: ccf79021-64c1-49aa-8abb-3bf328a0556e
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -899,7 +892,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 0ff16953-91de-4cf4-9e9e-7a7f3ef6cacb
       responses:
         '202':
           description: Task Id corresponding to the Volume Group delete operation.
@@ -1048,186 +1040,6 @@ components:
           $ref: '#/components/schemas/volumes.v4.0.config.FlashMode'
       additionalProperties: false
       description: Storage optimization features which must be enabled on the Volume Group. This is an optional field.
-    volumes.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    volumes.v4.0.config.IscsiFeatures:
-      title: Iscsi target features title
-      type: object
-      properties:
-        targetSecret:
-          maxLength: 16
-          minLength: 12
-          type: string
-          description: Target secret in case of a CHAP authentication. This field must only be provided in case the authentication
-            type is not set to CHAP. This is an optional field and it cannot be retrieved once configured.
-          format: password
-          writeOnly: true
-          example: '*************'
-        enabledAuthentications:
-          $ref: '#/components/schemas/volumes.v4.0.config.AuthenticationType'
-      additionalProperties: false
-      description: iSCSI specific settings for the Volume Group. This is an optional field.
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    volumes.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/volumes.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    volumes.v4.0.config.FlashMode:
-      type: object
-      properties:
-        isEnabled:
-          type: boolean
-          description: This field will indicate whether flash mode is enabled or not.
-          default: false
-      additionalProperties: false
-      description: Once configured, this field will avoid down migration of data from the hot tier unless the overrides field
-        is specified for the virtual disks.
-    volumes.v4.0.config.UsageType:
-      title: Supported Volume Group Usage types
-      type: string
-      description: Expected usage type for the Volume Group. This is an indicative hint on how the caller will consume the
-        Volume Group. This is an optional field.
-      enum:
-      - USER
-      - INTERNAL
-      - TEMPORARY
-      - BACKUP_TARGET
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        BACKUP_TARGET: The Volume Groups which store backup data.
-        INTERNAL: The Volume Groups, which are critical to AOS and its related applications must not be modified externally.
-        TEMPORARY: The temporary Volume Groups which are created to access the data from the disks and may be deleted without
-          any data loss.
-        USER: The Volume Groups created by the user, typically using the UI.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    volumes.v4.0.config.VolumeDisk:
-      title: Volume Disk object
-      description: A model that represents a Volume Disk associated with a Volume Group, supported by a backing file on DSF.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          index:
-            maximum: 16383
-            minimum: 0
-            type: integer
-            description: Index of the disk in a Volume Group. This field is optional and immutable.
-            example: 74
-          diskSizeBytes:
-            maximum: 219902325555200
-            minimum: 524288
-            type: integer
-            description: Size of the disk in bytes. This field is mandatory during Volume Group creation if a new disk is
-              created on the storage container.
-            format: int64
-            example: 156650882979022
-          storageContainerId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Storage container on which the disk must be created. This is a read-only field.
-            readOnly: true
-            example: 85858c65-8cb8-4aa3-a466-493d95850f9d
-          description:
-            maxLength: 1000
-            type: string
-            description: Volume Disk description. This is an optional field.
-          diskDataSourceReference:
-            $ref: '#/components/schemas/common.v1.0.config.EntityReference'
-          diskStorageFeatures:
-            $ref: '#/components/schemas/volumes.v4.0.config.DiskStorageFeatures'
-        additionalProperties: false
-        x-required-by-operation:
-          create:
-          - diskDataSourceReference
-    volumes.v4.0.config.SharingStatus:
-      title: The supported sharing status types
-      type: string
-      description: Indicates whether the Volume Group can be shared across multiple iSCSI initiators. The mode cannot be changed
-        from SHARED to NOT_SHARED on a Volume Group with multiple attachments. Similarly, a Volume Group cannot be associated
-        with more than one attachment as long as it is in exclusive mode. This is an optional field.
-      enum:
-      - SHARED
-      - NOT_SHARED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        SHARED: The Volume Group is shared between multiple iSCSI-clients or VMs.
-        NOT_SHARED: The Volume Group is exclusively accessed by an iSCSI client or VM.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: d92bfbe7-1b58-4493-ba79-3cf2a204bdca
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1274,25 +1086,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
     volumes.v4.0.config.AttachmentType:
       title: Supported Volume Group attachment types
       type: string
@@ -1313,351 +1106,26 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    volumes.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 73
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    volumes.v4.0.config.VolumeGroup:
-      title: Volume Group object
-      description: A model that represents a Volume Group resource.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 256
-            type: string
-            description: Volume Group name.
-          description:
-            maxLength: 1000
-            type: string
-            description: Volume Group description. This is an optional field.
-          shouldLoadBalanceVmAttachments:
-            type: boolean
-            description: Indicates whether to enable Volume Group load balancing for VM attachments. This cannot be enabled
-              if there are iSCSI client attachments already associated with the Volume Group, and vice-versa. This is an optional
-              field.
-            default: false
-          sharingStatus:
-            $ref: '#/components/schemas/volumes.v4.0.config.SharingStatus'
-          targetPrefix:
-            maxLength: 512
-            pattern: ^[\da-zA-Z:\.\-]+$
-            type: string
-            description: The specifications contain the target prefix for external clients as the value. This is an optional
-              field.
-            writeOnly: true
-          targetName:
-            maxLength: 512
-            minLength: 12
-            type: string
-            description: Name of the external client target that will be visible and accessible to the client. This is an
-              optional field.
-          enabledAuthentications:
-            $ref: '#/components/schemas/volumes.v4.0.config.AuthenticationType'
-          iscsiFeatures:
-            $ref: '#/components/schemas/volumes.v4.0.config.IscsiFeatures'
-          createdBy:
-            maxLength: 512
-            type: string
-            description: Service/user who created this Volume Group. This is an optional field.
-          clusterReference:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The UUID of the cluster that will host the Volume Group. This is a mandatory field for creating a
-              Volume Group on Prism Central.
-            example: 0caed483-a63d-4c31-a5ca-70161af400af
-          storageFeatures:
-            $ref: '#/components/schemas/volumes.v4.0.config.StorageFeatures'
-          usageType:
-            $ref: '#/components/schemas/volumes.v4.0.config.UsageType'
-          attachmentType:
-            $ref: '#/components/schemas/volumes.v4.0.config.AttachmentType'
-          protocol:
-            $ref: '#/components/schemas/volumes.v4.0.config.Protocol'
-          isHidden:
-            type: boolean
-            description: Indicates whether the Volume Group is meant to be hidden or not. This is an optional field. If omitted,
-              the VG will not be hidden.
-            default: false
-          disks:
-            maxItems: 10
-            minItems: 1
-            type: array
-            description: A list of Volume Disks to be attached to the Volume Group.
-            writeOnly: true
-            items:
-              $ref: '#/components/schemas/volumes.v4.0.config.VolumeDisk'
-        additionalProperties: false
-        x-required-by-operation:
-          create:
-          - clusterReference
-          - name
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
+    volumes.v4.0.config.Protocol:
+      title: Supported Volume group protocols
+      type: string
+      description: Type of protocol to be used for Volume Group.
+      enum:
+      - NOT_ASSIGNED
+      - ISCSI
+      - NVMF
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NOT_ASSIGNED: Volume Group does not use any protocol.
+        ISCSI: Volume Group uses iSCSI protocol.
+        NVMF: Volume Group uses NVMf protocol.
+        $UNKNOWN: 'Unknown value.
 
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
+          '
+        $REDACTED: 'Redacted value.
 
-        '
-    volumes.v4.0.config.DiskStorageFeatures:
-      type: object
-      properties:
-        flashMode:
-          $ref: '#/components/schemas/volumes.v4.0.config.FlashMode'
-      additionalProperties: false
-      description: Storage optimization features which must be enabled on the Volume Disks. This is an optional field. If
-        omitted, the disks will honor the Volume Group specific storage features setting.
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: d4e34a80-abc5-46ca-8fcd-af3f00f2930a
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    volumes.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
-
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 92
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 52
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 17
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    common.v1.0.config.EntityReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-            '
-          example: 1632c00d-c762-4aa5-b370-440584b6952b
-        name:
-          maxLength: 256
-          type: string
-          description: 'Name of entity that''s represented by this reference.
-
-            '
-        uris:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: URI of entities that's represented by this reference.
-          items:
-            type: string
-        entityType:
-          $ref: '#/components/schemas/common.v1.0.config.EntityType'
-      additionalProperties: false
+          '
     common.v1.0.config.EntityType:
       type: string
       description: 'Type of entity that''s represented by this reference. eg: VPC
@@ -1782,6 +1250,192 @@ components:
         $UNKNOWN: 'Unknown value.
 
           '
+    volumes.v4.0.config.IscsiFeatures:
+      title: Iscsi target features title
+      type: object
+      properties:
+        targetSecret:
+          maxLength: 16
+          minLength: 12
+          type: string
+          description: Target secret in case of a CHAP authentication. This field must only be provided in case the authentication
+            type is not set to CHAP. This is an optional field and it cannot be retrieved once configured.
+          format: password
+          writeOnly: true
+        enabledAuthentications:
+          $ref: '#/components/schemas/volumes.v4.0.config.AuthenticationType'
+      additionalProperties: false
+      description: iSCSI specific settings for the Volume Group. This is an optional field.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    volumes.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/volumes.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    volumes.v4.0.config.DiskStorageFeatures:
+      type: object
+      properties:
+        flashMode:
+          $ref: '#/components/schemas/volumes.v4.0.config.FlashMode'
+      additionalProperties: false
+      description: Storage optimization features which must be enabled on the Volume Disks. This is an optional field. If
+        omitted, the disks will honor the Volume Group specific storage features setting.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    volumes.v4.0.config.VolumeDisk:
+      title: Volume Disk object
+      description: A model that represents a Volume Disk associated with a Volume Group, supported by a backing file on DSF.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          index:
+            maximum: 16383
+            minimum: 0
+            type: integer
+            description: Index of the disk in a Volume Group. This field is optional and immutable.
+          diskSizeBytes:
+            maximum: 219902325555200
+            minimum: 524288
+            type: integer
+            description: Size of the disk in bytes. This field is mandatory during Volume Group creation if a new disk is
+              created on the storage container.
+            format: int64
+          storageContainerId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Storage container on which the disk must be created. This is a read-only field.
+            readOnly: true
+          description:
+            maxLength: 1000
+            type: string
+            description: Volume Disk description. This is an optional field.
+          diskDataSourceReference:
+            $ref: '#/components/schemas/common.v1.0.config.EntityReference'
+          diskStorageFeatures:
+            $ref: '#/components/schemas/volumes.v4.0.config.DiskStorageFeatures'
+        additionalProperties: false
+        x-required-by-operation:
+          create:
+          - diskDataSourceReference
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
     prism.v4.0.config.TaskReference:
       type: object
       properties:
@@ -1789,30 +1443,347 @@ components:
           pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
           type: string
           description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:2eb25ec6-5070-4b62-a03e-4717e1ffec5a
       additionalProperties: false
       description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
         a GET request to the task URI provided in the metadata section of the API response.
-    volumes.v4.0.config.Protocol:
-      title: Supported Volume group protocols
+    volumes.v4.0.config.UsageType:
+      title: Supported Volume Group Usage types
       type: string
-      description: Type of protocol to be used for Volume Group.
+      description: Expected usage type for the Volume Group. This is an indicative hint on how the caller will consume the
+        Volume Group. This is an optional field.
       enum:
-      - NOT_ASSIGNED
-      - ISCSI
-      - NVMF
+      - USER
+      - INTERNAL
+      - TEMPORARY
+      - BACKUP_TARGET
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        NOT_ASSIGNED: Volume Group does not use any protocol.
-        ISCSI: Volume Group uses iSCSI protocol.
-        NVMF: Volume Group uses NVMf protocol.
+        BACKUP_TARGET: The Volume Groups which store backup data.
+        INTERNAL: The Volume Groups, which are critical to AOS and its related applications must not be modified externally.
+        TEMPORARY: The temporary Volume Groups which are created to access the data from the disks and may be deleted without
+          any data loss.
+        USER: The Volume Groups created by the user, typically using the UI.
         $UNKNOWN: 'Unknown value.
 
           '
         $REDACTED: 'Redacted value.
 
           '
+    volumes.v4.0.config.VolumeGroup:
+      title: Volume Group object
+      description: A model that represents a Volume Group resource.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 256
+            type: string
+            description: Volume Group name.
+          description:
+            maxLength: 1000
+            type: string
+            description: Volume Group description. This is an optional field.
+          shouldLoadBalanceVmAttachments:
+            type: boolean
+            description: Indicates whether to enable Volume Group load balancing for VM attachments. This cannot be enabled
+              if there are iSCSI client attachments already associated with the Volume Group, and vice-versa. This is an optional
+              field.
+          sharingStatus:
+            $ref: '#/components/schemas/volumes.v4.0.config.SharingStatus'
+          targetPrefix:
+            maxLength: 512
+            pattern: ^[\da-zA-Z:\.\-]+$
+            type: string
+            description: The specifications contain the target prefix for external clients as the value. This is an optional
+              field.
+            writeOnly: true
+          targetName:
+            maxLength: 512
+            minLength: 12
+            type: string
+            description: Name of the external client target that will be visible and accessible to the client. This is an
+              optional field.
+          enabledAuthentications:
+            $ref: '#/components/schemas/volumes.v4.0.config.AuthenticationType'
+          iscsiFeatures:
+            $ref: '#/components/schemas/volumes.v4.0.config.IscsiFeatures'
+          createdBy:
+            maxLength: 512
+            type: string
+            description: Service/user who created this Volume Group. This is an optional field.
+          clusterReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The UUID of the cluster that will host the Volume Group. This is a mandatory field for creating a
+              Volume Group on Prism Central.
+          storageFeatures:
+            $ref: '#/components/schemas/volumes.v4.0.config.StorageFeatures'
+          usageType:
+            $ref: '#/components/schemas/volumes.v4.0.config.UsageType'
+          attachmentType:
+            $ref: '#/components/schemas/volumes.v4.0.config.AttachmentType'
+          protocol:
+            $ref: '#/components/schemas/volumes.v4.0.config.Protocol'
+          isHidden:
+            type: boolean
+            description: Indicates whether the Volume Group is meant to be hidden or not. This is an optional field. If omitted,
+              the VG will not be hidden.
+          disks:
+            maxItems: 10
+            minItems: 1
+            type: array
+            description: A list of Volume Disks to be attached to the Volume Group.
+            writeOnly: true
+            items:
+              $ref: '#/components/schemas/volumes.v4.0.config.VolumeDisk'
+        additionalProperties: false
+        x-required-by-operation:
+          create:
+          - clusterReference
+          - name
+    volumes.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    volumes.v4.0.config.FlashMode:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+          description: This field will indicate whether flash mode is enabled or not.
+      additionalProperties: false
+      description: Once configured, this field will avoid down migration of data from the hot tier unless the overrides field
+        is specified for the virtual disks.
+    volumes.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/volumes.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    volumes.v4.0.config.SharingStatus:
+      title: The supported sharing status types
+      type: string
+      description: Indicates whether the Volume Group can be shared across multiple iSCSI initiators. The mode cannot be changed
+        from SHARED to NOT_SHARED on a Volume Group with multiple attachments. Similarly, a Volume Group cannot be associated
+        with more than one attachment as long as it is in exclusive mode. This is an optional field.
+      enum:
+      - SHARED
+      - NOT_SHARED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SHARED: The Volume Group is shared between multiple iSCSI-clients or VMs.
+        NOT_SHARED: The Volume Group is exclusively accessed by an iSCSI client or VM.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    volumes.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.EntityReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+            '
+        name:
+          maxLength: 256
+          type: string
+          description: 'Name of entity that''s represented by this reference.
+
+            '
+        uris:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: URI of entities that's represented by this reference.
+          items:
+            type: string
+        entityType:
+          $ref: '#/components/schemas/common.v1.0.config.EntityType'
+      additionalProperties: false
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
   securitySchemes:
     basicAuthScheme:
       type: http

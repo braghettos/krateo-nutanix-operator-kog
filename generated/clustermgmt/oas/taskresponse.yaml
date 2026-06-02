@@ -30,7 +30,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 98981bbf-451e-4266-a85f-c2121b755193
       - name: taskResponseType
         in: query
         required: true
@@ -173,108 +172,6 @@ paths:
           \n"
 components:
   schemas:
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.IPAddress:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
-
-        '
-    clustermgmt.v4.0.config.ValidateBundleInfo:
-      type: object
-      properties:
-        md5Sum:
-          pattern: ^[a-fA-F0-9]{32}$
-          type: string
-          description: Md5sum of ISO.
-      additionalProperties: false
-      description: Information of the bundle to verify.
-    clustermgmt.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 22
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 9d4ffa56-91af-4dfb-99b2-ab3df07628fa
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    clustermgmt.v4.0.config.NameMacRef:
-      type: object
-      properties:
-        name:
-          maxLength: 64
-          type: string
-          description: Interface name.
-          example: eth0
-        mac:
-          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
-          type: string
-          description: Mac address.
-          example: 79:72:d3:3f:fd:55
-      additionalProperties: false
-      description: Interface name and mac address.
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -302,26 +199,425 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    clustermgmt.v4.0.config.NameNetworkRef:
+    common.v1.0.config.IPAddress:
       type: object
       properties:
-        hypervisorType:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorType'
-        name:
-          maxLength: 64
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    clustermgmt.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
           type: string
-          description: Interface name.
-          example: Test Interface name
-        networks:
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    clustermgmt.v4.0.config.UnconfiguredNodeListItem:
+      type: object
+      properties:
+        foundationVersion:
+          type: string
+          description: Foundation version.
+        rackableUnitSerial:
+          type: string
+          description: Rackable unit serial name.
+        nodeUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the host.
+        rackableUnitMaxNodes:
+          type: integer
+          description: Maximum number of nodes in rackable-unit.
+          format: int64
+        currentNetworkInterface:
+          type: string
+          description: Current network interface of a node.
+        nodePosition:
+          type: string
+          description: Position of a node in a rackable unit.
+        cvmIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        currentCvmVlanTag:
+          type: string
+          description: Current CVM VLAN tag.
+        isSecureBooted:
+          type: boolean
+          description: Secure boot status.
+        nosVersion:
+          type: string
+          description: NOS software version of a node.
+        cpuType:
           maxItems: 1024
           minItems: 0
           type: array
-          description: List of networks for interface.
+          description: CPU type.
           items:
             type: string
-            example: Test newtwork Names
+        hypervisorType:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorType'
+        hypervisorVersion:
+          type: string
+          description: Host version of the node.
+        interfaceIpv6:
+          type: string
+          description: Interface IPV6 address.
+        clusterId:
+          type: string
+          description: Cluster ID.
+        attributes:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.UnconfiguredNodeAttributeMap'
+        rackableUnitModel:
+          type: string
+          description: Rackable unit model type.
+        arch:
+          type: string
+          description: Cluster arch.
+        hypervisorIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        ipmiIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        hostType:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.HostTypeEnum'
       additionalProperties: false
-      description: Name and network information.
+      description: Unconfigured node details.
+    clustermgmt.v4.0.config.NetworkInfo:
+      type: object
+      properties:
+        hci:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: Network information of HCI nodes.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.NameNetworkRef'
+        so:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: Network information of SO nodes.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.NameNetworkRef'
+      additionalProperties: false
+      description: Network information of HCI and SO nodes.
+    clustermgmt.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    clustermgmt.v4.0.config.ConfigType:
+      type: string
+      enum:
+      - NTP_SERVER_CONFIG
+      - NAME_SERVER_CONFIG
+      - SMTP_SERVER_CONFIG
+      - NFS_SUBNET_WHITELIST_CONFIG
+      - SNMP_SERVER_CONFIG
+      - RSYSLOG_SERVER_CONFIG
+      - PULSE_CONFIG
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NFS_SUBNET_WHITELIST_CONFIG: NFS subnet whitelist configuration
+        NTP_SERVER_CONFIG: NTP server configuration
+        SNMP_SERVER_CONFIG: SNMP server configuration
+        SMTP_SERVER_CONFIG: SMTP server configuration
+        PULSE_CONFIG: Pulse status for a cluster.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        NAME_SERVER_CONFIG: Name server configuration
+        $REDACTED: 'Redacted value.
+
+          '
+        RSYSLOG_SERVER_CONFIG: RSYSLOG server configuration
+    clustermgmt.v4.0.config.UploadInfoNodeItem:
+      type: object
+      properties:
+        isHypervisorUploadRequired:
+          type: boolean
+          description: Provides information on whether hypervisor ISO upload is required or not. This API is not supported
+            for XEN hypervisor type.
+        isImagingMandatory:
+          type: boolean
+          description: Indicates if imaging is required or not.
+        nodeUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the host.
+        availableHypervisorIsoError:
+          type: string
+          description: Error message if any, for available hypervisor ISO.
+        requiredHypervisorType:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorType'
+        isNodeCompatible:
+          type: boolean
+          description: Indicates if node is compatible or not.
+        md5Sum:
+          pattern: ^[a-fA-F0-9]{32}$
+          type: string
+          description: Md5sum of ISO.
+        bundleName:
+          maxLength: 64
+          type: string
+          description: Name of the hypervisor bundle.
+      additionalProperties: false
+      description: Upload information for a node.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    clustermgmt.v4.0.config.TaskResponse:
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          taskResponseType:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.TaskResponseType'
+          response:
+            description: Task Response which is one of node-discovery, networking-details, hypervisor-upload, validate-bundle-info,
+              non-compatible-cluster-reference  information.
+            oneOf:
+            - $ref: '#/components/schemas/clustermgmt.v4.0.config.UnconfigureNodeDetails'
+            - $ref: '#/components/schemas/clustermgmt.v4.0.config.NodeNetworkingDetails'
+            - $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorUploadInfo'
+            - $ref: '#/components/schemas/clustermgmt.v4.0.config.ValidateBundleInfo'
+            - maxItems: 1024
+              minItems: 0
+              type: array
+              items:
+                $ref: '#/components/schemas/clustermgmt.v4.0.config.NonCompatibleClusterReference'
+        additionalProperties: false
+        description: Task Response which is one of node-discovery, networking-details, hypervisor-upload, validate-bundle-info,
+          non-compatible-cluster-reference  information.
+    clustermgmt.v4.0.config.HostTypeEnum:
+      type: string
+      description: Type of the host.
+      enum:
+      - HYPER_CONVERGED
+      - COMPUTE_ONLY
+      - STORAGE_ONLY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        HYPER_CONVERGED: Hyper-converged node.
+        COMPUTE_ONLY: Compute only node.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        STORAGE_ONLY: Storage only node.
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    clustermgmt.v4.0.config.UplinkInfo:
+      type: object
+      properties:
+        cvmIp:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        uplinkList:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: Uplink details for a controller VM.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.NameMacRef'
+      additionalProperties: false
+      description: Uplink information for controller VM.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    clustermgmt.v4.0.config.HypervisorUploadInfo:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+          description: Error message.
+        uploadInfoNodeList:
+          maxItems: 10
+          minItems: 0
+          type: array
+          description: Node list containing upload information.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.UploadInfoNodeItem'
+      additionalProperties: false
+      description: Hypervisor upload required information.
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    clustermgmt.v4.0.config.UnconfigureNodeDetails:
+      type: object
+      properties:
+        nodeList:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: List of unconfigured nodes.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.UnconfiguredNodeListItem'
+      additionalProperties: false
+      description: List of unconfigured nodes.
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -364,44 +660,22 @@ components:
 
           '
         AHV: AHV hypervisor.
-    clustermgmt.v4.0.config.UploadInfoNodeItem:
+    clustermgmt.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        isHypervisorUploadRequired:
-          type: boolean
-          description: Provides information on whether hypervisor ISO upload is required or not. This API is not supported
-            for XEN hypervisor type.
-          example: true
-        isImagingMandatory:
-          type: boolean
-          description: Indicates if imaging is required or not.
-          example: true
-        nodeUuid:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        location:
           type: string
-          description: UUID of the host.
-          example: 5d7e465f-6176-42f2-abcf-dceafd747564
-        availableHypervisorIsoError:
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
           type: string
-          description: Error message if any, for available hypervisor ISO.
-          example: success
-        requiredHypervisorType:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorType'
-        isNodeCompatible:
-          type: boolean
-          description: Indicates if node is compatible or not.
-          example: false
-        md5Sum:
-          pattern: ^[a-fA-F0-9]{32}$
+          description: The detailed message for the validation error.
+        attributePath:
           type: string
-          description: Md5sum of ISO.
-        bundleName:
-          maxLength: 64
-          type: string
-          description: Name of the hypervisor bundle.
-          example: Test Bundle Name
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
-      description: Upload information for a node.
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
     clustermgmt.v4.0.config.NonCompatibleClusterReference:
       type: object
       properties:
@@ -410,7 +684,6 @@ components:
           type: string
           description: Cluster Profile UUID
           readOnly: true
-          example: a48425de-508f-433e-bcc8-c2ba6ee470cc
         configDrifts:
           maxItems: 50
           minItems: 0
@@ -435,6 +708,49 @@ components:
       description: 'A wrapper schema containing a map with string keys and values.
 
         '
+    clustermgmt.v4.0.config.UnconfiguredNodeAttributeMap:
+      type: object
+      properties:
+        lcmFamily:
+          type: string
+          description: LCM family name.
+        isModelSupported:
+          type: boolean
+          description: Indicates whether the model is supported or not.
+        defaultWorkload:
+          type: string
+          description: Default workload.
+        shouldWorkWith1GNic:
+          type: boolean
+          description: Indicates if cvm interface can work with 1 GIG NIC or not.
+        isRoboMixedHypervisor:
+          type: boolean
+          description: Indicates whether the hypervisor is robo mixed or not.
+      additionalProperties: false
+      description: Map providing additional node attributes for the unconfigured node.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -453,7 +769,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: acf0fa40-7920-4a1c-8555-445a56268e96
           links:
             maxItems: 20
             minItems: 0
@@ -466,55 +781,55 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
-    clustermgmt.v4.0.error.AppMessage:
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    clustermgmt.v4.0.config.NameNetworkRef:
       type: object
       properties:
-        message:
+        hypervisorType:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorType'
+        name:
+          maxLength: 64
           type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
+          description: Interface name.
+        networks:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: List of networks for interface.
+          items:
             type: string
-          description: The map of argument name to value.
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
+      description: Name and network information.
+    clustermgmt.v4.0.config.NameMacRef:
+      type: object
+      properties:
+        name:
+          maxLength: 64
+          type: string
+          description: Interface name.
+        mac:
+          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+          type: string
+          description: Mac address.
+      additionalProperties: false
+      description: Interface name and mac address.
     clustermgmt.v4.0.config.TaskResponseType:
       type: string
       description: Task Response search type.
@@ -538,132 +853,27 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    clustermgmt.v4.0.config.UnconfiguredNodeListItem:
+    clustermgmt.v4.0.config.NodeNetworkingDetails:
       type: object
       properties:
-        foundationVersion:
-          type: string
-          description: Foundation version.
-          example: 5.10.0
-        rackableUnitSerial:
-          type: string
-          description: Rackable unit serial name.
-          example: NX123456789
-        nodeUuid:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: UUID of the host.
-          example: d119f3d6-c1cc-487d-82e4-45136a76fbca
-        rackableUnitMaxNodes:
-          type: integer
-          description: Maximum number of nodes in rackable-unit.
-          format: int64
-          example: 45
-        currentNetworkInterface:
-          type: string
-          description: Current network interface of a node.
-          example: eth0
-        nodePosition:
-          type: string
-          description: Position of a node in a rackable unit.
-          example: A
-        cvmIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        currentCvmVlanTag:
-          type: string
-          description: Current CVM VLAN tag.
-        isSecureBooted:
-          type: boolean
-          description: Secure boot status.
-          example: true
-        nosVersion:
-          type: string
-          description: NOS software version of a node.
-          example: 4.5.2
-        cpuType:
+        networkInfo:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.NetworkInfo'
+        uplinks:
           maxItems: 1024
           minItems: 0
           type: array
-          description: CPU type.
+          description: List of uplinks information for each CVM IP.
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.UplinkInfo'
+        warnings:
+          maxItems: 1024
+          minItems: 0
+          type: array
+          description: List of warning messages.
           items:
             type: string
-            example: AMD EPYC 7002
-        hypervisorType:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorType'
-        hypervisorVersion:
-          type: string
-          description: Host version of the node.
-          example: Nutanix 20220304.480
-        interfaceIpv6:
-          type: string
-          description: Interface IPV6 address.
-          example: 2001:db8::1
-        clusterId:
-          type: string
-          description: Cluster ID.
-          example: Test Cluster extId
-        attributes:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.UnconfiguredNodeAttributeMap'
-        rackableUnitModel:
-          type: string
-          description: Rackable unit model type.
-          example: NX-3060-G5
-        arch:
-          type: string
-          description: Cluster arch.
-          example: x86_64
-        hypervisorIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        ipmiIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        hostType:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.HostTypeEnum'
       additionalProperties: false
-      description: Unconfigured node details.
-    clustermgmt.v4.0.config.HostTypeEnum:
-      type: string
-      description: Type of the host.
-      enum:
-      - HYPER_CONVERGED
-      - COMPUTE_ONLY
-      - STORAGE_ONLY
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        HYPER_CONVERGED: Hyper-converged node.
-        COMPUTE_ONLY: Compute only node.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        STORAGE_ONLY: Storage only node.
-        $REDACTED: 'Redacted value.
-
-          '
-    clustermgmt.v4.0.config.UnconfiguredNodeAttributeMap:
-      type: object
-      properties:
-        lcmFamily:
-          type: string
-          description: LCM family name.
-          example: smc_gen_11
-        isModelSupported:
-          type: boolean
-          description: Indicates whether the model is supported or not.
-          example: true
-        defaultWorkload:
-          type: string
-          description: Default workload.
-          example: vdi/ storage_heavy
-        shouldWorkWith1GNic:
-          type: boolean
-          description: Indicates if cvm interface can work with 1 GIG NIC or not.
-          example: false
-        isRoboMixedHypervisor:
-          type: boolean
-          description: Indicates whether the hypervisor is robo mixed or not.
-          example: true
-      additionalProperties: false
-      description: Map providing additional node attributes for the unconfigured node.
+      description: Network details of nodes.
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -685,12 +895,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 66
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -721,275 +929,19 @@ components:
               '
             items:
               type: integer
-              example: 56
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    clustermgmt.v4.0.error.SchemaValidationErrorMessage:
+    clustermgmt.v4.0.config.ValidateBundleInfo:
       type: object
       properties:
-        location:
+        md5Sum:
+          pattern: ^[a-fA-F0-9]{32}$
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
+          description: Md5sum of ISO.
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.config.IPv6Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: 2cd8:0415:e91d:2cb3:386f:e395:8af4:dcb8
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
-          format: int32
-          default: 128
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
-    clustermgmt.v4.0.config.HypervisorUploadInfo:
-      type: object
-      properties:
-        errorMessage:
-          type: string
-          description: Error message.
-          example: Test error message
-        uploadInfoNodeList:
-          maxItems: 10
-          minItems: 0
-          type: array
-          description: Node list containing upload information.
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.UploadInfoNodeItem'
-      additionalProperties: false
-      description: Hypervisor upload required information.
-    clustermgmt.v4.0.config.NetworkInfo:
-      type: object
-      properties:
-        hci:
-          maxItems: 1024
-          minItems: 0
-          type: array
-          description: Network information of HCI nodes.
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.NameNetworkRef'
-        so:
-          maxItems: 1024
-          minItems: 0
-          type: array
-          description: Network information of SO nodes.
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.NameNetworkRef'
-      additionalProperties: false
-      description: Network information of HCI and SO nodes.
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 74
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    clustermgmt.v4.0.config.NodeNetworkingDetails:
-      type: object
-      properties:
-        networkInfo:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.NetworkInfo'
-        uplinks:
-          maxItems: 1024
-          minItems: 0
-          type: array
-          description: List of uplinks information for each CVM IP.
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.UplinkInfo'
-        warnings:
-          maxItems: 1024
-          minItems: 0
-          type: array
-          description: List of warning messages.
-          items:
-            type: string
-            example: ' test warning messages'
-      additionalProperties: false
-      description: Network details of nodes.
-    clustermgmt.v4.0.config.UplinkInfo:
-      type: object
-      properties:
-        cvmIp:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        uplinkList:
-          maxItems: 1024
-          minItems: 0
-          type: array
-          description: Uplink details for a controller VM.
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.NameMacRef'
-      additionalProperties: false
-      description: Uplink information for controller VM.
-    clustermgmt.v4.0.config.UnconfigureNodeDetails:
-      type: object
-      properties:
-        nodeList:
-          maxItems: 1024
-          minItems: 0
-          type: array
-          description: List of unconfigured nodes.
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.UnconfiguredNodeListItem'
-      additionalProperties: false
-      description: List of unconfigured nodes.
-    clustermgmt.v4.0.config.ConfigType:
-      type: string
-      enum:
-      - NTP_SERVER_CONFIG
-      - NAME_SERVER_CONFIG
-      - SMTP_SERVER_CONFIG
-      - NFS_SUBNET_WHITELIST_CONFIG
-      - SNMP_SERVER_CONFIG
-      - RSYSLOG_SERVER_CONFIG
-      - PULSE_CONFIG
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NFS_SUBNET_WHITELIST_CONFIG: NFS subnet whitelist configuration
-        NTP_SERVER_CONFIG: NTP server configuration
-        SNMP_SERVER_CONFIG: SNMP server configuration
-        SMTP_SERVER_CONFIG: SMTP server configuration
-        PULSE_CONFIG: Pulse status for a cluster.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        NAME_SERVER_CONFIG: Name server configuration
-        $REDACTED: 'Redacted value.
-
-          '
-        RSYSLOG_SERVER_CONFIG: RSYSLOG server configuration
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 39.47.28.212
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    clustermgmt.v4.0.config.TaskResponse:
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          taskResponseType:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.TaskResponseType'
-          response:
-            description: Task Response which is one of node-discovery, networking-details, hypervisor-upload, validate-bundle-info,
-              non-compatible-cluster-reference  information.
-            oneOf:
-            - $ref: '#/components/schemas/clustermgmt.v4.0.config.UnconfigureNodeDetails'
-            - $ref: '#/components/schemas/clustermgmt.v4.0.config.NodeNetworkingDetails'
-            - $ref: '#/components/schemas/clustermgmt.v4.0.config.HypervisorUploadInfo'
-            - $ref: '#/components/schemas/clustermgmt.v4.0.config.ValidateBundleInfo'
-            - maxItems: 1024
-              minItems: 0
-              type: array
-              items:
-                $ref: '#/components/schemas/clustermgmt.v4.0.config.NonCompatibleClusterReference'
-        additionalProperties: false
-        description: Task Response which is one of node-discovery, networking-details, hypervisor-upload, validate-bundle-info,
-          non-compatible-cluster-reference  information.
-    clustermgmt.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/clustermgmt.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
+      description: Information of the bundle to verify.
   securitySchemes:
     basicAuthScheme:
       type: http

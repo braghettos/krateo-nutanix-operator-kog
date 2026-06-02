@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -322,7 +320,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: ccadf13c-6722-4b4a-b699-add20a8e63ce
       responses:
         '200':
           description: Details of the requested replication job.
@@ -456,6 +453,232 @@ paths:
           \n"
 components:
   schemas:
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    files.v4.0.operations.ReplicationJob:
+      title: Replication job
+      description: Replication job details.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          policyExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: External identifier of the policy.
+            readOnly: true
+          sourceFileServerExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of the primary file server for the replication.
+            readOnly: true
+          targetFileServerExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of the secondary file server for the replication.
+            readOnly: true
+          sourceMountTargetExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of the source mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+            readOnly: true
+          targetMountTargetExtId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The external identifier of the target mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
+            readOnly: true
+          sourceMountTargetPath:
+            type: string
+            description: User provided source path for the replication job.
+            readOnly: true
+          targetMountTargetPath:
+            type: string
+            description: User provided target path for the replication job.
+            readOnly: true
+          statusMessage:
+            type: string
+            description: Status Message for the replication job. If the job failed or completed with errors, this field provides
+              the reason for the failure. If the job succeeded, this field provides the success message - Replication is complete.
+            readOnly: true
+          progressPercentage:
+            type: integer
+            description: Progress (%) of the replication job.
+            format: int64
+            readOnly: true
+          replicationSummary:
+            $ref: '#/components/schemas/files.v4.0.config.ReplicationSummary'
+          status:
+            $ref: '#/components/schemas/files.v4.0.operations.JobStatus'
+          startTime:
+            type: string
+            description: Start time for the replication job in ISO format.
+            format: date-time
+            readOnly: true
+          endTime:
+            type: string
+            description: End time for the replication job in ISO format.
+            format: date-time
+            readOnly: true
+          numberOfEstimatedFiles:
+            type: integer
+            description: Number of Estimated files for the replication job.
+            format: int64
+            readOnly: true
+          estimatedBytes:
+            type: integer
+            description: Estimated bytes for the replication job.
+            format: int64
+            readOnly: true
+          numberOfFilesTransferred:
+            type: integer
+            description: Number of Actual Files transferred for the replication job.
+            format: int64
+            readOnly: true
+          bytesTransferred:
+            type: integer
+            description: Actual bytes transferred for the replication job.
+            format: int64
+            readOnly: true
+          numberOfFilesFailed:
+            type: integer
+            description: Number of Files failed for the replication job.
+            format: int64
+            readOnly: true
+          averageThroughputBps:
+            type: integer
+            description: Average throughput for the replication job in Bytes per second.
+            format: int64
+            readOnly: true
+          isDeletePropagationEnabled:
+            type: boolean
+            description: Delete propagation set/unset the replication job. If delete propagation is enabled, the deletes on
+              source will be propagated to target
+            readOnly: true
+        additionalProperties: false
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    files.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
     common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
@@ -484,7 +707,6 @@ components:
 
             '
           format: int32
-          example: 3
         messages:
           maxItems: 20
           minItems: 0
@@ -509,209 +731,107 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
-    files.v4.0.error.SchemaValidationErrorMessage:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        location:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
+          readOnly: true
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
 
         '
-    common.v1.0.config.MessageSeverity:
-      type: string
-      description: 'The message severity.
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
 
-        '
-      enum:
-      - INFO
-      - WARNING
-      - ERROR
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ERROR: 'Error indicating failed completion.
-
-          '
-        INFO: 'Information about successful completion.
-
-          '
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: 'Warning indicating future error.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
 
               '
-            nullable: true
-            readOnly: true
-            example: 100c0cb9-922a-4edb-90bd-cd56a8d70ea9
-          links:
-            maxItems: 20
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
             minItems: 0
             type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
+            description: 'A value in a key-value pair that represents a list of strings.
 
               '
-            readOnly: true
             items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    files.v4.0.operations.ReplicationJob:
-      title: Replication job
-      description: Replication job details.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          policyExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: External identifier of the policy.
-            readOnly: true
-            example: 926ef944-59d1-4f4f-a557-ae27ed1ec40a
-          sourceFileServerExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The external identifier of the primary file server for the replication.
-            readOnly: true
-            example: d2eda433-6640-4176-84fb-df03c8db11e4
-          targetFileServerExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The external identifier of the secondary file server for the replication.
-            readOnly: true
-            example: e41d49e2-bd4a-45ab-82ab-a5dfb64d6ec9
-          sourceMountTargetExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The external identifier of the source mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
-            readOnly: true
-            example: 3623c63e-900b-4e1c-8d90-2bf5470ba27e
-          targetMountTargetExtId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The external identifier of the target mount target. Example:9c1e537d-6777-4c22-5d41-ddd0c3337aa9.
-            readOnly: true
-            example: e266bb1d-0f91-4ac8-b2ef-0b1bdda2b144
-          sourceMountTargetPath:
-            type: string
-            description: User provided source path for the replication job.
-            readOnly: true
-          targetMountTargetPath:
-            type: string
-            description: User provided target path for the replication job.
-            readOnly: true
-          statusMessage:
-            type: string
-            description: Status Message for the replication job. If the job failed or completed with errors, this field provides
-              the reason for the failure. If the job succeeded, this field provides the success message - Replication is complete.
-            readOnly: true
-          progressPercentage:
-            type: integer
-            description: Progress (%) of the replication job.
-            format: int64
-            readOnly: true
-            example: 26
-          replicationSummary:
-            $ref: '#/components/schemas/files.v4.0.config.ReplicationSummary'
-          status:
-            $ref: '#/components/schemas/files.v4.0.operations.JobStatus'
-          startTime:
-            type: string
-            description: Start time for the replication job in ISO format.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          endTime:
-            type: string
-            description: End time for the replication job in ISO format.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          numberOfEstimatedFiles:
-            type: integer
-            description: Number of Estimated files for the replication job.
-            format: int64
-            readOnly: true
-            example: 82
-          estimatedBytes:
-            type: integer
-            description: Estimated bytes for the replication job.
-            format: int64
-            readOnly: true
-            example: 58
-          numberOfFilesTransferred:
-            type: integer
-            description: Number of Actual Files transferred for the replication job.
-            format: int64
-            readOnly: true
-            example: 13
-          bytesTransferred:
-            type: integer
-            description: Actual bytes transferred for the replication job.
-            format: int64
-            readOnly: true
-            example: 19
-          numberOfFilesFailed:
-            type: integer
-            description: Number of Files failed for the replication job.
-            format: int64
-            readOnly: true
-            example: 99
-          averageThroughputBps:
-            type: integer
-            description: Average throughput for the replication job in Bytes per second.
-            format: int64
-            readOnly: true
-            example: 81
-          isDeletePropagationEnabled:
-            type: boolean
-            description: Delete propagation set/unset the replication job. If delete propagation is enabled, the deletes on
-              source will be propagated to target
-            readOnly: true
-            example: false
-        additionalProperties: false
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    files.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
     files.v4.0.operations.JobStatus:
       title: Replication status
       type: string
@@ -778,171 +898,9 @@ components:
           description: 'The locale for the message description.
 
             '
-          default: en_US
         severity:
           $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: d67deb34-dc4d-4a1f-b5e9-d478b949c2b7
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    files.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    files.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 13
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/files.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
-
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 36
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: false
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 41
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
     files.v4.0.error.AppMessage:
       type: object
       properties:
@@ -958,7 +916,6 @@ components:
         locale:
           type: string
           description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
         errorGroup:
           type: string
           description: The error group associated with this message of severity ERROR.
@@ -970,6 +927,20 @@ components:
       additionalProperties: false
       description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
   securitySchemes:
     basicAuthScheme:
       type: http

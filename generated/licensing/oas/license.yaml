@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -281,143 +279,30 @@ paths:
           \n"
 components:
   schemas:
-    licensing.v4.0.error.SchemaValidationErrorMessage:
+    licensing.v4.0.error.SchemaValidationError:
       type: object
       properties:
-        location:
+        timestamp:
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
           type: string
-          description: The detailed message for the validation error.
-        attributePath:
+          description: The generic error message for the response.
+        path:
           type: string
-          description: The path of the attribute that failed validation in the schema.
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationErrorMessage'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
+      description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    licensing.v4.0.config.Consumption:
-      type: object
-      properties:
-        clusterExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: Cluster UUID which is consuming the license.
-          example: 7f268714-b6a6-4049-ac10-bb67a834a9b8
-        quantityUsed:
-          type: number
-          description: Indicates quantity of licenses consumed by the cluster.
-          format: double
-          example: 71.23657398015844
-      additionalProperties: false
-      description: Model containing license consumption details like cluster id and quantity used in that cluster.
-    licensing.v4.0.config.License:
-      description: Model containing license details like id, type, category, sub-category, scope and others.
-      allOf:
-      - $ref: '#/components/schemas/licensing.v4.0.config.BaseLicenseInfo'
-      - type: object
-        properties:
-          salesforceLicenseId:
-            pattern: ^[A-Za-z0-9-]+$
-            type: string
-            description: Attribute for capturing salesforce generated license identifier e.g. LIC-XXX.
-          meter:
-            $ref: '#/components/schemas/licensing.v4.0.config.Meter'
-          scope:
-            $ref: '#/components/schemas/licensing.v4.0.config.Scope'
-          quantity:
-            type: number
-            description: Total quantity of license consumed.
-            format: double
-            example: 39.4509092745176
-          consumptionDetails:
-            maxItems: 100
-            minItems: 0
-            type: array
-            description: Array containing information about the clusters where these licenses are used.
-            items:
-              $ref: '#/components/schemas/licensing.v4.0.config.Consumption'
-        additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 68bb7679-88c1-4538-9f64-2bbc4025272d
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    licensing.v4.0.config.Scope:
-      title: Scope defines where licenses can be applied.
-      type: string
-      description: Possible values of scope are PC, PE & PC_PE.
-      enum:
-      - PC
-      - PE
-      - PC_PE
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PC: Licenses applicable to Prism Central like NCM/Prism. PC scoped features indicate features provided by Prism Central.
-        PE: Licenses applicable to AOS like NCI/AOS. PE scoped features indicate features provided by Prism Element.
-        PC_PE: Licenses applicable to AOS but overall usage reported at Prism Central like NUS.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    licensing.v4.0.config.SubCategory:
-      title: Defines license sub categories.
-      type: string
-      description: Possible values are ADDON, UNLIMITED_CAPACITY.
-      enum:
-      - ADDON
-      - UNLIMITED_CAPACITY
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ADDON: License is an addon.
-        UNLIMITED_CAPACITY: License is perpetual with unlimited capacity.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -445,25 +330,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
     licensing.v4.0.config.LicenseCategory:
       title: Defines different license categories.
       type: string
@@ -546,99 +412,56 @@ components:
         $UNKNOWN: 'Unknown value.
 
           '
-    common.v1.0.config.MapOfStringWrapper:
+    licensing.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: f6d37db9-0917-4c7c-bfbc-c252a9b24282
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    licensing.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
+        location:
           type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 84
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
         message:
           type: string
-          description: 'The description of the message.
-
-            '
-        locale:
+          description: The detailed message for the validation error.
+        attributePath:
           type: string
-          description: 'The locale for the message description.
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    licensing.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/licensing.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
 
             '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
       additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
     licensing.v4.0.error.AppMessage:
       type: object
       properties:
@@ -654,7 +477,6 @@ components:
         locale:
           type: string
           description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
         errorGroup:
           type: string
           description: The error group associated with this message of severity ERROR.
@@ -666,98 +488,6 @@ components:
       additionalProperties: false
       description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
-
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 78
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 45
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
-    licensing.v4.0.config.Meter:
-      title: License capacity is expressed in terms of meter.
-      type: string
-      description: Possible values of meter are CORES, NODE, TIB, FLASH, USERS, VI, VM_PACKS and VM.
-      enum:
-      - CORES
-      - NODE
-      - TIB
-      - FLASH
-      - USERS
-      - VI
-      - VM_PACKS
-      - VM
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        CORES: Licensing unit representing the number of CPU cores.
-        VI: Licensing unit representing the number of Virtual Instances.
-        VM_PACKS: Licensing unit representing the number of Virtual Machine packs where each pack allows fixed number of VMs.
-        NODE: Licensing unit representing the number of nodes in a cluster.
-        VM: Licensing unit representing the number of Virtual Machines.
-        TIB: Licensing unit representing storage capacity in Tebibytes.
-        USERS: Licensing unit representing the number of users.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        FLASH: Licensing unit representing solid state drive capacity.
-        $REDACTED: 'Redacted value.
-
-          '
     common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
@@ -786,7 +516,6 @@ components:
 
             '
           format: int32
-          example: 71
         messages:
           maxItems: 20
           minItems: 0
@@ -811,6 +540,80 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
+    licensing.v4.0.config.BaseLicenseInfo:
+      description: Model containing base licensing attributes like name, type, category and others.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 64
+            type: string
+            description: Indicates name of the license. Possible values could be NCI Pro, NCM Ultimate.
+          type:
+            $ref: '#/components/schemas/licensing.v4.0.config.LicenseType'
+          category:
+            $ref: '#/components/schemas/licensing.v4.0.config.LicenseCategory'
+          subCategory:
+            $ref: '#/components/schemas/licensing.v4.0.config.SubCategory'
+          expiryDate:
+            type: string
+            description: Indicates the expiration date of the license.
+            format: date
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    licensing.v4.0.config.Consumption:
+      type: object
+      properties:
+        clusterExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Cluster UUID which is consuming the license.
+        quantityUsed:
+          type: number
+          description: Indicates quantity of licenses consumed by the cluster.
+          format: double
+      additionalProperties: false
+      description: Model containing license consumption details like cluster id and quantity used in that cluster.
     licensing.v4.0.config.LicenseType:
       title: Defines different license types.
       type: string
@@ -889,42 +692,221 @@ components:
         $UNKNOWN: 'Unknown value.
 
           '
-    licensing.v4.0.config.BaseLicenseInfo:
-      description: Model containing base licensing attributes like name, type, category and others.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 64
-            type: string
-            description: Indicates name of the license. Possible values could be NCI Pro, NCM Ultimate.
-            example: NCI Pro
-          type:
-            $ref: '#/components/schemas/licensing.v4.0.config.LicenseType'
-          category:
-            $ref: '#/components/schemas/licensing.v4.0.config.LicenseCategory'
-          subCategory:
-            $ref: '#/components/schemas/licensing.v4.0.config.SubCategory'
-          expiryDate:
-            type: string
-            description: Indicates the expiration date of the license.
-            format: date
-            example: 2009-09-23
-        additionalProperties: false
-    licensing.v4.0.error.ErrorResponse:
+    common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/licensing.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/licensing.v4.0.error.SchemaValidationError'
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    licensing.v4.0.config.SubCategory:
+      title: Defines license sub categories.
+      type: string
+      description: Possible values are ADDON, UNLIMITED_CAPACITY.
+      enum:
+      - ADDON
+      - UNLIMITED_CAPACITY
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ADDON: License is an addon.
+        UNLIMITED_CAPACITY: License is perpetual with unlimited capacity.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    licensing.v4.0.config.License:
+      description: Model containing license details like id, type, category, sub-category, scope and others.
+      allOf:
+      - $ref: '#/components/schemas/licensing.v4.0.config.BaseLicenseInfo'
+      - type: object
+        properties:
+          salesforceLicenseId:
+            pattern: ^[A-Za-z0-9-]+$
+            type: string
+            description: Attribute for capturing salesforce generated license identifier e.g. LIC-XXX.
+          meter:
+            $ref: '#/components/schemas/licensing.v4.0.config.Meter'
+          scope:
+            $ref: '#/components/schemas/licensing.v4.0.config.Scope'
+          quantity:
+            type: number
+            description: Total quantity of license consumed.
+            format: double
+          consumptionDetails:
+            maxItems: 100
+            minItems: 0
+            type: array
+            description: Array containing information about the clusters where these licenses are used.
+            items:
+              $ref: '#/components/schemas/licensing.v4.0.config.Consumption'
+        additionalProperties: false
+    licensing.v4.0.config.Scope:
+      title: Scope defines where licenses can be applied.
+      type: string
+      description: Possible values of scope are PC, PE & PC_PE.
+      enum:
+      - PC
+      - PE
+      - PC_PE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PC: Licenses applicable to Prism Central like NCM/Prism. PC scoped features indicate features provided by Prism Central.
+        PE: Licenses applicable to AOS like NCI/AOS. PE scoped features indicate features provided by Prism Element.
+        PC_PE: Licenses applicable to AOS but overall usage reported at Prism Central like NUS.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    licensing.v4.0.config.Meter:
+      title: License capacity is expressed in terms of meter.
+      type: string
+      description: Possible values of meter are CORES, NODE, TIB, FLASH, USERS, VI, VM_PACKS and VM.
+      enum:
+      - CORES
+      - NODE
+      - TIB
+      - FLASH
+      - USERS
+      - VI
+      - VM_PACKS
+      - VM
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        CORES: Licensing unit representing the number of CPU cores.
+        VI: Licensing unit representing the number of Virtual Instances.
+        VM_PACKS: Licensing unit representing the number of Virtual Machine packs where each pack allows fixed number of VMs.
+        NODE: Licensing unit representing the number of nodes in a cluster.
+        VM: Licensing unit representing the number of Virtual Machines.
+        TIB: Licensing unit representing storage capacity in Tebibytes.
+        USERS: Licensing unit representing the number of users.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        FLASH: Licensing unit representing solid state drive capacity.
+        $REDACTED: 'Redacted value.
+
+          '
   securitySchemes:
     basicAuthScheme:
       type: http

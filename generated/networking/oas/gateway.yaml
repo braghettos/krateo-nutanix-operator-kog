@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -323,7 +321,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: a6b457b7-f360-4728-b672-65e53eef3d8b
       requestBody:
         description: Create gateway request body.
         content:
@@ -608,7 +605,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: b353e3db-01d8-457e-933d-8d71ea733350
       responses:
         '200':
           description: gateway details for the specified extId.
@@ -755,7 +751,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 45df59e7-8e43-40c1-a864-a0088c1f4327
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -782,7 +777,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 672d70dc-216c-4e8d-84e8-21922d202d0f
       requestBody:
         description: Update gateway request body.
         content:
@@ -1083,7 +1077,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 7f031d83-f53c-451f-9680-8a777601b615
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -1098,7 +1091,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 996c4ef3-8769-43cd-b4ed-5db4462b64af
       responses:
         '202':
           description: Delete gateway response.
@@ -1238,234 +1230,6 @@ paths:
           \n- \"https://{pc-ip}:9440/api/networking/v4.0/config/gateways/FbED0bEc-eDa9-D461-FA2C-8Bf1D75EB6Ae\"\n"
 components:
   schemas:
-    networking.v4.0.config.NetworkingBaseModel:
-      description: Networking common base object
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          metadata:
-            $ref: '#/components/schemas/common.v1.0.config.Metadata'
-        additionalProperties: false
-    networking.v4.0.config.VpcType:
-      type: string
-      description: Type of VPC.
-      enum:
-      - REGULAR
-      - TRANSIT
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        REGULAR: VPC type regular.
-        TRANSIT: VPC type transit.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    networking.v4.0.config.RemoteVpnService:
-      title: VPN service.
-      type: object
-      properties:
-        serviceAddress:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        ebgpConfig:
-          $ref: '#/components/schemas/networking.v4.0.config.BgpConfig'
-        peerIgpConfig:
-          $ref: '#/components/schemas/networking.v4.0.config.InternalRoutingConfig'
-        shouldInstallXiRoute:
-          type: boolean
-          description: 'Boolean flag indicating user opt-in for installing Xi LB route in on-prem Prism Central and Prism
-            Element CVMs provided on-prem Prism Central, Prism Element and VPN VM are in the same subnet.
-
-            '
-          default: false
-      additionalProperties: false
-      description: VPN service hosted on this remote gateway.
-    networking.v4.0.config.RemoteVtepService:
-      title: VTEP service.
-      type: object
-      properties:
-        vxlanPort:
-          maximum: 49151
-          minimum: 1
-          type: integer
-          description: VXLAN port.
-          format: int32
-          default: 4789
-        vteps:
-          maxItems: 10
-          minItems: 0
-          type: array
-          description: Remote VXLAN Tunnel Endpoints configuration.
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.Vtep'
-      additionalProperties: false
-      description: VTEP service hosted on this remote gateway.
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    networking.v4.0.config.Vpc:
-      title: Virtual Private Cloud (VPC) Object.
-      required:
-      - name
-      description: Schema for Virtual Private Cloud (VPC).
-      allOf:
-      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 128
-            type: string
-            description: Name of the VPC.
-            example: vpc-1
-          description:
-            maxLength: 1000
-            type: string
-            description: Description of the VPC.
-            example: VPC description
-          vpcType:
-            $ref: '#/components/schemas/networking.v4.0.config.VpcType'
-          commonDhcpOptions:
-            $ref: '#/components/schemas/networking.v4.0.config.VpcDhcpOptions'
-          snatIps:
-            maxItems: 2
-            minItems: 0
-            type: array
-            description: List of IP Addresses used for SNAT.
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-          externalSubnets:
-            maxItems: 4
-            minItems: 0
-            type: array
-            description: List of external subnets that the VPC is attached to.
-            items:
-              $ref: '#/components/schemas/networking.v4.0.config.ExternalSubnet'
-          externalRoutingDomainReference:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: External routing domain associated with this route table
-            example: d5610679-7249-4c73-a70e-9784d744011f
-          externallyRoutablePrefixes:
-            maxItems: 10
-            minItems: 0
-            type: array
-            description: CIDR blocks from the VPC which can talk externally without performing NAT. This is applicable when
-              connecting to external subnets which have disabled NAT.
-            items:
-              $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
-        additionalProperties: false
-    networking.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    common.v1.0.config.IPAddress:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
-
-        '
-    networking.v4.0.config.IPSubnet:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/networking.v4.0.config.IPv4Subnet'
-        ipv6:
-          $ref: '#/components/schemas/networking.v4.0.config.IPv6Subnet'
-      additionalProperties: false
-      description: IP subnet.
-    networking.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 250be642-1b1b-4687-bf88-af93fc7abf59
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    networking.v4.0.config.Vm:
-      type: object
-      properties:
-        name:
-          maxLength: 80
-          type: string
-          description: Virtual Machine name
-          example: user-vm-1
-      additionalProperties: false
-      description: Virtual Machine properties
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1493,17 +1257,90 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    networking.v4.0.config.Status:
+    common.v1.0.config.IPAddress:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    networking.v4.0.error.AppMessage:
       type: object
       properties:
         message:
           type: string
-          description: Detailed message of component status.
-          example: Entity is healthy
-        state:
-          $ref: '#/components/schemas/networking.v4.0.config.State'
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
       additionalProperties: false
-      description: Up/Down status of component and message.
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    networking.v4.0.config.OspfConfig:
+      type: object
+      properties:
+        areaId:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: OSPF area id of this gateway.
+        authenticationType:
+          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationType'
+        password:
+          type: string
+          description: Password for authentication.
+          format: password
+          writeOnly: true
+      additionalProperties: false
+      description: OSPF configuration for route peering with internal routers.
+    networking.v4.0.config.LocalBgpService:
+      title: BGP service.
+      required:
+      - asn
+      type: object
+      properties:
+        vpcReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'Reference to the VPC that this network gateway serves as its BGP speaker. Note that this BGP gateway
+            will not service a regular VPC sitting behind a Transit VPC.
+
+            '
+        asn:
+          maximum: 4294967294
+          minimum: 1
+          type: integer
+          description: Autonomous system number. 0 and 4294967295 are reserved.
+          format: int64
+      additionalProperties: false
+      description: BGP service hosted on this local gateway.
+    networking.v4.0.config.IbgpConfig:
+      title: Internal BGP configuration.
+      description: Internal BGP configuration.
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.BgpConfig'
+      - type: object
+        properties:
+          peerIp:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        additionalProperties: false
     networking.v4.0.config.RemoteBgpService:
       title: BGP service.
       required:
@@ -1519,181 +1356,8 @@ components:
           type: integer
           description: Autonomous system number. 0 and 4294967295 are reserved.
           format: int64
-          example: 45035
       additionalProperties: false
       description: BGP service hosted on this remote gateway.
-    networking.v4.0.config.LocalVtepService:
-      title: VTEP service.
-      required:
-      - vxlanPort
-      type: object
-      properties:
-        vxlanPort:
-          maximum: 49151
-          minimum: 1
-          type: integer
-          description: VXLAN port.
-          format: int32
-          example: 4789
-      additionalProperties: false
-      description: VTEP service hosted on this local gateway.
-    networking.v4.0.config.Vtep:
-      title: VXLAN Tunnel Endpoint.
-      type: object
-      properties:
-        address:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-      additionalProperties: false
-      description: VXLAN Tunnel Endpoint.
-    networking.v4.0.config.GatewayNodeReference:
-      type: object
-      properties:
-        nodeId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: UUID of gateway nodes
-          example: eea1a648-b89a-434f-935a-20361a9a93e3
-        nodeIpAddress:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-      additionalProperties: false
-      description: Reference of gateway nodes.
-    networking.v4.0.config.IPv4Subnet:
-      required:
-      - ip
-      - prefixLength
-      type: object
-      properties:
-        ip:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: Prefix length of the IPv4 subnet.
-          format: int32
-          example: 24
-      additionalProperties: false
-      description: IPv4 subnet.
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 870ef0a7-1d70-4ba5-839b-436e2c69e445
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    networking.v4.0.config.State:
-      type: string
-      description: Up/Down status of component.
-      enum:
-      - UP
-      - DOWN
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        DOWN: Component is not functional and down.
-        UP: Component is up and running.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    networking.v4.0.config.IPv6Subnet:
-      required:
-      - ip
-      - prefixLength
-      type: object
-      properties:
-        ip:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: Prefix length of the IPv6 subnet.
-          format: int32
-          example: 64
-      additionalProperties: false
-      description: IPv6 subnet.
     networking.v4.0.config.AuthenticationType:
       type: string
       description: Authentication type.
@@ -1711,194 +1375,11 @@ components:
 
           '
         MD5: MD5 authentication.
-    networking.v4.0.config.GatewayManagementInterface:
-      title: Network management interface of the gateway.
-      type: object
-      properties:
-        subnetReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The on-prem vlan subnet to deploy the network gateway VM on.
-          example: b48709e3-9d92-4ef6-9328-efbc0d282f98
-        vlanId:
-          maximum: 4095
-          minimum: 0
-          type: integer
-          description: The on-prem VLAN to deploy the gateway on.
-          format: int16
-          example: 10
-        address:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        defaultGateway:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        mtu:
-          type: integer
-          description: MTU of management interface.
-          format: int16
-          readOnly: true
-      additionalProperties: false
-      description: 'Network interface used to deliver network services and for managing the gateway. If a VPC reference is
-        supplied then the gateway will be deployed on a dedicated subnet within the VPC. If a VPC reference is not supplied,
-        then this interface defines the subnet on which the gateway will be deployed, and the address it will be assigned.
-        When a VPC reference is not present, either a subnet reference or a VLAN id must be supplied, along with the address
-        and default gateway of the subnet. A VLAN network without IPAM may be used.
-
-        '
-    networking.v4.0.config.LocalVpnService:
-      title: VPN service.
-      type: object
-      properties:
-        ebgpConfig:
-          $ref: '#/components/schemas/networking.v4.0.config.BgpConfig'
-        peerIgpConfig:
-          $ref: '#/components/schemas/networking.v4.0.config.InternalRoutingConfig'
-      additionalProperties: false
-      description: VPN service hosted on this local gateway.
-    networking.v4.0.config.BgpConfig:
-      title: BGP configuration.
-      type: object
-      properties:
-        asn:
-          maximum: 4294967294
-          minimum: 1
-          type: integer
-          description: Autonomous system number. 0 and 4294967295 are reserved.
-          format: int64
-          example: 45035
-        password:
-          type: string
-          description: BPG password.
-          writeOnly: true
-        shouldRedistributeRoutes:
-          type: boolean
-          description: 'Redistribute routes over eBGP. Applicable only to network gateways deployed on VLAN subnets with eBGP
-            over VPN.
-
-            '
-          default: false
-      additionalProperties: false
-      description: BGP configuration.
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
-
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 52
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 28
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
-    networking.v4.0.config.GatewayDeployment:
-      title: Network gateway deployment configuration.
-      type: object
-      properties:
-        clusterReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'Cluster reference required to identify which on-prem cluster to deploy the gateway VM on.
-
-            '
-          example: 42bba9d5-73b1-49ae-8038-f70f56286e5c
-        managementInterface:
-          $ref: '#/components/schemas/networking.v4.0.config.GatewayManagementInterface'
-        interfaces:
-          maxItems: 4
-          minItems: 0
-          type: array
-          description: List of network interfaces for this gateway.
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.GatewayInterface'
-        vcenterDatastoreName:
-          maxLength: 128
-          type: string
-          description: 'vCenter datastore to which the gateway disks and images will be uploaded during deployment.
-
-            '
-          example: myDatastore
-      additionalProperties: false
-      description: Network gateway deployment configuration.
-    common.v1.0.config.IPv6Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: eff4:180b:7f8b:7a40:8c4e:ea2c:d804:15e9
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
-          format: int32
-          default: 128
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
-    networking.v4.0.config.Gateway:
-      title: Network gateway.
+    networking.v4.0.config.Vpc:
+      title: Virtual Private Cloud (VPC) Object.
       required:
       - name
-      description: Network gateway.
+      description: Schema for Virtual Private Cloud (VPC).
       allOf:
       - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
       - type: object
@@ -1906,103 +1387,82 @@ components:
           name:
             maxLength: 128
             type: string
-            description: Name of the gateway.
-            example: gateway-a
+            description: Name of the VPC.
           description:
             maxLength: 1000
             type: string
-            description: Description of the gateway.
-            example: Network gateway description
-          vpcReference:
+            description: Description of the VPC.
+          vpcType:
+            $ref: '#/components/schemas/networking.v4.0.config.VpcType'
+          commonDhcpOptions:
+            $ref: '#/components/schemas/networking.v4.0.config.VpcDhcpOptions'
+          snatIps:
+            maxItems: 2
+            minItems: 0
+            type: array
+            description: List of IP Addresses used for SNAT.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+          externalSubnets:
+            maxItems: 4
+            minItems: 0
+            type: array
+            description: List of external subnets that the VPC is attached to.
+            items:
+              $ref: '#/components/schemas/networking.v4.0.config.ExternalSubnet'
+          externalRoutingDomainReference:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
-            description: VPC
-            example: 8b9bc121-23ff-459e-91bd-2079e27e0b70
-          cloudNetworkReference:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Cloud network on which network gateway is deployed.
-            example: ff079ccf-0ffa-4477-8f73-edd46467360e
-          installedSoftwareVersion:
-            type: string
-            description: Software version installed on the gateway appliance.
-            readOnly: true
-          supportedSoftwareVersion:
-            type: string
-            description: Supported gateway appliance version.
-            readOnly: true
-          vmReference:
-            type: string
-            description: 'Reference to a dedicated VM on which a local gateway is deployed.
-
-              '
-            readOnly: true
-          deployment:
-            $ref: '#/components/schemas/networking.v4.0.config.GatewayDeployment'
-          gatewayDeviceVendor:
-            type: string
-            description: Third-party gateway vendor.
-            example: Arista
-          services:
-            required:
-            - $objectType
-            properties:
-              $objectType:
-                type: string
-                example: networking.v4.config.LocalNetworkServices
-            description: Local or remote gateway service type.
-            oneOf:
-            - $ref: '#/components/schemas/networking.v4.0.config.LocalNetworkServices'
-            - $ref: '#/components/schemas/networking.v4.0.config.RemoteNetworkServices'
-          status:
-            $ref: '#/components/schemas/networking.v4.0.config.Status'
-          vpc:
-            $ref: '#/components/schemas/networking.v4.0.config.Vpc'
-          vm:
-            $ref: '#/components/schemas/networking.v4.0.config.Vm'
+            description: External routing domain associated with this route table
+          externallyRoutablePrefixes:
+            maxItems: 10
+            minItems: 0
+            type: array
+            description: CIDR blocks from the VPC which can talk externally without performing NAT. This is applicable when
+              connecting to external subnets which have disabled NAT.
+            items:
+              $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
         additionalProperties: false
-    networking.v4.0.config.GatewayInterface:
-      title: Network interface of the gateway.
+    networking.v4.0.config.RemoteVpnService:
+      title: VPN service.
       type: object
       properties:
-        subnetReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The VLAN subnet to deploy this network gateway VM on.
-          example: 0afbf64d-6fac-480e-ae60-7ed1102f0331
-        ipAddress:
+        serviceAddress:
           $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        defaultGatewayAddress:
-          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        macAddress:
-          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
-          type: string
-          description: MAC address of this gateway interface.
-          example: df:d8:39:c6:c4:ea
-        mtu:
-          type: integer
-          description: MTU of this gateway interface.
-          format: int16
-          readOnly: true
+        ebgpConfig:
+          $ref: '#/components/schemas/networking.v4.0.config.BgpConfig'
+        peerIgpConfig:
+          $ref: '#/components/schemas/networking.v4.0.config.InternalRoutingConfig'
+        shouldInstallXiRoute:
+          type: boolean
+          description: 'Boolean flag indicating user opt-in for installing Xi LB route in on-prem Prism Central and Prism
+            Element CVMs provided on-prem Prism Central, Prism Element and VPN VM are in the same subnet.
+
+            '
       additionalProperties: false
-      description: 'Network interface used to deliver network services. If the client  supplies a VPC reference, but does
-        not specify a VPC subnet, the gateway will be deployed on an auto-configured dedicated subnet  within the VPC. If
-        the client specifies a VPC subnet, the gateway  will be deployed on that subnet. If the gateway is deployed on a VLAN
-        subnet, with or without IPAM, then statically-allocated IP addresses on that subnet must be provided for each interface.
+      description: VPN service hosted on this remote gateway.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
 
         '
-    networking.v4.0.config.RemoteNetworkServices:
-      title: Remote gateway services.
-      type: object
-      properties:
-        remoteVpnService:
-          $ref: '#/components/schemas/networking.v4.0.config.RemoteVpnService'
-        remoteVtepService:
-          $ref: '#/components/schemas/networking.v4.0.config.RemoteVtepService'
-        remoteBgpService:
-          $ref: '#/components/schemas/networking.v4.0.config.RemoteBgpService'
-      additionalProperties: false
-      description: Services of this remote gateway.
     common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
@@ -2031,7 +1491,6 @@ components:
 
             '
           format: int32
-          example: 92
         messages:
           maxItems: 20
           minItems: 0
@@ -2056,66 +1515,24 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
-    networking.v4.0.config.LocalBgpService:
-      title: BGP service.
-      required:
-      - asn
+    networking.v4.0.config.LocalVpnService:
+      title: VPN service.
       type: object
       properties:
-        vpcReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'Reference to the VPC that this network gateway serves as its BGP speaker. Note that this BGP gateway
-            will not service a regular VPC sitting behind a Transit VPC.
-
-            '
-          example: 1cfe7c6d-18cb-4e03-8612-747881758e62
-        asn:
-          maximum: 4294967294
-          minimum: 1
-          type: integer
-          description: Autonomous system number. 0 and 4294967295 are reserved.
-          format: int64
-          example: 45035
+        ebgpConfig:
+          $ref: '#/components/schemas/networking.v4.0.config.BgpConfig'
+        peerIgpConfig:
+          $ref: '#/components/schemas/networking.v4.0.config.InternalRoutingConfig'
       additionalProperties: false
-      description: BGP service hosted on this local gateway.
-    prism.v4.0.config.TaskReference:
+      description: VPN service hosted on this local gateway.
+    networking.v4.0.config.Vtep:
+      title: VXLAN Tunnel Endpoint.
       type: object
       properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:9bf9c2d8-1857-4824-8f55-cbb6ab4eb85e
+        address:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
       additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    networking.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 17
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
+      description: VXLAN Tunnel Endpoint.
     networking.v4.0.config.VpcDhcpOptions:
       type: object
       properties:
@@ -2128,162 +1545,36 @@ components:
             $ref: '#/components/schemas/common.v1.0.config.IPAddress'
       additionalProperties: false
       description: List of DHCP options to be configured.
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
+    common.v1.0.config.Message:
       type: object
       properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+        code:
           type: string
-          description: 'The IPv4 address of the host.
+          description: 'A code that uniquely identifies a message.
 
             '
-          example: 59.225.95.31
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
+        message:
+          type: string
+          description: 'The description of the message.
 
             '
-          format: int32
-          default: 32
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
       additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    common.v1.0.config.Metadata:
+    networking.v4.0.config.IPSubnet:
       type: object
       properties:
-        ownerReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the owner of this resource.
-
-            '
-          example: 88c007ec-0157-4901-a28a-c93e6cd73adc
-        ownerUserName:
-          maxLength: 128
-          type: string
-          description: 'The userName of the owner of this resource.
-
-            '
-        projectReferenceId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the project this resource belongs to.
-
-            '
-          example: 3e2a7199-b4d8-481c-a4d1-446470c8d864
-        projectName:
-          maxLength: 128
-          type: string
-          description: 'The name of the project this resource belongs to.
-
-            '
-        categoryIds:
-          maxItems: 256
-          minItems: 1
-          type: array
-          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
-            with.
-
-            '
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 61bf1201-334e-4002-a9da-0ad47bd7fa2e
+        ipv4:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv4Subnet'
+        ipv6:
+          $ref: '#/components/schemas/networking.v4.0.config.IPv6Subnet'
       additionalProperties: false
-      description: 'Metadata associated with this resource.
-
-        '
-    networking.v4.0.config.InternalRoutingConfig:
-      type: object
-      properties:
-        ospfConfig:
-          $ref: '#/components/schemas/networking.v4.0.config.OspfConfig'
-        ibgpConfigList:
-          maxItems: 32
-          minItems: 0
-          type: array
-          description: iBGP configuration.
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.IbgpConfig'
-        localPrefixList:
-          maxItems: 250
-          minItems: 0
-          type: array
-          description: List of local prefixes to be advertised over eBGP.
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
-      additionalProperties: false
-      description: 'Describes the routing protocol configuration spec needed by this gateway to peer and learn routes from
-        internal routers using either iBGP or OSPF.
-
-        '
-    networking.v4.0.config.ExternalSubnet:
-      required:
-      - subnetReference
-      type: object
-      properties:
-        subnetReference:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: External subnet reference.
-          example: 613ddd7d-4c56-4ee9-b2c7-870d8a2e8d32
-        externalIps:
-          maxItems: 4
-          minItems: 0
-          type: array
-          description: List of IP Addresses used for SNAT, if NAT is enabled on the external subnet. If NAT is not enabled,
-            this specifies the IP address of the VPC port connected to the external gateway.
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-        gatewayNodes:
-          maxItems: 32
-          minItems: 3
-          type: array
-          description: List of gateway nodes that can be used for external connectivity.
-          items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 9daac89e-a56d-4098-a9a8-dcf9cb212e70
-        activeGatewayNodes:
-          maxItems: 4
-          minItems: 0
-          type: array
-          description: Currently active gateway nodes that are used for external connectivity.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/networking.v4.0.config.GatewayNodeReference'
-        activeGatewayCount:
-          maximum: 4
-          minimum: 1
-          type: integer
-          description: Maximum number of active gateway nodes for the VPC external subnet association.
-          format: int32
-          example: 3
-      additionalProperties: false
-      description: Information about the external subnet, SNAT IPs and the gateway nodes.
-    networking.v4.0.config.OspfConfig:
-      type: object
-      properties:
-        areaId:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: OSPF area id of this gateway.
-          example: 200.88.216.126
-        authenticationType:
-          $ref: '#/components/schemas/networking.v4.0.config.AuthenticationType'
-        password:
-          type: string
-          description: Password for authentication.
-          format: password
-          writeOnly: true
-          example: '******'
-      additionalProperties: false
-      description: OSPF configuration for route peering with internal routers.
+      description: IP subnet.
     networking.v4.0.config.LocalNetworkServices:
       title: Local gateway services.
       type: object
@@ -2321,16 +1612,662 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
-    networking.v4.0.config.IbgpConfig:
-      title: Internal BGP configuration.
-      description: Internal BGP configuration.
+    networking.v4.0.config.VpcType:
+      type: string
+      description: Type of VPC.
+      enum:
+      - REGULAR
+      - TRANSIT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        REGULAR: VPC type regular.
+        TRANSIT: VPC type transit.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.IPv6Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    networking.v4.0.config.NetworkingBaseModel:
+      description: Networking common base object
       allOf:
-      - $ref: '#/components/schemas/networking.v4.0.config.BgpConfig'
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
       - type: object
         properties:
-          peerIp:
-            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+          metadata:
+            $ref: '#/components/schemas/common.v1.0.config.Metadata'
         additionalProperties: false
+    networking.v4.0.config.InternalRoutingConfig:
+      type: object
+      properties:
+        ospfConfig:
+          $ref: '#/components/schemas/networking.v4.0.config.OspfConfig'
+        ibgpConfigList:
+          maxItems: 32
+          minItems: 0
+          type: array
+          description: iBGP configuration.
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.IbgpConfig'
+        localPrefixList:
+          maxItems: 250
+          minItems: 0
+          type: array
+          description: List of local prefixes to be advertised over eBGP.
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.IPSubnet'
+      additionalProperties: false
+      description: 'Describes the routing protocol configuration spec needed by this gateway to peer and learn routes from
+        internal routers using either iBGP or OSPF.
+
+        '
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    networking.v4.0.config.Gateway:
+      title: Network gateway.
+      required:
+      - name
+      description: Network gateway.
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 128
+            type: string
+            description: Name of the gateway.
+          description:
+            maxLength: 1000
+            type: string
+            description: Description of the gateway.
+          vpcReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: VPC
+          cloudNetworkReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Cloud network on which network gateway is deployed.
+          installedSoftwareVersion:
+            type: string
+            description: Software version installed on the gateway appliance.
+            readOnly: true
+          supportedSoftwareVersion:
+            type: string
+            description: Supported gateway appliance version.
+            readOnly: true
+          vmReference:
+            type: string
+            description: 'Reference to a dedicated VM on which a local gateway is deployed.
+
+              '
+            readOnly: true
+          deployment:
+            $ref: '#/components/schemas/networking.v4.0.config.GatewayDeployment'
+          gatewayDeviceVendor:
+            type: string
+            description: Third-party gateway vendor.
+          services:
+            required: []
+            properties: {}
+            description: Local or remote gateway service type.
+            oneOf:
+            - $ref: '#/components/schemas/networking.v4.0.config.LocalNetworkServices'
+            - $ref: '#/components/schemas/networking.v4.0.config.RemoteNetworkServices'
+          status:
+            $ref: '#/components/schemas/networking.v4.0.config.Status'
+          vpc:
+            $ref: '#/components/schemas/networking.v4.0.config.Vpc'
+          vm:
+            $ref: '#/components/schemas/networking.v4.0.config.Vm'
+        additionalProperties: false
+    networking.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    networking.v4.0.config.RemoteNetworkServices:
+      title: Remote gateway services.
+      type: object
+      properties:
+        remoteVpnService:
+          $ref: '#/components/schemas/networking.v4.0.config.RemoteVpnService'
+        remoteVtepService:
+          $ref: '#/components/schemas/networking.v4.0.config.RemoteVtepService'
+        remoteBgpService:
+          $ref: '#/components/schemas/networking.v4.0.config.RemoteBgpService'
+      additionalProperties: false
+      description: Services of this remote gateway.
+    networking.v4.0.config.LocalVtepService:
+      title: VTEP service.
+      required:
+      - vxlanPort
+      type: object
+      properties:
+        vxlanPort:
+          maximum: 49151
+          minimum: 1
+          type: integer
+          description: VXLAN port.
+          format: int32
+      additionalProperties: false
+      description: VTEP service hosted on this local gateway.
+    networking.v4.0.config.GatewayManagementInterface:
+      title: Network management interface of the gateway.
+      type: object
+      properties:
+        subnetReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The on-prem vlan subnet to deploy the network gateway VM on.
+        vlanId:
+          maximum: 4095
+          minimum: 0
+          type: integer
+          description: The on-prem VLAN to deploy the gateway on.
+          format: int16
+        address:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        defaultGateway:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        mtu:
+          type: integer
+          description: MTU of management interface.
+          format: int16
+          readOnly: true
+      additionalProperties: false
+      description: 'Network interface used to deliver network services and for managing the gateway. If a VPC reference is
+        supplied then the gateway will be deployed on a dedicated subnet within the VPC. If a VPC reference is not supplied,
+        then this interface defines the subnet on which the gateway will be deployed, and the address it will be assigned.
+        When a VPC reference is not present, either a subnet reference or a VLAN id must be supplied, along with the address
+        and default gateway of the subnet. A VLAN network without IPAM may be used.
+
+        '
+    networking.v4.0.config.RemoteVtepService:
+      title: VTEP service.
+      type: object
+      properties:
+        vxlanPort:
+          maximum: 49151
+          minimum: 1
+          type: integer
+          description: VXLAN port.
+          format: int32
+        vteps:
+          maxItems: 10
+          minItems: 0
+          type: array
+          description: Remote VXLAN Tunnel Endpoints configuration.
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.Vtep'
+      additionalProperties: false
+      description: VTEP service hosted on this remote gateway.
+    networking.v4.0.config.State:
+      type: string
+      description: Up/Down status of component.
+      enum:
+      - UP
+      - DOWN
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        DOWN: Component is not functional and down.
+        UP: Component is up and running.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    networking.v4.0.config.IPv4Subnet:
+      required:
+      - ip
+      - prefixLength
+      type: object
+      properties:
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: Prefix length of the IPv4 subnet.
+          format: int32
+      additionalProperties: false
+      description: IPv4 subnet.
+    networking.v4.0.config.GatewayInterface:
+      title: Network interface of the gateway.
+      type: object
+      properties:
+        subnetReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The VLAN subnet to deploy this network gateway VM on.
+        ipAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        defaultGatewayAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        macAddress:
+          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+          type: string
+          description: MAC address of this gateway interface.
+        mtu:
+          type: integer
+          description: MTU of this gateway interface.
+          format: int16
+          readOnly: true
+      additionalProperties: false
+      description: 'Network interface used to deliver network services. If the client  supplies a VPC reference, but does
+        not specify a VPC subnet, the gateway will be deployed on an auto-configured dedicated subnet  within the VPC. If
+        the client specifies a VPC subnet, the gateway  will be deployed on that subnet. If the gateway is deployed on a VLAN
+        subnet, with or without IPAM, then statically-allocated IP addresses on that subnet must be provided for each interface.
+
+        '
+    networking.v4.0.config.BgpConfig:
+      title: BGP configuration.
+      type: object
+      properties:
+        asn:
+          maximum: 4294967294
+          minimum: 1
+          type: integer
+          description: Autonomous system number. 0 and 4294967295 are reserved.
+          format: int64
+        password:
+          type: string
+          description: BPG password.
+          writeOnly: true
+        shouldRedistributeRoutes:
+          type: boolean
+          description: 'Redistribute routes over eBGP. Applicable only to network gateways deployed on VLAN subnets with eBGP
+            over VPN.
+
+            '
+      additionalProperties: false
+      description: BGP configuration.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    networking.v4.0.config.ExternalSubnet:
+      required:
+      - subnetReference
+      type: object
+      properties:
+        subnetReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: External subnet reference.
+        externalIps:
+          maxItems: 4
+          minItems: 0
+          type: array
+          description: List of IP Addresses used for SNAT, if NAT is enabled on the external subnet. If NAT is not enabled,
+            this specifies the IP address of the VPC port connected to the external gateway.
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+        gatewayNodes:
+          maxItems: 32
+          minItems: 3
+          type: array
+          description: List of gateway nodes that can be used for external connectivity.
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        activeGatewayNodes:
+          maxItems: 4
+          minItems: 0
+          type: array
+          description: Currently active gateway nodes that are used for external connectivity.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.GatewayNodeReference'
+        activeGatewayCount:
+          maximum: 4
+          minimum: 1
+          type: integer
+          description: Maximum number of active gateway nodes for the VPC external subnet association.
+          format: int32
+      additionalProperties: false
+      description: Information about the external subnet, SNAT IPs and the gateway nodes.
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.0.config.Metadata:
+      type: object
+      properties:
+        ownerReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the owner of this resource.
+
+            '
+        ownerUserName:
+          maxLength: 128
+          type: string
+          description: 'The userName of the owner of this resource.
+
+            '
+        projectReferenceId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the project this resource belongs to.
+
+            '
+        projectName:
+          maxLength: 128
+          type: string
+          description: 'The name of the project this resource belongs to.
+
+            '
+        categoryIds:
+          maxItems: 256
+          minItems: 1
+          type: array
+          description: 'A list of globally unique identifiers that represent all the categories the resource is associated
+            with.
+
+            '
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+      additionalProperties: false
+      description: 'Metadata associated with this resource.
+
+        '
+    networking.v4.0.config.GatewayDeployment:
+      title: Network gateway deployment configuration.
+      type: object
+      properties:
+        clusterReference:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'Cluster reference required to identify which on-prem cluster to deploy the gateway VM on.
+
+            '
+        managementInterface:
+          $ref: '#/components/schemas/networking.v4.0.config.GatewayManagementInterface'
+        interfaces:
+          maxItems: 4
+          minItems: 0
+          type: array
+          description: List of network interfaces for this gateway.
+          items:
+            $ref: '#/components/schemas/networking.v4.0.config.GatewayInterface'
+        vcenterDatastoreName:
+          maxLength: 128
+          type: string
+          description: 'vCenter datastore to which the gateway disks and images will be uploaded during deployment.
+
+            '
+      additionalProperties: false
+      description: Network gateway deployment configuration.
+    networking.v4.0.config.Status:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Detailed message of component status.
+        state:
+          $ref: '#/components/schemas/networking.v4.0.config.State'
+      additionalProperties: false
+      description: Up/Down status of component and message.
+    common.v1.0.config.KVPair:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    networking.v4.0.config.Vm:
+      type: object
+      properties:
+        name:
+          maxLength: 80
+          type: string
+          description: Virtual Machine name
+      additionalProperties: false
+      description: Virtual Machine properties
+    networking.v4.0.config.IPv6Subnet:
+      required:
+      - ip
+      - prefixLength
+      type: object
+      properties:
+        ip:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        prefixLength:
+          maximum: 128
+          minimum: 0
+          type: integer
+          description: Prefix length of the IPv6 subnet.
+          format: int32
+      additionalProperties: false
+      description: IPv6 subnet.
+    networking.v4.0.config.GatewayNodeReference:
+      type: object
+      properties:
+        nodeId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of gateway nodes
+        nodeIpAddress:
+          $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+      additionalProperties: false
+      description: Reference of gateway nodes.
   securitySchemes:
     basicAuthScheme:
       type: http

@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -342,7 +340,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: deb89d7a-a89a-4e20-8841-322142303e8f
       responses:
         '200':
           description: Returns the configuration details for a virtual machine.
@@ -473,218 +470,6 @@ paths:
           \n"
 components:
   schemas:
-    vmm.v4.0.esxi.config.Nic:
-      description: Virtual Machine NIC.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          backingInfo:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.NicBackingInfo'
-          networkInfo:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.NicNetworkInfo'
-        additionalProperties: false
-    vmm.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    vmm.v4.0.esxi.config.PortGroupInfo:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          type: string
-          description: Name of the Port Group.
-          readOnly: true
-      additionalProperties: false
-      description: Information about the virtual network in the datacenter.
-    vmm.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 24
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    vmm.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    vmm.v4.0.esxi.config.HostReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of a host type UUID.
-          example: 3bd4ab0c-56f5-49ef-abb7-d574fe4278b8
-      additionalProperties: false
-      description: Reference to the host, the VM is running on.
-    vmm.v4.0.esxi.config.CdRom:
-      description: Virtual Machine CD-ROM.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          diskAddress:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRomAddress'
-          backingInfo:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRomBackingInfo'
-        additionalProperties: false
-    vmm.v4.0.esxi.config.PowerState:
-      type: string
-      description: The current power state of the VM.
-      enum:
-      - 'ON'
-      - 'OFF'
-      - SUSPENDED
-      - UNDETERMINED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        UNDETERMINED: The VM power state is currently unknown.
-        SUSPENDED: The VM power state is currently suspended.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        'OFF': The VM is powered-off.
-        $REDACTED: 'Redacted value.
-
-          '
-        'ON': The VM is powered-on.
-    vmm.v4.0.esxi.config.OwnerReference:
-      type: object
-      properties:
-        entityType:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.OwnerReferenceEntityType'
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The globally unique identifier of an instance of type UUID.
-          example: 5b54f51c-bffa-4d2e-9fc9-e6f4eee27d5f
-      additionalProperties: false
-      description: Owner reference.
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 58c42276-2fd7-49bc-9bf7-67d18ba54f14
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
-    vmm.v4.0.esxi.config.AdapterType:
-      type: string
-      description: Adapter type for VM NIC.
-      enum:
-      - E1000
-      - PCNET32
-      - VMXNET
-      - VMXNET2
-      - VMXNET3
-      - E1000E
-      - SRIOV
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        E1000E: The NIC adapter type is E1000e.
-        E1000: The NIC adapter type is E1000.
-        SRIOV: The NIC adapter type is Sriov.
-        PCNET32: The NIC adapter type is PCNet32.
-        VMXNET: The NIC adapter type is Vmxnet.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        VMXNET3: The NIC adapter type is Vmxnet3.
-        $REDACTED: 'Redacted value.
-
-          '
-        VMXNET2: The NIC adapter type is Vmxnet2.
-    vmm.v4.0.esxi.config.DiskAddress:
-      type: object
-      properties:
-        busType:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.DiskBusType'
-        index:
-          minimum: 0
-          type: integer
-          description: Device index on the bus. This field is ignored unless the bus details are specified.
-          format: int32
-          readOnly: true
-          example: 54
-      additionalProperties: false
-      description: Disk address.
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -712,17 +497,51 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    vmm.v4.0.esxi.config.Disk:
-      description: Virtual Machine disk (VM disk).
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          diskAddress:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.DiskAddress'
-          backingInfo:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDisk'
-        additionalProperties: false
+    vmm.v4.0.esxi.config.VmDiskContainerReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk container. It should be of type UUID.
+          readOnly: true
+      additionalProperties: false
+      description: This reference is for disk level storage container preference. This preference specifies the storage container
+        to which this disk belongs.
+    vmm.v4.0.esxi.config.PortGroupInfo:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          type: string
+          description: Name of the Port Group.
+          readOnly: true
+      additionalProperties: false
+      description: Information about the virtual network in the datacenter.
+    vmm.v4.0.esxi.config.VmDisk:
+      type: object
+      properties:
+        diskSizeBytes:
+          minimum: 1
+          type: integer
+          description: Size of the disk in bytes.
+          format: int64
+          readOnly: true
+        storageContainer:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDiskContainerReference'
+        storageConfig:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDiskStorageConfig'
+      additionalProperties: false
+      description: Storage provided by Nutanix ADSF.
+    vmm.v4.0.esxi.config.CategoryReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of an instance of type UUID.
+      additionalProperties: false
+      description: Reference to a category.
     vmm.v4.0.esxi.config.NicNetworkInfo:
       type: object
       properties:
@@ -732,35 +551,323 @@ components:
           $ref: '#/components/schemas/vmm.v4.0.esxi.config.IpAddressInfo'
       additionalProperties: false
       description: Network information for a NIC.
-    vmm.v4.0.esxi.config.CategoryReference:
+    vmm.v4.0.esxi.config.CdRomBackingInfo:
+      type: object
+      properties:
+        diskExtId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: A globally unique identifier of a VM disk of type UUID.
+          readOnly: true
+        storageContainer:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDiskContainerReference'
+      additionalProperties: false
+      description: Storage provided by Nutanix ADSF.
+    vmm.v4.0.esxi.config.DiskAddress:
+      type: object
+      properties:
+        busType:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.DiskBusType'
+        index:
+          minimum: 0
+          type: integer
+          description: Device index on the bus. This field is ignored unless the bus details are specified.
+          format: int32
+          readOnly: true
+      additionalProperties: false
+      description: Disk address.
+    vmm.v4.0.esxi.config.Vm:
+      description: VM configuration.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 80
+            type: string
+            description: VM name.
+          cluster:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.ClusterReference'
+          host:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.HostReference'
+          description:
+            type: string
+            description: VM description.
+          categories:
+            maxItems: 256
+            minItems: 0
+            type: array
+            description: Categories for the VM.
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.esxi.config.CategoryReference'
+          ownershipInfo:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.OwnershipInfo'
+          nutanixGuestTools:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.NutanixGuestTools'
+          powerState:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.PowerState'
+          memorySizeBytes:
+            minimum: 1
+            type: integer
+            description: Memory size in bytes.
+            format: int64
+            readOnly: true
+          numCoresPerSocket:
+            minimum: 1
+            type: integer
+            description: Number of cores per socket.
+            format: int64
+            readOnly: true
+          numCpus:
+            minimum: 1
+            type: integer
+            description: Number of vCPUs.
+            format: int64
+            readOnly: true
+          guestOsName:
+            maxLength: 256
+            type: string
+            description: Name of the guest OS.
+            readOnly: true
+          virtualHardwareVersion:
+            minimum: 1
+            type: integer
+            description: Virtual hardware version of the VM.
+            format: int64
+            readOnly: true
+          disks:
+            maxItems: 256
+            minItems: 0
+            type: array
+            description: Disks attached to the VM.
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.esxi.config.Disk'
+          cdRoms:
+            maxItems: 256
+            minItems: 0
+            type: array
+            description: CD-ROMs attached to the VM.
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRom'
+          nics:
+            maxItems: 32
+            minItems: 0
+            type: array
+            description: NICs attached to the VM.
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.esxi.config.Nic'
+        additionalProperties: false
+    vmm.v4.0.esxi.config.ClusterReference:
       type: object
       properties:
         extId:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
           description: The globally unique identifier of an instance of type UUID.
-          example: 8308d90d-846e-4d03-8ecc-db0222db2887
       additionalProperties: false
-      description: Reference to a category.
-    common.v1.0.response.ApiLink:
+      description: Reference to a cluster.
+    common.v1.0.config.Flag:
       type: object
       properties:
-        href:
+        name:
+          maxLength: 128
+          minLength: 3
           type: string
-          description: 'The URL at which the entity described by the link can be accessed.
+          description: 'Name of the flag.
 
             '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
+        value:
+          type: boolean
+          description: 'Value of the flag.
 
             '
       additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
 
         '
+    vmm.v4.0.esxi.config.Nic:
+      description: Virtual Machine NIC.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          backingInfo:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.NicBackingInfo'
+          networkInfo:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.NicNetworkInfo'
+        additionalProperties: false
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    vmm.v4.0.esxi.config.NicBackingInfo:
+      type: object
+      properties:
+        macAddress:
+          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
+          type: string
+          description: MAC address of the NIC.
+          readOnly: true
+        isConnected:
+          type: boolean
+          description: Indicates whether the NIC is connected or not. Default is True.
+          readOnly: true
+        adapterType:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.AdapterType'
+      additionalProperties: false
+      description: Information about how NIC is emulated.
+    vmm.v4.0.esxi.config.PowerState:
+      type: string
+      description: The current power state of the VM.
+      enum:
+      - 'ON'
+      - 'OFF'
+      - SUSPENDED
+      - UNDETERMINED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        UNDETERMINED: The VM power state is currently unknown.
+        SUSPENDED: The VM power state is currently suspended.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        'OFF': The VM is powered-off.
+        $REDACTED: 'Redacted value.
+
+          '
+        'ON': The VM is powered-on.
+    vmm.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/vmm.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    vmm.v4.0.esxi.config.OwnerReferenceEntityType:
+      type: string
+      description: Type of the entity that the owner reference is pointing to.
+      enum:
+      - USER
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        USER: Entity type that the owner reference is pointing to is User.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.esxi.config.CdRom:
+      description: Virtual Machine CD-ROM.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          diskAddress:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRomAddress'
+          backingInfo:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRomBackingInfo'
+        additionalProperties: false
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    vmm.v4.0.esxi.config.DiskBusType:
+      type: string
+      description: 'Bus type for the device. The acceptable values are: SCSI, IDE, PCI, SATA, SPAPR (only PPC).'
+      enum:
+      - SCSI
+      - IDE
+      - SATA
+      - NVME
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        SCSI: The type of disk bus is SCSI.
+        NVME: The type of disk bus is NVME.
+        IDE: The type of disk bus is IDE.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SATA: The type of disk bus is SATA.
+        $REDACTED: 'Redacted value.
+
+          '
     vmm.v4.0.esxi.config.NutanixGuestTools:
       type: object
       properties:
@@ -772,16 +879,13 @@ components:
           type: boolean
           description: Indicates whether Nutanix Guest Tools is installed on the VM or not.
           readOnly: true
-          example: false
         isEnabled:
           type: boolean
           description: Indicates whether Nutanix Guest Tools is enabled or not.
-          example: false
         isIsoInserted:
           type: boolean
           description: Indicates whether Nutanix Guest Tools ISO is inserted or not.
           readOnly: true
-          example: false
         capabilities:
           maxItems: 2
           minItems: 0
@@ -802,56 +906,163 @@ components:
           type: boolean
           description: Indicates whether the communication from VM to CVM is active or not.
           readOnly: true
-          example: true
         isVssSnapshotCapable:
           type: boolean
           description: Indicates whether the VM is configured to take VSS snapshots through NGT or not.
           readOnly: true
-          example: true
         isVmMobilityDriversInstalled:
           type: boolean
           description: Indicates whether the VM mobility drivers are installed on the VM or not.
           readOnly: true
-          example: false
       additionalProperties: false
       description: The details about Nutanix Guest Tools for a VM.
-    vmm.v4.0.esxi.config.IpAddressInfo:
+    common.v1.0.response.ApiLink:
       type: object
       properties:
-        ipv4Addresses:
-          maxItems: 128
-          minItems: 0
-          type: array
-          description: IP addresses for the NIC.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6Addresses:
-          maxItems: 128
-          minItems: 0
-          type: array
-          description: IPV6 addresses for the NIC.
-          readOnly: true
-          items:
-            type: string
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
       additionalProperties: false
-      description: The IP address information of NIC.
-    vmm.v4.0.esxi.config.VmDisk:
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    vmm.v4.0.esxi.config.CdRomAddress:
       type: object
       properties:
-        diskSizeBytes:
-          minimum: 1
+        busType:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRomBusType'
+        index:
+          minimum: 0
           type: integer
-          description: Size of the disk in bytes.
-          format: int64
+          description: Device index on the bus. This field is ignored unless the bus details are specified.
+          format: int32
           readOnly: true
-          example: 98
-        storageContainer:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDiskContainerReference'
-        storageConfig:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDiskStorageConfig'
       additionalProperties: false
-      description: Storage provided by Nutanix ADSF.
+      description: CD-ROM address.
+    vmm.v4.0.esxi.config.Disk:
+      description: Virtual Machine disk (VM disk).
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          diskAddress:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.DiskAddress'
+          backingInfo:
+            $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDisk'
+        additionalProperties: false
+    vmm.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    vmm.v4.0.esxi.config.VmDiskStorageConfig:
+      type: object
+      properties:
+        isFlashModeEnabled:
+          type: boolean
+          description: Indicates whether the virtual disk is pinned to the hot tier or not.
+          readOnly: true
+      additionalProperties: false
+      description: Storage configuration for VM disks.
+    vmm.v4.0.esxi.config.AdapterType:
+      type: string
+      description: Adapter type for VM NIC.
+      enum:
+      - E1000
+      - PCNET32
+      - VMXNET
+      - VMXNET2
+      - VMXNET3
+      - E1000E
+      - SRIOV
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        E1000E: The NIC adapter type is E1000e.
+        E1000: The NIC adapter type is E1000.
+        SRIOV: The NIC adapter type is Sriov.
+        PCNET32: The NIC adapter type is PCNet32.
+        VMXNET: The NIC adapter type is Vmxnet.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        VMXNET3: The NIC adapter type is Vmxnet3.
+        $REDACTED: 'Redacted value.
+
+          '
+        VMXNET2: The NIC adapter type is Vmxnet2.
+    vmm.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/vmm.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    vmm.v4.0.esxi.config.HostReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The globally unique identifier of a host type UUID.
+      additionalProperties: false
+      description: Reference to the host, the VM is running on.
+    vmm.v4.0.esxi.config.OwnershipInfo:
+      required:
+      - owner
+      type: object
+      properties:
+        owner:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.OwnerReference'
+      additionalProperties: false
+      description: Ownership information for the VM.
     common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
@@ -866,23 +1077,29 @@ components:
       description: 'A wrapper schema containing a map with string keys and values.
 
         '
-    vmm.v4.0.esxi.config.CdRomBusType:
-      type: string
-      description: 'Bus type for the device. The acceptable values are: IDE or SATA.'
-      enum:
-      - IDE
-      - SATA
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        IDE: The type of CD-ROM bus is IDE.
-        $UNKNOWN: 'Unknown value.
+    common.v1.0.config.IPv4Address:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The IPv4 address of the host.
 
-          '
-        SATA: The type of CD-ROM bus is SATA.
-        $REDACTED: 'Redacted value.
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
 
-          '
+            '
+          format: int32
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -901,7 +1118,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: 6c335c2e-8b41-4973-b7d4-08fefbe88680
           links:
             maxItems: 20
             minItems: 0
@@ -914,38 +1130,69 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
-    vmm.v4.0.esxi.config.ClusterReference:
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    vmm.v4.0.esxi.config.NutanixGuestToolsCapability:
+      type: string
+      description: The capabilities of the Nutanix Guest Tools in the VM.
+      enum:
+      - SELF_SERVICE_RESTORE
+      - VSS_SNAPSHOT
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        VSS_SNAPSHOT: Enablement status of the Volume Snapshot Service application.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SELF_SERVICE_RESTORE: Enablement status of the Self Service Restore application.
+        $REDACTED: 'Redacted value.
+
+          '
+    vmm.v4.0.esxi.config.OwnerReference:
       type: object
       properties:
+        entityType:
+          $ref: '#/components/schemas/vmm.v4.0.esxi.config.OwnerReferenceEntityType'
         extId:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
           description: The globally unique identifier of an instance of type UUID.
-          example: a40705ba-6c50-43c4-991c-452cbec6df24
       additionalProperties: false
-      description: Reference to a cluster.
+      description: Owner reference.
+    vmm.v4.0.esxi.config.CdRomBusType:
+      type: string
+      description: 'Bus type for the device. The acceptable values are: IDE or SATA.'
+      enum:
+      - IDE
+      - SATA
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        IDE: The type of CD-ROM bus is IDE.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SATA: The type of CD-ROM bus is SATA.
+        $REDACTED: 'Redacted value.
+
+          '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -967,12 +1214,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 31
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -1003,333 +1248,47 @@ components:
               '
             items:
               type: integer
-              example: 99
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    vmm.v4.0.esxi.config.VmDiskStorageConfig:
+    vmm.v4.0.esxi.config.IpAddressInfo:
       type: object
       properties:
-        isFlashModeEnabled:
-          type: boolean
-          description: Indicates whether the virtual disk is pinned to the hot tier or not.
+        ipv4Addresses:
+          maxItems: 128
+          minItems: 0
+          type: array
+          description: IP addresses for the NIC.
           readOnly: true
-          example: true
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6Addresses:
+          maxItems: 128
+          minItems: 0
+          type: array
+          description: IPV6 addresses for the NIC.
+          readOnly: true
+          items:
+            type: string
       additionalProperties: false
-      description: Storage configuration for VM disks.
-    vmm.v4.0.esxi.config.Vm:
-      description: VM configuration.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 80
-            type: string
-            description: VM name.
-            example: Test VM
-          cluster:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.ClusterReference'
-          host:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.HostReference'
-          description:
-            type: string
-            description: VM description.
-            example: Description for your VM
-          categories:
-            maxItems: 256
-            minItems: 0
-            type: array
-            description: Categories for the VM.
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.esxi.config.CategoryReference'
-          ownershipInfo:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.OwnershipInfo'
-          nutanixGuestTools:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.NutanixGuestTools'
-          powerState:
-            $ref: '#/components/schemas/vmm.v4.0.esxi.config.PowerState'
-          memorySizeBytes:
-            minimum: 1
-            type: integer
-            description: Memory size in bytes.
-            format: int64
-            readOnly: true
-            example: 67
-          numCoresPerSocket:
-            minimum: 1
-            type: integer
-            description: Number of cores per socket.
-            format: int64
-            readOnly: true
-            example: 98
-          numCpus:
-            minimum: 1
-            type: integer
-            description: Number of vCPUs.
-            format: int64
-            readOnly: true
-            example: 3
-          guestOsName:
-            maxLength: 256
-            type: string
-            description: Name of the guest OS.
-            readOnly: true
-            example: CentOS 7 (64-bit)
-          virtualHardwareVersion:
-            minimum: 1
-            type: integer
-            description: Virtual hardware version of the VM.
-            format: int64
-            readOnly: true
-            example: 38
-          disks:
-            maxItems: 256
-            minItems: 0
-            type: array
-            description: Disks attached to the VM.
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.esxi.config.Disk'
-          cdRoms:
-            maxItems: 256
-            minItems: 0
-            type: array
-            description: CD-ROMs attached to the VM.
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRom'
-          nics:
-            maxItems: 32
-            minItems: 0
-            type: array
-            description: NICs attached to the VM.
-            items:
-              $ref: '#/components/schemas/vmm.v4.0.esxi.config.Nic'
-        additionalProperties: false
-    vmm.v4.0.esxi.config.DiskBusType:
-      type: string
-      description: 'Bus type for the device. The acceptable values are: SCSI, IDE, PCI, SATA, SPAPR (only PPC).'
-      enum:
-      - SCSI
-      - IDE
-      - SATA
-      - NVME
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        SCSI: The type of disk bus is SCSI.
-        NVME: The type of disk bus is NVME.
-        IDE: The type of disk bus is IDE.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SATA: The type of disk bus is SATA.
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.esxi.config.OwnershipInfo:
-      required:
-      - owner
+      description: The IP address information of NIC.
+    vmm.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        owner:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.OwnerReference'
-      additionalProperties: false
-      description: Ownership information for the VM.
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 25
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    vmm.v4.0.esxi.config.NutanixGuestToolsCapability:
-      type: string
-      description: The capabilities of the Nutanix Guest Tools in the VM.
-      enum:
-      - SELF_SERVICE_RESTORE
-      - VSS_SNAPSHOT
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        VSS_SNAPSHOT: Enablement status of the Volume Snapshot Service application.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SELF_SERVICE_RESTORE: Enablement status of the Self Service Restore application.
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.error.AppMessage:
-      type: object
-      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
         message:
           type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
+          description: The detailed message for the validation error.
+        attributePath:
           type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
+          description: The path of the attribute that failed validation in the schema.
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
+      description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
-    vmm.v4.0.esxi.config.VmDiskContainerReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM disk container. It should be of type UUID.
-          readOnly: true
-          example: a07a4e30-c19a-44a2-b2cb-b97ce4f82370
-      additionalProperties: false
-      description: This reference is for disk level storage container preference. This preference specifies the storage container
-        to which this disk belongs.
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 248.218.207.162
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    vmm.v4.0.esxi.config.CdRomBackingInfo:
-      type: object
-      properties:
-        diskExtId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: A globally unique identifier of a VM disk of type UUID.
-          readOnly: true
-          example: c15a8938-f93a-4ed8-bf9a-aeb2634afa01
-        storageContainer:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.VmDiskContainerReference'
-      additionalProperties: false
-      description: Storage provided by Nutanix ADSF.
-    vmm.v4.0.esxi.config.CdRomAddress:
-      type: object
-      properties:
-        busType:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.CdRomBusType'
-        index:
-          minimum: 0
-          type: integer
-          description: Device index on the bus. This field is ignored unless the bus details are specified.
-          format: int32
-          readOnly: true
-          example: 74
-      additionalProperties: false
-      description: CD-ROM address.
-    vmm.v4.0.esxi.config.OwnerReferenceEntityType:
-      type: string
-      description: Type of the entity that the owner reference is pointing to.
-      enum:
-      - USER
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        USER: Entity type that the owner reference is pointing to is User.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    vmm.v4.0.esxi.config.NicBackingInfo:
-      type: object
-      properties:
-        macAddress:
-          pattern: ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$
-          type: string
-          description: MAC address of the NIC.
-          readOnly: true
-          example: 9f:bb:2f:97:1e:62
-        isConnected:
-          type: boolean
-          description: Indicates whether the NIC is connected or not. Default is True.
-          readOnly: true
-          default: true
-        adapterType:
-          $ref: '#/components/schemas/vmm.v4.0.esxi.config.AdapterType'
-      additionalProperties: false
-      description: Information about how NIC is emulated.
   securitySchemes:
     basicAuthScheme:
       type: http

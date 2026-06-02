@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -361,7 +359,6 @@ paths:
         schema:
           pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
           type: string
-          example: QmFzZTY0RW5jb2RlZA==:f1aee1aa-666a-4c56-bb5e-9a01697798e8
       - name: $select
         in: query
         description: 'A URL query parameter that allows clients to request a specific set of properties for each entity or
@@ -552,216 +549,30 @@ paths:
           \n"
 components:
   schemas:
-    prism.v4.0.config.Task:
+    prism.v4.0.error.SchemaValidationError:
       type: object
       properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+        timestamp:
           type: string
-          description: A globally unique identifier of a task.
-          readOnly: true
-          example: QmFzZTY0RW5jb2RlZA==:86114933-1b11-4c4f-bb21-b8b7075e1044
-        operation:
-          type: string
-          description: The operation name being tracked by the task.
-          readOnly: true
-          example: kVmCreate
-        operationDescription:
-          type: string
-          description: Description of the operation being tracked by the task.
-          readOnly: true
-          example: Create VM
-        parentTask:
-          $ref: '#/components/schemas/prism.v4.0.config.TaskReferenceInternal'
-        createdTime:
-          type: string
-          description: UTC date and time in RFC-3339 format when the task was created.
+          description: Timestamp of the response.
           format: date-time
-          readOnly: true
-          example: 2009-09-23 14:30:00-07:00
-        startedTime:
-          type: string
-          description: UTC date and time in RFC-3339 format when the task was started.
-          format: date-time
-          readOnly: true
-          example: 2009-09-23 14:30:00-07:00
-        completedTime:
-          type: string
-          description: UTC date and time in RFC-3339 format when the task was completed.
-          format: date-time
-          readOnly: true
-          example: 2009-09-23 14:30:00-07:00
-        status:
-          $ref: '#/components/schemas/prism.v4.0.config.TaskStatus'
-        progressPercentage:
-          maximum: 100
-          minimum: 0
+        statusCode:
           type: integer
-          description: Task progress expressed as a percentage.
-          format: int32
-          readOnly: true
-          example: 90
-        entitiesAffected:
-          maxItems: 300
-          minItems: 0
-          type: array
-          description: Reference to entities associated with the task.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/prism.v4.0.config.EntityReference'
-        subTasks:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Reference to tasks spawned as children of the current task. The task get response would contain a limited
-            number of subtask references. To get the entire list of subtasks for a task, use the parent task filter in the
-            task list API.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/prism.v4.0.config.TaskReferenceInternal'
-        subSteps:
-          maxItems: 50
-          minItems: 0
-          type: array
-          description: List of steps completed as part of the task.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/prism.v4.0.config.TaskStep'
-        isCancelable:
-          type: boolean
-          description: Signifies if the task can be cancelled.
-          readOnly: true
-          example: true
-        ownedBy:
-          $ref: '#/components/schemas/prism.v4.0.config.OwnerReference'
-        completionDetails:
-          maxItems: 50
-          minItems: 0
-          type: array
-          description: Additional details on the task to aid the user with further actions post completion of the task.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-        errorMessages:
-          maxItems: 100
-          minItems: 0
-          type: array
-          description: Error details explaining a task failure. These would be populated only in the case of task failures.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
-        legacyErrorMessage:
+          description: The HTTP status code of the response.
+        error:
           type: string
-          description: Provides an error message in the absence of a well-defined error message for the tasks created through
-            legacy APIs.
-          readOnly: true
-          example: Setting Credential Guard for a VM with a GPU is not supported
-        warnings:
-          maxItems: 50
-          minItems: 0
-          type: array
-          description: Warning messages to alert the user of issues which did not directly cause task failure. These can be
-            populated for any task.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
-        lastUpdatedTime:
+          description: The generic error message for the response.
+        path:
           type: string
-          description: UTC date and time in RFC-3339 format when the task was last updated.
-          format: date-time
-          readOnly: true
-          example: 2009-09-23 14:30:00-07:00
-        clusterExtIds:
-          maxItems: 500
-          minItems: 0
+          description: API path on which the request was made.
+        validationErrorMessages:
           type: array
-          description: List of globally unique identifiers for clusters associated with the task or any of its subtasks.
-          readOnly: true
+          description: List of validation error messages
           items:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            example: 883f56b3-b093-427f-a9fc-eb04a73a821c
-        rootTask:
-          $ref: '#/components/schemas/prism.v4.0.config.TaskReferenceInternal'
-        isBackgroundTask:
-          type: boolean
-          description: Signifies if the task is a background task or not.
-          readOnly: true
-          example: true
-        numberOfSubtasks:
-          type: integer
-          description: Number of tasks spawned as children of the current task.
-          format: int32
-          readOnly: true
-          example: 78
-        numberOfEntitiesAffected:
-          type: integer
-          description: Number of entities associated with the task.
-          format: int32
-          readOnly: true
-          example: 79
+            $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationErrorMessage'
       additionalProperties: false
-      description: The task object tracking an asynchronous operation.
-    prism.v4.0.config.TaskReferenceInternal:
-      description: Reference to the parent task associated with the current task.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-            type: string
-            description: A globally unique identifier of the task.
-            readOnly: true
-            example: QmFzZTY0RW5jb2RlZA==:0b2e57b5-209f-4031-a435-7ad83da469aa
-        additionalProperties: false
-    prism.v4.0.config.EntityReference:
-      type: object
-      properties:
-        extId:
-          type: string
-          description: A globally unique identifier of the entity.
-          readOnly: true
-          example: 7ccae44f-d067-4d49-a4d0-7409e2455894
-        rel:
-          type: string
-          description: Entity type identified as 'namespace:module[:submodule]:entityType'. For example - vmm:ahv:vm, where
-            vmm is the namepsace, ahv is the module and vm is the entitytype.
-          readOnly: true
-          example: vmm:ahv:config:vm
-        name:
-          maxLength: 256
-          type: string
-          description: Name of the entity.
-          readOnly: true
-          example: Test VM
-      additionalProperties: false
-      description: Details of the entity.
-    prism.v4.0.config.TaskStep:
-      type: object
-      properties:
-        name:
-          maxLength: 512
-          type: string
-          description: Message describing the completed steps for the task.
-          readOnly: true
-          example: Create underlying infrastructure
-      additionalProperties: false
-      description: A single step in the task.
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -789,117 +600,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    prism.v4.0.config.TaskStatus:
-      type: string
-      description: Status of the task.
-      enum:
-      - QUEUED
-      - RUNNING
-      - CANCELING
-      - SUCCEEDED
-      - FAILED
-      - CANCELED
-      - SUSPENDED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        FAILED: Status indicating that the task has failed.
-        QUEUED: Status indicating that the task is queued for execution.
-        RUNNING: Status indicating that the task is currently being executed.
-        SUSPENDED: Status indicating that the task is currently suspended.
-        SUCCEEDED: Status indicating that the task has been executed successfully.
-        CANCELED: Status indicating that the task has been cancelled.
-        CANCELING: Status indicating that the task is marked for cancellation.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    prism.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    prism.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -919,6 +619,163 @@ components:
         an address for retrieving the particular resource.
 
         '
+    prism.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    prism.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    prism.v4.0.config.EntityReference:
+      type: object
+      properties:
+        extId:
+          type: string
+          description: A globally unique identifier of the entity.
+          readOnly: true
+        rel:
+          type: string
+          description: Entity type identified as 'namespace:module[:submodule]:entityType'. For example - vmm:ahv:vm, where
+            vmm is the namepsace, ahv is the module and vm is the entitytype.
+          readOnly: true
+        name:
+          maxLength: 256
+          type: string
+          description: Name of the entity.
+          readOnly: true
+      additionalProperties: false
+      description: Details of the entity.
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    prism.v4.0.config.TaskStep:
+      type: object
+      properties:
+        name:
+          maxLength: 512
+          type: string
+          description: Message describing the completed steps for the task.
+          readOnly: true
+      additionalProperties: false
+      description: A single step in the task.
+    prism.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -940,12 +797,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 3
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -976,106 +831,206 @@ components:
               '
             items:
               type: integer
-              example: 3
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    prism.v4.0.error.SchemaValidationError:
+    prism.v4.0.config.Task:
       type: object
       properties:
-        timestamp:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
           type: string
-          description: Timestamp of the response.
+          description: A globally unique identifier of a task.
+          readOnly: true
+        operation:
+          type: string
+          description: The operation name being tracked by the task.
+          readOnly: true
+        operationDescription:
+          type: string
+          description: Description of the operation being tracked by the task.
+          readOnly: true
+        parentTask:
+          $ref: '#/components/schemas/prism.v4.0.config.TaskReferenceInternal'
+        createdTime:
+          type: string
+          description: UTC date and time in RFC-3339 format when the task was created.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
+          readOnly: true
+        startedTime:
+          type: string
+          description: UTC date and time in RFC-3339 format when the task was started.
+          format: date-time
+          readOnly: true
+        completedTime:
+          type: string
+          description: UTC date and time in RFC-3339 format when the task was completed.
+          format: date-time
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/prism.v4.0.config.TaskStatus'
+        progressPercentage:
+          maximum: 100
+          minimum: 0
           type: integer
-          description: The HTTP status code of the response.
-          example: 36
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/prism.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    prism.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
+          description: Task progress expressed as a percentage.
           format: int32
-          example: 41
-        messages:
-          maxItems: 20
+          readOnly: true
+        entitiesAffected:
+          maxItems: 300
           minItems: 0
           type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
+          description: Reference to entities associated with the task.
+          readOnly: true
           items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
+            $ref: '#/components/schemas/prism.v4.0.config.EntityReference'
+        subTasks:
+          maxItems: 100
           minItems: 0
           type: array
-          description: 'An array of entity-specific metadata
-
-            '
+          description: Reference to tasks spawned as children of the current task. The task get response would contain a limited
+            number of subtask references. To get the entire list of subtasks for a task, use the parent task filter in the
+            task list API.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/prism.v4.0.config.TaskReferenceInternal'
+        subSteps:
+          maxItems: 50
+          minItems: 0
+          type: array
+          description: List of steps completed as part of the task.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/prism.v4.0.config.TaskStep'
+        isCancelable:
+          type: boolean
+          description: Signifies if the task can be cancelled.
+          readOnly: true
+        ownedBy:
+          $ref: '#/components/schemas/prism.v4.0.config.OwnerReference'
+        completionDetails:
+          maxItems: 50
+          minItems: 0
+          type: array
+          description: Additional details on the task to aid the user with further actions post completion of the task.
+          readOnly: true
           items:
             $ref: '#/components/schemas/common.v1.0.config.KVPair'
+        errorMessages:
+          maxItems: 100
+          minItems: 0
+          type: array
+          description: Error details explaining a task failure. These would be populated only in the case of task failures.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
+        legacyErrorMessage:
+          type: string
+          description: Provides an error message in the absence of a well-defined error message for the tasks created through
+            legacy APIs.
+          readOnly: true
+        warnings:
+          maxItems: 50
+          minItems: 0
+          type: array
+          description: Warning messages to alert the user of issues which did not directly cause task failure. These can be
+            populated for any task.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/prism.v4.0.error.AppMessage'
+        lastUpdatedTime:
+          type: string
+          description: UTC date and time in RFC-3339 format when the task was last updated.
+          format: date-time
+          readOnly: true
+        clusterExtIds:
+          maxItems: 500
+          minItems: 0
+          type: array
+          description: List of globally unique identifiers for clusters associated with the task or any of its subtasks.
+          readOnly: true
+          items:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+        rootTask:
+          $ref: '#/components/schemas/prism.v4.0.config.TaskReferenceInternal'
+        isBackgroundTask:
+          type: boolean
+          description: Signifies if the task is a background task or not.
+          readOnly: true
+        numberOfSubtasks:
+          type: integer
+          description: Number of tasks spawned as children of the current task.
+          format: int32
+          readOnly: true
+        numberOfEntitiesAffected:
+          type: integer
+          description: Number of entities associated with the task.
+          format: int32
+          readOnly: true
       additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+      description: The task object tracking an asynchronous operation.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
 
-        '
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    prism.v4.0.config.TaskStatus:
+      type: string
+      description: Status of the task.
+      enum:
+      - QUEUED
+      - RUNNING
+      - CANCELING
+      - SUCCEEDED
+      - FAILED
+      - CANCELED
+      - SUSPENDED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        FAILED: Status indicating that the task has failed.
+        QUEUED: Status indicating that the task is queued for execution.
+        RUNNING: Status indicating that the task is currently being executed.
+        SUSPENDED: Status indicating that the task is currently suspended.
+        SUCCEEDED: Status indicating that the task has been executed successfully.
+        CANCELED: Status indicating that the task has been cancelled.
+        CANCELING: Status indicating that the task is marked for cancellation.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    prism.v4.0.config.TaskReferenceInternal:
+      description: Reference to the parent task associated with the current task.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+            type: string
+            description: A globally unique identifier of the task.
+            readOnly: true
+        additionalProperties: false
     prism.v4.0.config.OwnerReference:
       type: object
       properties:
@@ -1084,15 +1039,27 @@ components:
           type: string
           description: A globally unique identifier of the task owner.
           readOnly: true
-          example: c9a10a62-5724-4b67-8a7d-2d8bdf6365d8
         name:
           maxLength: 256
           type: string
           description: Username of the task owner.
           readOnly: true
-          example: Test User
       additionalProperties: false
       description: Reference to the owner of the task.
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
   securitySchemes:
     basicAuthScheme:
       type: http

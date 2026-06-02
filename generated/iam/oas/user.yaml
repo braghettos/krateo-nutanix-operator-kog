@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -509,7 +507,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: d3a3232a-9055-4740-b54f-b21a33524565
       responses:
         '200':
           description: Returns the requested user.
@@ -650,7 +647,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: d7ad0a20-ed64-49fc-ac8a-12a0492f0723
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -839,233 +835,19 @@ paths:
           \n"
 components:
   schemas:
-    iam.v4.0.error.SchemaValidationErrorMessage:
+    iam.v4.0.error.ErrorResponse:
       type: object
       properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/iam.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationError'
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
       x-platform-generated: true
-    iam.v4.0.authn.CreationType:
-      type: string
-      description: The creation mechanism of this entity.
-      enum:
-      - PREDEFINED
-      - USERDEFINED
-      - SERVICEDEFINED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PREDEFINED: Predefined creator workflow type is for entity created by the system.
-        SERVICEDEFINED: Servicedefined creator workflow type is for entity created by the service.
-        USERDEFINED: Userdefined creator workflow type is for entity created by the users.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    iam.v4.0.authn.UserType:
-      type: string
-      description: User type like SAML user or local user, and so on.
-      enum:
-      - LOCAL
-      - SAML
-      - LDAP
-      - EXTERNAL
-      - SERVICE_ACCOUNT
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        SERVICE_ACCOUNT: User stored locally in IAM and is used by customer applications, scripts and internal services.
-        LDAP: User belonging to a directory service (OpenLDAP/AD).
-        EXTERNAL: User not stored locally nor belonging to any IDP or directory service.
-        LOCAL: User stored locally in IAM.
-        SAML: User belonging to a SAML IDP.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    iam.v4.0.authn.User:
-      required:
-      - userType
-      - username
-      description: Information of the user.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          username:
-            maxLength: 255
-            minLength: 1
-            pattern: ^[^<>;'()&+%\/\\"`]*$
-            type: string
-            description: Identifier of the user.
-            example: john_doe
-          userType:
-            $ref: '#/components/schemas/iam.v4.0.authn.UserType'
-          idpId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Identifier of the IDP for the user.
-            example: 64804474-631f-4b69-a734-591d0a28a139
-          displayName:
-            maxLength: 255
-            minLength: 1
-            pattern: ^[^<>;'()&+%\/\\"`]*$
-            type: string
-            description: Display name of the user. For LDAP and SAML users, this is set from AD config.
-            example: john jane doe
-          firstName:
-            maxLength: 255
-            minLength: 1
-            pattern: ^[^<>;'()&+%\/\\"`]*$
-            type: string
-            description: First name of the user.
-            example: john
-          middleInitial:
-            maxLength: 255
-            minLength: 1
-            pattern: ^[^<>;'()&+%\/\\"`]*$
-            type: string
-            description: Middle name of the user.
-            example: jane
-          lastName:
-            maxLength: 255
-            minLength: 1
-            pattern: ^[^<>;'()&+%\/\\"`]*$
-            type: string
-            description: Last name of the user.
-            example: doe
-          emailId:
-            maxLength: 255
-            pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-            type: string
-            description: Email ID of the user.
-            example: john.doe@example.com
-          locale:
-            type: string
-            description: Default locale of the user.
-            example: en-US
-          region:
-            type: string
-            description: Default region of the user.
-            example: en-US
-          password:
-            type: string
-            description: Password of the user.
-            writeOnly: true
-          isForceResetPasswordEnabled:
-            type: boolean
-            description: Flag to force the user to reset password.
-            example: true
-          additionalAttributes:
-            maxItems: 10
-            minItems: 0
-            type: array
-            description: Indicates additional attributes of the user.
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.KVPair'
-          status:
-            $ref: '#/components/schemas/iam.v4.0.authn.UserStatusType'
-          bucketsAccessKeys:
-            maxItems: 5
-            minItems: 0
-            type: array
-            description: Bucket access keys for the user.
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/iam.v4.0.authn.BucketsAccessKey'
-          lastLoginTime:
-            type: string
-            description: The last successful login time for the user.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          createdTime:
-            type: string
-            description: Creation time of the user.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          lastUpdatedTime:
-            type: string
-            description: The last updated time for the user.
-            format: date-time
-            readOnly: true
-            example: 2009-09-23 14:30:00-07:00
-          createdBy:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: User or Service who created the user.
-            readOnly: true
-            example: e2f0d068-48c1-4872-a008-439d00c9fc40
-          lastUpdatedBy:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Last updated by this user ID.
-            readOnly: true
-            example: 48f316c1-78c1-415e-a11b-c457d98a012b
-          description:
-            type: string
-            description: Description of the user.
-            readOnly: false
-            example: IT user
-          creationType:
-            $ref: '#/components/schemas/iam.v4.0.authn.CreationType'
-        additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 89fb8492-86d4-43cb-ac1a-bc51ae0dff45
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1093,6 +875,183 @@ components:
         $REDACTED: 'Redacted value.
 
           '
+    iam.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    iam.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    iam.v4.0.authn.UserStatusType:
+      type: string
+      description: Status of the user.
+      enum:
+      - ACTIVE
+      - INACTIVE
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ACTIVE: Denotes that the local user is active.
+        INACTIVE: Denotes that the local user is inactive and needs to be reactivated.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    iam.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
     common.v1.0.response.ApiLink:
       type: object
       properties:
@@ -1112,6 +1071,137 @@ components:
         an address for retrieving the particular resource.
 
         '
+    iam.v4.0.authn.User:
+      required:
+      - userType
+      - username
+      description: Information of the user.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          username:
+            maxLength: 255
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: Identifier of the user.
+          userType:
+            $ref: '#/components/schemas/iam.v4.0.authn.UserType'
+          idpId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Identifier of the IDP for the user.
+          displayName:
+            maxLength: 255
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: Display name of the user. For LDAP and SAML users, this is set from AD config.
+          firstName:
+            maxLength: 255
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: First name of the user.
+          middleInitial:
+            maxLength: 255
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: Middle name of the user.
+          lastName:
+            maxLength: 255
+            minLength: 1
+            pattern: ^[^<>;'()&+%\/\\"`]*$
+            type: string
+            description: Last name of the user.
+          emailId:
+            maxLength: 255
+            pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+            type: string
+            description: Email ID of the user.
+          locale:
+            type: string
+            description: Default locale of the user.
+          region:
+            type: string
+            description: Default region of the user.
+          password:
+            type: string
+            description: Password of the user.
+            writeOnly: true
+          isForceResetPasswordEnabled:
+            type: boolean
+            description: Flag to force the user to reset password.
+          additionalAttributes:
+            maxItems: 10
+            minItems: 0
+            type: array
+            description: Indicates additional attributes of the user.
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.KVPair'
+          status:
+            $ref: '#/components/schemas/iam.v4.0.authn.UserStatusType'
+          bucketsAccessKeys:
+            maxItems: 5
+            minItems: 0
+            type: array
+            description: Bucket access keys for the user.
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/iam.v4.0.authn.BucketsAccessKey'
+          lastLoginTime:
+            type: string
+            description: The last successful login time for the user.
+            format: date-time
+            readOnly: true
+          createdTime:
+            type: string
+            description: Creation time of the user.
+            format: date-time
+            readOnly: true
+          lastUpdatedTime:
+            type: string
+            description: The last updated time for the user.
+            format: date-time
+            readOnly: true
+          createdBy:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: User or Service who created the user.
+            readOnly: true
+          lastUpdatedBy:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Last updated by this user ID.
+            readOnly: true
+          description:
+            type: string
+            description: Description of the user.
+            readOnly: false
+          creationType:
+            $ref: '#/components/schemas/iam.v4.0.authn.CreationType'
+        additionalProperties: false
+    iam.v4.0.authn.CreationType:
+      type: string
+      description: The creation mechanism of this entity.
+      enum:
+      - PREDEFINED
+      - USERDEFINED
+      - SERVICEDEFINED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PREDEFINED: Predefined creator workflow type is for entity created by the system.
+        SERVICEDEFINED: Servicedefined creator workflow type is for entity created by the service.
+        USERDEFINED: Userdefined creator workflow type is for entity created by the users.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
     common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
@@ -1126,6 +1216,25 @@ components:
       description: 'A wrapper schema containing a map with string keys and values.
 
         '
+    iam.v4.0.authn.BucketsAccessKeyStatusType:
+      type: string
+      description: The status of the buckets access key, that is, valid, expired or revoked.
+      enum:
+      - VALID
+      - REVOKED
+      - EXPIRED
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        REVOKED: Buckets access key is revoked.
+        VALID: Buckets access key is valid.
+        EXPIRED: Buckets access key is expired.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -1144,7 +1253,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: afa17ed1-36c0-4cc0-9fec-c15178ad9aab
           links:
             maxItems: 20
             minItems: 0
@@ -1157,28 +1265,24 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
-    common.v1.0.config.Message:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        code:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          description: 'A code that uniquely identifies a message.
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+          readOnly: true
       additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1200,12 +1304,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 52
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1236,160 +1338,27 @@ components:
               '
             items:
               type: integer
-              example: 28
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    iam.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/iam.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    iam.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 72
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    iam.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 60
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    iam.v4.0.authn.UserStatusType:
+    iam.v4.0.authn.UserType:
       type: string
-      description: Status of the user.
+      description: User type like SAML user or local user, and so on.
       enum:
-      - ACTIVE
-      - INACTIVE
+      - LOCAL
+      - SAML
+      - LDAP
+      - EXTERNAL
+      - SERVICE_ACCOUNT
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        ACTIVE: Denotes that the local user is active.
-        INACTIVE: Denotes that the local user is inactive and needs to be reactivated.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    iam.v4.0.authn.BucketsAccessKeyStatusType:
-      type: string
-      description: The status of the buckets access key, that is, valid, expired or revoked.
-      enum:
-      - VALID
-      - REVOKED
-      - EXPIRED
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        REVOKED: Buckets access key is revoked.
-        VALID: Buckets access key is valid.
-        EXPIRED: Buckets access key is expired.
+        SERVICE_ACCOUNT: User stored locally in IAM and is used by customer applications, scripts and internal services.
+        LDAP: User belonging to a directory service (OpenLDAP/AD).
+        EXTERNAL: User not stored locally nor belonging to any IDP or directory service.
+        LOCAL: User stored locally in IAM.
+        SAML: User belonging to a SAML IDP.
         $UNKNOWN: 'Unknown value.
 
           '
@@ -1410,7 +1379,6 @@ components:
             pattern: ^[^<>;'()&+%\/\\"`]*$
             type: string
             description: Name of the bucket access key.
-            example: key1
           secretAccessKey:
             type: string
             description: This represents secret access key, which will be returned only during access key creation.
@@ -1420,32 +1388,27 @@ components:
             type: string
             description: User identifier who owns the bucket access key.
             readOnly: true
-            example: 48e608f0-7c9c-40fa-a710-0df37f57a135
           createdTime:
             type: string
             description: Creation time for the bucket access key.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           lastUpdatedBy:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: Entity that updated the buckets access key.
             readOnly: true
-            example: 4e7761a5-d9eb-4d54-a8cf-6a95afd49267
           assignedTo:
             maxLength: 255
             minLength: 3
             type: string
             description: External client to whom this key is allocated.
-            example: user2
           creationType:
             $ref: '#/components/schemas/iam.v4.0.authn.CreationType'
           expiryTime:
             type: string
             description: The expiry time of the buckets access Key.
             format: date-time
-            example: 2009-09-23 14:30:00-07:00
           status:
             $ref: '#/components/schemas/iam.v4.0.authn.BucketsAccessKeyStatusType'
           createdBy:
@@ -1453,13 +1416,11 @@ components:
             type: string
             description: Service account user who created the buckets access key.
             readOnly: true
-            example: 72a0aa3b-c129-4cc6-a0b5-a78989db546e
           lastUpdatedTime:
             type: string
             description: Creation time for the bucket access key.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
         additionalProperties: false
   securitySchemes:
     basicAuthScheme:

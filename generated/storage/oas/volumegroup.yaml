@@ -42,7 +42,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -79,7 +77,6 @@ paths:
         explode: true
         schema:
           type: string
-          example: string
       - name: $orderby
         in: query
         description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects.
@@ -97,7 +94,6 @@ paths:
         explode: true
         schema:
           type: string
-          example: string
       responses:
         '200':
           description: Paginated list of Volume Groups.
@@ -182,12 +178,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeGroupApiResponse'
-        default:
-          description: Task Id corresponding to the Volume Group create operation.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeGroupApiResponse'
         4XX:
           description: Client error response
           content:
@@ -265,7 +255,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 158cd0fe-ac94-4b5d-883e-90035551fd03
       responses:
         '200':
           description: Details of the queried Volume Group.
@@ -334,7 +323,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 89c90d94-f765-4e6d-98af-3d022e170107
       responses:
         '202':
           description: Task Id corresponding to the Volume Group delete operation.
@@ -346,12 +334,6 @@ paths:
                 pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
                 type: string
                 description: Indicates the target of a redirection or the URL of a newly created resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse'
-        default:
-          description: Task Id corresponding to the Volume Group delete operation.
           content:
             application/json:
               schema:
@@ -417,7 +399,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 17377353-5b7b-426a-bb3f-798af45688dd
       requestBody:
         description: A model that represents a Volume Group resource.
         content:
@@ -436,12 +417,6 @@ paths:
                 pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
                 type: string
                 description: Indicates the target of a redirection or the URL of a newly created resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse'
-        default:
-          description: Task Id corresponding to the Volume Group update operation.
           content:
             application/json:
               schema:
@@ -513,6 +488,16 @@ paths:
           \n"
 components:
   schemas:
+    storage.v4.r0.a3.config.Task:
+      title: Task object
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the task.
+      additionalProperties: false
+      description: An object encapsulating Task Id return value.
     common.v1.r0.a3.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -524,95 +509,101 @@ components:
       - ERROR
       - $UNKNOWN
       - $REDACTED
-    common.v1.r0.a3.config.Message:
+    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
       type: object
       properties:
-        code:
+        location:
           type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-          example: string
         message:
           type: string
-          example: string
-        locale:
+        attributePath:
           type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
       additionalProperties: false
-    storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse:
+      description: This schema is generated from SchemaValidationErrorMessage.java
+    storage.v4.r0.a3.config.GetVolumeGroupApiResponse:
       type: object
       properties:
         metadata:
           $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
         data:
           oneOf:
-          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
-          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
           - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
       additionalProperties: false
-      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Delete operation
-    storage.v4.r0.a3.error.ErrorResponse:
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Get operation
+    storage.v4.r0.a3.config.StorageFeatures:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/storage.v4.r0.a3.error.AppMessage'
-          - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
+        flashMode:
+          $ref: '#/components/schemas/storage.v4.r0.a3.config.FlashMode'
       additionalProperties: false
-      description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
-    storage.v4.r0.a3.error.AppMessage:
+      description: Storage features for the Volume Groups.
+    storage.v4.r0.a3.config.AuthenticationType:
+      title: Supported types of authentication
+      type: string
+      description: The authentication type enabled for the Volume Group. If this is set to CHAP, the target/client secret
+        must be provided.
+      enum:
+      - CHAP
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.TenantAwareModel:
       type: object
       properties:
-        message:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: string
-        severity:
-          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
-        code:
-          type: string
-          example: string
-        locale:
-          type: string
-          description: The locale for the message description.
-          default: en_US
-        errorGroup:
-          type: string
-          example: string
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity.  It is automatically
+            assigned by the system and is immutable from an API consumer perspective (some use cases may cause this Id to
+            change - for instance a use case may require the transfer of ownership of the entity, but these cases are handled
+            automatically on the server).
+
+            '
+          readOnly: true
       additionalProperties: false
-      description: This schema is generated from AppMessage.java
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    storage.v4.r0.a3.config.SharingStatus:
+      title: The supported sharing status types
+      type: string
+      description: Indicates whether the Volume Group can be shared across multiple iSCSI initiators. The mode cannot be changed
+        from SHARED to NOT_SHARED on a Volume Group with multiple attachments. Similarly, a Volume Group cannot be associated
+        with more than one attachment as long as it is in exclusive mode.
+      enum:
+      - SHARED
+      - NOT_SHARED
+      - $UNKNOWN
+      - $REDACTED
     storage.v4.r0.a3.config.FlashMode:
       type: object
       properties:
         isEnabled:
           type: boolean
-          example: false
       additionalProperties: false
       description: Once configured, this field will avoid down migration of data from the hot tier unless the overrides field
         is specified for the virtual disks.
-    storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse:
+    common.v1.r0.a3.response.ApiLink:
       type: object
       properties:
-        metadata:
-          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
-        data:
-          oneOf:
-          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
-          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
-          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+        href:
+          type: string
+          description: 'The URL at which the entity described by this link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
+            special value of "self" identifies the URL for the object.
+
+            '
       additionalProperties: false
-      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Patch operation
+      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
     common.v1.r0.a3.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -630,7 +621,6 @@ components:
 
               '
             nullable: true
-            example: ac7be6a0-e497-4e10-8744-ab55a2f96402
           links:
             type: array
             description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the
@@ -640,6 +630,217 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
         additionalProperties: false
+    prism.v4.r0.a1.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: Globally unique identifier of a task.
+      additionalProperties: false
+      description: Reference to a task tracking the async operation.
+    storage.v4.r0.a3.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        statusCode:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
+        validationErrorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+    storage.v4.r0.a3.config.VolumeGroup:
+      title: Volume Group object
+      description: A model that represents a Volume Group resource.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 256
+            type: string
+            description: Volume Group name.
+          description:
+            maxLength: 1000
+            type: string
+            description: Volume Group description.
+          loadBalanceVmAttachments:
+            type: boolean
+            description: Indicates whether to enable Volume Group load balancing for VM attachments. This cannot be enabled
+              if there are iSCSI client attachments already associated with the Volume Group, and vice-versa.
+          sharingStatus:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.SharingStatus'
+          iscsiTargetPrefix:
+            maxLength: 512
+            pattern: ^[\da-zA-Z:\.\-]+$
+            type: string
+            description: The specifications can either contain the iSCSI target prefix or the iSCSI target name as the value.
+              This is an optional field.
+            writeOnly: true
+          iscsiTargetName:
+            type: string
+            description: The specifications can either contain the iSCSI target prefix or the iSCSI target name as the value.
+              This is an optional field.
+          targetSecret:
+            maxLength: 16
+            minLength: 12
+            type: string
+            description: Target secret in case of a CHAP authentication. This field should not be provided in case the authentication
+              type is not set to CHAP.
+            format: password
+            writeOnly: true
+          enabledAuthentications:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.AuthenticationType'
+          createdBy:
+            maxLength: 512
+            type: string
+            description: Service/user who created this Volume Group.
+          clusterReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The UUID of the cluster that will host the Volume Group. This is a mandatory field for creating a
+              Volume Group on Prism Central.
+          storageFeatures:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageFeatures'
+          usageType:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.UsageType'
+          isHidden:
+            type: boolean
+            description: Indicates whether the Volume Group is meant to be hidden or not.
+        additionalProperties: false
+    storage.v4.r0.a3.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+        code:
+          type: string
+        locale:
+          type: string
+          description: The locale for the message description.
+        errorGroup:
+          type: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+      description: This schema is generated from AppMessage.java
+    storage.v4.r0.a3.config.CreateVolumeGroupApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups Post operation
+    storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Patch operation
+    common.v1.r0.a3.config.KVPair:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The key of this key value pair
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+          - type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    storage.v4.r0.a3.config.GetVolumeGroupsApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups Get operation
+    common.v1.r0.a3.config.Flag:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: boolean
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.r0.a3.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+      additionalProperties: false
+    storage.v4.r0.a3.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.error.AppMessage'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
+      additionalProperties: false
+      description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
+    storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Delete operation
     common.v1.r0.a3.response.ApiResponseMetadata:
       type: object
       properties:
@@ -654,7 +855,6 @@ components:
         totalAvailableResults:
           type: integer
           format: int32
-          example: 50
         messages:
           type: array
           items:
@@ -669,185 +869,6 @@ components:
         the API request that produced this response.  Also contains pagination data for paginated requests.
 
         '
-    common.v1.r0.a3.config.Flag:
-      type: object
-      properties:
-        name:
-          type: string
-          example: string
-        value:
-          type: boolean
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.r0.a3.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by this link can be accessed.
-
-            '
-          example: string
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The
-            special value of "self" identifies the URL for the object.
-
-            '
-          example: string
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    storage.v4.r0.a3.config.SharingStatus:
-      title: The supported sharing status types
-      type: string
-      description: Indicates whether the Volume Group can be shared across multiple iSCSI initiators. The mode cannot be changed
-        from SHARED to NOT_SHARED on a Volume Group with multiple attachments. Similarly, a Volume Group cannot be associated
-        with more than one attachment as long as it is in exclusive mode.
-      enum:
-      - SHARED
-      - NOT_SHARED
-      - $UNKNOWN
-      - $REDACTED
-    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          example: string
-        message:
-          type: string
-          example: string
-        attributePath:
-          type: string
-          example: string
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-    storage.v4.r0.a3.config.AuthenticationType:
-      title: Supported types of authentication
-      type: string
-      description: The authentication type enabled for the Volume Group. If this is set to CHAP, the target/client secret
-        must be provided.
-      enum:
-      - CHAP
-      - NONE
-      - $UNKNOWN
-      - $REDACTED
-    storage.v4.r0.a3.config.VolumeGroup:
-      title: Volume Group object
-      description: A model that represents a Volume Group resource.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.r0.a3.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 256
-            type: string
-            description: Volume Group name.
-            example: string
-          description:
-            maxLength: 1000
-            type: string
-            description: Volume Group description.
-            example: string
-          loadBalanceVmAttachments:
-            type: boolean
-            description: Indicates whether to enable Volume Group load balancing for VM attachments. This cannot be enabled
-              if there are iSCSI client attachments already associated with the Volume Group, and vice-versa.
-            example: true
-          sharingStatus:
-            $ref: '#/components/schemas/storage.v4.r0.a3.config.SharingStatus'
-          iscsiTargetPrefix:
-            maxLength: 512
-            pattern: ^[\da-zA-Z:\.\-]+$
-            type: string
-            description: The specifications can either contain the iSCSI target prefix or the iSCSI target name as the value.
-              This is an optional field.
-            writeOnly: true
-            example: string
-          iscsiTargetName:
-            type: string
-            description: The specifications can either contain the iSCSI target prefix or the iSCSI target name as the value.
-              This is an optional field.
-            example: string
-          targetSecret:
-            maxLength: 16
-            minLength: 12
-            type: string
-            description: Target secret in case of a CHAP authentication. This field should not be provided in case the authentication
-              type is not set to CHAP.
-            format: password
-            writeOnly: true
-            example: '***************'
-          enabledAuthentications:
-            $ref: '#/components/schemas/storage.v4.r0.a3.config.AuthenticationType'
-          createdBy:
-            maxLength: 512
-            type: string
-            description: Service/user who created this Volume Group.
-            example: string
-          clusterReference:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: The UUID of the cluster that will host the Volume Group. This is a mandatory field for creating a
-              Volume Group on Prism Central.
-            example: 8a9f3a73-3b43-45c7-9edf-129c9dbcf076
-          storageFeatures:
-            $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageFeatures'
-          usageType:
-            $ref: '#/components/schemas/storage.v4.r0.a3.config.UsageType'
-          isHidden:
-            type: boolean
-            description: Indicates whether the Volume Group is meant to be hidden or not.
-            example: true
-        additionalProperties: false
-    storage.v4.r0.a3.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          example: string
-        statusCode:
-          type: integer
-          example: 25
-        error:
-          type: string
-          example: string
-        path:
-          type: string
-          example: string
-        validationErrorMessages:
-          type: array
-          items:
-            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-    common.v1.r0.a3.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity.  It is automatically
-            assigned by the system and is immutable from an API consumer perspective (some use cases may cause this Id to
-            change - for instance a use case may require the transfer of ownership of the entity, but these cases are handled
-            automatically on the server).
-
-            '
-          readOnly: true
-          example: 69d77424-8db5-4a6a-878a-c2ef281783df
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     storage.v4.r0.a3.config.UsageType:
       title: Supported Volume Group Usage types
       type: string
@@ -859,88 +880,6 @@ components:
       - BACKUP_TARGET
       - $UNKNOWN
       - $REDACTED
-    storage.v4.r0.a3.config.StorageFeatures:
-      type: object
-      properties:
-        flashMode:
-          $ref: '#/components/schemas/storage.v4.r0.a3.config.FlashMode'
-      additionalProperties: false
-      description: Storage features for the Volume Groups.
-    storage.v4.r0.a3.config.GetVolumeGroupsApiResponse:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
-        data:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
-          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
-      additionalProperties: false
-      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups Get operation
-    common.v1.r0.a3.config.KVPair:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The key of this key value pair
-          example: string
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            example: string
-          - type: integer
-            example: 6
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
-    prism.v4.r0.a1.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: Globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:e783b480-4d55-4fd7-b760-10291f7ba4ca
-      additionalProperties: false
-      description: Reference to a task tracking the async operation.
-    storage.v4.r0.a3.config.GetVolumeGroupApiResponse:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
-        data:
-          oneOf:
-          - $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
-          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
-      additionalProperties: false
-      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Get operation
-    storage.v4.r0.a3.config.CreateVolumeGroupApiResponse:
-      type: object
-      properties:
-        metadata:
-          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
-        data:
-          oneOf:
-          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
-          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
-          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
-      additionalProperties: false
-      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups Post operation
-    storage.v4.r0.a3.config.Task:
-      title: Task object
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: The external identifier of the task.
-          example: f4ef6b76-9e80-4ce5-ac90-fda128b72f4c
-      additionalProperties: false
-      description: An object encapsulating Task Id return value.
   securitySchemes:
     basicAuthScheme:
       type: http

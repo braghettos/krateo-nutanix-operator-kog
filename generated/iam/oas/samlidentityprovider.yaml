@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -471,7 +469,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: a2a8650a-358a-4791-90c9-7a8b6e2989d6
       responses:
         '200':
           description: Returns SAML identity provider.
@@ -615,7 +612,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 6399d7e9-abdc-4c35-a35b-df73010165d6
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -816,7 +812,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: cf18fbde-18f0-4b34-af40-ff411c5afad3
       - name: If-Match
         in: header
         description: 'The If-Match request header makes the request conditional. When not provided the server will respond
@@ -890,48 +885,86 @@ paths:
         version: '2024.3'
 components:
   schemas:
-    iam.v4.0.authn.IdpMetadata:
-      required:
-      - certificate
-      - entityId
-      - loginUrl
+    iam.v4.0.error.ErrorResponse:
       type: object
       properties:
-        entityId:
-          maxLength: 2000
-          minLength: 3
-          type: string
-          description: Entity identifier of identity provider.
-          example: http://{{idp_host}}/entity
-        loginUrl:
-          maxLength: 2000
-          minLength: 3
-          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
-          type: string
-          description: Login URL of the identity provider.
-          example: http://{{idp_host}}/loginUrl
-        logoutUrl:
-          maxLength: 2000
-          minLength: 3
-          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
-          type: string
-          description: Logout URL of the identity provider.
-          example: http://{{idp_host}}/logoutUrl
-        errorUrl:
-          maxLength: 2000
-          minLength: 3
-          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
-          type: string
-          description: Error URL of the identity provider.
-          example: http://{{idp_host}}/errorUrl
-        certificate:
-          minLength: 64
-          type: string
-          description: Certificate for verification.
-        nameIdPolicyFormat:
-          $ref: '#/components/schemas/iam.v4.0.authn.NameIdPolicyFormat'
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/iam.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationError'
       additionalProperties: false
-      description: Information of the IDP.
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
     iam.v4.0.authn.NameIdPolicyFormat:
       type: string
       description: Name ID Policy format.
@@ -963,47 +996,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.config.MessageSeverity:
-      type: string
-      description: 'The message severity.
-
-        '
-      enum:
-      - INFO
-      - WARNING
-      - ERROR
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ERROR: 'Error indicating failed completion.
-
-          '
-        INFO: 'Information about successful completion.
-
-          '
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: 'Warning indicating future error.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
     common.v1.0.response.ExternalizableAbstractModel:
       description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
         type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
@@ -1022,7 +1014,6 @@ components:
               '
             nullable: true
             readOnly: true
-            example: afa17ed1-36c0-4cc0-9fec-c15178ad9aab
           links:
             maxItems: 20
             minItems: 0
@@ -1035,6 +1026,114 @@ components:
             items:
               $ref: '#/components/schemas/common.v1.0.response.ApiLink'
         additionalProperties: false
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
+    iam.v4.0.authn.IdpMetadata:
+      required:
+      - certificate
+      - entityId
+      - loginUrl
+      type: object
+      properties:
+        entityId:
+          maxLength: 2000
+          minLength: 3
+          type: string
+          description: Entity identifier of identity provider.
+        loginUrl:
+          maxLength: 2000
+          minLength: 3
+          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+          type: string
+          description: Login URL of the identity provider.
+        logoutUrl:
+          maxLength: 2000
+          minLength: 3
+          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+          type: string
+          description: Logout URL of the identity provider.
+        errorUrl:
+          maxLength: 2000
+          minLength: 3
+          pattern: ^((http[s]?|nfs):\/)?\/?([^:\/\s]*)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+          type: string
+          description: Error URL of the identity provider.
+        certificate:
+          minLength: 64
+          type: string
+          description: Certificate for verification.
+        nameIdPolicyFormat:
+          $ref: '#/components/schemas/iam.v4.0.authn.NameIdPolicyFormat'
+      additionalProperties: false
+      description: Information of the IDP.
     iam.v4.0.error.SchemaValidationErrorMessage:
       type: object
       properties:
@@ -1051,47 +1150,6 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 89fb8492-86d4-43cb-ac1a-bc51ae0dff45
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     iam.v4.0.authn.SamlIdentityProvider:
       required:
       - name
@@ -1107,7 +1165,6 @@ components:
             type: string
             description: Metadata URL that provides IDP details.
             writeOnly: true
-            example: http://{{idp_host}}/idp_metadata
           idpMetadataXml:
             minLength: 3
             type: string
@@ -1121,26 +1178,22 @@ components:
             pattern: ^[^<>;'()&+%\/\\"`]*$
             type: string
             description: Unique name of the IDP.
-            example: saml1
           usernameAttribute:
             maxLength: 256
             minLength: 1
             pattern: ^[^<>;'()&+%\/\\"`]*$
             type: string
             description: SAML assertion username attribute element.
-            default: name
           emailAttribute:
             maxLength: 256
             minLength: 3
             type: string
             description: SAML assertion email attribute element.
-            default: email
           groupsAttribute:
             maxLength: 256
             minLength: 3
             type: string
             description: SAML assertion groups attribute element.
-            example: grpAttribute1
           groupsDelim:
             maxLength: 3
             minLength: 1
@@ -1154,76 +1207,29 @@ components:
             items:
               maxLength: 16
               type: string
-              example: Attribute1
           entityIssuer:
             maxLength: 2000
             minLength: 3
             type: string
             description: It will be used as an issuer in SAML authnRequest.
-            example: issuer1
           isSignedAuthnReqEnabled:
             type: boolean
             description: Flag indicating signing of SAML authnRequests.
-            example: true
           createdTime:
             type: string
             description: Creation time of the SAML identity provider.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           lastUpdatedTime:
             type: string
             description: Last updated time of the SAML identity provider.
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           createdBy:
             type: string
             description: User or service who created the SAML identity provider.
             readOnly: true
-            example: 390b7801-7a80-5c94-8a07-8de63651b27b
         additionalProperties: false
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1245,12 +1251,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 52
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: true
           - maxItems: 100
             minItems: 0
             type: array
@@ -1281,11 +1285,31 @@ components:
               '
             items:
               type: integer
-              example: 28
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
     iam.v4.0.error.AppMessage:
       type: object
       properties:
@@ -1301,7 +1325,6 @@ components:
         locale:
           type: string
           description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
         errorGroup:
           type: string
           description: The error group associated with this message of severity ERROR.
@@ -1320,11 +1343,9 @@ components:
           type: string
           description: Timestamp of the response.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
         statusCode:
           type: integer
           description: The HTTP status code of the response.
-          example: 72
         error:
           type: string
           description: The generic error message for the response.
@@ -1339,70 +1360,18 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
-    iam.v4.0.error.ErrorResponse:
+    common.v1.0.config.MapOfStringWrapper:
       type: object
       properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/iam.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/iam.v4.0.error.SchemaValidationError'
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
       additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 60
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+      description: 'A wrapper schema containing a map with string keys and values.
 
         '
   securitySchemes:

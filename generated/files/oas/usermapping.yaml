@@ -31,7 +31,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 77710ec5-16b6-4289-9842-b8fcd4c9fb51
       responses:
         '200':
           description: Response to the download user mappings request.
@@ -176,6 +175,86 @@ paths:
       version: 5.1
 components:
   schemas:
+    common.v1.0.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ERROR: 'Error indicating failed completion.
+
+          '
+        INFO: 'Information about successful completion.
+
+          '
+        $UNKNOWN: 'Unknown value.
+
+          '
+        WARNING: 'Warning indicating future error.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    files.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
     common.v1.0.response.ApiResponseMetadata:
       type: object
       properties:
@@ -204,7 +283,6 @@ components:
 
             '
           format: int32
-          example: 3
         messages:
           maxItems: 20
           minItems: 0
@@ -245,123 +323,32 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationErrorMessage.java
       x-platform-generated: true
-    common.v1.0.config.MapOfStringWrapper:
+    files.v4.0.error.AppMessage:
       type: object
       properties:
-        map:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
           type: object
           additionalProperties:
             type: string
-          description: 'A map with string keys and values.
-
-            '
+          description: The map of argument name to value.
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.config.MessageSeverity:
-      type: string
-      description: 'The message severity.
-
-        '
-      enum:
-      - INFO
-      - WARNING
-      - ERROR
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ERROR: 'Error indicating failed completion.
-
-          '
-        INFO: 'Information about successful completion.
-
-          '
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: 'Warning indicating future error.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    files.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/files.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/files.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      description: Message with associated severity describing status of the current operation.
       x-platform-generated: true
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
     files.v4.0.error.SchemaValidationError:
       type: object
       properties:
@@ -369,11 +356,9 @@ components:
           type: string
           description: Timestamp of the response.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
         statusCode:
           type: integer
           description: The HTTP status code of the response.
-          example: 13
         error:
           type: string
           description: The generic error message for the response.
@@ -409,12 +394,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 36
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -445,38 +428,45 @@ components:
               '
             items:
               type: integer
-              example: 41
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    files.v4.0.error.AppMessage:
+    common.v1.0.config.Message:
       type: object
       properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
         code:
           type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
         locale:
           type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
           type: object
           additionalProperties:
             type: string
-          description: The map of argument name to value.
+          description: 'A map with string keys and values.
+
+            '
       additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
   securitySchemes:
     basicAuthScheme:
       type: http

@@ -40,7 +40,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -61,7 +60,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -256,7 +254,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 414abb4f-4b6f-44ee-8aea-e544d9aec47e
       requestBody:
         description: Create Traffic mirror session request body.
         content:
@@ -440,7 +437,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 5a9fd492-b6ad-4912-99b3-07520137583f
       responses:
         '200':
           description: Get a Traffic mirror session for the provided UUID.
@@ -587,7 +583,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: ee570ec9-20f1-481d-be6c-442abbbce0fe
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -614,7 +609,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 26b2cccf-ec49-4def-9c5f-709d71af6f55
       requestBody:
         description: Update Traffic mirror session request body.
         content:
@@ -815,7 +809,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: bad7fb98-134d-4d5c-80fb-b4a258d8de02
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -830,7 +823,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 0089e2c5-231c-4ff5-93c4-6fba4d1ac96c
       responses:
         '202':
           description: Delete Traffic mirror session response.
@@ -971,135 +963,6 @@ paths:
           \n- \"https://{pc-ip}:9440/api/networking/v4.0/config/traffic-mirrors/1Ff53FF6-D82e-bEcA-DcBA-CaBDf79AcFe0\"\n"
 components:
   schemas:
-    networking.v4.0.config.NetworkingBaseModel:
-      description: Networking common base object
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          metadata:
-            $ref: '#/components/schemas/common.v1.0.config.Metadata'
-        additionalProperties: false
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    networking.v4.0.config.TrafficMirrorPortNicType:
-      title: Traffic mirror session port NIC type.
-      type: string
-      description: Port NIC type for the Traffic mirror session. Allowed values are HOST_NIC and VIRTUAL_NIC.
-      enum:
-      - HOST_NIC
-      - VIRTUAL_NIC
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        HOST_NIC: Traffic mirror port is a host NIC.
-        $REDACTED: 'Redacted value.
-
-          '
-        VIRTUAL_NIC: Traffic mirror port is a virtual NIC.
-    networking.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
-    networking.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
-    networking.v4.0.config.TrafficMirrorSourcePortDirection:
-      title: Traffic mirror session source port direction.
-      type: string
-      description: Indicates the direction of traffic that the session will mirror. Allowed values are INGRESS, EGRESS and
-        BIDIRECTIONAL.
-      enum:
-      - INGRESS
-      - EGRESS
-      - BIDIRECTIONAL
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        EGRESS: Indicates the outgoing direction of traffic that the session will mirror.
-        INGRESS: Indicates the incoming direction of traffic that the session will mirror.
-        BIDIRECTIONAL: Indicates the bidirectional traffic that the session will mirror.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 250be642-1b1b-4687-bf88-af93fc7abf59
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1127,263 +990,6 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    networking.v4.0.config.TrafficMirrorSourcePort:
-      title: Traffic mirror session source port configuration.
-      description: Traffic mirror session source port to mirror traffic from.
-      allOf:
-      - $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorPort'
-      - required:
-        - direction
-        type: object
-        properties:
-          direction:
-            $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorSourcePortDirection'
-        additionalProperties: false
-    common.v1.0.response.ApiLink:
-      type: object
-      properties:
-        href:
-          type: string
-          description: 'The URL at which the entity described by the link can be accessed.
-
-            '
-        rel:
-          type: string
-          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
-            unique value of "self" identifies the URL for the object.
-
-            '
-      additionalProperties: false
-      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
-        an address for retrieving the particular resource.
-
-        '
-    networking.v4.0.config.TrafficMirror:
-      title: Port mirroring session.
-      required:
-      - clusterReferenceList
-      - destinationList
-      - name
-      - sourceList
-      description: 'Mirror network traffic from a set of source ports, to a set of destination ports.
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
-      - type: object
-        properties:
-          name:
-            maxLength: 128
-            type: string
-            description: Name of the session.
-            example: TM1
-          description:
-            maxLength: 1000
-            type: string
-            description: Description of the session.
-            example: TM1 description
-          sourceList:
-            maxItems: 50
-            minItems: 1
-            type: array
-            description: List of source ports of the session. Maximum of 4 source ports are allowed per session. Each session
-              should have at least 1 source port.
-            items:
-              $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorSourcePort'
-          destinationList:
-            maxItems: 50
-            minItems: 1
-            type: array
-            description: List of destination ports of the session. Maximum of 2 destination ports are allowed per session.
-              Each session should have at least 1 destination port.
-            items:
-              $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorPort'
-          isEnabled:
-            type: boolean
-            description: Indicates whether the port mirroring session is enabled or not.
-            default: true
-          clusterReferenceList:
-            maxItems: 1
-            minItems: 1
-            type: array
-            description: List of cluster UUIDs that are configured for this session. Currently, only 1 cluster is allowed
-              to participate in a session.
-            items:
-              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-              type: string
-              example: a9389661-ba3f-4fb4-9caa-56967321e55f
-          hostReferenceList:
-            maxItems: 64
-            minItems: 1
-            type: array
-            description: List of host UUIDs that are configured for this session. Currently, only 1 host is allowed to participate
-              in a session.
-            items:
-              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-              type: string
-              example: a757efa5-a02f-4b78-8793-9a7080b99adb
-          virtualSwitchReference:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: Traffic mirror virtual switch reference to use for Remote SPAN.
-            example: be1f23f3-0e47-4f3f-80af-4b5e906bba52
-          state:
-            $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorState'
-          stateMessage:
-            type: string
-            description: Traffic mirror state message.
-            readOnly: true
-        additionalProperties: false
-    common.v1.0.config.MapOfStringWrapper:
-      type: object
-      properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
-
-            '
-      additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
-
-        '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
-
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
-
-              '
-            nullable: true
-            readOnly: true
-            example: 870ef0a7-1d70-4ba5-839b-436e2c69e445
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    networking.v4.0.config.TrafficMirrorPort:
-      title: Traffic mirror session port configuration.
-      required:
-      - nicType
-      - nicUuid
-      type: object
-      properties:
-        nicType:
-          $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorPortNicType'
-        nicUuid:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: UUID of the NIC that this port belongs to.
-          example: 4f00a93e-60ce-4dd0-a251-da22b2b0b802
-        isUp:
-          type: boolean
-          description: Indicates whether the port is up.
-          readOnly: true
-          example: false
-      additionalProperties: false
-      description: Traffic mirror session port description.
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    common.v1.0.config.KVPair:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'The key of the key-value pair.
-
-            '
-        value:
-          description: The value associated with the key for this key-value pair
-          oneOf:
-          - type: string
-            description: 'A string value in a key-value pair.
-
-              '
-          - type: integer
-            description: 'An integer value in a key-value pair.
-
-              '
-            example: 52
-          - type: boolean
-            description: 'An boolean value in a key-value pair.
-
-              '
-            example: true
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of strings.
-
-              '
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: string
-            description: 'A value in a key-value pair that represents a map of string keys and values.
-
-              '
-          - maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
-
-              '
-            items:
-              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
-          - maxItems: 100
-            minItems: 0
-            type: array
-            description: 'A value in a key-value pair that represents a list of integers.
-
-              '
-            items:
-              type: integer
-              example: 28
-      additionalProperties: false
-      description: 'A map describing a set of keys and their corresponding values.
-
-        '
     networking.v4.0.config.TrafficMirrorState:
       title: Traffic mirror state title.
       type: string
@@ -1398,6 +1004,74 @@ components:
         DISABLED: Traffic mirror session is disabled.
         ACTIVE: Traffic mirror session is active.
         ERROR: Traffic mirror session is in error status.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    networking.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    networking.v4.0.config.TrafficMirrorSourcePortDirection:
+      title: Traffic mirror session source port direction.
+      type: string
+      description: Indicates the direction of traffic that the session will mirror. Allowed values are INGRESS, EGRESS and
+        BIDIRECTIONAL.
+      enum:
+      - INGRESS
+      - EGRESS
+      - BIDIRECTIONAL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        EGRESS: Indicates the outgoing direction of traffic that the session will mirror.
+        INGRESS: Indicates the incoming direction of traffic that the session will mirror.
+        BIDIRECTIONAL: Indicates the bidirectional traffic that the session will mirror.
         $UNKNOWN: 'Unknown value.
 
           '
@@ -1432,7 +1106,6 @@ components:
 
             '
           format: int32
-          example: 92
         messages:
           maxItems: 20
           minItems: 0
@@ -1457,6 +1130,102 @@ components:
         self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
 
         '
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    networking.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    networking.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/networking.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/networking.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    common.v1.0.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by the link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of the link to the object that is returned by the URL.  The
+            unique value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the link and
+        an address for retrieving the particular resource.
+
+        '
+    networking.v4.0.config.TrafficMirrorPortNicType:
+      title: Traffic mirror session port NIC type.
+      type: string
+      description: Port NIC type for the Traffic mirror session. Allowed values are HOST_NIC and VIRTUAL_NIC.
+      enum:
+      - HOST_NIC
+      - VIRTUAL_NIC
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        HOST_NIC: Traffic mirror port is a host NIC.
+        $REDACTED: 'Redacted value.
+
+          '
+        VIRTUAL_NIC: Traffic mirror port is a virtual NIC.
+    networking.v4.0.config.NetworkingBaseModel:
+      description: Networking common base object
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          metadata:
+            $ref: '#/components/schemas/common.v1.0.config.Metadata'
+        additionalProperties: false
     prism.v4.0.config.TaskReference:
       type: object
       properties:
@@ -1464,7 +1233,6 @@ components:
           pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
           type: string
           description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:9bf9c2d8-1857-4824-8f55-cbb6ab4eb85e
       additionalProperties: false
       description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
         a GET request to the task URI provided in the metadata section of the API response.
@@ -1475,11 +1243,9 @@ components:
           type: string
           description: Timestamp of the response.
           format: date-time
-          example: 2009-09-23 14:30:00-07:00
         statusCode:
           type: integer
           description: The HTTP status code of the response.
-          example: 17
         error:
           type: string
           description: The generic error message for the response.
@@ -1494,6 +1260,99 @@ components:
       additionalProperties: false
       description: This schema is generated from SchemaValidationError.java
       x-platform-generated: true
+    networking.v4.0.config.TrafficMirrorSourcePort:
+      title: Traffic mirror session source port configuration.
+      description: Traffic mirror session source port to mirror traffic from.
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorPort'
+      - required:
+        - direction
+        type: object
+        properties:
+          direction:
+            $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorSourcePortDirection'
+        additionalProperties: false
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
+    networking.v4.0.config.TrafficMirrorPort:
+      title: Traffic mirror session port configuration.
+      required:
+      - nicType
+      - nicUuid
+      type: object
+      properties:
+        nicType:
+          $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorPortNicType'
+        nicUuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the NIC that this port belongs to.
+        isUp:
+          type: boolean
+          description: Indicates whether the port is up.
+          readOnly: true
+      additionalProperties: false
+      description: Traffic mirror session port description.
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
+    common.v1.0.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
+
+        '
     common.v1.0.config.Metadata:
       type: object
       properties:
@@ -1503,7 +1362,6 @@ components:
           description: 'A globally unique identifier that represents the owner of this resource.
 
             '
-          example: 88c007ec-0157-4901-a28a-c93e6cd73adc
         ownerUserName:
           maxLength: 128
           type: string
@@ -1516,7 +1374,6 @@ components:
           description: 'A globally unique identifier that represents the project this resource belongs to.
 
             '
-          example: 3e2a7199-b4d8-481c-a4d1-446470c8d864
         projectName:
           maxLength: 128
           type: string
@@ -1534,27 +1391,139 @@ components:
           items:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
-            example: 61bf1201-334e-4002-a9da-0ad47bd7fa2e
       additionalProperties: false
       description: 'Metadata associated with this resource.
 
         '
-    networking.v4.0.error.SchemaValidationErrorMessage:
+    common.v1.0.config.KVPair:
       type: object
       properties:
-        location:
+        name:
+          maxLength: 128
+          minLength: 3
           type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
+          description: 'The key of the key-value pair.
+
+            '
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+            description: 'A string value in a key-value pair.
+
+              '
+          - type: integer
+            description: 'An integer value in a key-value pair.
+
+              '
+          - type: boolean
+            description: 'An boolean value in a key-value pair.
+
+              '
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of strings.
+
+              '
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: string
+            description: 'A value in a key-value pair that represents a map of string keys and values.
+
+              '
+          - maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents an array of maps of string keys and values.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.0.config.MapOfStringWrapper'
+          - maxItems: 100
+            minItems: 0
+            type: array
+            description: 'A value in a key-value pair that represents a list of integers.
+
+              '
+            items:
+              type: integer
       additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    networking.v4.0.config.TrafficMirror:
+      title: Port mirroring session.
+      required:
+      - clusterReferenceList
+      - destinationList
+      - name
+      - sourceList
+      description: 'Mirror network traffic from a set of source ports, to a set of destination ports.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/networking.v4.0.config.NetworkingBaseModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 128
+            type: string
+            description: Name of the session.
+          description:
+            maxLength: 1000
+            type: string
+            description: Description of the session.
+          sourceList:
+            maxItems: 50
+            minItems: 1
+            type: array
+            description: List of source ports of the session. Maximum of 4 source ports are allowed per session. Each session
+              should have at least 1 source port.
+            items:
+              $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorSourcePort'
+          destinationList:
+            maxItems: 50
+            minItems: 1
+            type: array
+            description: List of destination ports of the session. Maximum of 2 destination ports are allowed per session.
+              Each session should have at least 1 destination port.
+            items:
+              $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorPort'
+          isEnabled:
+            type: boolean
+            description: Indicates whether the port mirroring session is enabled or not.
+          clusterReferenceList:
+            maxItems: 1
+            minItems: 1
+            type: array
+            description: List of cluster UUIDs that are configured for this session. Currently, only 1 cluster is allowed
+              to participate in a session.
+            items:
+              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+              type: string
+          hostReferenceList:
+            maxItems: 64
+            minItems: 1
+            type: array
+            description: List of host UUIDs that are configured for this session. Currently, only 1 host is allowed to participate
+              in a session.
+            items:
+              pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+              type: string
+          virtualSwitchReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: Traffic mirror virtual switch reference to use for Remote SPAN.
+          state:
+            $ref: '#/components/schemas/networking.v4.0.config.TrafficMirrorState'
+          stateMessage:
+            type: string
+            description: Traffic mirror state message.
+            readOnly: true
+        additionalProperties: false
   securitySchemes:
     basicAuthScheme:
       type: http

@@ -41,7 +41,6 @@ paths:
 
             '
           format: int32
-          default: 0
       - name: $limit
         in: query
         description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be
@@ -62,7 +61,6 @@ paths:
 
             '
           format: int32
-          default: 50
       - name: $filter
         in: query
         description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified
@@ -332,7 +330,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 7247ec3a-98ed-4199-a5d6-4ecffa7e5c23
       requestBody:
         description: The required parameters to create a cluster profile
         content:
@@ -575,7 +572,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 1498b3aa-af7a-4093-af5b-a661d8a509e1
       responses:
         '200':
           description: Cluster Profile entity
@@ -722,7 +718,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: 1ab23d6e-2494-4de1-8a1e-b678d020f470
       - name: If-Match
         in: header
         description: The If-Match request header makes the request conditional. When not provided, the server will respond
@@ -749,7 +744,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: cad27ace-33d9-4b3b-aee2-0e366d8f9dd6
       - name: $dryrun
         in: query
         description: 'A URL query parameter that allows long running operations to execute in a dry-run mode providing ability
@@ -769,7 +763,6 @@ paths:
             The operation runs in dry-run mode only if the provided value is true.
 
             '
-          example: false
       requestBody:
         description: The required parameters to update a profile
         content:
@@ -1029,7 +1022,6 @@ paths:
         schema:
           pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
           type: string
-          example: e48d90ae-afa5-484e-8835-896a2ebc9b6a
       - name: NTNX-Request-Id
         in: header
         description: 'A unique identifier that is associated with each request. The provided value must be opaque and preferably
@@ -1044,7 +1036,6 @@ paths:
         schema:
           type: string
           format: uuid
-          example: 68465539-2f30-4e80-968f-1660c572e62d
       responses:
         '202':
           description: Task ID to monitor the cluster profile deletion.
@@ -1186,227 +1177,6 @@ paths:
       version: '2024.3'
 components:
   schemas:
-    clustermgmt.v4.0.config.RsyslogNetworkProtocol:
-      type: string
-      description: RSYSLOG server protocol type.
-      enum:
-      - UDP
-      - TCP
-      - RELP
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        UDP: UDP protocol.
-        TCP: TCP protocol.
-        RELP: RELP protocol.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.FQDN:
-      type: object
-      properties:
-        value:
-          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
-          type: string
-          description: 'The fully qualified domain name of the host.
-
-            '
-          example: www.example-corp.com
-      additionalProperties: false
-      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
-        System.
-
-        '
-    clustermgmt.v4.0.config.SnmpTrap:
-      description: SNMP trap details.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - address
-        - version
-        type: object
-        properties:
-          address:
-            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-          username:
-            maxLength: 64
-            type: string
-            description: SNMP username. For SNMP trap v3 version, SNMP username is required parameter.
-            example: Test UserName
-          protocol:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpProtocol'
-          port:
-            type: integer
-            description: SNMP port.
-            format: int32
-            example: 72
-          shouldInform:
-            type: boolean
-            description: SNMP information status.
-            example: false
-          engineId:
-            pattern: ^(?:0[xX])?[0-9a-fA-F]+$
-            type: string
-            description: SNMP engine Id.
-            example: Test snmp engine Id
-          version:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrapVersion'
-          recieverName:
-            maxLength: 64
-            type: string
-            description: SNMP receiver name.
-            example: Test Receiver Name
-          communityString:
-            type: string
-            description: Community string(plaintext) for SNMP version 2.0.
-            example: snmp-server community public RO 192.168.1.0 255.255.255.0
-        additionalProperties: false
-        description: SNMP trap details.
-    clustermgmt.v4.0.config.PIIScrubbingLevel:
-      type: string
-      description: PII Scrubbing Level for pulse.
-      enum:
-      - DEFAULT
-      - ALL
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        ALL: Scrub All PII Information from Pulse including data like entity names and IP addresses.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        DEFAULT: Default PII Scrubbing level. Data like entity names and IP addresses will not be scrubbed from Pulse.
-        $REDACTED: 'Redacted value.
-
-          '
-    common.v1.0.config.Flag:
-      type: object
-      properties:
-        name:
-          maxLength: 128
-          minLength: 3
-          type: string
-          description: 'Name of the flag.
-
-            '
-        value:
-          type: boolean
-          description: 'Value of the flag.
-
-            '
-          default: false
-      additionalProperties: false
-      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
-        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
-        that tells which flags are actually present for that entity.
-
-        '
-    common.v1.0.config.IPAddress:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
-
-        '
-    clustermgmt.v4.0.config.SnmpPrivType:
-      type: string
-      description: SNMP user encryption type.
-      enum:
-      - DES
-      - AES
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        DES: DES SNMP key.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        $REDACTED: 'Redacted value.
-
-          '
-        AES: AES SNMP key.
-    clustermgmt.v4.0.error.SchemaValidationError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Timestamp of the response.
-          format: date-time
-          example: 2009-09-23 14:30:00-07:00
-        statusCode:
-          type: integer
-          description: The HTTP status code of the response.
-          example: 22
-        error:
-          type: string
-          description: The generic error message for the response.
-        path:
-          type: string
-          description: API path on which the request was made.
-        validationErrorMessages:
-          type: array
-          description: List of validation error messages
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationErrorMessage'
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationError.java
-      x-platform-generated: true
-    clustermgmt.v4.0.config.SnmpUser:
-      description: SNMP user information.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - authKey
-        - authType
-        - username
-        type: object
-        properties:
-          username:
-            maxLength: 64
-            type: string
-            description: SNMP username. For SNMP trap v3 version, SNMP username is required parameter.
-            example: Test UserName
-          authType:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpAuthType'
-          authKey:
-            pattern: ^[^']+$
-            type: string
-            description: SNMP user authentication key.
-            example: Test_SNMP_user_authentication_key.
-          privType:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpPrivType'
-          privKey:
-            pattern: ^[^']+$
-            type: string
-            description: SNMP user encryption key.
-            example: Test_SNMP_user_encryption_key.
-        additionalProperties: false
-    common.v1.0.config.TenantAwareModel:
-      type: object
-      properties:
-        tenantId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-          type: string
-          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
-            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
-            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
-            on the server).
-
-            '
-          readOnly: true
-          example: 9d4ffa56-91af-4dfb-99b2-ab3df07628fa
-      additionalProperties: false
-      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
-        base model class that it extends and is automatically set by the server.
-
-        '
     common.v1.0.config.MessageSeverity:
       type: string
       description: 'The message severity.
@@ -1434,23 +1204,427 @@ components:
         $REDACTED: 'Redacted value.
 
           '
-    clustermgmt.v4.0.config.SnmpTrapVersion:
+    clustermgmt.v4.0.config.ManagedCluster:
+      required:
+      - extId
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Cluster UUID.
+        isCompliant:
+          type: boolean
+          description: Indicates if attached cluster is compliant with cluster profile or not
+          readOnly: true
+        lastSyncedTime:
+          type: string
+          description: Most recent date and time when the cluster profile was monitored across all attached clusters
+          format: date-time
+          readOnly: true
+        configDrifts:
+          maxItems: 50
+          minItems: 0
+          type: array
+          description: Drifted settings information
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.ConfigType'
+      additionalProperties: false
+      description: Managed cluster information
+    clustermgmt.v4.0.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the response.
+          format: date-time
+        statusCode:
+          type: integer
+          description: The HTTP status code of the response.
+        error:
+          type: string
+          description: The generic error message for the response.
+        path:
+          type: string
+          description: API path on which the request was made.
+        validationErrorMessages:
+          type: array
+          description: List of validation error messages
+          items:
+            $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+      x-platform-generated: true
+    common.v1.0.config.IPAddress:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 or IPv6 format.
+
+        '
+    common.v1.0.config.FQDN:
+      type: object
+      properties:
+        value:
+          pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+([a-z0-9]+(-[a-z0-9]+)*){1,63}$
+          type: string
+          description: 'The fully qualified domain name of the host.
+
+            '
+      additionalProperties: false
+      description: 'A fully qualified domain name that specifies its exact location in the tree hierarchy of the Domain Name
+        System.
+
+        '
+    clustermgmt.v4.0.config.SnmpPrivType:
       type: string
-      description: SNMP version.
+      description: SNMP user encryption type.
       enum:
-      - V2
-      - V3
+      - DES
+      - AES
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        V2: V2 SNMP version.
+        DES: DES SNMP key.
         $UNKNOWN: 'Unknown value.
 
           '
-        V3: V3 SNMP version.
         $REDACTED: 'Redacted value.
 
           '
+        AES: AES SNMP key.
+    clustermgmt.v4.0.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.error.AppMessage'
+          - $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationError'
+      additionalProperties: false
+      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
+        Please look at the HTTP status code and namespace specific error code and error message for further details.
+      x-platform-generated: true
+    clustermgmt.v4.0.config.ConfigType:
+      type: string
+      enum:
+      - NTP_SERVER_CONFIG
+      - NAME_SERVER_CONFIG
+      - SMTP_SERVER_CONFIG
+      - NFS_SUBNET_WHITELIST_CONFIG
+      - SNMP_SERVER_CONFIG
+      - RSYSLOG_SERVER_CONFIG
+      - PULSE_CONFIG
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        NFS_SUBNET_WHITELIST_CONFIG: NFS subnet whitelist configuration
+        NTP_SERVER_CONFIG: NTP server configuration
+        SNMP_SERVER_CONFIG: SNMP server configuration
+        SMTP_SERVER_CONFIG: SMTP server configuration
+        PULSE_CONFIG: Pulse status for a cluster.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        NAME_SERVER_CONFIG: Name server configuration
+        $REDACTED: 'Redacted value.
+
+          '
+        RSYSLOG_SERVER_CONFIG: RSYSLOG server configuration
+    clustermgmt.v4.0.config.SnmpProtocol:
+      type: string
+      description: SNMP protocol type.
+      enum:
+      - UDP
+      - UDP6
+      - TCP
+      - TCP6
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        UDP: UDP protocol.
+        TCP: TCP protocol.
+        UDP6: UDP6 protocol.
+        TCP6: TCP6 protocol.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.SmtpType:
+      type: string
+      description: Type of SMTP server.
+      enum:
+      - PLAIN
+      - STARTTLS
+      - SSL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        PLAIN: Plain type SMTP server.
+        STARTTLS: Start TLS type SMTP server.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SSL: SSL type SMTP server.
+        $REDACTED: 'Redacted value.
+
+          '
+    clustermgmt.v4.0.config.RsyslogServer:
+      description: RSYSLOG Server.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - ipAddress
+        - networkProtocol
+        - port
+        - serverName
+        type: object
+        properties:
+          serverName:
+            maxLength: 64
+            type: string
+            description: RSYSLOG server name.
+          ipAddress:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+          port:
+            type: integer
+            description: RSYSLOG server port.
+            format: int32
+          networkProtocol:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.RsyslogNetworkProtocol'
+          modules:
+            maxItems: 1024
+            minItems: 0
+            type: array
+            description: List of modules registered to RSYSLOG server.
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.RsyslogModuleItem'
+        additionalProperties: false
+        description: RSYSLOG Server.
+    common.v1.0.config.Flag:
+      type: object
+      properties:
+        name:
+          maxLength: 128
+          minLength: 3
+          type: string
+          description: 'Name of the flag.
+
+            '
+        value:
+          type: boolean
+          description: 'Value of the flag.
+
+            '
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that
+        entity through this object.  The field that hosts this type of object must have an attribute called x-bounded-map-keys
+        that tells which flags are actually present for that entity.
+
+        '
+    common.v1.0.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
+            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Flag'
+        links:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          description: 'The total number of entities that are available on the server for this type.
+
+            '
+          format: int32
+        messages:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'Information, Warning or Error messages that might provide additional contextual information related
+            to the operation.
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.Message'
+        extraInfo:
+          maxItems: 20
+          minItems: 0
+          type: array
+          description: 'An array of entity-specific metadata
+
+            '
+          items:
+            $ref: '#/components/schemas/common.v1.0.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. This value is always present and minimally contains the
+        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
+
+        '
+    clustermgmt.v4.0.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message string.
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+        code:
+          type: string
+          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
+            belongs to. For example: VMM-40000'
+        locale:
+          type: string
+          description: Locale for this message. The default locale would be 'en-US'.
+        errorGroup:
+          type: string
+          description: The error group associated with this message of severity ERROR.
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+          description: The map of argument name to value.
+      additionalProperties: false
+      description: Message with associated severity describing status of the current operation.
+      x-platform-generated: true
+    clustermgmt.v4.0.config.SmtpServerRef:
+      required:
+      - emailAddress
+      - server
+      type: object
+      properties:
+        emailAddress:
+          pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+          type: string
+          description: SMTP email address.
+        server:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.SmtpNetwork'
+        type:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.SmtpType'
+      additionalProperties: false
+      description: SMTP servers on a cluster. This is part of payload for cluster update operation only.
+    clustermgmt.v4.0.config.PulseStatus:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+          description: Flag determines whether pulse is enabled for a cluster.
+        piiScrubbingLevel:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.PIIScrubbingLevel'
+      additionalProperties: false
+      description: Pulse status for a cluster.
+    common.v1.0.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+          description: 'The description of the message.
+
+            '
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
+      additionalProperties: false
+    clustermgmt.v4.0.config.PIIScrubbingLevel:
+      type: string
+      description: PII Scrubbing Level for pulse.
+      enum:
+      - DEFAULT
+      - ALL
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        ALL: Scrub All PII Information from Pulse including data like entity names and IP addresses.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        DEFAULT: Default PII Scrubbing level. Data like entity names and IP addresses will not be scrubbed from Pulse.
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.IPAddressOrFQDN:
+      type: object
+      properties:
+        ipv4:
+          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
+        ipv6:
+          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
+        fqdn:
+          $ref: '#/components/schemas/common.v1.0.config.FQDN'
+      additionalProperties: false
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
+        Fully Qualified Domain Name.
+
+        '
+    clustermgmt.v4.0.config.SnmpTrap:
+      description: SNMP trap details.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - address
+        - version
+        type: object
+        properties:
+          address:
+            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
+          username:
+            maxLength: 64
+            type: string
+            description: SNMP username. For SNMP trap v3 version, SNMP username is required parameter.
+          protocol:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpProtocol'
+          port:
+            type: integer
+            description: SNMP port.
+            format: int32
+          shouldInform:
+            type: boolean
+            description: SNMP information status.
+          engineId:
+            pattern: ^(?:0[xX])?[0-9a-fA-F]+$
+            type: string
+            description: SNMP engine Id.
+          version:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrapVersion'
+          recieverName:
+            maxLength: 64
+            type: string
+            description: SNMP receiver name.
+          communityString:
+            type: string
+            description: Community string(plaintext) for SNMP version 2.0.
+        additionalProperties: false
+        description: SNMP trap details.
     clustermgmt.v4.0.config.ClusterProfile:
       allOf:
       - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
@@ -1463,42 +1637,35 @@ components:
             pattern: ^[A-Za-z0-9._-]+$
             type: string
             description: Name of the cluster profile
-            example: Test Cluster Profile
           description:
             maxLength: 1000
             type: string
             description: Detailed description of a cluster profile
-            example: Test ClusterProfile Description
           createTime:
             type: string
             description: Creation time of cluster profile
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           lastUpdateTime:
             type: string
             description: Last updated time of a cluster profile
             format: date-time
             readOnly: true
-            example: 2009-09-23 14:30:00-07:00
           createdBy:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: Details of the user who created this cluster profile
             readOnly: true
-            example: b5f6bded-6b9c-40ef-9a89-e243a1d320fa
           lastUpdatedBy:
             pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
             type: string
             description: Details of the user who has recently updated this cluster profile
             readOnly: true
-            example: 07ecf618-850c-40f2-a52b-78a76620465c
           clusterCount:
             type: integer
             description: Count of clusters associated to a cluster profile
             format: int32
             readOnly: true
-            example: 90
           driftedClusterCount:
             type: integer
             description: The count indicates the number of clusters associated with a cluster profile that have experienced
@@ -1506,7 +1673,6 @@ components:
               the NTP server has different values on a cluster as compared to the profile it is attached.
             format: int32
             readOnly: true
-            example: 83
           clusters:
             maxItems: 400
             minItems: 1
@@ -1548,7 +1714,6 @@ components:
             items:
               pattern: \b(?:\d{1,3}\.){3}\d{1,3}/(?:\d{1,3}\.){3}\d{1,3}\b
               type: string
-              example: 10.110.106.45/255.255.255.255
           snmpConfig:
             $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpConfig'
           rsyslogServerList:
@@ -1562,21 +1727,48 @@ components:
             $ref: '#/components/schemas/clustermgmt.v4.0.config.PulseStatus'
         additionalProperties: false
         description: Attributes of a cluster profile entity
-    clustermgmt.v4.0.config.SnmpTransport:
+    clustermgmt.v4.0.config.RsyslogNetworkProtocol:
+      type: string
+      description: RSYSLOG server protocol type.
+      enum:
+      - UDP
+      - TCP
+      - RELP
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        UDP: UDP protocol.
+        TCP: TCP protocol.
+        RELP: RELP protocol.
+        $UNKNOWN: 'Unknown value.
+
+          '
+        $REDACTED: 'Redacted value.
+
+          '
+    common.v1.0.config.IPv6Address:
       required:
-      - port
-      - protocol
+      - value
       type: object
       properties:
-        protocol:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpProtocol'
-        port:
+        value:
+          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
+          type: string
+          description: 'The IPv6 address of the host.
+
+            '
+        prefixLength:
+          maximum: 128
+          minimum: 0
           type: integer
-          description: SNMP port.
+          description: 'The prefix length of the network to which this host IPv6 address belongs.
+
+            '
           format: int32
-          example: 10
       additionalProperties: false
-      description: SNMP transport details.
+      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
+
+        '
     clustermgmt.v4.0.config.RsyslogModuleItem:
       required:
       - logSeverityLevel
@@ -1590,7 +1782,6 @@ components:
         shouldLogMonitorFiles:
           type: boolean
           description: Option to log, monitor/output files of a module.
-          default: true
       additionalProperties: false
       description: RSYSLOG Module information.
     common.v1.0.response.ApiLink:
@@ -1612,71 +1803,136 @@ components:
         an address for retrieving the particular resource.
 
         '
-    clustermgmt.v4.0.config.SmtpType:
-      type: string
-      description: Type of SMTP server.
-      enum:
-      - PLAIN
-      - STARTTLS
-      - SSL
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        PLAIN: Plain type SMTP server.
-        STARTTLS: Start TLS type SMTP server.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SSL: SSL type SMTP server.
-        $REDACTED: 'Redacted value.
-
-          '
-    clustermgmt.v4.0.config.RsyslogModuleLogSeverityLevel:
-      type: string
-      description: RSYSLOG module log severity level.
-      enum:
-      - EMERGENCY
-      - ALERT
-      - CRITICAL
-      - ERROR
-      - WARNING
-      - NOTICE
-      - INFO
-      - DEBUG
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        EMERGENCY: Emergency level.
-        NOTICE: Notice level.
-        ERROR: Error level.
-        ALERT: Alert level.
-        INFO: Info level.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        WARNING: Warning level.
-        DEBUG: Debug level.
-        CRITICAL: Critical level.
-        $REDACTED: 'Redacted value.
-
-          '
-    clustermgmt.v4.0.config.SmtpServerRef:
+    clustermgmt.v4.0.config.SnmpTransport:
       required:
-      - emailAddress
-      - server
+      - port
+      - protocol
       type: object
       properties:
-        emailAddress:
-          pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-          type: string
-          description: SMTP email address.
-          example: john.doe@example.com
-        server:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.SmtpNetwork'
-        type:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.SmtpType'
+        protocol:
+          $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpProtocol'
+        port:
+          type: integer
+          description: SNMP port.
+          format: int32
       additionalProperties: false
-      description: SMTP servers on a cluster. This is part of payload for cluster update operation only.
+      description: SNMP transport details.
+    clustermgmt.v4.0.config.SnmpUser:
+      description: SNMP user information.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - required:
+        - authKey
+        - authType
+        - username
+        type: object
+        properties:
+          username:
+            maxLength: 64
+            type: string
+            description: SNMP username. For SNMP trap v3 version, SNMP username is required parameter.
+          authType:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpAuthType'
+          authKey:
+            pattern: ^[^']+$
+            type: string
+            description: SNMP user authentication key.
+          privType:
+            $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpPrivType'
+          privKey:
+            pattern: ^[^']+$
+            type: string
+            description: SNMP user encryption key.
+        additionalProperties: false
+    clustermgmt.v4.0.config.SnmpAuthType:
+      type: string
+      description: SNMP user authentication type.
+      enum:
+      - MD5
+      - SHA
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        $UNKNOWN: 'Unknown value.
+
+          '
+        SHA: SHA SNMP authentication.
+        $REDACTED: 'Redacted value.
+
+          '
+        MD5: MD5 SNMP authentication.
+    clustermgmt.v4.0.config.SnmpConfig:
+      description: SNMP information.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          isEnabled:
+            type: boolean
+            description: SNMP status.
+          users:
+            maxItems: 1024
+            minItems: 0
+            type: array
+            description: SNMP user information.
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpUser'
+          transports:
+            maxItems: 1024
+            minItems: 0
+            type: array
+            description: SNMP transport details.
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTransport'
+          traps:
+            maxItems: 1024
+            minItems: 0
+            type: array
+            description: SNMP trap details.
+            items:
+              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrap'
+        additionalProperties: false
+        description: SNMP information.
+    prism.v4.0.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: A globally unique identifier of a task.
+      additionalProperties: false
+      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
+        a GET request to the task URI provided in the metadata section of the API response.
+    clustermgmt.v4.0.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
+            request body.
+        message:
+          type: string
+          description: The detailed message for the validation error.
+        attributePath:
+          type: string
+          description: The path of the attribute that failed validation in the schema.
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+      x-platform-generated: true
+    common.v1.0.config.MapOfStringWrapper:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+          description: 'A map with string keys and values.
+
+            '
+      additionalProperties: false
+      description: 'A wrapper schema containing a map with string keys and values.
+
+        '
     clustermgmt.v4.0.config.SmtpNetwork:
       required:
       - ipAddress
@@ -1688,48 +1944,68 @@ components:
           type: integer
           description: SMTP port.
           format: int32
-          example: 99
         username:
           maxLength: 64
           type: string
           description: SMTP server user name.
-          example: user1
         password:
           type: string
           description: SMTP server password.
       additionalProperties: false
       description: SMTP network details.
-    clustermgmt.v4.0.config.ManagedCluster:
+    common.v1.0.config.IPv4Address:
       required:
-      - extId
+      - value
       type: object
       properties:
-        extId:
-          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        value:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
           type: string
-          description: Cluster UUID.
-          example: 1ec4f2ea-cba8-4ad4-9bd9-356a1da7e295
-        isCompliant:
-          type: boolean
-          description: Indicates if attached cluster is compliant with cluster profile or not
-          readOnly: true
-          example: true
-        lastSyncedTime:
-          type: string
-          description: Most recent date and time when the cluster profile was monitored across all attached clusters
-          format: date-time
-          readOnly: true
-          example: 2009-09-23 14:30:00-07:00
-        configDrifts:
-          maxItems: 50
-          minItems: 0
-          type: array
-          description: Drifted settings information
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.ConfigType'
+          description: 'The IPv4 address of the host.
+
+            '
+        prefixLength:
+          maximum: 32
+          minimum: 0
+          type: integer
+          description: 'The prefix length of the network to which this host IPv4 address belongs.
+
+            '
+          format: int32
       additionalProperties: false
-      description: Managed cluster information
+      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
+
+        '
+    common.v1.0.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
+        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
+        are always tenant aware and, therefore, extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+            readOnly: true
+          links:
+            maxItems: 20
+            minItems: 0
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
+              link and an address for retrieving the particular resource.
+
+              '
+            readOnly: true
+            items:
+              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
+        additionalProperties: false
     clustermgmt.v4.0.config.RsyslogModuleName:
       type: string
       description: RSYSLOG module name.
@@ -1783,134 +2059,53 @@ components:
           '
         CASSANDRA: Cassandra module.
         LAZAN: Lazan module.
-    clustermgmt.v4.0.config.RsyslogServer:
-      description: RSYSLOG Server.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - required:
-        - ipAddress
-        - networkProtocol
-        - port
-        - serverName
-        type: object
-        properties:
-          serverName:
-            maxLength: 64
-            type: string
-            description: RSYSLOG server name.
-            example: testServer1
-          ipAddress:
-            $ref: '#/components/schemas/common.v1.0.config.IPAddress'
-          port:
-            type: integer
-            description: RSYSLOG server port.
-            format: int32
-            example: 36
-          networkProtocol:
-            $ref: '#/components/schemas/clustermgmt.v4.0.config.RsyslogNetworkProtocol'
-          modules:
-            maxItems: 1024
-            minItems: 0
-            type: array
-            description: List of modules registered to RSYSLOG server.
-            items:
-              $ref: '#/components/schemas/clustermgmt.v4.0.config.RsyslogModuleItem'
-        additionalProperties: false
-        description: RSYSLOG Server.
-    common.v1.0.config.MapOfStringWrapper:
+    common.v1.0.config.TenantAwareModel:
       type: object
       properties:
-        map:
-          type: object
-          additionalProperties:
-            type: string
-          description: 'A map with string keys and values.
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity. The system automatically
+            assigns it, and it and is immutable from an API consumer perspective (some use cases may cause this Id to change
+            - For instance, a use case may require the transfer of ownership of the entity, but these cases are handled automatically
+            on the server).
 
             '
+          readOnly: true
       additionalProperties: false
-      description: 'A wrapper schema containing a map with string keys and values.
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the
+        base model class that it extends and is automatically set by the server.
 
         '
-    common.v1.0.response.ExternalizableAbstractModel:
-      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this
-        type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances
-        are always tenant aware and, therefore, extend the TenantAwareModel
+    clustermgmt.v4.0.config.RsyslogModuleLogSeverityLevel:
+      type: string
+      description: RSYSLOG module log severity level.
+      enum:
+      - EMERGENCY
+      - ALERT
+      - CRITICAL
+      - ERROR
+      - WARNING
+      - NOTICE
+      - INFO
+      - DEBUG
+      - $UNKNOWN
+      - $REDACTED
+      x-enumDescriptions:
+        EMERGENCY: Emergency level.
+        NOTICE: Notice level.
+        ERROR: Error level.
+        ALERT: Alert level.
+        INFO: Info level.
+        $UNKNOWN: 'Unknown value.
 
-        '
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.config.TenantAwareModel'
-      - type: object
-        properties:
-          extId:
-            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
-            type: string
-            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+          '
+        WARNING: Warning level.
+        DEBUG: Debug level.
+        CRITICAL: Critical level.
+        $REDACTED: 'Redacted value.
 
-              '
-            nullable: true
-            readOnly: true
-            example: acf0fa40-7920-4a1c-8555-445a56268e96
-          links:
-            maxItems: 20
-            minItems: 0
-            type: array
-            description: 'A HATEOAS style link for the response.  Each link contains a user-friendly name identifying the
-              link and an address for retrieving the particular resource.
-
-              '
-            readOnly: true
-            items:
-              $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        additionalProperties: false
-    common.v1.0.config.Message:
-      type: object
-      properties:
-        code:
-          type: string
-          description: 'A code that uniquely identifies a message.
-
-            '
-        message:
-          type: string
-          description: 'The description of the message.
-
-            '
-        locale:
-          type: string
-          description: 'The locale for the message description.
-
-            '
-          default: en_US
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-      additionalProperties: false
-    clustermgmt.v4.0.error.AppMessage:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message string.
-        severity:
-          $ref: '#/components/schemas/common.v1.0.config.MessageSeverity'
-        code:
-          type: string
-          description: 'The code associated with this message.This string is typically prefixed by the namespace the endpoint
-            belongs to. For example: VMM-40000'
-        locale:
-          type: string
-          description: Locale for this message. The default locale would be 'en-US'.
-          default: en_US
-        errorGroup:
-          type: string
-          description: The error group associated with this message of severity ERROR.
-        argumentsMap:
-          type: object
-          additionalProperties:
-            type: string
-          description: The map of argument name to value.
-      additionalProperties: false
-      description: Message with associated severity describing status of the current operation.
-      x-platform-generated: true
+          '
     common.v1.0.config.KVPair:
       type: object
       properties:
@@ -1932,12 +2127,10 @@ components:
             description: 'An integer value in a key-value pair.
 
               '
-            example: 66
           - type: boolean
             description: 'An boolean value in a key-value pair.
 
               '
-            example: false
           - maxItems: 100
             minItems: 0
             type: array
@@ -1968,276 +2161,27 @@ components:
               '
             items:
               type: integer
-              example: 56
       additionalProperties: false
       description: 'A map describing a set of keys and their corresponding values.
 
         '
-    clustermgmt.v4.0.error.SchemaValidationErrorMessage:
-      type: object
-      properties:
-        location:
-          type: string
-          description: The part of the request that failed validation. Validation can fail for path, query parameters, and
-            request body.
-        message:
-          type: string
-          description: The detailed message for the validation error.
-        attributePath:
-          type: string
-          description: The path of the attribute that failed validation in the schema.
-      additionalProperties: false
-      description: This schema is generated from SchemaValidationErrorMessage.java
-      x-platform-generated: true
-    common.v1.0.config.IPv6Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:(?:[A-Fa-f0-9]{1,4}:){6}|(?=(?:[A-Fa-f0-9]{0,4}:){0,6}(?:[0-9]{1,3}\.){3}[0-9]{1,3}$)(([0-9a-fA-F]{1,4}:){0,5}|:)((:[0-9a-fA-F]{1,4}){1,5}:|:)|::(?:[A-Fa-f0-9]{1,4}:){5})(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}|(?=(?:[A-Fa-f0-9]{0,4}:){0,7}[A-Fa-f0-9]{0,4}$)(([0-9a-fA-F]{1,4}:){1,7}|:)((:[0-9a-fA-F]{1,4}){1,7}|:)|(?:[A-Fa-f0-9]{1,4}:){7}:|:(:[A-Fa-f0-9]{1,4}){7})$
-          type: string
-          description: 'The IPv6 address of the host.
-
-            '
-          example: 2cd8:0415:e91d:2cb3:386f:e395:8af4:dcb8
-        prefixLength:
-          maximum: 128
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv6 address belongs.
-
-            '
-          format: int32
-          default: 128
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv6 format.
-
-        '
-    common.v1.0.response.ApiResponseMetadata:
-      type: object
-      properties:
-        flags:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of flags that may indicate the status of the response. For example, a flag with the name
-            ''isPaginated'' and value ''false'', indicates that the response is not paginated.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Flag'
-        links:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of HATEOAS style links for the response that may also include pagination links for list operations.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.response.ApiLink'
-        totalAvailableResults:
-          type: integer
-          description: 'The total number of entities that are available on the server for this type.
-
-            '
-          format: int32
-          example: 74
-        messages:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'Information, Warning or Error messages that might provide additional contextual information related
-            to the operation.
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.Message'
-        extraInfo:
-          maxItems: 20
-          minItems: 0
-          type: array
-          description: 'An array of entity-specific metadata
-
-            '
-          items:
-            $ref: '#/components/schemas/common.v1.0.config.KVPair'
-      additionalProperties: false
-      description: 'The metadata associated with an API response. This value is always present and minimally contains the
-        self-link for the API request that produced this response. It also contains pagination data for the paginated requests.
-
-        '
-    clustermgmt.v4.0.config.SnmpProtocol:
+    clustermgmt.v4.0.config.SnmpTrapVersion:
       type: string
-      description: SNMP protocol type.
+      description: SNMP version.
       enum:
-      - UDP
-      - UDP6
-      - TCP
-      - TCP6
+      - V2
+      - V3
       - $UNKNOWN
       - $REDACTED
       x-enumDescriptions:
-        UDP: UDP protocol.
-        TCP: TCP protocol.
-        UDP6: UDP6 protocol.
-        TCP6: TCP6 protocol.
+        V2: V2 SNMP version.
         $UNKNOWN: 'Unknown value.
 
           '
+        V3: V3 SNMP version.
         $REDACTED: 'Redacted value.
 
           '
-    common.v1.0.config.IPAddressOrFQDN:
-      type: object
-      properties:
-        ipv4:
-          $ref: '#/components/schemas/common.v1.0.config.IPv4Address'
-        ipv6:
-          $ref: '#/components/schemas/common.v1.0.config.IPv6Address'
-        fqdn:
-          $ref: '#/components/schemas/common.v1.0.config.FQDN'
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4/IPv6 format or a
-        Fully Qualified Domain Name.
-
-        '
-    clustermgmt.v4.0.config.SnmpConfig:
-      description: SNMP information.
-      allOf:
-      - $ref: '#/components/schemas/common.v1.0.response.ExternalizableAbstractModel'
-      - type: object
-        properties:
-          isEnabled:
-            type: boolean
-            description: SNMP status.
-            example: false
-          users:
-            maxItems: 1024
-            minItems: 0
-            type: array
-            description: SNMP user information.
-            items:
-              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpUser'
-          transports:
-            maxItems: 1024
-            minItems: 0
-            type: array
-            description: SNMP transport details.
-            items:
-              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTransport'
-          traps:
-            maxItems: 1024
-            minItems: 0
-            type: array
-            description: SNMP trap details.
-            items:
-              $ref: '#/components/schemas/clustermgmt.v4.0.config.SnmpTrap'
-        additionalProperties: false
-        description: SNMP information.
-    clustermgmt.v4.0.config.PulseStatus:
-      type: object
-      properties:
-        isEnabled:
-          type: boolean
-          description: Flag determines whether pulse is enabled for a cluster.
-          example: false
-        piiScrubbingLevel:
-          $ref: '#/components/schemas/clustermgmt.v4.0.config.PIIScrubbingLevel'
-      additionalProperties: false
-      description: Pulse status for a cluster.
-    prism.v4.0.config.TaskReference:
-      type: object
-      properties:
-        extId:
-          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
-          type: string
-          description: A globally unique identifier of a task.
-          example: QmFzZTY0RW5jb2RlZA==:8637ae89-6d88-4345-bd2d-682dfad61b73
-      additionalProperties: false
-      description: A reference to a task tracking an asynchronous operation. The status of the task can be queried by making
-        a GET request to the task URI provided in the metadata section of the API response.
-    clustermgmt.v4.0.config.ConfigType:
-      type: string
-      enum:
-      - NTP_SERVER_CONFIG
-      - NAME_SERVER_CONFIG
-      - SMTP_SERVER_CONFIG
-      - NFS_SUBNET_WHITELIST_CONFIG
-      - SNMP_SERVER_CONFIG
-      - RSYSLOG_SERVER_CONFIG
-      - PULSE_CONFIG
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        NFS_SUBNET_WHITELIST_CONFIG: NFS subnet whitelist configuration
-        NTP_SERVER_CONFIG: NTP server configuration
-        SNMP_SERVER_CONFIG: SNMP server configuration
-        SMTP_SERVER_CONFIG: SMTP server configuration
-        PULSE_CONFIG: Pulse status for a cluster.
-        $UNKNOWN: 'Unknown value.
-
-          '
-        NAME_SERVER_CONFIG: Name server configuration
-        $REDACTED: 'Redacted value.
-
-          '
-        RSYSLOG_SERVER_CONFIG: RSYSLOG server configuration
-    common.v1.0.config.IPv4Address:
-      required:
-      - value
-      type: object
-      properties:
-        value:
-          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-          type: string
-          description: 'The IPv4 address of the host.
-
-            '
-          example: 39.47.28.212
-        prefixLength:
-          maximum: 32
-          minimum: 0
-          type: integer
-          description: 'The prefix length of the network to which this host IPv4 address belongs.
-
-            '
-          format: int32
-          default: 32
-      additionalProperties: false
-      description: 'An unique address that identifies a device on the internet or a local network in IPv4 format.
-
-        '
-    clustermgmt.v4.0.config.SnmpAuthType:
-      type: string
-      description: SNMP user authentication type.
-      enum:
-      - MD5
-      - SHA
-      - $UNKNOWN
-      - $REDACTED
-      x-enumDescriptions:
-        $UNKNOWN: 'Unknown value.
-
-          '
-        SHA: SHA SNMP authentication.
-        $REDACTED: 'Redacted value.
-
-          '
-        MD5: MD5 SNMP authentication.
-    clustermgmt.v4.0.error.ErrorResponse:
-      type: object
-      properties:
-        error:
-          oneOf:
-          - type: array
-            items:
-              $ref: '#/components/schemas/clustermgmt.v4.0.error.AppMessage'
-          - $ref: '#/components/schemas/clustermgmt.v4.0.error.SchemaValidationError'
-      additionalProperties: false
-      description: An error response indicates that the operation has failed either due to a client error(4XX) or server error(5XX).
-        Please look at the HTTP status code and namespace specific error code and error message for further details.
-      x-platform-generated: true
   securitySchemes:
     basicAuthScheme:
       type: http
