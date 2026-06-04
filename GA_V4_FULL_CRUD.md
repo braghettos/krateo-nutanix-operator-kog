@@ -1,7 +1,7 @@
 # GA v4.0 — Exhaustive Full-CRUD Validation of all 189 RestDefinitions
 
 **Target:** live Nutanix Prism Central **pc.2024.3.1.13** (GA v4.0 surface), nested on the OVH bare-metal CE host.
-**Endpoint:** `https://141.94.131.53.nip.io:9441/api` (admin) — browser-trusted LE cert.
+**Endpoint:** `https://<prism-central-host>:9441/api` (admin) — browser-trusted LE cert.
 **Cluster:** `d2892a6a-5626-4cd8-95e9-0ac9840ba7bd` (the PC's own `PRISM_CENTRAL` cluster — **no PE registered**, see §3).
 **Method:** 19 parallel agents (one per namespace), each reading `generated/<ns>/restdefinitions/*.yaml` + `oas/_official/<ns>-v4.0.yaml`, building valid create bodies (with live refs + `$objectType` discriminators + required headers), and running **findby → create → get → update → delete** with cleanup against the live PC. Date: 2026-06-04.
 
