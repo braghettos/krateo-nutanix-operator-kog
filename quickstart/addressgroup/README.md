@@ -56,18 +56,30 @@ kubectl get crd addressgroups.microseg.nutanix.krateo.io addressgroupconfigurati
 ```yaml
 apiVersion: v1
 kind: Secret
-metadata: { name: nutanix-pc-auth, namespace: nutanix-system }
+metadata:
+  name: nutanix-pc-auth
+  namespace: nutanix-system
 type: Opaque
-stringData: { username: admin, password: "<your-pc-password>" }
+stringData:
+  username: admin
+  password: "<your-pc-password>"
 ---
 apiVersion: microseg.nutanix.krateo.io/v1alpha1
 kind: AddressGroupConfiguration
-metadata: { name: nutanix-pc, namespace: nutanix-system }
+metadata:
+  name: nutanix-pc
+  namespace: nutanix-system
 spec:
   authentication:
     basic:
-      usernameRef: { name: nutanix-pc-auth, namespace: nutanix-system, key: username }
-      passwordRef:  { name: nutanix-pc-auth, namespace: nutanix-system, key: password }
+      usernameRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: username
+      passwordRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: password
 ```
 
 ## 4. Create the Address Group
@@ -75,9 +87,13 @@ spec:
 ```yaml
 apiVersion: microseg.nutanix.krateo.io/v1alpha1
 kind: AddressGroup
-metadata: { name: krateo-qs-addressgroup, namespace: nutanix-system }
+metadata:
+  name: krateo-qs-addressgroup
+  namespace: nutanix-system
 spec:
-  configurationRef: { name: nutanix-pc, namespace: nutanix-system }
+  configurationRef:
+    name: nutanix-pc
+    namespace: nutanix-system
   name: krateo-qs-addressgroup
   description: "Created by the Krateo KOG operator via the Nutanix v4 proxy"
   ipv4Addresses:
