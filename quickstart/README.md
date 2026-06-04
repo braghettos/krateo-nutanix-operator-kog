@@ -99,18 +99,30 @@ kubectl get crd vms.vmm.nutanix.krateo.io vmconfigurations.vmm.nutanix.krateo.io
 ```yaml
 apiVersion: v1
 kind: Secret
-metadata: { name: nutanix-pc-auth, namespace: nutanix-system }
+metadata:
+  name: nutanix-pc-auth
+  namespace: nutanix-system
 type: Opaque
-stringData: { username: admin, password: "<your-pc-password>" }
+stringData:
+  username: admin
+  password: "<your-pc-password>"
 ---
 apiVersion: vmm.nutanix.krateo.io/v1alpha1
 kind: VmConfiguration
-metadata: { name: nutanix-pc, namespace: nutanix-system }
+metadata:
+  name: nutanix-pc
+  namespace: nutanix-system
 spec:
   authentication:
     basic:
-      usernameRef: { name: nutanix-pc-auth, namespace: nutanix-system, key: username }
-      passwordRef:  { name: nutanix-pc-auth, namespace: nutanix-system, key: password }
+      usernameRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: username
+      passwordRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: password
 ```
 
 ## 4. Create the VM
@@ -118,15 +130,20 @@ spec:
 ```yaml
 apiVersion: vmm.nutanix.krateo.io/v1alpha1
 kind: Vm
-metadata: { name: quickstart-vm, namespace: nutanix-system }
+metadata:
+  name: quickstart-vm
+  namespace: nutanix-system
 spec:
-  configurationRef: { name: nutanix-pc, namespace: nutanix-system }
+  configurationRef:
+    name: nutanix-pc
+    namespace: nutanix-system
   name: quickstart-vm
   description: "Created by the Krateo KOG operator via the Nutanix v4 middleware"
   numSockets: 1
   numCoresPerSocket: 1
   memorySizeBytes: 2147483648          # 2 GiB
-  cluster: { extId: "<REGISTERED-PE-CLUSTER-EXTID>" }
+  cluster:
+    extId: "<REGISTERED-PE-CLUSTER-EXTID>"
   # NOTE: do NOT set powerState on create (the API rejects it; the VM defaults to OFF)
 ```
 

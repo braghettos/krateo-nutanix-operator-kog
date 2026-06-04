@@ -65,18 +65,30 @@ kubectl get crd categories.prism.nutanix.krateo.io categoryconfigurations.prism.
 ```yaml
 apiVersion: v1
 kind: Secret
-metadata: { name: nutanix-pc-auth, namespace: nutanix-system }
+metadata:
+  name: nutanix-pc-auth
+  namespace: nutanix-system
 type: Opaque
-stringData: { username: admin, password: "<your-pc-password>" }
+stringData:
+  username: admin
+  password: "<your-pc-password>"
 ---
 apiVersion: prism.nutanix.krateo.io/v1alpha1
 kind: CategoryConfiguration
-metadata: { name: nutanix-pc, namespace: nutanix-system }
+metadata:
+  name: nutanix-pc
+  namespace: nutanix-system
 spec:
   authentication:
     basic:
-      usernameRef: { name: nutanix-pc-auth, namespace: nutanix-system, key: username }
-      passwordRef:  { name: nutanix-pc-auth, namespace: nutanix-system, key: password }
+      usernameRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: username
+      passwordRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: password
 ```
 
 ## 4. Create the Category
@@ -84,9 +96,13 @@ spec:
 ```yaml
 apiVersion: prism.nutanix.krateo.io/v1alpha1
 kind: Category
-metadata: { name: quickstart-category, namespace: nutanix-system }
+metadata:
+  name: quickstart-category
+  namespace: nutanix-system
 spec:
-  configurationRef: { name: nutanix-pc, namespace: nutanix-system }
+  configurationRef:
+    name: nutanix-pc
+    namespace: nutanix-system
   key: krateo-qs
   value: category
   type: USER
