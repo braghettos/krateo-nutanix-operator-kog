@@ -54,12 +54,20 @@ The Secret `nutanix-pc-auth` (keys `username` / `password`) already exists; refe
 ```yaml
 apiVersion: storage.nutanix.krateo.io/v1alpha1
 kind: VolumeGroupConfiguration
-metadata: { name: nutanix-pc, namespace: nutanix-system }
+metadata:
+  name: nutanix-pc
+  namespace: nutanix-system
 spec:
   authentication:
     basic:
-      usernameRef: { name: nutanix-pc-auth, namespace: nutanix-system, key: username }
-      passwordRef:  { name: nutanix-pc-auth, namespace: nutanix-system, key: password }
+      usernameRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: username
+      passwordRef:
+        name: nutanix-pc-auth
+        namespace: nutanix-system
+        key: password
 ```
 
 ## 3. Create the Volume Group
@@ -67,9 +75,13 @@ spec:
 ```yaml
 apiVersion: storage.nutanix.krateo.io/v1alpha1
 kind: VolumeGroup
-metadata: { name: krateo-qs-volumegroup, namespace: nutanix-system }
+metadata:
+  name: krateo-qs-volumegroup
+  namespace: nutanix-system
 spec:
-  configurationRef: { name: nutanix-pc, namespace: nutanix-system }
+  configurationRef:
+    name: nutanix-pc
+    namespace: nutanix-system
   name: krateo-qs-volumegroup
   description: "Created by the Krateo KOG operator via the Nutanix v4 proxy"
   clusterReference: "<REGISTERED-PE-CLUSTER-EXTID>"   # mandatory on Prism Central
