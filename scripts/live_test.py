@@ -20,8 +20,8 @@ REPO = '/Users/diegobraga/krateo/nutanix'
 CTX = 'kind-nova-kog'
 NS = 'nutanix-system'
 PROXY = 'http://nutanix-mw.nutanix-system.svc.cluster.local:8080'
-PC = 'https://<prism-central-host>:9441/api'
-AUTH = 'admin:<your-pc-password>'
+PC = os.environ.get('PC_BASE', 'https://<prism-central-host>:9440/api')
+AUTH = os.environ.get('PC_AUTH', 'admin:<your-pc-password>')
 SECRET = 'nutanix-pc-auth'
 
 BLOCKED_NS = {'files', 'licensing', 'opsmgmt', 'objects', 'security', 'multidomain'}
