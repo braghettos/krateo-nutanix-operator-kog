@@ -1,0 +1,59 @@
+# Nutanix v4 translating proxy — Deployment + Service.
+#
+# Option A (build the image):  docker build -t <repo>/nutanix-v4-proxy:0.1 . && push, set `image:` below.
+# Option B (no registry, quickstart): run the stdlib script from a ConfigMap on python:3.11-slim:
+#   kubectl -n nutanix-system create configmap nutanix-proxy-src \
+#     --from-file=nutanix_v4_proxy.py=quickstart/middleware/nutanix_v4_proxy.py
+# (Option B is what `image: python:3.11-slim` + the volume/command below use.)
+#
+# Set PC_BASE to your Prism Central API base (must end in /api).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nutanix-mw
+  namespace: nutanix-system
+  labels: { app: nutanix-mw }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: nutanix-mw } }
+  template:
+    metadata: { labels: { app: nutanix-mw } }
+    spec:
+      containers:
+        - name: proxy
+          # Option A: image: <repo>/nutanix-v4-proxy:0.1   (command/volume not needed)
+          image: python:3.11-slim
+          command: ["python", "/app/nutanix_v4_proxy.py"]
+          env:
+            - name: PC_BASE
+              value: "https://<PRISM-CENTRAL-HOST>:9440/api"
+            - name: TLS_VERIFY
+              value: "false"           # set true once the PC serves a trusted cert
+            - name: TASK_TIMEOUT_S
+              value: "180"
+            - name: LOG_LEVEL
+              value: "INFO"
+            # Optional: override $objectType for irregular paths, e.g.
+            # - { name: OBJECTTYPE_OVERRIDES, value: '{"/some/v4.0/config/things":"some.v4.config.Thing"}' }
+          ports: [{ containerPort: 8080 }]
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          volumeMounts: [{ name: src, mountPath: /app }]   # Option B only
+      volumes:
+        - name: src                                        # Option B only
+          configMap: { name: nutanix-proxy-src }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nutanix-mw
+  namespace: nutanix-system
+spec:
+  selector: { app: nutanix-mw }
+  ports: [{ port: 8080, targetPort: 8080 }]

@@ -1,0 +1,804 @@
+openapi: 3.0.1
+info:
+  title: Nutanix Storage APIs
+  description: Manage storage configuration and operations.
+  version: 4.0.1-alpha-3
+  x-repo-name: storage
+  x-logo:
+    altText: Storage Logo
+    url: https://developers.nutanix.com/api/v1/namespaces/storage/images/storage-logo-img.svg
+  x-minimum-negotiation-version: v4.2
+servers:
+- url: http://nutanix-mw.nutanix-system.svc.cluster.local:8080
+security:
+- basicAuthScheme: []
+paths:
+  /storage/v4.0.a3/config/volume-groups:
+    get:
+      tags:
+      - VolumeGroup
+      summary: Get a list of all the Volume Groups.
+      description: Query the list of Volume Groups.
+      operationId: getVolumeGroups
+      parameters:
+      - name: $page
+        in: query
+        description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer between 0 and the maximum number of pages that are available for that resource.  Any number out of this range will be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number greater than the total available pages would be set to the last page.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          minimum: 0
+          type: integer
+          description: 'A URL query parameter that specifies the page number of the result set.  Must be a positive integer between 0 and the maximum number of pages that are available for that resource.  Any number out of this range will be set to its nearest bound.  In other words, a page number of less than 0 would be set to 0 and a page number greater than the total available pages would be set to the last page.
+
+            '
+          format: int32
+      - name: $limit
+        in: query
+        description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number of records, which is 100.
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 100
+          type: integer
+          description: 'A URL query parameter that specifies the total number of records returned in the result set.  Must be a positive integer between 0 and 100. Any number out of this range will be set to the default maximum number of records, which is 100.
+
+            '
+          format: int32
+      - name: $filter
+        in: query
+        description: 'A URL query parameter that allows clients to filter a collection of resources. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response. Expression specified with the $filter must conform to the OData V4.01 URL conventions.
+
+          The filter can be applied on the following fields:
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: 'A URL query parameter that allows clients to specify the sort criteria for the returned list of objects. Resources can be sorted in ascending order using asc or descending order using desc. If asc or desc are not specified the resources will be sorted in ascending order by default. For example, ''orderby=templateName desc'' would get all templates sorted by templateName in desc order.
+
+          The orderby can be applied to the following fields:
+
+          - name
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Paginated list of Volume Groups.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeGroupsApiResponse'
+        '400':
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeGroupsApiResponse'
+        '500':
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeGroupsApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.GetVolumeGroupsApiResponse;\n\npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\");\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\n\t\tint $page = 0;\n\t\tint $limit = 50;\n\t\tString $filter = \"string_sample_data\";\n\t\tString $orderby = \"string_sample_data\";\n\t\tGetVolumeGroupsApiResponse getVolumeGroupsApiResponse = volumeGroupApi.getVolumeGroups($page, $limit, $filter, $orderby);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\";\nimport GetVolumeGroupsApiResponse from \"../src/models/storage/v4/config/GetVolumeGroupsApiResponse\";\n\nvar apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample() {\n    let $page = 0;\n    let $limit = 50;\n    let $filter = \"string_sample_data\";\n    let $orderby = \"string_sample_data\";\n\n    volumeGroupApi.getVolumeGroups($page, $limit, $filter, $orderby).then(({data, response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1, retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    $page = 0\n    $limit = 50\n    $filter = \"string_sample_data\"\n    $orderby = \"string_sample_data\"\n    api_response = volumeGroupApi.get_volume_groups($page, $limit, $filter, $orderby)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\nfunc main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation = true\n\n    $page := 0\n    $limit := 50\n    $filter := \"string_sample_data\"\n    $orderby := \"string_sample_data\"\n\n    response, _ := VolumeGroupApiInstance.GetVolumeGroups($page, $limit, $filter, $orderby)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0\" \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups?$filter=string_sample_data&$limit=50&$orderby=string_sample_data&$page=0\"\n"
+    post:
+      tags:
+      - VolumeGroup
+      summary: Create a new Volume Group.
+      description: Create a new Volume Group.
+      operationId: createVolumeGroup
+      requestBody:
+        description: A model that represents a Volume Group resource.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
+        required: true
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Group create operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeGroupApiResponse'
+        '400':
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeGroupApiResponse'
+        '500':
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeGroupApiResponse'
+        '200':
+          description: Task Id corresponding to the Volume Group create operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeGroupApiResponse'
+        '201':
+          description: Task Id corresponding to the Volume Group create operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.CreateVolumeGroupApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.VolumeGroup;\nimport dp1.sto.storage.v4.config.CreateVolumeGroupApiResponse;\n\npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\");\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\n\t\tVolumeGroup volumeGroup = new VolumeGroup();\n\n\t\t// VolumeGroup object initializations here...\n\n\t\tCreateVolumeGroupApiResponse createVolumeGroupApiResponse = volumeGroupApi.createVolumeGroup(volumeGroup);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\";\nimport VolumeGroup from \"../src/models/storage/v4/config/VolumeGroup\";\nimport CreateVolumeGroupApiResponse from \"../src/models/storage/v4/config/CreateVolumeGroupApiResponse\";\n\nvar apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample() {\n    let volumeGroup = new VolumeGroup();\n\n    // VolumeGroup object initializations here...\n\n\n    volumeGroupApi.createVolumeGroup(volumeGroup, ).then(({data, response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1, retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeGroup = swagger_client.VolumeGroup()\n\n    # VolumeGroup object initializations here...\n\n    api_response = volumeGroupApi.create_volume_group(volumeGroup)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    import1 \"storage_go_sdk/models/storage/v1/defaultapi\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\nfunc main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation = true\n\n    volumeGroup := import1.newVolumeGroup()\n\n    // VolumeGroup object initializations here...\n\n\n    response, _ := VolumeGroupApiInstance.CreateVolumeGroup(volumeGroup)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request POST \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups\" \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\":\"string\",\"loadBalanceVmAttachments\":true,\"sharingStatus\":\"$UNKNOWN\",\"iscsiTargetPrefix\":\"string\",\"iscsiTargetName\":\"string\",\"targetSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"createdBy\":\"string\",\"clusterReference\":\"string\",\"storageFeatures\":{\"flashMode\":{\"isEnabled\":true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.StorageFeatures\"},\"usageType\":\"$UNKNOWN\",\"isHidden\":true,\"$objectType\":\"storage.v4.config.VolumeGroup\"} \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method POST \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\":\"string\",\"loadBalanceVmAttachments\":true,\"sharingStatus\":\"$UNKNOWN\",\"iscsiTargetPrefix\":\"string\",\"iscsiTargetName\":\"string\",\"targetSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"createdBy\":\"string\",\"clusterReference\":\"string\",\"storageFeatures\":{\"flashMode\":{\"isEnabled\":true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.StorageFeatures\"},\"usageType\":\"$UNKNOWN\",\"isHidden\":true,\"$objectType\":\"storage.v4.config.VolumeGroup\"} \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups\"\n"
+  /storage/v4.0.a3/config/volume-groups/{extId}:
+    get:
+      tags:
+      - VolumeGroup
+      summary: Get a Volume Group identified by {extId}.
+      description: Query the Volume Group identified by {extId}.
+      operationId: getVolumeGroupById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+      responses:
+        '200':
+          description: Details of the queried Volume Group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeGroupApiResponse'
+        '400':
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeGroupApiResponse'
+        '500':
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.GetVolumeGroupApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.GetVolumeGroupApiResponse;\n\npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\");\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\n\t\tString extId = \"^9bcB1B58-AdeD-EBd7-447a-C47b88Ad6Cec$\";\n\t\tGetVolumeGroupApiResponse getVolumeGroupApiResponse = volumeGroupApi.getVolumeGroupById(extId);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\";\nimport GetVolumeGroupApiResponse from \"../src/models/storage/v4/config/GetVolumeGroupApiResponse\";\n\nvar apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample() {\n    let extId = \"^36FDCcBe-bfC8-cbba-022e-eF5c43FcDcde$\";\n\n    volumeGroupApi.getVolumeGroupById(extId).then(({data, response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1, retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    extId = \"^C6129FDE-D1b3-bFeA-f47d-9C24E6dd5BBb$\"\n    api_response = volumeGroupApi.get_volume_group_by_id(extId)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\nfunc main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation = true\n\n    extId := \"^b8B3afDB-b7Bc-FA30-b9A5-cd40E3CBC49E$\"\n\n    response, _ := VolumeGroupApiInstance.GetVolumeGroupById(extId)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request GET \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^EFCcA97c-adf9-E7DC-0A3e-fF830BAEC3BF$\" \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method GET \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^be7dF924-Ec1f-AB0f-cCec-a93221aeFFbA$\"\n"
+    delete:
+      tags:
+      - VolumeGroup
+      summary: Delete the Volume Group identified by {extId}.
+      description: Delete the Volume Group identified by {extId}.
+      operationId: deleteVolumeGroupById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Group delete operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse'
+        '400':
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse'
+        '500':
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse'
+        '200':
+          description: Task Id corresponding to the Volume Group delete operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse'
+        '201':
+          description: Task Id corresponding to the Volume Group delete operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.DeleteVolumeGroupApiResponse;\n\npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\");\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\n\t\tString extId = \"^A0D2b7f0-eFbE-1eaC-cee6-e82DD8BBE24b$\";\n\t\tDeleteVolumeGroupApiResponse deleteVolumeGroupApiResponse = volumeGroupApi.deleteVolumeGroupById(extId);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\";\nimport DeleteVolumeGroupApiResponse from \"../src/models/storage/v4/config/DeleteVolumeGroupApiResponse\";\n\nvar apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample() {\n    let extId = \"^Fa8eDCFa-BE18-bEF4-Aeed-bCEEb8e8C2b0$\";\n\n    volumeGroupApi.deleteVolumeGroupById(extId).then(({data, response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1, retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    extId = \"^E0400CDa-D3EC-eC5c-b0a4-Bbd3cdeaDaB2$\"\n    api_response = volumeGroupApi.delete_volume_group_by_id(extId)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\nfunc main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation = true\n\n    extId := \"^aa1b9fcb-fb1C-A83F-aAdb-0EeDeE75Dbde$\"\n\n    response, _ := VolumeGroupApiInstance.DeleteVolumeGroupById(extId)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request DELETE \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^aeE5FaFD-954D-ADFd-63AF-9fEBbBb42770$\" \\\n     --header 'Accept: application/json' \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method DELETE \\\n     --header 'Accept: application/json' \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^Be3D9ed6-BAcd-FDDA-eeEd-f3f5dAbfBDbc$\"\n"
+    patch:
+      tags:
+      - VolumeGroup
+      summary: Update details of a specified Volume Group identified by {extId}.
+      description: Update details of a specified Volume Group identified by {extId}.
+      operationId: updateVolumeGroupById
+      parameters:
+      - name: extId
+        in: path
+        description: The external identifier of the Volume Group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+      requestBody:
+        description: A model that represents a Volume Group resource.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
+        required: true
+      responses:
+        '202':
+          description: Task Id corresponding to the Volume Group update operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse'
+        '400':
+          description: Client error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse'
+        '500':
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse'
+        '200':
+          description: Task Id corresponding to the Volume Group update operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse'
+        '201':
+          description: Task Id corresponding to the Volume Group update operation.
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+                type: string
+                description: Indicates the target of a redirection or the URL of a newly created resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse'
+      x-code-samples:
+      - lang: Java
+        source: "\npackage sample;\n\nimport sto.java.client.api.VolumeGroupApi;\nimport dp1.sto.storage.v4.config.VolumeGroup;\nimport dp1.sto.storage.v4.config.UpdateVolumeGroupApiResponse;\n\npublic class JavaSdkSample {\n\tprivate static final VolumeGroupApi volumeGroupApi = new VolumeGroupApi();\n\n\tpublic static void main(String[] args) {\n\t\tvolumeGroupApi.getApiClient().setBasePath(\"https://api.nutanix.com\");\n\t\tvolumeGroupApi.getApiClient().setBackOffPeriod(100);\n\t\tvolumeGroupApi.getApiClient().setMaxRetryAttempts(2);\n\n\t\tVolumeGroup volumeGroup = new VolumeGroup();\n\n\t\t// VolumeGroup object initializations here...\n\n\t\tString extId = \"^0CB1dB1D-8d75-c18C-b4E1-2E9AEF9acE1F$\";\n\t\tUpdateVolumeGroupApiResponse updateVolumeGroupApiResponse = volumeGroupApi.updateVolumeGroupById(volumeGroup, extId);\n\t}\n}\n"
+      - lang: JavaScript
+        source: "\nimport {ApiClient} from \"../src/ApiClient\";\nimport {VolumeGroupApi} from \"../src/apis/VolumeGroup-endpoints\";\nimport VolumeGroup from \"../src/models/storage/v4/config/VolumeGroup\";\nimport UpdateVolumeGroupApiResponse from \"../src/models/storage/v4/config/UpdateVolumeGroupApiResponse\";\n\nvar apiClientInstance = new ApiClient();\napiClientInstance.maxRetryAttempts = 2;\napiClientInstance.backOffPeriod = 500;\napiClientInstance.basePath = \"https://api.nutanix.com\";\nvar volumeGroupApi = new VolumeGroupApi(apiClientInstance);\n\nfunction sample() {\n    let volumeGroup = new VolumeGroup();\n\n    // VolumeGroup object initializations here...\n\n    let extId = \"^d36eAbaf-aAbB-ccca-aD4F-FadCa7E155b2$\";\n\n    volumeGroupApi.updateVolumeGroupById(volumeGroup, extId).then(({data, response}) =>\n        console.log(response.status);\n        console.log(data.getData());\n        done();\n    }).catch((error) => {\n        console.log(error);\n        done(error);\n    });\n}\n"
+      - lang: Python
+        source: "\nimport swagger_client\n\nif __name__ == \"__main__\":\n    configuration = swagger_client.configuration.Configuration()\n    configuration.host = \"http://api.nutanix.com\"\n    api_client = swagger_client.ApiClient(configuration, max_retry_attempts=1, retry_backoff_period=100)\n    volumeGroupApi = swagger_client.VolumeGroupApi(api_client)\n    volumeGroup = swagger_client.VolumeGroup()\n\n    # VolumeGroup object initializations here...\n\n    extId = \"^cA1ca8fD-14d3-4ac0-AF5d-Ae43C591D2fa$\"\n    api_response = volumeGroupApi.update_volume_group_by_id(volumeGroup, extId)\n"
+      - lang: Go
+        source: "\npackage main\n\nimport {\n    \"fmt\"\n    import1 \"storage_go_sdk/models/storage/v1/defaultapi\"\n    \"storage_go_sdk/api\"\n    \"storage_go_sdk/client\"\n}\n\nfunc main() {\n    var VolumeGroupApiInstance *api.VolumeGroupApi\n    VolumeGroupApiInstance = api.NewVolumeGroupApi()\n    VolumeGroupApiInstance.ApiClient.BasePath = \"http://localhost:8080\"\n    VolumeGroupApiInstance.ApiClient.AllowVersionNegotiation = true\n\n    volumeGroup := import1.newVolumeGroup()\n\n    // VolumeGroup object initializations here...\n\n    extId := \"^ECa9D2bb-4aCE-E1c7-adf9-Ef3caAFea5CC$\"\n\n    response, _ := VolumeGroupApiInstance.UpdateVolumeGroupById(volumeGroup, extId)\n    fmt.Println(response)\n}\n\n"
+      - lang: cURL
+        source: "\ncurl --request PATCH \\\n     --url \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^5BBCECF9-eeCb-aCAd-FcEE-50DaBE5a19b5$\" \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\":\"string\",\"loadBalanceVmAttachments\":true,\"sharingStatus\":\"$UNKNOWN\",\"iscsiTargetPrefix\":\"string\",\"iscsiTargetName\":\"string\",\"targetSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"createdBy\":\"string\",\"clusterReference\":\"string\",\"storageFeatures\":{\"flashMode\":{\"isEnabled\":true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.StorageFeatures\"},\"usageType\":\"$UNKNOWN\",\"isHidden\":true,\"$objectType\":\"storage.v4.config.VolumeGroup\"} \\\n"
+      - lang: Wget
+        source: "\nwget --verbose \\\n     --method PATCH \\\n     --header 'Accept: application/json' \\\n     --header 'Content-Type: application/json' \\\n     --body-data {\"tenantId\":\"string\",\"extId\":\"string\",\"links\":[{\"href\":\"string\",\"rel\":\"string\",\"$objectType\":\"common.v1.response.ApiLink\"}],\"name\":\"string\",\"description\":\"string\",\"loadBalanceVmAttachments\":true,\"sharingStatus\":\"$UNKNOWN\",\"iscsiTargetPrefix\":\"string\",\"iscsiTargetName\":\"string\",\"targetSecret\":\"string\",\"enabledAuthentications\":\"$UNKNOWN\",\"createdBy\":\"string\",\"clusterReference\":\"string\",\"storageFeatures\":{\"flashMode\":{\"isEnabled\":true,\"$objectType\":\"storage.v4.config.FlashMode\"},\"$objectType\":\"storage.v4.config.StorageFeatures\"},\"usageType\":\"$UNKNOWN\",\"isHidden\":true,\"$objectType\":\"storage.v4.config.VolumeGroup\"} \\\n     - \"https://api.nutanix.com/storage/v4.0.a3/config/volume-groups/^BDC6ff9E-c02C-cEaf-d4C9-c04ebEdc5EBc$\"\n"
+components:
+  schemas:
+    storage.v4.r0.a3.error.SchemaValidationErrorMessage:
+      type: object
+      properties:
+        location:
+          type: string
+        message:
+          type: string
+        attributePath:
+          type: string
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationErrorMessage.java
+    storage.v4.r0.a3.config.CreateVolumeGroupApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups Post operation
+    common.v1.r0.a3.response.ApiLink:
+      type: object
+      properties:
+        href:
+          type: string
+          description: 'The URL at which the entity described by this link can be accessed.
+
+            '
+        rel:
+          type: string
+          description: 'A name that identifies the relationship of this link to the object that is returned by the URL.  The special value of "self" identifies the URL for the object.
+
+            '
+      additionalProperties: false
+      description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and an address for retrieving the particular resource.
+
+        '
+    storage.v4.r0.a3.config.FlashMode:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+      additionalProperties: false
+      description: Once configured, this field will avoid down migration of data from the hot tier unless the overrides field is specified for the virtual disks.
+    storage.v4.r0.a3.error.AppMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+        code:
+          type: string
+        locale:
+          type: string
+          description: The locale for the message description.
+        errorGroup:
+          type: string
+        argumentsMap:
+          type: object
+          additionalProperties:
+            type: string
+      additionalProperties: false
+      description: This schema is generated from AppMessage.java
+    storage.v4.r0.a3.config.DeleteVolumeGroupApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Delete operation
+    storage.v4.r0.a3.error.SchemaValidationError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        statusCode:
+          type: integer
+        error:
+          type: string
+        path:
+          type: string
+        validationErrorMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationErrorMessage'
+      additionalProperties: false
+      description: This schema is generated from SchemaValidationError.java
+    storage.v4.r0.a3.config.StorageFeatures:
+      type: object
+      properties:
+        flashMode:
+          $ref: '#/components/schemas/storage.v4.r0.a3.config.FlashMode'
+      additionalProperties: false
+      description: Storage features for the Volume Groups.
+    storage.v4.r0.a3.config.GetVolumeGroupApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Get operation
+    storage.v4.r0.a3.config.UpdateVolumeGroupApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/storage.v4.r0.a3.config.Task'
+          - $ref: '#/components/schemas/prism.v4.r0.a1.config.TaskReference'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups/{extId} Patch operation
+    storage.v4.r0.a3.config.AuthenticationType:
+      title: Supported types of authentication
+      type: string
+      description: The authentication type enabled for the Volume Group. If this is set to CHAP, the target/client secret must be provided.
+      enum:
+      - CHAP
+      - NONE
+      - $UNKNOWN
+      - $REDACTED
+    prism.v4.r0.a1.config.TaskReference:
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-zA-Z0-9/+]*={0,2}:[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+          type: string
+          description: Globally unique identifier of a task.
+      additionalProperties: false
+      description: Reference to a task tracking the async operation.
+    storage.v4.r0.a3.config.Task:
+      title: Task object
+      type: object
+      properties:
+        extId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: The external identifier of the task.
+      additionalProperties: false
+      description: An object encapsulating Task Id return value.
+    storage.v4.r0.a3.config.UsageType:
+      title: Supported Volume Group Usage types
+      type: string
+      description: Expected usage type for the Volume Group.
+      enum:
+      - USER
+      - INTERNAL
+      - TEMPORARY
+      - BACKUP_TARGET
+      - $UNKNOWN
+      - $REDACTED
+    common.v1.r0.a3.config.Flag:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: boolean
+      additionalProperties: false
+      description: 'Many entities in the Nutanix APIs carry flags.  This object captures all the flags associated with that entity through this object.  The field that hosts this type of an object must have an attribute called x-bounded-map-keys that tells which flags are actually present for that entity.
+
+        '
+    common.v1.r0.a3.config.TenantAwareModel:
+      type: object
+      properties:
+        tenantId:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: 'A globally unique identifier that represents the tenant that owns this entity.  It is automatically assigned by the system and is immutable from an API consumer perspective (some use cases may cause this Id to change - for instance a use case may require the transfer of ownership of the entity, but these cases are handled automatically on the server).
+
+            '
+          readOnly: true
+      additionalProperties: false
+      description: 'A model base class whose instances are bound to a specific tenant.  This model adds a tenantId to the base model class that it extends and is automatically set by the server.
+
+        '
+    common.v1.r0.a3.response.ApiResponseMetadata:
+      type: object
+      properties:
+        flags:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Flag'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        totalAvailableResults:
+          type: integer
+          format: int32
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.Message'
+        extraInfo:
+          type: array
+          description: An array of entity specific metadata
+          items:
+            $ref: '#/components/schemas/common.v1.r0.a3.config.KVPair'
+      additionalProperties: false
+      description: 'The metadata associated with an API response. Always present and minimally contains the self link for the API request that produced this response.  Also contains pagination data for paginated requests.
+
+        '
+    common.v1.r0.a3.config.MessageSeverity:
+      type: string
+      description: 'The message severity.
+
+        '
+      enum:
+      - INFO
+      - WARNING
+      - ERROR
+      - $UNKNOWN
+      - $REDACTED
+    storage.v4.r0.a3.error.ErrorResponse:
+      type: object
+      properties:
+        error:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.error.AppMessage'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.SchemaValidationError'
+      additionalProperties: false
+      description: This schema is auto-generated by the Open API Dev Platform as REST response for 4xx and 5xx error responses.
+    common.v1.r0.a3.config.Message:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 'A code that uniquely identifies a message.
+
+            '
+        message:
+          type: string
+        locale:
+          type: string
+          description: 'The locale for the message description.
+
+            '
+        severity:
+          $ref: '#/components/schemas/common.v1.r0.a3.config.MessageSeverity'
+      additionalProperties: false
+    common.v1.r0.a3.response.ExternalizableAbstractModel:
+      description: 'A model that represents an object instance that is accessible through an API endpoint.  Instances of this type get an extId field that contains the globally unique identifier for that instance.  Externally accessible instances are always tenant aware and therefore extend the TenantAwareModel
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.config.TenantAwareModel'
+      - type: object
+        properties:
+          extId:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: 'A globally unique identifier of an instance that is suitable for external consumption.
+
+              '
+            nullable: true
+          links:
+            type: array
+            description: 'A HATEOAS style link for the response.  Each link contains a user friendly name identifying the link and an address for retrieving the particular resource.
+
+              '
+            items:
+              $ref: '#/components/schemas/common.v1.r0.a3.response.ApiLink'
+        additionalProperties: false
+    common.v1.r0.a3.config.KVPair:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The key of this key value pair
+        value:
+          description: The value associated with the key for this key-value pair
+          oneOf:
+          - type: string
+          - type: integer
+      additionalProperties: false
+      description: 'A map describing a set of keys and their corresponding values.
+
+        '
+    storage.v4.r0.a3.config.VolumeGroup:
+      title: Volume Group object
+      description: A model that represents a Volume Group resource.
+      allOf:
+      - $ref: '#/components/schemas/common.v1.r0.a3.response.ExternalizableAbstractModel'
+      - type: object
+        properties:
+          name:
+            maxLength: 256
+            type: string
+            description: Volume Group name.
+          description:
+            maxLength: 1000
+            type: string
+            description: Volume Group description.
+          loadBalanceVmAttachments:
+            type: boolean
+            description: Indicates whether to enable Volume Group load balancing for VM attachments. This cannot be enabled if there are iSCSI client attachments already associated with the Volume Group, and vice-versa.
+          sharingStatus:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.SharingStatus'
+          iscsiTargetPrefix:
+            maxLength: 512
+            pattern: ^[\da-zA-Z:\.\-]+$
+            type: string
+            description: The specifications can either contain the iSCSI target prefix or the iSCSI target name as the value. This is an optional field.
+            writeOnly: true
+          iscsiTargetName:
+            type: string
+            description: The specifications can either contain the iSCSI target prefix or the iSCSI target name as the value. This is an optional field.
+          targetSecret:
+            maxLength: 16
+            minLength: 12
+            type: string
+            description: Target secret in case of a CHAP authentication. This field should not be provided in case the authentication type is not set to CHAP.
+            format: password
+            writeOnly: true
+          enabledAuthentications:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.AuthenticationType'
+          createdBy:
+            maxLength: 512
+            type: string
+            description: Service/user who created this Volume Group.
+          clusterReference:
+            pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+            type: string
+            description: The UUID of the cluster that will host the Volume Group. This is a mandatory field for creating a Volume Group on Prism Central.
+          storageFeatures:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.StorageFeatures'
+          usageType:
+            $ref: '#/components/schemas/storage.v4.r0.a3.config.UsageType'
+          isHidden:
+            type: boolean
+            description: Indicates whether the Volume Group is meant to be hidden or not.
+        additionalProperties: false
+    storage.v4.r0.a3.config.SharingStatus:
+      title: The supported sharing status types
+      type: string
+      description: Indicates whether the Volume Group can be shared across multiple iSCSI initiators. The mode cannot be changed from SHARED to NOT_SHARED on a Volume Group with multiple attachments. Similarly, a Volume Group cannot be associated with more than one attachment as long as it is in exclusive mode.
+      enum:
+      - SHARED
+      - NOT_SHARED
+      - $UNKNOWN
+      - $REDACTED
+    storage.v4.r0.a3.config.GetVolumeGroupsApiResponse:
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/common.v1.r0.a3.response.ApiResponseMetadata'
+        data:
+          oneOf:
+          - type: array
+            items:
+              $ref: '#/components/schemas/storage.v4.r0.a3.config.VolumeGroup'
+          - $ref: '#/components/schemas/storage.v4.r0.a3.error.ErrorResponse'
+      additionalProperties: false
+      description: REST response for all response codes in api path /storage/v4.0.a3/config/volume-groups Get operation
+  securitySchemes:
+    basicAuthScheme:
+      type: http
+      scheme: basic
+    apiKeyAuthScheme:
+      type: apiKey
+      name: X-ntnx-api-key
+      in: header
