@@ -46,20 +46,34 @@ The `RestDefinition` for a Nutanix VM is almost boring:
 ```yaml
 apiVersion: ogen.krateo.io/v1alpha1
 kind: RestDefinition
-metadata: { name: nutanix-vmm-vm, namespace: nutanix-system }
+metadata:
+  name: nutanix-vmm-vm
+  namespace: nutanix-system
 spec:
   oasPath: configmap://nutanix-system/nutanix-vmm-vm-oas/vm.yaml
   resourceGroup: vmm.nutanix.krateo.io
   resource:
     kind: Vm
-    identifiers: [name]
-    additionalStatusFields: [extId]
+    identifiers:
+      - name
+    additionalStatusFields:
+      - extId
     verbsDescription:
-      - { action: findby, method: GET,    path: /vmm/v4.0/ahv/config/vms }
-      - { action: create, method: POST,   path: /vmm/v4.0/ahv/config/vms }
-      - { action: get,    method: GET,    path: /vmm/v4.0/ahv/config/vms/{extId} }
-      - { action: update, method: PUT,    path: /vmm/v4.0/ahv/config/vms/{extId} }
-      - { action: delete, method: DELETE, path: /vmm/v4.0/ahv/config/vms/{extId} }
+      - action: findby
+        method: GET
+        path: /vmm/v4.0/ahv/config/vms
+      - action: create
+        method: POST
+        path: /vmm/v4.0/ahv/config/vms
+      - action: get
+        method: GET
+        path: /vmm/v4.0/ahv/config/vms/{extId}
+      - action: update
+        method: PUT
+        path: /vmm/v4.0/ahv/config/vms/{extId}
+      - action: delete
+        method: DELETE
+        path: /vmm/v4.0/ahv/config/vms/{extId}
 ```
 
 Apply it, and a `Vm` CRD and its controller appear. Now the end state we *want* is just this:
@@ -67,14 +81,19 @@ Apply it, and a `Vm` CRD and its controller appear. Now the end state we *want* 
 ```yaml
 apiVersion: vmm.nutanix.krateo.io/v1alpha1
 kind: Vm
-metadata: { name: quickstart-vm, namespace: nutanix-system }
+metadata:
+  name: quickstart-vm
+  namespace: nutanix-system
 spec:
-  configurationRef: { name: nutanix-pc, namespace: nutanix-system }
+  configurationRef:
+    name: nutanix-pc
+    namespace: nutanix-system
   name: quickstart-vm
   numSockets: 1
   numCoresPerSocket: 1
   memorySizeBytes: 2147483648        # 2 GiB
-  cluster: { extId: "<your-prism-element-cluster>" }
+  cluster:
+    extId: "<your-prism-element-cluster>"
 ```
 
 `kubectl apply -f vm.yaml`, and a VM should show up in Prism Central. That was the goal.
