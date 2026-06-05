@@ -199,10 +199,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
                             return data[0].get("extId")
                     except ValueError:
                         pass
-                for e in (d.get("entitiesAffected") or []):  # fallback
-                    if e.get("extId"):
-                        return e["extId"]
-                return None
+                aff = [e.get("extId") for e in (d.get("entitiesAffected") or []) if e.get("extId")]
+                # a child create affects both parent and child; the parent's extId is in the
+                # collection path, so prefer the entity that is NOT the parent (the new child).
+                for eid in aff:
+                    if eid not in collection_path:
+                        return eid
+                return aff[0] if aff else None
             time.sleep(2)
         log("WARN", "task %s timed out" % task_id)
         return None

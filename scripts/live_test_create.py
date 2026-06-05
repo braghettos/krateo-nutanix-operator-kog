@@ -96,12 +96,26 @@ RES += [
        'role':ROLE,'entities':[{'entityFilter':{'*':{'*':{'eq':'*'}}}}],
        'identities':[{'identityFilter':{'user':{'uuid':{'anyof':[ADMIN]}}}}]} if ROLE else None),
 ]
-# extend the vm chain with cd-rom + disk children (reuse the same VM parent; both need parent If-Match)
+# extend the vm chain with cd-rom + disk + nic children (reuse the same VM parent; all need parent If-Match)
+SUBNET=find_extid('/networking/v4.0/config/subnets','name','vm-net')
 CHAINS[0]['children'] += [
   ('vmm','cdrom','vmExtId',{'diskAddress':{'busType':'IDE','index':0}}),
   ('vmm','disk','vmExtId',{'diskAddress':{'busType':'SCSI','index':1},
        'backingInfo':{'$objectType':'vmm.v4.ahv.config.VmDisk','diskSizeBytes':1073741824,
                       'storageContainer':{'extId':SC}}}),
+  ('vmm','nic','vmExtId',{'networkInfo':{'nicType':'NORMAL_NIC','subnet':{'extId':SUBNET}}} if SUBNET else None),
+]
+# user -> key (API key under an existing service-account user; no If-Match)
+CHAINS += [
+  {'parent':('iam','user',{'username':'krateo-qs-ct-svc','userType':'SERVICE_ACCOUNT','description':'krateo'}),
+   'find':('/iam/v4.0/authn/users','username','krateo-qs-ct-svc'),
+   'children':[('iam','key','userExtId',{'name':'krateo-qs-ct-key','keyType':'API_KEY'})]},
+]
+# template from the VM (CREATE_NEEDS_REF; versionSource is a discriminated oneOf -> needs $objectType)
+RES += [
+  ('vmm','template', {'templateName':'krateo-qs-ct-tmpl','templateDescription':'krateo live-test',
+       'templateVersionSpec':{'versionName':'v1','versionDescription':'initial',
+           'versionSource':{'$objectType':'vmm.v4.content.TemplateVmReference','extId':VMP}}} if VMP else None),
 ]
 
 def provision(ns,key,body,crname):
@@ -141,17 +155,22 @@ if not DO_CHAINS:
     print(f"{ns}/{key:28s} Synced={synced:6s} {msg[:80]}")
     results.append((ns,key,synced,msg))
 else:
+  PARENTS=os.environ.get('PARENTS')       # comma-list of parent keys to run
+  CHILDREN=os.environ.get('CHILDREN')     # comma-list of child keys to run
   for ch in CHAINS:
     pns,pkey,pbody=ch['parent']
+    if PARENTS and pkey not in PARENTS.split(','): continue
+    kids=[c for c in ch['children'] if c and (not CHILDREN or c[1] in CHILDREN.split(','))]
+    if not kids: continue
     if auth_code()!='200': print('!! auth locked -> abort'); break
     psync,pmsg,pext=provision(pns,pkey,pbody,f'ct-{pkey}-parent')
-    if not pext and 'find' in ch and psync=='True':
-        pext=find_extid(*ch['find'])           # resolve parent extId from the PC by name
+    if not pext and 'find' in ch:
+        pext=find_extid(*ch['find'])           # parent may already exist (409 on re-create) -> resolve by name
     print(f"[parent] {pns}/{pkey:20s} Synced={psync:6s} extId={str(pext)[:20]} {pmsg[:50]}")
     results.append((pns,pkey,psync,pmsg))
-    if psync!='True' or not pext:
-        print('   !! parent not ready/extId missing -> skipping children'); continue
-    for cns,ckey,pfield,cbody in ch['children']:
+    if not pext:
+        print('   !! parent extId unresolved -> skipping children'); continue
+    for cns,ckey,pfield,cbody in kids:
         if auth_code()!='200': print('!! auth locked -> abort'); break
         b=dict(cbody); b[pfield]=pext
         csync,cmsg,_=provision(cns,ckey,b,f'ct-{ckey}-child')

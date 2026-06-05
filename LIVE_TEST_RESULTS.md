@@ -70,8 +70,17 @@ findby on the PC by name), and threads it into each child's `{…ExtId}` path pa
 |---|---|
 | `vmm/Vm` → `vmm/SerialPort` | ✅ both True — serial-port present on the VM. The child POST to `/vms/{vmExtId}/serial-ports` requires the **parent VM's `If-Match`**; the proxy now injects it (GET parent → ETag → retry) only when the API demands it (`412/428`). Proxy log: `retried POST …/serial-ports with parent If-Match -> 202`. |
 | `vmm/Vm` → `vmm/Disk` | ✅ True — disk on the VM. The body's discriminated `backingInfo.$objectType` (`vmm.v4.ahv.config.VmDisk`) is carried by the CRD (discriminated union), unlike the discriminator-less `Filter`. |
-| `vmm/Vm` → `vmm/CdRom` | ⚠️ **created on the PC** (cd-rom present on the VM), but the controller can't confirm it back (`cannot determine creation result … external-create-pending`) — a rest-dynamic-controller observe limit for nameless children whose findby can't disambiguate the just-created entity. |
+| `vmm/Vm` → `vmm/CdRom` | ⚠️ **created on the PC** (cd-rom present on the VM), but the controller can't confirm it back — see note below. |
+| `vmm/Vm` → `vmm/Nic` | ⚠️ **created on the PC** (used existing subnet `vm-net`; nic present on the VM via the parent-If-Match retry → 202), but observe-blocked — see note below. |
+| `iam/User` → `iam/Key` | ✅ True — API key created under the service-account user and observed. The parent already existed, so the runner resolves the parent extId via findby-by-name and proceeds straight to the child. |
 | `volumes/VolumeGroup` → `volumes/Disk` | ⚠️ parent True + extId threaded into the child path correctly, but this PC build's `VolumeDisk` create rejects a blank disk (`VOL-40101: DiskDataSourceReference cannot be empty`) — a server-side data requirement, not a chaining failure. |
+
+**Nameless VM children (`CdRom`, `Nic`) — created but not observable.** The create *succeeds*
+(both are present on the VM on the PC), but the Nutanix async task for a nic/cd-rom create reports
+only the **parent VM** in `entitiesAffected` — never the child's extId. A schema-agnostic proxy
+can't recover the child id from the task, so the get-back fails and the controller loops
+(`external-create-pending`). `SerialPort` and `Disk` (same parent-If-Match path) observe fine, so
+this is specific to how those two endpoints report their task entities, not a chaining gap.
 
 This added a **new proxy capability (5b)**: child-of-parent `If-Match` on POST.
 
@@ -82,17 +91,19 @@ This added a **new proxy capability (5b)**: child-of-parent `If-Match` on POST.
 | iam | AuthorizationPolicy | role ref + ABAC entity/identity filters | ✅ True (on PC) — `entityFilter`/`identityFilter` are preserve-unknown objects; `role` resolved from the seeded role |
 | datapolicies | ProtectionPolicy | local replication location + schedule **with linear retention** | ✅ True (on PC) — CRD's `schedule.retention` is preserve-unknown, so the nested `$objectType` is accepted |
 | dataprotection | RecoveryPoint | VM ref in nested `vmRecoveryPoints` | ❌ operator-blocked — the create **works at the API**, but it requires `$objectType` on the nested `vmRecoveryPoints` items, a field the generated CRD does not carry (strict-decode rejects it) and the schema-agnostic proxy can't infer a nested discriminator |
+| vmm | Template | discriminated `templateVersionSpec.versionSource` from a VM | ✅ True (on PC) — created from the seeded VM; the nested oneOf `versionSource.$objectType` (`TemplateVmReference`) is carried by the CRD |
 
 Combined with the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`),
-**17 creatable RDs are operator-verified on the live PC** (`Synced=True`) — plus `CdRom`
-created-but-observe-pending — plus the 23 read-observe → **40 RDs live-tested green**.
+**19 creatable RDs are operator-verified on the live PC** (`Synced=True`) — plus `CdRom` and
+`Nic` created-but-observe-pending — plus the 23 read-observe → **42 RDs live-tested green**.
 
 Genuine blocks recorded: `Trap` (oasgen-provider CRD codegen), `VolumeDisk` (PC requires a
-data source), `RecoveryPoint` (nested discriminator the CRD can't carry), `CdRom` (controller
-observe of nameless children). Remaining untested are the same bespoke-body shape — no new
-mechanism: every create path (read-observe, sync/async, X-Cluster-Id, cluster path-param,
-live-ref, ABAC/preserve-unknown bodies, parent-chain + parent-If-Match, discriminated
-nested unions) is now proven against the live GA v4.0 PC.
+data source), `RecoveryPoint` (nested discriminator the CRD can't carry), `CdRom`/`Nic`
+(Nutanix task reports only the parent VM, so the child can't be observed back). Remaining
+untested RDs are the same bespoke-body shape — **no new mechanism**: every create path
+(read-observe, sync/async, X-Cluster-Id, cluster path-param, live-ref, ABAC/preserve-unknown
+bodies, parent-chain + parent-If-Match, discriminated nested unions, create-from-source) is
+now proven against the live GA v4.0 PC.
 
 ## Notes
 
