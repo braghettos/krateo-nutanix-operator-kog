@@ -54,12 +54,31 @@ RES=[
   ('vmm','ratelimitpolicy', {'name':'krateo-qs-ct-rlp','rateLimitKbps':1024,'clusterEntityFilter':FILT()} if CAT else None),
 ]
 
-ONLY=os.environ.get('ONLY')          # comma-list of keys to restrict the run (re-test subset)
-if ONLY: RES=[r for r in RES if r[1] in ONLY.split(',')]
-results=[]
-for ns,key,body in RES:
-    if body is None: print(ns+'/'+key,'SKIP (no category ref)'); results.append((ns,key,'SKIP-noref','')); continue
-    if auth_code()!='200': print('!! auth locked -> abort'); results.append((ns,key,'LOCK','')); break
+# Parent-chains: create a parent, capture its status.extId, thread it into each child's
+# spec (the {…ExtId} path param is sourced from a spec field of the same name). volumes/disk
+# needs no If-Match (only volumeGroupExtId) -> cleanest CREATE_NEEDS_PARENT proof.
+_scs=curl("/clustermgmt/v4.0/config/storage-containers?$limit=10").get('data') or []
+def _scid(c): return c.get('containerExtId') or c.get('extId')
+SC=next((_scid(c) for c in _scs if c.get('name','').startswith('krateo-qs')), None) or next((_scid(c) for c in _scs),None)
+CHAINS=[
+  # vm -> serial-port: child POST needs the PARENT VM's If-Match (proxy injects it on 412/428).
+  {'parent':('vmm','vm',{'name':'krateo-qs-ct-vmp','description':'krateo chain parent','numSockets':1,
+                         'numCoresPerSocket':1,'memorySizeBytes':2147483648,'cluster':{'extId':CLUSTER}}),
+   'find':('/vmm/v4.0/ahv/config/vms', 'name', 'krateo-qs-ct-vmp'),
+   'children':[('vmm','serialport','vmExtId',{'index':0,'isConnected':False})]},
+  # vg -> disk: chaining works (parent extId resolved + threaded), but this PC build's VolumeDisk
+  # create requires a diskDataSourceReference (won't make a blank disk) -> VOL-40101. Left documented.
+  {'parent':('volumes','volumegroup',{'name':'krateo-qs-ct-vgp','clusterReference':CLUSTER,'usageType':'USER'}),
+   'find':('/volumes/v4.0/config/volume-groups', 'name', 'krateo-qs-ct-vgp'),
+   'children':[('volumes','disk','volumeGroupExtId',{'index':0,'diskSizeBytes':1073741824,'storageContainerId':SC})]},
+]
+def find_extid(coll, field, val):
+    import urllib.parse
+    d=curl("%s?$filter=%s%%20eq%%20'%s'"%(coll, field, urllib.parse.quote(val))).get('data') or []
+    return d[0].get('extId') if d else None
+
+def provision(ns,key,body,crname):
+    """patch slice -> RD -> Configuration -> CR; poll Synced; return (synced,msg,extId)."""
     y=yaml.safe_load(open(f'{REPO}/generated/{ns}/restdefinitions/{key}.restdefinition.yaml'))
     r=y['spec']['resource']; kind=r['kind']; group=y['spec']['resourceGroup']
     cm=y['spec']['oasPath'].split('/')[3]; oaskey=y['spec']['oasPath'].split('/')[-1]
@@ -71,17 +90,46 @@ for ns,key,body in RES:
     cfg=("apiVersion: %s/v1alpha1\nkind: %sConfiguration\nmetadata: {name: nutanix-pc, namespace: %s}\nspec: {authentication: {basic: {usernameRef: {name: %s, namespace: %s, key: username}, passwordRef: {name: %s, namespace: %s, key: password}}}}\n"%(group,kind,NS,SECRET,NS,SECRET,NS))
     kc('apply','-f','-',inp=cfg)
     spec={'configurationRef':{'name':'nutanix-pc','namespace':NS}}; spec.update(body)
-    cr={'apiVersion':f'{group}/v1alpha1','kind':kind,'metadata':{'name':f'ct-{key}','namespace':NS},'spec':spec}
+    cr={'apiVersion':f'{group}/v1alpha1','kind':kind,'metadata':{'name':crname,'namespace':NS},'spec':spec}
     kc('apply','-f','-',inp=yaml.safe_dump(cr))
-    crd=crd_name(kind,group); synced='?'; msg=''
+    crd=crd_name(kind,group); synced='?'; msg=''; extId=None
     for _ in range(13):
         time.sleep(8)
         if auth_code()!='200': synced='LOCK'; break
-        s=kc('get',crd,f'ct-{key}','-n',NS,'-o',"jsonpath={range .status.conditions[?(@.type=='Synced')]}{.status}|{.reason}|{.message}{end}").stdout.strip()
+        s=kc('get',crd,crname,'-n',NS,'-o',"jsonpath={range .status.conditions[?(@.type=='Synced')]}{.status}|{.reason}|{.message}{end}").stdout.strip()
         if s: synced=s.split('|')[0]; msg='|'.join(s.split('|')[1:])
         if synced=='True': break
+    extId=kc('get',crd,crname,'-n',NS,'-o','jsonpath={.status.extId}').stdout.strip() or None
+    return synced,msg,extId
+
+ONLY=os.environ.get('ONLY')          # comma-list of keys to restrict the run (re-test subset)
+DO_CHAINS=os.environ.get('CHAINS','')=='1'
+if ONLY: RES=[r for r in RES if r[1] in ONLY.split(',')]
+results=[]
+if not DO_CHAINS:
+  for ns,key,body in RES:
+    if body is None: print(ns+'/'+key,'SKIP (no category ref)'); results.append((ns,key,'SKIP-noref','')); continue
+    if auth_code()!='200': print('!! auth locked -> abort'); results.append((ns,key,'LOCK','')); break
+    synced,msg,_=provision(ns,key,body,f'ct-{key}')
     print(f"{ns}/{key:28s} Synced={synced:6s} {msg[:80]}")
     results.append((ns,key,synced,msg))
+else:
+  for ch in CHAINS:
+    pns,pkey,pbody=ch['parent']
+    if auth_code()!='200': print('!! auth locked -> abort'); break
+    psync,pmsg,pext=provision(pns,pkey,pbody,f'ct-{pkey}-parent')
+    if not pext and 'find' in ch and psync=='True':
+        pext=find_extid(*ch['find'])           # resolve parent extId from the PC by name
+    print(f"[parent] {pns}/{pkey:20s} Synced={psync:6s} extId={str(pext)[:20]} {pmsg[:50]}")
+    results.append((pns,pkey,psync,pmsg))
+    if psync!='True' or not pext:
+        print('   !! parent not ready/extId missing -> skipping children'); continue
+    for cns,ckey,pfield,cbody in ch['children']:
+        if auth_code()!='200': print('!! auth locked -> abort'); break
+        b=dict(cbody); b[pfield]=pext
+        csync,cmsg,_=provision(cns,ckey,b,f'ct-{ckey}-child')
+        print(f"  [child] {cns}/{ckey:20s} Synced={csync:6s} ({pfield}={str(pext)[:12]}) {cmsg[:50]}")
+        results.append((cns,ckey,csync,cmsg))
 
 npass=sum(1 for r in results if r[2]=='True')
 print(f"\n=> CREATE BATCH: {npass}/{sum(1 for r in results if r[2] not in ('SKIP-noref',))} created+Synced")

@@ -14,6 +14,9 @@ adaptations the Nutanix v4 API requires but a generic OpenAPI client does not do
                       completion and return the real resource as a synchronous 200.
   5. ETag/If-Match  : on PUT/DELETE without If-Match, GET the resource first to
                       capture its ETag and add the header.
+  5b. parent If-Match: on a child create (POST .../parent/{id}/children) that the API
+                      rejects for a missing precondition (412/428), GET the parent and
+                      retry with the parent's ETag — needed for VM disks/nics/serial-ports.
 
 It is resource-agnostic: every translation is generic, so the same proxy serves
 all Nutanix v4 RestDefinitions (vmm, clustermgmt, prism, networking, storage, ...).
@@ -242,6 +245,19 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
         st, rh, rb = forward(method, path, hdrs, body or None)
         log("DEBUG", "%s %s -> %s" % (method, path, st))
+
+        # (5b) child-of-parent create: POST .../parent/{id}/children needs the PARENT's
+        # If-Match (concurrency token on the parent, e.g. VM disks/nics/cd-roms). The
+        # controller never sends one (patch_slice drops it as required), so only when the
+        # API demands it (412/428) do we GET the parent resource and retry with its ETag.
+        if method == "POST" and st in (409, 412, 428) and "If-Match" not in hdrs:
+            parent = path.split("?")[0].rstrip("/").rsplit("/", 1)[0]
+            _, ph, _ = forward("GET", parent, self._auth(), None)
+            petag = ph.get("Etag") or ph.get("ETag")
+            if petag:
+                hdrs["If-Match"] = petag
+                st, rh, rb = forward(method, path, hdrs, body or None)
+                log("INFO", "retried POST %s with parent If-Match -> %s" % (path, st))
 
         if st == 202:                                         # (4) async resolution
             try:

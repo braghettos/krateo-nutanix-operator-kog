@@ -61,14 +61,27 @@ Two findings worth recording for future fixtures:
 - Cluster-scoped resources (`rsyslog-servers`, `snmp/traps`) take `{clusterExtId}` from a
   matching `spec.clusterExtId` field — no extra mapping needed.
 
-Combined with the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`),
-**13 creatable RDs are operator-verified on the live PC** — plus the 23 read-observe →
-**36 RDs live-tested green** so far.
+## Parent-chained creates (`CREATE_NEEDS_PARENT`)
 
-Remaining testable (next batches, same serialized runner): `authorizationpolicy` (role ref),
-`userdefinedpolicy`, `protectionpolicy`, `image` (ISO URL), `recoverypoint` (VM ref), and the
-parent-chained children (`vm`→{disk,nic,serialport,cdrom}, `volumegroup`→disk, `user`→{key,accesskey},
-`template`→version).
+The runner now creates a parent, resolves its extId (from CR status, falling back to a
+findby on the PC by name), and threads it into each child's `{…ExtId}` path param:
+
+| chain | result |
+|---|---|
+| `vmm/Vm` → `vmm/SerialPort` | ✅ both True — serial-port present on the VM. The child POST to `/vms/{vmExtId}/serial-ports` requires the **parent VM's `If-Match`**; the proxy now injects it (GET parent → ETag → retry) only when the API demands it (`412/428`). Proxy log: `retried POST …/serial-ports with parent If-Match -> 202`. |
+| `volumes/VolumeGroup` → `volumes/Disk` | ⚠️ parent True + extId threaded into the child path correctly, but this PC build's `VolumeDisk` create rejects a blank disk (`VOL-40101: DiskDataSourceReference cannot be empty`) — a server-side data requirement, not a chaining failure. |
+
+This adds a **new proxy capability (5b)**: child-of-parent `If-Match` on POST. Combined with
+the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`),
+**14 creatable RDs are operator-verified on the live PC** — plus the 23 read-observe →
+**37 RDs live-tested green**.
+
+Remaining testable (same serialized runner): `authorizationpolicy` (role ref + entity/identity
+filters), `userdefinedpolicy` (trigger conditions), `protectionpolicy` (replication config),
+`image` (ISO URL), `recoverypoint` (VM ref), and the remaining parent-chained children
+(`vm`→{disk,nic,cd-rom}, `user`→{key,accesskey}, `template`→version) — each needs a bespoke body
+but no new mechanism (all of read-observe, sync/async create, X-Cluster-Id, cluster path-param,
+live-ref, and parent-chain + parent-If-Match are now proven).
 
 ## Notes
 
