@@ -97,10 +97,17 @@ Combined with the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `
 **19 creatable RDs are operator-verified on the live PC** (`Synced=True`) — plus `CdRom` and
 `Nic` created-but-observe-pending — plus the 23 read-observe → **42 RDs live-tested green**.
 
-Genuine blocks recorded: `Trap` (oasgen-provider CRD codegen), `VolumeDisk` (PC requires a
-data source), `RecoveryPoint` (nested discriminator the CRD can't carry), `CdRom`/`Nic`
-(Nutanix task reports only the parent VM, so the child can't be observed back). Remaining
-untested RDs are the same bespoke-body shape — **no new mechanism**: every create path
+Blocks recorded — each external to the operator, not a KOG/proxy gap:
+- `Trap` — oasgen-provider CRD codegen fails (`generating CRD: exit status 1`).
+- `VolumeDisk` — this PC build requires a `diskDataSourceReference` (won't create a blank disk).
+- `RecoveryPoint` — API needs `$objectType` on nested `vmRecoveryPoints`; the CRD can't carry it.
+- `CdRom`/`Nic` — created on the PC, but the Nutanix create task reports only the parent VM, so
+  the child extId can't be observed back.
+- `UserDefinedPolicy` — needs the Nutanix alert-metric catalog (valid `entityType`/`metricName`);
+  the API returns a bare `400` with no detail and no catalog is exposed.
+- `Image` — needs an external ISO/disk download (out-of-band dependency).
+
+Remaining untested RDs are the same bespoke-body shape — **no new mechanism**: every create path
 (read-observe, sync/async, X-Cluster-Id, cluster path-param, live-ref, ABAC/preserve-unknown
 bodies, parent-chain + parent-If-Match, discriminated nested unions, create-from-source) is
 now proven against the live GA v4.0 PC.
