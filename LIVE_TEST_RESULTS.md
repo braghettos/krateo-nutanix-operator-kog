@@ -34,6 +34,20 @@ controller does findby/get against the live PC.
 | iam | samlspmetadata | controller bug | `observe failed: handling response: converting JSON to YAML` — rest-dynamic-controller can't deserialize this endpoint's response shape |
 | lifecycle | statu | unverifiable | the generator named the kind `Statu` → CRD `status.lifecycle.nutanix.krateo.io`, which collides with the Kubernetes `status` keyword, so the CR can't be queried cleanly (the resource itself is likely fine) |
 
+## Create batch (CREATE_NOPARENT + category-ref, serialized)
+
+**4 / 5** creatable RDs created on the PC + `Synced=True` via the operator (one controller at a time, `scripts/live_test_create.py`):
+
+| ns | kind | type | result |
+|---|---|---|---|
+| aiops | Simulation | sync, no parent | ✅ True (on PC) |
+| microseg | ServiceGroup | async, no parent | ✅ True (on PC) |
+| clustermgmt | StorageContainer | needs `X-Cluster-Id` | ✅ True (on PC) — validates the proxy's X-Cluster-Id injection |
+| vmm | VmAntiAffinityPolicy | needs a category ref | ✅ True (seeded category extId) |
+| vmm | RateLimitPolicy | category + nested Filter `$objectType` | ❓ inconclusive (nested filter body needs a tweak) |
+
+Combined with the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`), **8 creatable RDs are operator-verified on the live PC** — plus the 23 read-observe → **31 RDs live-tested green** so far. Remaining testable: `role`→`authorizationpolicy`, `userdefinedpolicy`, `protectionpolicy`, `placement`/`ratelimit` policies, cluster-scoped (`rsyslogserver`/`trap`/SNMP `user`), and the parent-chained children (`vm`→disk/nic/…, `volumegroup`→disk).
+
 ## Notes
 
 - This run also surfaced and fixed a bug in `scripts/live_test.py`: it derived the
