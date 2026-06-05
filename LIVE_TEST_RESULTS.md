@@ -305,3 +305,15 @@ address: absent product/service (CMSP, Atlas, Files, Objects, licensing, securit
 (ESXi-only datastore), version gate (NCC), oasgen-provider CRD codegen (`trap`, `version`, `statu`),
 subnet type (unmanaged), or the controller model (XML singleton, identifier-findby, int/float
 drift). The proxy v0.3.0 is **validated-complete for this environment**.
+
+## Feature 6 — confirmed `Ready=True` across create classes (rebuilt cluster)
+
+With the `{data}`-envelope unwrap, creatables reach **`Ready=True / Available`** (not just `Synced`),
+verified with fresh names on the rebuilt cluster:
+- `aiops/Simulation` (sync create) → `Ready=True`, extId populated.
+- `microseg/ServiceGroup` (async create) → `Ready=True` (settles a few reconciles after extId).
+- `prism/Category` (extId-identified) → `Ready=True` (the former chicken-and-egg).
+
+The **only** create class that still won't settle to `Ready=True` is resources with a **large-integer
+spec field** (`Vm.memorySizeBytes`, `Disk/VG *SizeBytes`) — the controller's int-vs-`float64` `%v`
+string compare loops (documented above, not proxy-fixable, accepted). Everything else: green.
