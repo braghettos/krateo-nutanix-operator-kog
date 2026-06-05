@@ -290,3 +290,18 @@ subnet; `vm-net` is an unmanaged VLAN).
 **Session running total of distinct RDs verified ≈ 61** (43 prior + 5 cluster-scoped reads + 13
 parent-scoped reads). Still **zero proxy-fixable failures** — every miss is codegen, cluster type,
 subnet type, product/Atlas absence, or test timing.
+
+## Remaining top-level reads — reachable reads now exhausted (+3)
+
+Probed the read RDs the original sweep had skip-listed. **3 more reachable → all `Synced=True`:**
+`aiops/source`, `networking/capability`, `networking/nodeschedulablestatuse`. The rest are
+product-gated `503`/`404` (files, licensing, security/STIG, prism/batch, vmm/effective-rate-limit,
+storage/datastore) — CMSP/product absent.
+
+**This exhausts the reachable read RDs on this PC.** Session total of distinct RDs verified ≈ **64**
+(43 prior + 5 cluster-scoped + 13 parent-scoped + 3 top-level). Across the entire campaign —
+**zero proxy-fixable failures.** Every untested/failed RD is blocked by something the proxy can't
+address: absent product/service (CMSP, Atlas, Files, Objects, licensing, security), cluster type
+(ESXi-only datastore), version gate (NCC), oasgen-provider CRD codegen (`trap`, `version`, `statu`),
+subnet type (unmanaged), or the controller model (XML singleton, identifier-findby, int/float
+drift). The proxy v0.3.0 is **validated-complete for this environment**.
