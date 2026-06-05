@@ -77,6 +77,33 @@ def find_extid(coll, field, val):
     d=curl("%s?$filter=%s%%20eq%%20'%s'"%(coll, field, urllib.parse.quote(val))).get('data') or []
     return d[0].get('extId') if d else None
 
+# --- batch 3: bespoke-body creates (need live refs resolved from the PC) ---
+VMP=find_extid('/vmm/v4.0/ahv/config/vms','name','krateo-qs-ct-vmp')      # the chain-parent VM
+ROLE=find_extid('/iam/v4.0/authz/roles','displayName','krateo-qs-ct-role')
+DM=next((x['extId'] for x in (curl('/prism/v4.0/config/domain-managers?$limit=1').get('data') or [])),None)
+ADMIN='00000000-0000-0000-0000-000000000000'
+print('batch3 refs: vm=%s role=%s dm=%s sc=%s'%(str(VMP)[:12],str(ROLE)[:12],str(DM)[:12],str(SC)[:12]))
+RES += [
+  ('dataprotection','recoverypoint', {'name':'krateo-qs-ct-rp','recoveryPointType':'CRASH_CONSISTENT',
+       'expirationTime':'2027-06-05T00:00:00.000Z',
+       'vmRecoveryPoints':[{'vmExtId':VMP,'recoveryPointType':'CRASH_CONSISTENT'}]} if VMP else None),
+  ('datapolicies','protectionpolicy', {'name':'krateo-qs-ct-pol',
+       'replicationLocations':[{'label':'local','domainManagerExtId':DM,'isPrimary':True}],
+       'replicationConfigurations':[{'sourceLocationLabel':'local',
+           'schedule':{'recoveryPointType':'CRASH_CONSISTENT','recoveryPointObjectiveTimeSeconds':3600,
+                       'retention':{'$objectType':'datapolicies.v4.config.LinearRetention','local':1}}}]} if DM else None),
+  ('iam','authorizationpolicy', {'displayName':'krateo-qs-ct-authzp','authorizationPolicyType':'USER_DEFINED',
+       'role':ROLE,'entities':[{'entityFilter':{'*':{'*':{'eq':'*'}}}}],
+       'identities':[{'identityFilter':{'user':{'uuid':{'anyof':[ADMIN]}}}}]} if ROLE else None),
+]
+# extend the vm chain with cd-rom + disk children (reuse the same VM parent; both need parent If-Match)
+CHAINS[0]['children'] += [
+  ('vmm','cdrom','vmExtId',{'diskAddress':{'busType':'IDE','index':0}}),
+  ('vmm','disk','vmExtId',{'diskAddress':{'busType':'SCSI','index':1},
+       'backingInfo':{'$objectType':'vmm.v4.ahv.config.VmDisk','diskSizeBytes':1073741824,
+                      'storageContainer':{'extId':SC}}}),
+]
+
 def provision(ns,key,body,crname):
     """patch slice -> RD -> Configuration -> CR; poll Synced; return (synced,msg,extId)."""
     y=yaml.safe_load(open(f'{REPO}/generated/{ns}/restdefinitions/{key}.restdefinition.yaml'))
