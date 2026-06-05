@@ -46,6 +46,11 @@ PORT = int(os.environ.get("PORT", "8080"))
 TLS_VERIFY = os.environ.get("TLS_VERIFY", "false").lower() == "true"
 TASK_TIMEOUT_S = int(os.environ.get("TASK_TIMEOUT_S", "180"))
 OVERRIDES = json.loads(os.environ.get("OBJECTTYPE_OVERRIDES", "{}"))
+# Optional default cluster extId. Some v4 endpoints (e.g. networking/config/vpcs,
+# clustermgmt storage-containers, the networking AWS subtree) require an
+# `X-Cluster-Id` header to scope the request to a cluster. When set, the proxy
+# adds it to every forwarded request that doesn't already carry one.
+X_CLUSTER_ID = os.environ.get("X_CLUSTER_ID", "")
 DEBUG = os.environ.get("LOG_LEVEL", "INFO").upper() == "DEBUG"
 
 SSL_CTX = ssl.create_default_context() if TLS_VERIFY else ssl._create_unverified_context()
@@ -127,6 +132,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         h = {"Accept": "application/json"}
         if self.headers.get("Authorization"):
             h["Authorization"] = self.headers["Authorization"]
+        xcid = self.headers.get("X-Cluster-Id") or X_CLUSTER_ID
+        if xcid:
+            h["X-Cluster-Id"] = xcid
         return h
 
     def _read_body(self):

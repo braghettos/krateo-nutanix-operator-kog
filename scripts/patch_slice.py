@@ -34,7 +34,7 @@ def patch(src_path, proxy_url):
             op['responses'] = r
             ps = op.get('parameters')
             if ps:
-                ps = [x for x in ps if str(x.get('name', '')).lower() not in ('ntnx-request-id', 'if-match')]
+                ps = [x for x in ps if str(x.get('name', '')).lower() not in ('ntnx-request-id', 'if-match', 'x-cluster-id')]
                 op['parameters'] = ps
             # findby list op = GET on a collection path (no trailing {param})
             if m == 'get' and not path.rstrip('/').endswith('}'):

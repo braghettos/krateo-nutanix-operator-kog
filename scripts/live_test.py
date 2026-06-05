@@ -96,9 +96,11 @@ def run_one(rd):
           "spec: {configurationRef: {name: nutanix-pc, namespace: %s}}\n") % (group, kind, rd['key'], NS, NS)
     kc('apply', '-f', '-', inp=cfg)
     kc('apply', '-f', '-', inp=cr)
-    # 4. poll Synced + auth
-    plural = kind.lower() + 's'
-    crd = '%s.%s' % (plural, group)
+    # 4. poll Synced + auth (resolve the REAL CRD name — KOG pluralizes properly,
+    #    e.g. Entity->entities, LcmSummary->lcmsummaries, not kind+'s')
+    crd = next((c['metadata']['name'] for c in json.loads(kc('get', 'crd', '-o', 'json').stdout).get('items', [])
+                if c['spec']['names']['kind'] == kind and c['spec']['group'] == group),
+               '%s.%s' % (kind.lower() + 's', group))
     synced, a = '?', '200'
     for _ in range(7):
         time.sleep(7)
