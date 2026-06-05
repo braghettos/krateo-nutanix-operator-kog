@@ -3,7 +3,7 @@
 # Pinned base (python:3.11-slim-bookworm) by digest for reproducible builds.
 FROM python:3.11-slim-bookworm@sha256:8dca233de9f3d9bb410665f00a4da6dd06f331083137e0e98ccf227236fcc438
 
-ARG VERSION=0.2.0
+ARG VERSION=0.3.0
 LABEL org.opencontainers.image.title="nutanix-v4-proxy" \
       org.opencontainers.image.description="Translating proxy that lets Krateo rest-dynamic-controller drive the Nutanix Prism Central v4 API" \
       org.opencontainers.image.version="${VERSION}" \

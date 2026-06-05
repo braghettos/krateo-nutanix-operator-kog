@@ -17,6 +17,9 @@ adaptations the Nutanix v4 API requires but a generic OpenAPI client does not do
   5b. parent If-Match: on a child create (POST .../parent/{id}/children) that the API
                       rejects for a missing precondition (412/428), GET the parent and
                       retry with the parent's ETag — needed for VM disks/nics/serial-ports.
+  6. data unwrap    : unwrap the `{data: {...}}` envelope on a successful single-object
+                      response so the controller's status mapping (which reads fields at the
+                      body root) populates status.extId / Ready=True. Lists are left intact.
 
 It is resource-agnostic: every translation is generic, so the same proxy serves
 all Nutanix v4 RestDefinitions (vmm, clustermgmt, prism, networking, storage, ...).
@@ -44,7 +47,7 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 PC_BASE = os.environ["PC_BASE"].rstrip("/")
 PORT = int(os.environ.get("PORT", "8080"))
@@ -279,6 +282,20 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 st, rb = 204, b""
             else:
                 st, rb = 200, json.dumps({"data": {"extId": ext}}).encode()
+
+        # (6) unwrap the Nutanix `{data: {...}}` envelope on a successful response so the
+        # rest-dynamic-controller's status population (which reads identifier /
+        # additionalStatusFields at the BODY ROOT) finds extId etc. — fixing status.extId
+        # and Ready=True on the create/get paths. Only unwrap a single-object `data`; leave
+        # list responses (`{data: [...]}`, findby) for the controller's item-extraction +
+        # paginator to handle.
+        if 200 <= st < 300 and rb:
+            try:
+                obj = json.loads(rb)
+                if isinstance(obj, dict) and isinstance(obj.get("data"), dict):
+                    rb = json.dumps(obj["data"]).encode()
+            except ValueError:
+                pass
 
         self.send_response(st)
         etag = rh.get("Etag") or rh.get("ETag")

@@ -189,3 +189,33 @@ hasStatus=true`), and the rendered SerialPort carried `spec.vmExtId=<the VM's ru
 
 (Correction: an earlier note here claimed a static blueprint *can't* wire cross-CR inputs — that
 was wrong. `lookup` + the controller's reconcile loop is exactly the supported mechanism.)
+
+## status.extId reliability — root cause + proxy fix (v0.3.0, feature 6)
+
+KOG resources reached `Synced=True` but often stayed `Ready=False/Creating` with `status.extId`
+empty/flapping. Tracing `rest-dynamic-controller:0.8.0` (the latest tag — no upgrade available):
+
+- `internal/controllers/helpers.go` `populateStatusFields` reads identifier /
+  `additionalStatusFields` at the **body root** (`body["extId"]`).
+- Nutanix v4 wraps every response: `{data:{…}}` (single) / `{data:[…]}` (list).
+- The **create** (`restResources.go:358`) and **get-by-id** paths pass the raw enveloped body —
+  no unwrap — so `extId` (at `data.extId`) is never lifted into status.
+- Only **findby** unwraps (`restclient.go:474 extractItemsFromResponse`), and its match
+  (`clienttools.go:112 isInResource`) compares the API value to `spec`/`status` — so
+  `extId`-identified resources (e.g. `category`) can **never** match on a cold observe
+  (chicken-and-egg) and sit at `Ready=False`.
+
+**This is controller code, not an RD YAML fix.** The RDs already declare the correct
+`identifiers` + `additionalStatusFields`, and findby returns the right item.
+
+**Fix shipped — proxy feature 6 (no controller change):** the proxy now **unwraps the
+`{data:{…}}` envelope on successful single-object responses**, so the controller sees resource
+fields (incl. `extId`) at the body root on the create/get paths — populating `status.extId` and
+`Ready=True`, and breaking the extId chicken-and-egg. **List** responses (`{data:[…]}`) are left
+intact for findby item-extraction + the paginator.
+
+Validated at the proxy level against the live PC: GET-by-id through the proxy returns `extId` at
+the root with no `data` envelope; LIST keeps the `data` array. (End-to-end controller validation
+is pending a rebuild of the KOG test cluster, which was torn down.) The proper upstream fix
+(option 1) is to make `rest-dynamic-controller` unwrap the envelope and lift `extId` from the
+create response directly — tracked for the Krateo team.
