@@ -142,8 +142,8 @@ def main():
              '| ns | kind | findby | Synced | auth |', '|---|---|---|---|---|']
     for rd, s, a in results:
         lines.append('| %s | %s | `%s` | %s | %s |' % (rd['ns'], rd['kind'], 'GET ' + rd['key'], s, a))
-    open(REPO + '/LIVE_TEST_RESULTS.md', 'w').write('\n'.join(lines) + '\n')
-    print('\n=> %d/%d PASS ; wrote LIVE_TEST_RESULTS.md' % (npass, len(results)))
+    open(REPO + '/LIVE_TEST_READOBSERVE.md', 'w').write('\n'.join(lines) + '\n')
+    print('\n=> %d/%d PASS ; wrote LIVE_TEST_READOBSERVE.md' % (npass, len(results)))
 
 
 if __name__ == '__main__':
