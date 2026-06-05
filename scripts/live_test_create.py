@@ -28,18 +28,34 @@ def category_extid():
     d=curl("/prism/v4.0/config/categories?$limit=50").get('data') or []
     return next((c['extId'] for c in d if c.get('type')=='USER'), d[0]['extId'] if d else None)
 
-CAT=category_extid()
-print('refs: cluster=%s  category=%s'%(CLUSTER[:12], (CAT or 'NONE')[:12]))
+def role_operations():
+    d=curl("/iam/v4.0/authz/operations?$limit=3").get('data') or []
+    return [o['extId'] for o in d] or None
 
-# (ns, key, body dict) — body fields only; proxy injects $objectType + NTNX-Request-Id (top level)
+CAT=category_extid(); OPS=role_operations()
+print('refs: cluster=%s  category=%s  ops=%d'%(CLUSTER[:12], (CAT or 'NONE')[:12], len(OPS or [])))
+# vmm Filter has no discriminator -> the generated CRD rejects a nested $objectType; omit it.
+FILT=lambda: {'type':'CATEGORIES_MATCH_ANY','categoryExtIds':[CAT]}
+
+# (ns, key, body dict) — body fields only; proxy injects $objectType + NTNX-Request-Id (top level);
+# nested objects need an explicit $objectType. clusterExtId is a path param sourced from spec.
 RES=[
+  # --- batch 1 (proven) ---
   ('aiops','simulation', {'name':'krateo-qs-ct-simulation','simulationSpec':{'hddGb':100,'ramGb':16,'vcpuCount':4}}),
   ('microseg','servicegroup', {'name':'krateo-qs-ct-servicegroup','description':'krateo live-test','tcpServices':[{'startPort':8080,'endPort':8080}]}),
   ('clustermgmt','storagecontainer', {'name':'krateo-qs-ct-storagecontainer'}),
   ('vmm','vmantiaffinitypolicy', {'name':'krateo-qs-ct-vmaap','categories':[{'extId':CAT}]} if CAT else None),
-  ('vmm','ratelimitpolicy', {'name':'krateo-qs-ct-rlp','rateLimitKbps':1024,'clusterEntityFilter':{'$objectType':'vmm.v4.images.config.Filter','type':'CATEGORIES_MATCH_ANY','categoryExtIds':[CAT]}} if CAT else None),
+  # --- batch 2 ---
+  ('iam','user', {'username':'krateo-qs-ct-svc','userType':'SERVICE_ACCOUNT','description':'krateo live-test svc acct'}),
+  ('iam','role', {'displayName':'krateo-qs-ct-role','clientName':'krateo','operations':OPS} if OPS else None),
+  ('clustermgmt','rsyslogserver', {'clusterExtId':CLUSTER,'serverName':'krateoqsctrsys','ipAddress':{'ipv4':{'value':'192.0.2.50'}},'port':514,'networkProtocol':'UDP'}),
+  ('clustermgmt','trap', {'clusterExtId':CLUSTER,'address':{'ipv4':{'value':'192.0.2.60'}},'version':'V2','recieverName':'krateoqscttrap'}),
+  ('vmm','placementpolicy', {'name':'krateo-qs-ct-pp','placementType':'SOFT','imageEntityFilter':FILT(),'clusterEntityFilter':FILT()} if CAT else None),
+  ('vmm','ratelimitpolicy', {'name':'krateo-qs-ct-rlp','rateLimitKbps':1024,'clusterEntityFilter':FILT()} if CAT else None),
 ]
 
+ONLY=os.environ.get('ONLY')          # comma-list of keys to restrict the run (re-test subset)
+if ONLY: RES=[r for r in RES if r[1] in ONLY.split(',')]
 results=[]
 for ns,key,body in RES:
     if body is None: print(ns+'/'+key,'SKIP (no category ref)'); results.append((ns,key,'SKIP-noref','')); continue

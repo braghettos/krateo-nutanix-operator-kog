@@ -34,19 +34,41 @@ controller does findby/get against the live PC.
 | iam | samlspmetadata | controller bug | `observe failed: handling response: converting JSON to YAML` — rest-dynamic-controller can't deserialize this endpoint's response shape |
 | lifecycle | statu | unverifiable | the generator named the kind `Statu` → CRD `status.lifecycle.nutanix.krateo.io`, which collides with the Kubernetes `status` keyword, so the CR can't be queried cleanly (the resource itself is likely fine) |
 
-## Create batch (CREATE_NOPARENT + category-ref, serialized)
+## Create batch — serialized creates through the operator
 
-**4 / 5** creatable RDs created on the PC + `Synced=True` via the operator (one controller at a time, `scripts/live_test_create.py`):
+**9 / 10** creatable RDs were **created on the live PC + reached `Synced=True`** via the operator
+(one controller at a time, `scripts/live_test_create.py` — each resource confirmed present on
+the PC by a follow-up API read):
 
-| ns | kind | type | result |
+| ns | kind | create type | result |
 |---|---|---|---|
 | aiops | Simulation | sync, no parent | ✅ True (on PC) |
 | microseg | ServiceGroup | async, no parent | ✅ True (on PC) |
-| clustermgmt | StorageContainer | needs `X-Cluster-Id` | ✅ True (on PC) — validates the proxy's X-Cluster-Id injection |
-| vmm | VmAntiAffinityPolicy | needs a category ref | ✅ True (seeded category extId) |
-| vmm | RateLimitPolicy | category + nested Filter `$objectType` | ❓ inconclusive (nested filter body needs a tweak) |
+| clustermgmt | StorageContainer | needs `X-Cluster-Id` | ✅ True (on PC) — validates the proxy's **X-Cluster-Id** injection |
+| iam | User | no parent (`SERVICE_ACCOUNT`) | ✅ True (on PC) |
+| iam | Role | needs live operation extIds | ✅ True (on PC) |
+| clustermgmt | RsyslogServer | cluster-scoped path | ✅ True (on PC) — validates **`{clusterExtId}` path-param** sourced from spec |
+| vmm | VmAntiAffinityPolicy | needs a category ref | ✅ True (on PC) |
+| vmm | PlacementPolicy | two category `Filter`s | ✅ True (on PC) |
+| vmm | RateLimitPolicy | category `Filter` | ✅ True (on PC) |
+| clustermgmt | Trap (SNMP) | — | ❌ CRD won't generate (`generating CRD: exit status 1`) — oasgen-provider codegen limit, same bucket as `samlspmetadata`/`statu` |
 
-Combined with the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`), **8 creatable RDs are operator-verified on the live PC** — plus the 23 read-observe → **31 RDs live-tested green** so far. Remaining testable: `role`→`authorizationpolicy`, `userdefinedpolicy`, `protectionpolicy`, `placement`/`ratelimit` policies, cluster-scoped (`rsyslogserver`/`trap`/SNMP `user`), and the parent-chained children (`vm`→disk/nic/…, `volumegroup`→disk).
+Two findings worth recording for future fixtures:
+- The vmm `Filter` schema has **no discriminator**, so the generated CRD rejects a nested
+  `$objectType` (`strict decoding error: unknown field "spec.clusterEntityFilter.$objectType"`).
+  The proxy only injects `$objectType` at the **top level**; nested objects that *do* carry a
+  discriminator must supply it in-spec, but a discriminator-less type like `Filter` must **omit** it.
+- Cluster-scoped resources (`rsyslog-servers`, `snmp/traps`) take `{clusterExtId}` from a
+  matching `spec.clusterExtId` field — no extra mapping needed.
+
+Combined with the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`),
+**13 creatable RDs are operator-verified on the live PC** — plus the 23 read-observe →
+**36 RDs live-tested green** so far.
+
+Remaining testable (next batches, same serialized runner): `authorizationpolicy` (role ref),
+`userdefinedpolicy`, `protectionpolicy`, `image` (ISO URL), `recoverypoint` (VM ref), and the
+parent-chained children (`vm`→{disk,nic,serialport,cdrom}, `volumegroup`→disk, `user`→{key,accesskey},
+`template`→version).
 
 ## Notes
 
