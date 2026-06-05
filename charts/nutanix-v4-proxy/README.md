@@ -14,6 +14,18 @@ controller can't:
 
 ## Install
 
+From the published OCI registry (image + chart are pushed by CI on each `v*.*.*` tag —
+see `.github/workflows/release.yml`):
+
+```bash
+helm install nutanix-mw oci://ghcr.io/braghettos/charts/nutanix-v4-proxy --version 0.2.0 \
+  -n nutanix-system --create-namespace \
+  --set config.pcBase=https://<PC-HOST>:9440/api \
+  --set config.xClusterId=<registered-PE-cluster-extId>      # optional
+```
+
+Or from a local checkout:
+
 ```bash
 helm install nutanix-mw charts/nutanix-v4-proxy -n nutanix-system --create-namespace \
   --set config.pcBase=https://<PC-HOST>:9440/api \
