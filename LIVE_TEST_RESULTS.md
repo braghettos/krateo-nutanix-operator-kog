@@ -93,9 +93,10 @@ This added a **new proxy capability (5b)**: child-of-parent `If-Match` on POST.
 | dataprotection | RecoveryPoint | VM ref in nested `vmRecoveryPoints` | ❌ operator-blocked — the create **works at the API**, but it requires `$objectType` on the nested `vmRecoveryPoints` items, a field the generated CRD does not carry (strict-decode rejects it) and the schema-agnostic proxy can't infer a nested discriminator |
 | vmm | Template | discriminated `templateVersionSpec.versionSource` from a VM | ✅ True (on PC) — created from the seeded VM; the nested oneOf `versionSource.$objectType` (`TemplateVmReference`) is carried by the CRD |
 
-Combined with the four quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`),
-**19 creatable RDs are operator-verified on the live PC** (`Synced=True`) — plus `CdRom` and
-`Nic` created-but-observe-pending — plus the 23 read-observe → **42 RDs live-tested green**.
+Plus `vmm/VmHostAffinityPolicy` (vm+host category refs) → ✅ True. Combined with the four
+quickstart creatables (`Vm`, `Category`, `VolumeGroup`, `AddressGroup`), **20 creatable RDs are
+operator-verified on the live PC** (`Synced=True`) — plus `CdRom` and `Nic` created-but-observe-
+pending — plus the 23 read-observe → **43 RDs live-tested green**.
 
 Blocks recorded — each external to the operator, not a KOG/proxy gap:
 - `Trap` — oasgen-provider CRD codegen fails (`generating CRD: exit status 1`).
@@ -124,3 +125,55 @@ now proven against the live GA v4.0 PC.
   `patch_slice.py` now drops the required `X-Cluster-Id` param — together these unblock
   X-Cluster-Id-gated resources (e.g. `clustermgmt/storage-containers`) that have a live
   backend.
+
+## Coverage map of all 189 RDs (this install is PC size `STARTER`)
+
+A full per-RD reachability probe (GET each collection on the live PC):
+
+| bucket | count | meaning |
+|---|---:|---|
+| reachable now | ~75 | product present — testable with the right body |
+| need-a-parent | ~79 | findby needs a parent extId (chainable / inline — see blueprint) |
+| `503` not deployed | ~24 | service absent on this PC |
+| `404` absent | ~11 | feature not present |
+
+**The hard ceiling is PC size.** Almost every blocked RD funnels through **CMSP/MSP
+(Microservices Infrastructure)**, which requires a **Small-or-larger PC** — this one is
+`STARTER` (`pc.2024.3.1.13`). So the whole product tier is unreachable here:
+
+- **Flow Virtual Networking / Atlas** — ~22 `networking` RDs (`vpc2`, overlay `subnet2`,
+  `floatingip`, `gateway`, `routingpolicy`, `vpnconnection`, `bgpsession`, `loadbalancersession`,
+  `trafficmirror`, `virtualswitch`, …); `networking/controllers` is reachable but `count=0`.
+- **Files** (22, Files Manager) · **Objects** (3) · **security** (5: approval/KMS/STIG, 404) ·
+  **opsmgmt** (6 reports, 503) · **licensing** (10, 503 — unlicensed) · **multidomain** (1).
+
+External-system gated (not a PC-size issue): `iam` `directoryservice`/`samlidentityprovider`/
+`usergroup`/`certauthprovider` (LDAP/SAML/cert), `lifecycle/bundle` (LCM artifact),
+`monitoring/userdefinedpolicy` (alert-metric catalog — opaque 400), `aiops/scenario`
+(observe 400). Infra-creation we can't do: `clustermgmt/cluster`, `prism/domainmanager`.
+`microseg/policy` create → 500 (Flow security policy needs additional setup).
+
+**To unlock the product tier you need a Small+ PC** (resize this one — gated on the OVH host
+resources — or stand up a fresh larger Nutanix). Highest-ROI single product: **CMSP** (unlocks
+Atlas networking + Objects).
+
+## Chained resources via a Krateo blueprint
+
+Directive: chainable resources should be tested as a Krateo blueprint, not an ad-hoc runner.
+
+**Finding:** a static Krateo (Helm) blueprint **can't** wire a parent→child Nutanix chain where
+the child needs the parent's runtime extId. The child RDs' create uses
+`requestFieldMapping: [{inPath: vmExtId, inCustomResource: spec.vmExtId}]`, and KOG's
+`inCustomResource` is a JSONPath **within the same CR** — there is no cross-resource reference,
+and Helm renders statically (can't read a sibling `Vm`'s `status.extId`).
+
+**But it doesn't need to:** the Nutanix `Vm` create body accepts `disks`, `nics`, `cdRoms` and
+`serialPorts` **inline**, and the KOG `Vm` CRD carries them. So the blueprint
+`blueprints/nutanix-virtualmachine` provisions a fully-built VM as **one** declarative resource.
+
+**Validated end-to-end:** `helm template … | kubectl apply` → `Vm` `Synced=True` → on the PC the
+VM `krateo-bp-vm` has **1 disk + 1 nic + 1 serial-port**, all from one composition, no runtime
+wiring. The standalone child RDs (`Disk`/`Nic`/`SerialPort`/`CdRom`, `volumes/Disk`, `iam/Key`,
+`template`→`version`) remain **day-2 add-ons** to an existing parent; to make those composable a
+blueprint would need KOG to emit a reference field (e.g. `vmRef: {name}`) whose
+`requestFieldMapping` can source a path param from another CR's `status.extId`.

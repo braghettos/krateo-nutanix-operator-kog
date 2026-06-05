@@ -116,6 +116,11 @@ RES += [
   ('vmm','template', {'templateName':'krateo-qs-ct-tmpl','templateDescription':'krateo live-test',
        'templateVersionSpec':{'versionName':'v1','versionDescription':'initial',
            'versionSource':{'$objectType':'vmm.v4.content.TemplateVmReference','extId':VMP}}} if VMP else None),
+  # --- batch 4: final harvest of reachable no-parent creatables on the STARTER PC ---
+  ('vmm','vmhostaffinitypolicy', {'name':'krateo-qs-ct-vmhost','vmCategories':[{'extId':CAT}],
+       'hostCategories':[{'extId':CAT}]} if CAT else None),
+  ('aiops','scenario', {'name':'krateo-qs-ct-scenario','targetRunwayDays':30,'vendors':['NUTANIX'],'clusterExtId':CLUSTER}),
+  ('microseg','policy', {'name':'krateo-qs-ct-nsp','type':'QUARANTINE','state':'MONITOR'}),
 ]
 
 def provision(ns,key,body,crname):

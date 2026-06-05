@@ -1,0 +1,73 @@
+{{- if not .Values.vm.clusterExtId }}
+{{- fail "vm.clusterExtId is required (a registered PE cluster extId)" }}
+{{- end }}
+apiVersion: vmm.nutanix.krateo.io/v1alpha1
+kind: VmConfiguration
+metadata:
+  name: {{ .Values.configuration.name }}
+  namespace: {{ .Values.configuration.namespace }}
+spec:
+  authentication:
+    basic:
+      usernameRef:
+        name: {{ .Values.configuration.authSecret.name }}
+        namespace: {{ .Values.configuration.authSecret.namespace }}
+        key: username
+      passwordRef:
+        name: {{ .Values.configuration.authSecret.name }}
+        namespace: {{ .Values.configuration.authSecret.namespace }}
+        key: password
+---
+apiVersion: vmm.nutanix.krateo.io/v1alpha1
+kind: Vm
+metadata:
+  name: {{ .Values.vm.name }}
+  namespace: {{ .Values.configuration.namespace }}
+spec:
+  configurationRef:
+    name: {{ .Values.configuration.name }}
+    namespace: {{ .Values.configuration.namespace }}
+  name: {{ .Values.vm.name }}
+  description: {{ .Values.vm.description | quote }}
+  numSockets: {{ .Values.vm.numSockets }}
+  numCoresPerSocket: {{ .Values.vm.numCoresPerSocket }}
+  memorySizeBytes: {{ .Values.vm.memorySizeBytes }}
+  cluster:
+    extId: {{ .Values.vm.clusterExtId | quote }}
+  {{- with .Values.vm.categories }}
+  categories:
+    {{- range . }}
+    - extId: {{ . | quote }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.disks }}
+  disks:
+    {{- range $i, $d := . }}
+    - backingInfo:
+        $objectType: vmm.v4.ahv.config.VmDisk
+        diskSizeBytes: {{ $d.sizeBytes }}
+        {{- with $d.storageContainerExtId }}
+        storageContainer:
+          extId: {{ . | quote }}
+        {{- end }}
+      diskAddress:
+        busType: {{ $d.busType | default "SCSI" }}
+        index: {{ $i }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.nics }}
+  nics:
+    {{- range . }}
+    - networkInfo:
+        nicType: {{ .nicType | default "NORMAL_NIC" }}
+        subnet:
+          extId: {{ .subnetExtId | quote }}
+    {{- end }}
+  {{- end }}
+  {{- with .Values.serialPorts }}
+  serialPorts:
+    {{- range . }}
+    - index: {{ .index }}
+      isConnected: {{ .isConnected | default false }}
+    {{- end }}
+  {{- end }}
