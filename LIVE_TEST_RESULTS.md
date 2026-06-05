@@ -270,3 +270,23 @@ service layer (the 500 is the absent service, not the proxy).
 exists from a prior run) because the controller can't adopt an existing resource by name
 (`identifiers:[extId]`, empty CR spec). Not proxy-fixable — a clean PC, or controller adopt-by-name,
 resolves it.
+
+## Parent-scoped read sweep #2 (non-cluster parents) — +13 new RDs
+
+`scripts/live_test_parent2.py` supplies each RD's parent path-param value (resolved from the PC)
+in `spec.<field>`. **13/15 `Synced=True`:**
+
+- **VG children (8)** — `storage/{categoryassociation,iscsiclientattachment,metadatainfo,vmattachment}`,
+  `volumes/{categoryassociation,externaliscsiattachment,metadata,vmattachment}` (parent = a volume group).
+- `networking/vnic` (parent subnet), `vmm/vmcompliancestate` (vm-anti-affinity policy),
+  `vmm/ahvvmcompliancestate` (vm-host-affinity policy), `vmm/guesttool` (a VM),
+  `monitoring/clusterconfig` (a system-defined policy).
+
+The 2 non-passes are **not proxy-fixable**: `vmm/version` → oasgen-provider CRD codegen failure
+(`generating CRD: exit status 1`, same bucket as `trap`); `networking/reservedip` →
+`"Cannot fetch reserved IP addresses for unmanaged subnet"` (reserved IPs need a managed/IPAM
+subnet; `vm-net` is an unmanaged VLAN).
+
+**Session running total of distinct RDs verified ≈ 61** (43 prior + 5 cluster-scoped reads + 13
+parent-scoped reads). Still **zero proxy-fixable failures** — every miss is codegen, cluster type,
+subnet type, product/Atlas absence, or test timing.
