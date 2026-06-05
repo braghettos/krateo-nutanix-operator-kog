@@ -222,13 +222,22 @@ live PC):
   populated and stable** (4/4 reads identical), resource on the PC. ✅ This is the direct proof of
   feature 6.
 - `vmm/Vm` (`identifiers:[name]`) → `status.extId` now populates from the create response, but it
-  then **flaps empty and `Ready` stays `False`** — a **separate** controller bug, not the envelope:
-  the spec-vs-remote drift check (`helpers.go isCRUpdated` → `comparison.CompareExisting`) flags the
-  minimal CR spec against the rich remote VM as perpetually drifted, so the controller loops
-  create→update (logs show repeated `update` events) and each Update `clearStatusFields` wipes
-  `status.extId`. Fix is controller-side: compare only spec-managed fields. Tracked separately.
+  then **flaps empty and `Ready` stays `False`** — a **separate** controller bug, **not the
+  envelope and not proxy-fixable**. Debug log: `values differ, FirstValue=2147483648,
+  SecondValue=2.147483648e+09`. The spec's `memorySizeBytes` is a k8s int64 (`%v` → `"2147483648"`),
+  but the controller parses every JSON number into a Go `float64` (`json.Unmarshal`→`interface{}`)
+  which `%v`-renders as `"2.147483648e+09"`; `comparison.CompareAny` compares the two **strings** →
+  never equal → endless `update` loop → each Update `clearStatusFields` wipes `status.extId`. The
+  `float64` conversion + `%v` formatting happen **inside the controller, after the proxy**, so no
+  proxy response can make the int-spec match the float-remote.
+
+**Decision: accept it (option 1).** Feature 6 is the proxy-side ceiling and fixes the broad class
+(every resource **without a large-integer spec field** — `category` proves it). Resources **with**
+a large-int field (`Vm` `memorySizeBytes`, `Disk`/`VolumeGroup` `*SizeBytes`) still provision (the
+resource exists on the PC) but won't settle to `Ready=True` until the controller compares numbers
+numerically rather than via `%v` strings. We do **not** paper over it with a proxy field-strip
+(that would disable drift detection on those fields). The real fix is controller-side
+(`CompareAny` numeric-aware) — tracked for the Krateo team, out of scope here.
 
 Proxy-level check too: GET-by-id through the proxy returns `extId` at the root (no `data`
-envelope); LIST keeps the `data` array. The proper upstream fix (option 1) is to make
-`rest-dynamic-controller` unwrap the envelope + lift `extId` from the create response **and** scope
-the drift comparison to managed fields — tracked for the Krateo team.
+envelope); LIST keeps the `data` array.
