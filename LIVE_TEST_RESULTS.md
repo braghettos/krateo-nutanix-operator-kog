@@ -161,19 +161,31 @@ Atlas networking + Objects).
 
 Directive: chainable resources should be tested as a Krateo blueprint, not an ad-hoc runner.
 
-**Finding:** a static Krateo (Helm) blueprint **can't** wire a parent→child Nutanix chain where
-the child needs the parent's runtime extId. The child RDs' create uses
-`requestFieldMapping: [{inPath: vmExtId, inCustomResource: spec.vmExtId}]`, and KOG's
-`inCustomResource` is a JSONPath **within the same CR** — there is no cross-resource reference,
-and Helm renders statically (can't read a sibling `Vm`'s `status.extId`).
+There are **two** blueprint patterns, both validated:
 
-**But it doesn't need to:** the Nutanix `Vm` create body accepts `disks`, `nics`, `cdRoms` and
-`serialPorts` **inline**, and the KOG `Vm` CRD carries them. So the blueprint
-`blueprints/nutanix-virtualmachine` provisions a fully-built VM as **one** declarative resource.
+**1. Inline composition.** The Nutanix `Vm` create body accepts `disks`, `nics`, `cdRoms` and
+`serialPorts` **inline**, and the KOG `Vm` CRD carries them. So `blueprints/nutanix-virtualmachine`
+provisions a fully-built VM as **one** declarative resource — no cross-CR wiring needed.
+Validated end-to-end: `helm template … | kubectl apply` → `Vm` `Synced=True` → on the PC the VM
+`krateo-bp-vm` has **1 disk + 1 nic + 1 serial-port** from one composition. This covers the 8
+creatable inline children (vm's disk/nic/cdrom/serialport/gpu/pcieDevice, `volumes/VolumeGroup.disks`,
+`iam/User.bucketsAccessKeys`).
 
-**Validated end-to-end:** `helm template … | kubectl apply` → `Vm` `Synced=True` → on the PC the
-VM `krateo-bp-vm` has **1 disk + 1 nic + 1 serial-port**, all from one composition, no runtime
-wiring. The standalone child RDs (`Disk`/`Nic`/`SerialPort`/`CdRom`, `volumes/Disk`, `iam/Key`,
-`template`→`version`) remain **day-2 add-ons** to an existing parent; to make those composable a
-blueprint would need KOG to emit a reference field (e.g. `vmRef: {name}`) whose
-`requestFieldMapping` can source a path param from another CR's `status.extId`.
+**2. `lookup`-coupled dependents.** For a *day-2* child that needs the parent's runtime extId
+(`spec.<parent>ExtId`), a blueprint couples them with Helm's **`lookup`** function: the
+composition-dynamic-controller re-renders each reconcile, and `lookup` reads the sibling CR's
+**live** status. `blueprints/nutanix-chain-lookup` demonstrates this — the dependent `SerialPort`
+is rendered only once `lookup` resolves the parent `Vm`'s `status.extId`, then injected as
+`spec.vmExtId`. Proven: `helm lookup` returns the Vm CR with its status (`found=true,
+hasStatus=true`), and the rendered SerialPort carried `spec.vmExtId=<the VM's runtime extId>`.
+
+**Caveats for pattern 2 (both upstream of the blueprint, in the rest-dynamic-controller):**
+- The source CR must publish `status.extId`. The Vm CR's is **unreliable** today (it stays
+  `Ready=False/Creating` and the extId flaps empty), so `lookup` needs several reconciles to
+  catch it — which the composition controller does anyway, but a deterministic
+  `status.extId` (the [[kog-controller-nutanix-gap]]) would make it clean.
+- Each KOG kind needs its own typed `<Kind>Configuration`, so the blueprint must render one per
+  kind it uses (`VmConfiguration`, `SerialPortConfiguration`, …).
+
+(Correction: an earlier note here claimed a static blueprint *can't* wire cross-CR inputs — that
+was wrong. `lookup` + the controller's reconcile loop is exactly the supported mechanism.)

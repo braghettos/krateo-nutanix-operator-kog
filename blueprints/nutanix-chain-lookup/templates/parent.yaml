@@ -1,0 +1,29 @@
+apiVersion: vmm.nutanix.krateo.io/v1alpha1
+kind: VmConfiguration
+metadata: {name: {{ .Values.configuration.name }}, namespace: {{ .Values.configuration.namespace }}}
+spec:
+  authentication:
+    basic:
+      usernameRef: {name: {{ .Values.configuration.authSecret.name }}, namespace: {{ .Values.configuration.authSecret.namespace }}, key: username}
+      passwordRef: {name: {{ .Values.configuration.authSecret.name }}, namespace: {{ .Values.configuration.authSecret.namespace }}, key: password}
+---
+apiVersion: vmm.nutanix.krateo.io/v1alpha1
+kind: Vm
+metadata: {name: {{ .Values.vm.name }}, namespace: {{ .Values.configuration.namespace }}}
+spec:
+  configurationRef: {name: {{ .Values.configuration.name }}, namespace: {{ .Values.configuration.namespace }}}
+  name: {{ .Values.vm.name }}
+  numSockets: {{ .Values.vm.numSockets }}
+  numCoresPerSocket: {{ .Values.vm.numCoresPerSocket }}
+  memorySizeBytes: {{ .Values.vm.memorySizeBytes }}
+  cluster: {extId: {{ .Values.vm.clusterExtId | quote }}}
+---
+# Each KOG kind has its own typed <Kind>Configuration; the SerialPort needs one too.
+apiVersion: vmm.nutanix.krateo.io/v1alpha1
+kind: SerialPortConfiguration
+metadata: {name: {{ .Values.configuration.name }}, namespace: {{ .Values.configuration.namespace }}}
+spec:
+  authentication:
+    basic:
+      usernameRef: {name: {{ .Values.configuration.authSecret.name }}, namespace: {{ .Values.configuration.authSecret.namespace }}, key: username}
+      passwordRef: {name: {{ .Values.configuration.authSecret.name }}, namespace: {{ .Values.configuration.authSecret.namespace }}, key: password}

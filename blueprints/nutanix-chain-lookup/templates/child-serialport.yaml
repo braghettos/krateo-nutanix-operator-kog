@@ -1,0 +1,17 @@
+{{- $ns := .Values.configuration.namespace -}}
+{{- $vm := lookup "vmm.nutanix.krateo.io/v1alpha1" "Vm" $ns .Values.vm.name -}}
+{{- $ext := "" -}}
+{{- if $vm }}{{- $ext = dig "status" "extId" "" $vm -}}{{- end -}}
+{{- if $ext }}
+# lookup resolved the parent VM's runtime extId -> the dependent SerialPort is now coupled.
+apiVersion: vmm.nutanix.krateo.io/v1alpha1
+kind: SerialPort
+metadata: {name: {{ .Values.vm.name }}-sp, namespace: {{ $ns }}}
+spec:
+  configurationRef: {name: {{ .Values.configuration.name }}, namespace: {{ $ns }}}
+  vmExtId: {{ $ext | quote }}                  # <-- coupled from the sibling Vm CR via lookup
+  index: {{ .Values.child.serialPortIndex }}
+  isConnected: false
+{{- else }}
+# parent VM extId not yet available; SerialPort deferred to a later reconcile (lookup empty).
+{{- end }}
