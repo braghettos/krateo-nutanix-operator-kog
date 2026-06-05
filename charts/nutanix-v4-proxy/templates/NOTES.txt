@@ -1,0 +1,14 @@
+nutanix-v4-proxy {{ .Chart.AppVersion }} deployed as release "{{ .Release.Name }}".
+
+In-cluster URL (point your RestDefinition OAS slices' servers[0].url at this):
+
+  http://{{ include "nutanix-v4-proxy.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+Forwarding to Prism Central: {{ .Values.config.pcBase }}
+{{- if .Values.config.xClusterId }}
+Default X-Cluster-Id: {{ .Values.config.xClusterId }}
+{{- end }}
+
+Check health:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "nutanix-v4-proxy.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+  curl http://127.0.0.1:{{ .Values.service.port }}/healthz   # -> ok

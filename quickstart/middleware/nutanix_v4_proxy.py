@@ -44,6 +44,8 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
+__version__ = "0.2.0"
+
 PC_BASE = os.environ["PC_BASE"].rstrip("/")
 PORT = int(os.environ.get("PORT", "8080"))
 TLS_VERIFY = os.environ.get("TLS_VERIFY", "false").lower() == "true"
@@ -311,7 +313,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 
 def main():
-    log("INFO", "nutanix-v4-proxy on :%d -> %s (tls_verify=%s)" % (PORT, PC_BASE, TLS_VERIFY))
+    log("INFO", "nutanix-v4-proxy v%s on :%d -> %s (tls_verify=%s)" % (__version__, PORT, PC_BASE, TLS_VERIFY))
     http.server.ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
 
 

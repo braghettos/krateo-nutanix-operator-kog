@@ -1,0 +1,76 @@
+{{- if not .Values.config.pcBase }}
+{{- fail "config.pcBase is required (the Prism Central API base, ending in /api). Set it with --set config.pcBase=https://<pc-host>:9440/api" }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nutanix-v4-proxy.fullname" . }}
+  labels:
+    {{- include "nutanix-v4-proxy.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "nutanix-v4-proxy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "nutanix-v4-proxy.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: proxy
+          image: {{ include "nutanix-v4-proxy.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+            - name: PC_BASE
+              value: {{ .Values.config.pcBase | quote }}
+            - name: TLS_VERIFY
+              value: {{ .Values.config.tlsVerify | quote }}
+            - name: TASK_TIMEOUT_S
+              value: {{ .Values.config.taskTimeoutSeconds | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.config.logLevel | quote }}
+            {{- if .Values.config.xClusterId }}
+            - name: X_CLUSTER_ID
+              value: {{ .Values.config.xClusterId | quote }}
+            {{- end }}
+            {{- if .Values.config.objectTypeOverrides }}
+            - name: OBJECTTYPE_OVERRIDES
+              value: {{ .Values.config.objectTypeOverrides | toJson | quote }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
