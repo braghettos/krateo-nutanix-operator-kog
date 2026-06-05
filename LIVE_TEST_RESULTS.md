@@ -214,8 +214,21 @@ fields (incl. `extId`) at the body root on the create/get paths — populating `
 `Ready=True`, and breaking the extId chicken-and-egg. **List** responses (`{data:[…]}`) are left
 intact for findby item-extraction + the paginator.
 
-Validated at the proxy level against the live PC: GET-by-id through the proxy returns `extId` at
-the root with no `data` envelope; LIST keeps the `data` array. (End-to-end controller validation
-is pending a rebuild of the KOG test cluster, which was torn down.) The proper upstream fix
-(option 1) is to make `rest-dynamic-controller` unwrap the envelope and lift `extId` from the
-create response directly — tracked for the Krateo team.
+**End-to-end validated** (rebuilt a fresh kind cluster → oasgen-provider 0.11.1 → proxy v0.3.0 →
+live PC):
+
+- `prism/Category` (`identifiers:[extId]`, the chicken-and-egg case that previously **never**
+  populated and sat at `Ready=False` forever) → now **`Ready=True / Available`, `status.extId`
+  populated and stable** (4/4 reads identical), resource on the PC. ✅ This is the direct proof of
+  feature 6.
+- `vmm/Vm` (`identifiers:[name]`) → `status.extId` now populates from the create response, but it
+  then **flaps empty and `Ready` stays `False`** — a **separate** controller bug, not the envelope:
+  the spec-vs-remote drift check (`helpers.go isCRUpdated` → `comparison.CompareExisting`) flags the
+  minimal CR spec against the rich remote VM as perpetually drifted, so the controller loops
+  create→update (logs show repeated `update` events) and each Update `clearStatusFields` wipes
+  `status.extId`. Fix is controller-side: compare only spec-managed fields. Tracked separately.
+
+Proxy-level check too: GET-by-id through the proxy returns `extId` at the root (no `data`
+envelope); LIST keeps the `data` array. The proper upstream fix (option 1) is to make
+`rest-dynamic-controller` unwrap the envelope + lift `extId` from the create response **and** scope
+the drift comparison to managed fields — tracked for the Krateo team.
