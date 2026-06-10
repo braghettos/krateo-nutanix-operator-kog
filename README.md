@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/hero-dark.svg">
+    <img alt="Krateo ❤ Nutanix" src="docs/hero-light.svg" width="820">
+  </picture>
+</p>
+
 # Krateo RestDefinitions for Nutanix Prism Central v4
 
 Manage **Nutanix Prism Central (GA v4.0)** resources as native Kubernetes objects with
