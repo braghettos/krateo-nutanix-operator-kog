@@ -14,6 +14,27 @@ Success bar = `Synced=True` AND (creatables) resource confirmed on PC. `status.e
 
 ---
 
+## Update 2026-06-11 — Small-PC rebuild: Atlas / Flow Virtual Networking now live
+
+The totals below were captured on a STARTER / x-small PC with Atlas undeployed. The
+target PC has since been rebuilt to **size Small** with **CMSP** + the **Network
+Controller** enabled (PE registered). Re-probed 2026-06-11: **17 / 30 `networking`
+RDs are route-reachable (200)** — up from 9 — and a `vpc2` create→delete plus a
+5-RD Atlas sweep passed full-CRUD through the operator.
+
+- **Now reachable (`N — Atlas` rows below are superseded):** `vpc2`, `subnet2`,
+  `floatingip`, `gateway`, `routingpolicy`, `vpnconnection`, `bgpsession`,
+  `layer2stretch`, `loadbalancersession`, `routetable`, `ipfixexporter`,
+  `trafficmirror`, `virtualswitch`, `vpcvirtualswitchmapping`, `uplinkbond`,
+  `controller`, `capability2`.
+- **Still 400 — not Atlas:** parent-scoped children that need a parent `extId`
+  (`bgproute`, `route`, `vnic`, `reservedip`, `learnedmacaddress`, `remotesubnet`,
+  `remotevpnconnection`, `remotevtepgateway`, `vpnvendorconfig`); and the AWS cloud
+  paths `/networking/v4.0/aws/*` (`capability`, `subnet`, `vpc`) + `nodeschedulablestatuse`
+  (need AWS cloud connectivity).
+
+---
+
 ## Totals on this environment
 
 | | count |
