@@ -85,8 +85,32 @@ Validated against a live `pc.2024.3.1.13`: **89 / 189 RDs proven end-to-end**
 (30 full-CRUD + 59 read), **182 / 189 routes confirmed live**. See
 [`GA_V4_FULL_CRUD.md`](GA_V4_FULL_CRUD.md) for the per-RD verdicts and
 [`LIVE_TEST_MATRIX.md`](LIVE_TEST_MATRIX.md) for the per-RD live-test method.
-The rest are blocked by undeployed PC services (Files, Licensing, Objects, Atlas
-networking) or features absent on a Community-Edition / x-small PC.
+The rest are blocked by undeployed PC services (Files, Licensing, Objects) or
+features that need external infra (LDAP/SAML, AWS cloud connectivity).
 
 > The Nutanix v4 conventions and operational notes (e.g. serialize controllers — a concurrent
 > storm can lock the shared PC admin account) are documented in the quickstarts.
+
+### Update 2026-06-11 — Small-PC rebuild unlocked Atlas / Flow Virtual Networking
+
+The numbers above were taken on a STARTER / x-small PC where Flow Virtual Networking
+(Atlas) was undeployed. The PC has since been rebuilt to **size Small** with **CMSP**
+and the **Network Controller (Atlas)** enabled, and the PE registered to it — which
+lifts the single biggest block:
+
+- **Atlas is live.** Re-probed 2026-06-11: **17 / 30 `networking` RDs are
+  route-reachable (HTTP 200)** — up from 9 — including `vpc2`, `subnet2`,
+  `floatingip`, `gateway`, `routingpolicy`, `vpnconnection`, `bgpsession`,
+  `layer2stretch`, `loadbalancersession`, `routetable`, `ipfixexporter`,
+  `trafficmirror`, `virtualswitch`, `vpcvirtualswitchmapping`, `uplinkbond`,
+  `controller`, `capability2`. The remaining 13 are parent-scoped children (need a
+  parent `extId` in the path) or `/networking/v4.0/aws/*` (no AWS cloud
+  connectivity configured) — **not** Atlas-gated.
+- **Write-CRUD proven through the operator** on Atlas: a `vpc2` create→delete
+  round-trip plus a per-RD Atlas CRUD sweep (5 RDs FULL_PASS). The `N — Atlas`
+  verdicts in [`LIVE_TEST_MATRIX.md`](LIVE_TEST_MATRIX.md) are superseded for the
+  Flow-VN tier.
+
+Also generated this round (RDs live in a separate working tree, not committed here):
+**NDB** (105), **NKE** (46), plus Foundation / Foundation Central / Move / Self-Service /
+NC2 / Prism v3 / Prism v2 — ~1165 RDs across 28 product namespaces.
