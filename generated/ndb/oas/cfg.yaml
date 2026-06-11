@@ -1,0 +1,632 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /encryptions/tde/kms/{kms-id}/cfg:
+    get:
+      operationId: getConfigsByKMSId
+      parameters:
+      - description: ID of the KMS for which the user wants to fetch KMSConfigs.
+        in: path
+        name: kms-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: db-type
+        schema:
+          type: string
+      - description: Name of the KMSConfig.
+        in: query
+        name: name
+        schema:
+          type: string
+      - in: query
+        name: limit
+        schema:
+          type: integer
+      - in: query
+        name: offset
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/EraPaginationResponse'
+                - properties:
+                    entities:
+                      items:
+                        $ref: '#/components/schemas/KMSConfig'
+                      type: array
+                  type: object
+          description: Operation completed.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Get a list of KMSConfigs using KMS ID
+      tags:
+      - KMS
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/encryptions/tde/kms/{kms-id}/cfg\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/encryptions/tde/kms/{kms-id}/cfg';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      operationId: addKMSConfig
+      parameters:
+      - in: path
+        name: kms-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KMSConfig'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KMSConfig'
+          description: Operation completed.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Create a new KMSConfig
+      tags:
+      - KMS
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json'\
+          \ \\\n    --data '{\n    \"databaseType\": \"string\",\n    \"description\": \"string\",\n    \"details\": {\n \
+          \       \"certificates\": {\n            \"property1\": {\n                \"data\": \"string\",\n             \
+          \   \"fileName\": \"string\",\n                \"password\": \"string\"\n            },\n            \"property2\"\
+          : {\n                \"data\": \"string\",\n                \"fileName\": \"string\",\n                \"password\"\
+          : \"string\"\n            }\n        },\n        \"credentials\": {\n            \"property1\": \"string\",\n  \
+          \          \"property2\": \"string\"\n        },\n        \"keys\": {\n            \"property1\": \"string\",\n\
+          \            \"property2\": \"string\"\n        }\n    },\n    \"name\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"databaseType\"\
+          : \"string\",\n    \"description\": \"string\",\n    \"details\": {\n        \"certificates\": {\n            \"\
+          property1\": {\n                \"data\": \"string\",\n                \"fileName\": \"string\",\n             \
+          \   \"password\": \"string\"\n            },\n            \"property2\": {\n                \"data\": \"string\"\
+          ,\n                \"fileName\": \"string\",\n                \"password\": \"string\"\n            }\n        },\n\
+          \        \"credentials\": {\n            \"property1\": \"string\",\n            \"property2\": \"string\"\n   \
+          \     },\n        \"keys\": {\n            \"property1\": \"string\",\n            \"property2\": \"string\"\n \
+          \       }\n    },\n    \"name\": \"string\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"databaseType\": \"string\",\n    \"description\": \"string\",\n    \"details\": {\n        \"\
+          certificates\": {\n            \"property1\": {\n                \"data\": \"string\",\n                \"fileName\"\
+          : \"string\",\n                \"password\": \"string\"\n            },\n            \"property2\": {\n        \
+          \        \"data\": \"string\",\n                \"fileName\": \"string\",\n                \"password\": \"string\"\
+          \n            }\n        },\n        \"credentials\": {\n            \"property1\": \"string\",\n            \"\
+          property2\": \"string\"\n        },\n        \"keys\": {\n            \"property1\": \"string\",\n            \"\
+          property2\": \"string\"\n        }\n    },\n    \"name\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/encryptions/tde/kms/{kms-id}/cfg\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg\"\n\t\n\tpayload :=  strings.NewReader(`{\"databaseType\":\
+          \ \"string\", \"description\": \"string\", \"details\": {\"certificates\": {\"property1\": {\"data\": \"string\"\
+          , \"fileName\": \"string\", \"password\": \"string\"}, \"property2\": {\"data\": \"string\", \"fileName\": \"string\"\
+          , \"password\": \"string\"}}, \"credentials\": {\"property1\": \"string\", \"property2\": \"string\"}, \"keys\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}}, \"name\": \"string\"}`)\n\treq, err := http.NewRequest(\"\
+          POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"databaseType\\\": \\\"string\\\", \\\"\
+          description\\\": \\\"string\\\", \\\"details\\\": {\\\"certificates\\\": {\\\"property1\\\": {\\\"data\\\": \\\"\
+          string\\\", \\\"fileName\\\": \\\"string\\\", \\\"password\\\": \\\"string\\\"}, \\\"property2\\\": {\\\"data\\\"\
+          : \\\"string\\\", \\\"fileName\\\": \\\"string\\\", \\\"password\\\": \\\"string\\\"}}, \\\"credentials\\\": {\\\
+          \"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"keys\\\": {\\\"property1\\\": \\\"string\\\
+          \", \\\"property2\\\": \\\"string\\\"}}, \\\"name\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/encryptions/tde/kms/{kms-id}/cfg';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"databaseType\": \"string\", \"description\": \"string\", \"details\": {\"certificates\": {\"property1\"\
+          : {\"data\": \"string\", \"fileName\": \"string\", \"password\": \"string\"}, \"property2\": {\"data\": \"string\"\
+          , \"fileName\": \"string\", \"password\": \"string\"}}, \"credentials\": {\"property1\": \"string\", \"property2\"\
+          : \"string\"}, \"keys\": {\"property1\": \"string\", \"property2\": \"string\"}}, \"name\": \"string\"}`\n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+  /encryptions/tde/kms/{kms-id}/cfg/{cfg-id}:
+    delete:
+      operationId: deleteKMSConfigById
+      parameters:
+      - in: path
+        name: kms-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: cfg-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          description: Operation completed.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Delete KMSConfig using KMS ID and KMSConfig ID
+      tags:
+      - KMS
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id} \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\",\
+          \ url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}';\nconst options = {\n  method: 'DELETE',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      operationId: getKMSConfigById
+      parameters:
+      - in: path
+        name: kms-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: cfg-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: load-details
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KMSConfig'
+          description: Operation completed.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Get a KMSConfig using KMS ID and KMSConfig ID
+      tags:
+      - KMS
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id} \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\",\
+          \ headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}';\nconst options = {\n  method: 'GET',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      operationId: updateKMSConfigById
+      parameters:
+      - in: path
+        name: kms-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: cfg-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/KMSConfig'
+              - properties:
+                  databaseType:
+                    readOnly: true
+                    type: string
+                  details:
+                    readOnly: true
+                    type: object
+                  kmsId:
+                    readOnly: true
+                    type: string
+                type: object
+        description: Payload required to update given KMSConfig.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KMSConfig'
+          description: Operation completed.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Update a KMSConfig using KMS ID and KMSConfig ID
+      tags:
+      - KMS
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id} \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"databaseType\": \"string\",\n    \"description\": \"string\",\n   \
+          \ \"details\": {\n        \"certificates\": {\n            \"property1\": {\n                \"data\": \"string\"\
+          ,\n                \"fileName\": \"string\",\n                \"password\": \"string\"\n            },\n       \
+          \     \"property2\": {\n                \"data\": \"string\",\n                \"fileName\": \"string\",\n     \
+          \           \"password\": \"string\"\n            }\n        },\n        \"credentials\": {\n            \"property1\"\
+          : \"string\",\n            \"property2\": \"string\"\n        },\n        \"keys\": {\n            \"property1\"\
+          : \"string\",\n            \"property2\": \"string\"\n        }\n    },\n    \"name\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"databaseType\"\
+          : \"string\",\n    \"description\": \"string\",\n    \"details\": {\n        \"certificates\": {\n            \"\
+          property1\": {\n                \"data\": \"string\",\n                \"fileName\": \"string\",\n             \
+          \   \"password\": \"string\"\n            },\n            \"property2\": {\n                \"data\": \"string\"\
+          ,\n                \"fileName\": \"string\",\n                \"password\": \"string\"\n            }\n        },\n\
+          \        \"credentials\": {\n            \"property1\": \"string\",\n            \"property2\": \"string\"\n   \
+          \     },\n        \"keys\": {\n            \"property1\": \"string\",\n            \"property2\": \"string\"\n \
+          \       }\n    },\n    \"name\": \"string\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"databaseType\": \"string\",\n    \"description\": \"string\",\n    \"details\": {\n        \"\
+          certificates\": {\n            \"property1\": {\n                \"data\": \"string\",\n                \"fileName\"\
+          : \"string\",\n                \"password\": \"string\"\n            },\n            \"property2\": {\n        \
+          \        \"data\": \"string\",\n                \"fileName\": \"string\",\n                \"password\": \"string\"\
+          \n            }\n        },\n        \"credentials\": {\n            \"property1\": \"string\",\n            \"\
+          property2\": \"string\"\n        },\n        \"keys\": {\n            \"property1\": \"string\",\n            \"\
+          property2\": \"string\"\n        }\n    },\n    \"name\": \"string\"\n}\"\"\"\n\nconn.request(\"PUT\",\"/era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"databaseType\"\
+          : \"string\", \"description\": \"string\", \"details\": {\"certificates\": {\"property1\": {\"data\": \"string\"\
+          , \"fileName\": \"string\", \"password\": \"string\"}, \"property2\": {\"data\": \"string\", \"fileName\": \"string\"\
+          , \"password\": \"string\"}}, \"credentials\": {\"property1\": \"string\", \"property2\": \"string\"}, \"keys\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}}, \"name\": \"string\"}`)\n\treq, err := http.NewRequest(\"\
+          PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"databaseType\\\": \\\"string\\\", \\\"\
+          description\\\": \\\"string\\\", \\\"details\\\": {\\\"certificates\\\": {\\\"property1\\\": {\\\"data\\\": \\\"\
+          string\\\", \\\"fileName\\\": \\\"string\\\", \\\"password\\\": \\\"string\\\"}, \\\"property2\\\": {\\\"data\\\"\
+          : \\\"string\\\", \\\"fileName\\\": \\\"string\\\", \\\"password\\\": \\\"string\\\"}}, \\\"credentials\\\": {\\\
+          \"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"keys\\\": {\\\"property1\\\": \\\"string\\\
+          \", \\\"property2\\\": \\\"string\\\"}}, \\\"name\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}';\nconst options = {\n  method: 'PUT',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"databaseType\": \"string\", \"description\": \"string\", \"details\": {\"certificates\": {\"property1\"\
+          : {\"data\": \"string\", \"fileName\": \"string\", \"password\": \"string\"}, \"property2\": {\"data\": \"string\"\
+          , \"fileName\": \"string\", \"password\": \"string\"}}, \"credentials\": {\"property1\": \"string\", \"property2\"\
+          : \"string\"}, \"keys\": {\"property1\": \"string\", \"property2\": \"string\"}}, \"name\": \"string\"}`\n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    KMSCertificate:
+      properties:
+        data:
+          type: string
+        fileName:
+          type: string
+        password:
+          type: string
+      type: object
+    KMSConfigDetails:
+      properties:
+        certificates:
+          additionalProperties:
+            $ref: '#/components/schemas/KMSCertificate'
+          type: object
+        credentials:
+          additionalProperties:
+            type: string
+          type: object
+        keys:
+          additionalProperties:
+            type: string
+          type: object
+      type: object
+      writeOnly: true
+    KMSConfig:
+      properties:
+        databaseCount:
+          readOnly: true
+          type: integer
+        databaseType:
+          type: string
+        dateCreated:
+          readOnly: true
+          type: string
+        dateModified:
+          readOnly: true
+          type: string
+        description:
+          type: string
+        details:
+          $ref: '#/components/schemas/KMSConfigDetails'
+          type: object
+        id:
+          format: uuid
+          readOnly: true
+          type: string
+        kmsId:
+          format: uuid
+          readOnly: true
+          type: string
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          readOnly: true
+          type: string
+        status:
+          readOnly: true
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+    EraPaginationResponse:
+      properties:
+        count:
+          format: int32
+          type: integer
+        entities:
+          items:
+            type: object
+          type: array
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

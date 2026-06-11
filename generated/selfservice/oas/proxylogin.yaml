@@ -1,0 +1,113 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /proxy_login:
+    post:
+      description: Only Super Admin can use this API to proxy login for the provided username
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/proxy_login_input'
+        description: Request body
+        required: true
+      tags:
+      - Proxy Login
+      x-private: true
+      x-doc-hide: true
+      summary: Proxy Login for given username
+      responses:
+        '200':
+          description: Request Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/proxy_login_output'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/proxy_login \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json'\
+          \ \\\n    --data '{\n    \"proxy_for_username\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"proxy_for_username\"\
+          : \"string\"\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/proxy_login"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"proxy_for_username\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/nutanix/v3/proxy_login\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/proxy_login\"\n\t\n\tpayload :=  strings.NewReader(`{\"proxy_for_username\"\
+          : \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"\
+          application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/proxy_login\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"proxy_for_username\\\": \\\"string\\\"\
+          }\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/proxy_login';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"proxy_for_username\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    proxy_login_status:
+      description: 'The status of a REST API call. Only used when there is a failure to report.
+
+        '
+      type: object
+      properties:
+        status:
+          readOnly: true
+          type: string
+          description: failure
+        message:
+          readOnly: true
+          type: string
+          description: Something went wrong.
+      title: Response status
+    proxy_login_input:
+      description: Proxy Login Request Input.
+      required:
+      - proxy_for_username
+      type: object
+      properties:
+        proxy_for_username:
+          type: string
+      title: Proxy Login Request Input.
+    proxy_login_output:
+      description: Response containing the Auth token and expiry
+      required:
+      - ntnx_igw_session
+      - expires
+      type: object
+      properties:
+        expires:
+          type: string
+        ntnx_igw_session:
+          type: string
+      title: Proxy Login Response

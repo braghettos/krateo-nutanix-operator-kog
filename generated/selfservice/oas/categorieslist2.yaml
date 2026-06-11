@@ -1,0 +1,351 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /xi/v1/categories/list:
+    post:
+      description: List all categories according to the filter.
+      requestBody:
+        $ref: '#/components/requestBodies/xi_list_metadata'
+      tags:
+      - xi/categories
+      x-private: true
+      x-doc-hide: true
+      summary: Get Xi cloud categories
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: calm_provider_xi_category
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groups_get_entities_response'
+        '404':
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/xi_status'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/xi/v1/categories/list \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"filter\": \"string\",\n    \"kind\": \"xi\",\n    \"length\": 1,\n\
+          \    \"offset\": 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\",\n    \"kind\": \"xi\",\n    \"length\": 1,\n    \"offset\": 0,\n    \"sort_attribute\": \"string\"\
+          ,\n    \"sort_order\": \"string\"\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/xi/v1/categories/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\",\n    \"kind\": \"xi\",\n    \"length\": 1,\n    \"offset\"\
+          : 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/nutanix/v3/xi/v1/categories/list\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/xi/v1/categories/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          filter\": \"string\", \"kind\": \"xi\", \"length\": 1, \"offset\": 0, \"sort_attribute\": \"string\", \"sort_order\"\
+          : \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"\
+          application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/xi/v1/categories/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\", \\\"kind\\\
+          \": \\\"xi\\\", \\\"length\\\": 1, \\\"offset\\\": 0, \\\"sort_attribute\\\": \\\"string\\\", \\\"sort_order\\\"\
+          : \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\n\
+          client.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/xi/v1/categories/list';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"filter\": \"string\", \"kind\": \"xi\", \"length\": 1, \"offset\": 0, \"sort_attribute\"\
+          : \"string\", \"sort_order\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const\
+          \ data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  requestBodies:
+    xi_list_metadata:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/xi_list_metadata'
+      description: Request body
+      required: true
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    groups_group_summary_map:
+      additionalProperties:
+        $ref: '#/components/schemas/groups_field_data'
+      type: object
+      description: Group Summary Info Map.
+      title: Group Summary Map
+    xi_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - xi
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    xi_list_metadata:
+      description: 'All api calls that return a list will have this metadata block as input
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - xi
+          type: string
+          description: The kind name
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter in FIQL syntax used for the results.
+        length:
+          minimum: 1
+          type: integer
+          description: The number of records to retrieve relative to the offset
+          format: int32
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          minimum: 0
+          type: integer
+          description: Offset from the start of the entity list
+          format: int32
+      title: Metadata for xi list
+    groups_field_data:
+      description: Group Summary Data.
+      type: object
+      properties:
+        buckets:
+          $ref: '#/components/schemas/groups_bucket_summary_map'
+        values:
+          items:
+            $ref: '#/components/schemas/groups_timevalue_pair'
+          type: array
+        name:
+          type: string
+      title: Group Summary Data
+    groups_bucket_summary_map:
+      additionalProperties:
+        type: integer
+        format: int64
+      type: object
+      description: Group Bucket Summary Map.
+      title: Group Buckets Summary Map
+    groups_get_entities_response:
+      description: Get Entities Response.
+      type: object
+      properties:
+        entity_type:
+          type: string
+        filtered_group_count:
+          type: integer
+          format: int64
+        total_entity_count:
+          type: integer
+          format: int64
+        filtered_entity_count:
+          type: integer
+          format: int64
+        group_results:
+          items:
+            $ref: '#/components/schemas/groups_group_result'
+          type: array
+        total_group_count:
+          type: integer
+          format: int64
+      title: Get Entities Response
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    groups_entity:
+      description: An Individual Entity.
+      type: object
+      properties:
+        entity_id:
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/groups_field_data'
+          type: array
+      title: Entity
+    groups_timevalue_pair:
+      description: Time-Value Pair Data.
+      type: object
+      properties:
+        values:
+          items:
+            type: string
+          type: array
+        time:
+          type: integer
+          format: int64
+      title: Time-Value Pair
+    sort_order:
+      x-ntnx-enum:
+      - ASCENDING
+      - DESCENDING
+      description: The sort order in which results are returned
+      title: Sort order
+    groups_group_result:
+      description: Group Result.
+      type: object
+      properties:
+        entity_results:
+          items:
+            $ref: '#/components/schemas/groups_entity'
+          type: array
+        group_by_column_value:
+          type: string
+        total_entity_count:
+          type: integer
+          format: int64
+        group_summaries:
+          $ref: '#/components/schemas/groups_group_summary_map'
+      title: Group Result

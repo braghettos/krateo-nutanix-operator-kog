@@ -1,0 +1,309 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /upgrade/{type}/softwares/{name}/upload:
+    post:
+      tags:
+      - /upgrade
+      operationId: post/upgrade/{type}/softwares/{name}/upload/uploadSoftware
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: overwrite
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: file_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: md5sum
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: version
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: hypervisor_type
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: software_metadata
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/java.io.InputStream'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.upgrade.SoftwareDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/upgrade/{type}/softwares/{name}/upload\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/octet-stream' \\\n   \
+          \ --header 'software_metadata: string' \\\n    --data '{\n    \"max_skip_buffer_size\": 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/octet-stream' \\\n    --header 'software_metadata: string' \\\n    --body-data '{\n    \"max_skip_buffer_size\"\
+          : 0\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/upgrade/{type}/softwares/{name}/upload"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/octet-stream\",\n    \"software_metadata\": \"string\"\
+          \n}\n\npayload =  \"\"\"{\n    \"max_skip_buffer_size\": 0\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/upgrade/{type}/softwares/{name}/upload\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/upgrade/{type}/softwares/{name}/upload\"\n\t\n\t\
+          payload :=  strings.NewReader(`{\"max_skip_buffer_size\": 0}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/octet-stream\")\n      \
+          \  req.Header.Add(\"software_metadata\", \"string\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err !=\
+          \ nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody,\
+          \ err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/upgrade/{type}/softwares/{name}/upload\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/octet-stream\")\n\
+          \  .setHeader(\"software_metadata\", \"string\")\n  .setBody(\"{\\\"max_skip_buffer_size\\\": 0}\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/upgrade/{type}/softwares/{name}/upload';\n\
+          const options = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/octet-stream',\
+          \ 'software_metadata': 'string'},\n  body:  `{\"max_skip_buffer_size\": 0}`\n};\n\ntry {\n  const response = await\
+          \ fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  requestBodies:
+    java.io.InputStream:
+      content:
+        application/octet-stream:
+          schema:
+            $ref: '#/components/schemas/java.io.InputStream'
+  schemas:
+    create.dto.upgrade.SoftwareDTO:
+      type: object
+      properties:
+        cmsp_required:
+          type: boolean
+        compatible_fs_versions:
+          items:
+            type: string
+          type: array
+        compatible_fsm_versions:
+          items:
+            type: string
+          type: array
+        compatible_nos_versions:
+          items:
+            type: string
+          type: array
+        compatible_pe_nos_versions:
+          items:
+            type: string
+          type: array
+        compatible_platforms:
+          items:
+            type: string
+          type: array
+        compatible_versions:
+          items:
+            type: string
+          type: array
+        current_size_in_bytes:
+          format: int64
+          type: integer
+        full_release_version:
+          type: string
+        gpg_signature:
+          type: string
+        hypervisor_installer_string:
+          type: string
+        hypervisor_type:
+          type: string
+        is_lts:
+          type: boolean
+        log:
+          $ref: '#/components/schemas/org.slf4j.Logger'
+        md5_sum:
+          type: string
+        min_nos_version:
+          type: string
+        min_pcversion:
+          type: string
+        minimum_requirements_dto:
+          $ref: '#/components/schemas/create.dto.upgrade.MinimumRequirementsDTO'
+        name:
+          type: string
+        prism_central_sizes:
+          items:
+            $ref: '#/components/schemas/create.dto.prismcentral.PrismCentralSizeDTO'
+          type: array
+        qualified_date:
+          format: int64
+          type: integer
+        release_date:
+          format: int64
+          type: integer
+        release_note_url:
+          type: string
+        software_type:
+          enum:
+          - NOS
+          - HYPERVISOR
+          - HYPERVISOR_INSTALLER
+          - HYPERVISOR_ISO
+          - NCC
+          - FILE_SERVER
+          - FILES
+          - FIRMWARE
+          - FIRMWARE_DISK
+          - FIRMWARE_NIC
+          - FIRMWARE_BIOS
+          - FIRMWARE_BMC
+          - FIRMWARE_HBA
+          - FOUNDATION
+          - ACS
+          - PRISM_CENTRAL_DEPLOY
+          - PRISM_CENTRAL
+          - FILE_ANALYTICS
+          - UNKNOWN
+          type: string
+        status:
+          enum:
+          - NONE
+          - AVAILABLE
+          - QUEUED
+          - INPROGRESS
+          - PAUSED
+          - COMPLETED
+          - CORRUPTED
+          - MD5SUMMISMATCH
+          - FAILED
+          type: string
+        supported_models:
+          items:
+            type: string
+          type: array
+        total_size_in_bytes:
+          format: int64
+          type: integer
+        transfer_type:
+          enum:
+          - AUTOMATIC_DOWNLOAD
+          - DOWNLOAD
+          - UPLOAD
+          type: string
+        upgrade_notification:
+          $ref: '#/components/schemas/create.dto.upgrade.UpgradeNotificationDTO'
+        url:
+          type: string
+        version:
+          type: string
+    java.io.InputStream:
+      type: object
+      properties:
+        max_skip_buffer_size:
+          format: int32
+          type: integer
+    create.dto.upgrade.DescriptionItemDTO:
+      type: object
+      properties:
+        affected_releases:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+        severity_level:
+          type: string
+    create.dto.upgrade.UpgradeNotificationDTO:
+      type: object
+      properties:
+        cancel_message:
+          type: string
+        description_item_list:
+          items:
+            $ref: '#/components/schemas/create.dto.upgrade.DescriptionItemDTO'
+          type: array
+        proceed_message:
+          type: string
+        title:
+          type: string
+    org.slf4j.Logger:
+      type: object
+      properties:
+        root_logger_name:
+          type: string
+    create.dto.upgrade.MinimumRequirementsDTO:
+      type: object
+      properties:
+        memory_gb:
+          format: int32
+          type: integer
+        storage_gb:
+          format: int32
+          type: integer
+        v_cpus:
+          format: int32
+          type: integer
+    create.dto.prismcentral.PrismCentralSizeDTO:
+      type: object
+      properties:
+        disk_size_in_gib:
+          format: int32
+          type: integer
+        memory_size_in_gib:
+          format: int32
+          type: integer
+        num_vms_supported:
+          format: int32
+          type: integer
+        pc_vm_form_factor:
+          type: string
+        vcpus:
+          format: int32
+          type: integer

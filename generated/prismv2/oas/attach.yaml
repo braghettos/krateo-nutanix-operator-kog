@@ -1,0 +1,272 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /vms/{uuid}/disks/attach:
+    post:
+      summary: Attach disks to Virtual Machine.
+      description: Attach disks to Virtual Machine.A disk drive may either be a regular disk drive, or a CD-ROM drive. Only
+        CD-ROM drives may be empty. By default, regular disk drives are configured on the SCSI bus, and CD-ROM drives are
+        configured on the IDE bus. The user may override this behavior with the deviceBus attribute. By default, a disk drive
+        is placed on the first available bus slot. The user may override this behavior with the deviceIndex attribute. Disks
+        on the SCSI bus may optionally be configured for passthrough on platforms that support iSCSI. When in passthrough
+        mode, SCSI commands are passed directly to NDFS via iSCSI. When SCSI passthrough is disabled, the hypervisor provides
+        a SCSI emulation layer, and treats the underlying iSCSI target as a block device. By default, SCSI passthrough is
+        enabled for SCSI devices on supported platforms. If the disk image is cloned from an existing vmdisk or NFS file,
+        the user may specify a minimum size for the resulting clone. This can be used to expand a disk image at clone time.
+        If the VM is running, the disk is hot-added to the VM. Note that certain buses, like IDE, are not hot-pluggable. This
+        is also an asynchronous operation that results in the creation of a task object. The UUID of this task object is returned
+        as the response of this operation. This task can be monitored by using the /tasks/poll API.
+      tags:
+      - /vms
+      operationId: post/vms/{uuid}/disks/attach/attachVMDisk
+      parameters:
+      - name: uuid
+        in: path
+        description: Id of the Virtual Machine
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.uhura.VMDiskAttachDTO'
+        description: Info about the virtual disks or CD-Roms to be attached
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/disks/attach\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"uuid\": \"string\",\n    \"vm_disks\": [\n        {\n            \"disk_address\": {\n                \"\
+          device_bus\": \"SCSI\",\n                \"device_index\": 0,\n                \"device_uuid\": \"string\",\n  \
+          \              \"disk_label\": \"string\",\n                \"is_cdrom\": true,\n                \"ndfs_filepath\"\
+          : \"string\",\n                \"vmdisk_uuid\": \"string\",\n                \"volume_group_uuid\": \"string\"\n\
+          \            },\n            \"flash_mode_enabled\": true,\n            \"is_cdrom\": true,\n            \"is_empty\"\
+          : true,\n            \"is_scsi_pass_through\": true,\n            \"is_thin_provisioned\": true,\n            \"\
+          vm_disk_clone\": {\n                \"disk_address\": {\n                    \"device_bus\": \"SCSI\",\n       \
+          \             \"device_index\": 0,\n                    \"device_uuid\": \"string\",\n                    \"disk_label\"\
+          : \"string\",\n                    \"is_cdrom\": true,\n                    \"ndfs_filepath\": \"string\",\n   \
+          \                 \"vmdisk_uuid\": \"string\",\n                    \"volume_group_uuid\": \"string\"\n        \
+          \        },\n                \"minimum_size\": 0,\n                \"snapshot_group_uuid\": \"string\",\n      \
+          \          \"storage_container_uuid\": \"string\"\n            },\n            \"vm_disk_clone_external\": {\n \
+          \               \"external_disk_url\": \"string\",\n                \"size\": 0,\n                \"storage_container_uuid\"\
+          : \"string\"\n            },\n            \"vm_disk_create\": {\n                \"size\": 0,\n                \"\
+          storage_container_uuid\": \"string\"\n            },\n            \"vm_disk_passthru_external\": {\n           \
+          \     \"external_disk_url\": \"string\",\n                \"storage_container_uuid\": \"string\"\n            }\n\
+          \        }\n    ]\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"uuid\": \"string\",\n    \"vm_disks\": [\n        {\n        \
+          \    \"disk_address\": {\n                \"device_bus\": \"SCSI\",\n                \"device_index\": 0,\n    \
+          \            \"device_uuid\": \"string\",\n                \"disk_label\": \"string\",\n                \"is_cdrom\"\
+          : true,\n                \"ndfs_filepath\": \"string\",\n                \"vmdisk_uuid\": \"string\",\n        \
+          \        \"volume_group_uuid\": \"string\"\n            },\n            \"flash_mode_enabled\": true,\n        \
+          \    \"is_cdrom\": true,\n            \"is_empty\": true,\n            \"is_scsi_pass_through\": true,\n       \
+          \     \"is_thin_provisioned\": true,\n            \"vm_disk_clone\": {\n                \"disk_address\": {\n  \
+          \                  \"device_bus\": \"SCSI\",\n                    \"device_index\": 0,\n                    \"device_uuid\"\
+          : \"string\",\n                    \"disk_label\": \"string\",\n                    \"is_cdrom\": true,\n      \
+          \              \"ndfs_filepath\": \"string\",\n                    \"vmdisk_uuid\": \"string\",\n              \
+          \      \"volume_group_uuid\": \"string\"\n                },\n                \"minimum_size\": 0,\n           \
+          \     \"snapshot_group_uuid\": \"string\",\n                \"storage_container_uuid\": \"string\"\n           \
+          \ },\n            \"vm_disk_clone_external\": {\n                \"external_disk_url\": \"string\",\n          \
+          \      \"size\": 0,\n                \"storage_container_uuid\": \"string\"\n            },\n            \"vm_disk_create\"\
+          : {\n                \"size\": 0,\n                \"storage_container_uuid\": \"string\"\n            },\n    \
+          \        \"vm_disk_passthru_external\": {\n                \"external_disk_url\": \"string\",\n                \"\
+          storage_container_uuid\": \"string\"\n            }\n        }\n    ]\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/disks/attach"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"uuid\": \"string\"\
+          ,\n    \"vm_disks\": [\n        {\n            \"disk_address\": {\n                \"device_bus\": \"SCSI\",\n\
+          \                \"device_index\": 0,\n                \"device_uuid\": \"string\",\n                \"disk_label\"\
+          : \"string\",\n                \"is_cdrom\": true,\n                \"ndfs_filepath\": \"string\",\n           \
+          \     \"vmdisk_uuid\": \"string\",\n                \"volume_group_uuid\": \"string\"\n            },\n        \
+          \    \"flash_mode_enabled\": true,\n            \"is_cdrom\": true,\n            \"is_empty\": true,\n         \
+          \   \"is_scsi_pass_through\": true,\n            \"is_thin_provisioned\": true,\n            \"vm_disk_clone\":\
+          \ {\n                \"disk_address\": {\n                    \"device_bus\": \"SCSI\",\n                    \"\
+          device_index\": 0,\n                    \"device_uuid\": \"string\",\n                    \"disk_label\": \"string\"\
+          ,\n                    \"is_cdrom\": true,\n                    \"ndfs_filepath\": \"string\",\n               \
+          \     \"vmdisk_uuid\": \"string\",\n                    \"volume_group_uuid\": \"string\"\n                },\n\
+          \                \"minimum_size\": 0,\n                \"snapshot_group_uuid\": \"string\",\n                \"\
+          storage_container_uuid\": \"string\"\n            },\n            \"vm_disk_clone_external\": {\n              \
+          \  \"external_disk_url\": \"string\",\n                \"size\": 0,\n                \"storage_container_uuid\"\
+          : \"string\"\n            },\n            \"vm_disk_create\": {\n                \"size\": 0,\n                \"\
+          storage_container_uuid\": \"string\"\n            },\n            \"vm_disk_passthru_external\": {\n           \
+          \     \"external_disk_url\": \"string\",\n                \"storage_container_uuid\": \"string\"\n            }\n\
+          \        }\n    ]\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/vms/{uuid}/disks/attach\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/disks/attach\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          uuid\": \"string\", \"vm_disks\": [{\"disk_address\": {\"device_bus\": \"SCSI\", \"device_index\": 0, \"device_uuid\"\
+          : \"string\", \"disk_label\": \"string\", \"is_cdrom\": true, \"ndfs_filepath\": \"string\", \"vmdisk_uuid\": \"\
+          string\", \"volume_group_uuid\": \"string\"}, \"flash_mode_enabled\": true, \"is_cdrom\": true, \"is_empty\": true,\
+          \ \"is_scsi_pass_through\": true, \"is_thin_provisioned\": true, \"vm_disk_clone\": {\"disk_address\": {\"device_bus\"\
+          : \"SCSI\", \"device_index\": 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\": true, \"\
+          ndfs_filepath\": \"string\", \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"minimum_size\":\
+          \ 0, \"snapshot_group_uuid\": \"string\", \"storage_container_uuid\": \"string\"}, \"vm_disk_clone_external\": {\"\
+          external_disk_url\": \"string\", \"size\": 0, \"storage_container_uuid\": \"string\"}, \"vm_disk_create\": {\"size\"\
+          : 0, \"storage_container_uuid\": \"string\"}, \"vm_disk_passthru_external\": {\"external_disk_url\": \"string\"\
+          , \"storage_container_uuid\": \"string\"}}]}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err\
+          \ != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\"\
+          , \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/disks/attach\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"uuid\\\": \\\"string\\\", \\\"vm_disks\\\": [{\\\"disk_address\\\": {\\\"device_bus\\\": \\\"SCSI\\\", \\\"\
+          device_index\\\": 0, \\\"device_uuid\\\": \\\"string\\\", \\\"disk_label\\\": \\\"string\\\", \\\"is_cdrom\\\":\
+          \ true, \\\"ndfs_filepath\\\": \\\"string\\\", \\\"vmdisk_uuid\\\": \\\"string\\\", \\\"volume_group_uuid\\\": \\\
+          \"string\\\"}, \\\"flash_mode_enabled\\\": true, \\\"is_cdrom\\\": true, \\\"is_empty\\\": true, \\\"is_scsi_pass_through\\\
+          \": true, \\\"is_thin_provisioned\\\": true, \\\"vm_disk_clone\\\": {\\\"disk_address\\\": {\\\"device_bus\\\":\
+          \ \\\"SCSI\\\", \\\"device_index\\\": 0, \\\"device_uuid\\\": \\\"string\\\", \\\"disk_label\\\": \\\"string\\\"\
+          , \\\"is_cdrom\\\": true, \\\"ndfs_filepath\\\": \\\"string\\\", \\\"vmdisk_uuid\\\": \\\"string\\\", \\\"volume_group_uuid\\\
+          \": \\\"string\\\"}, \\\"minimum_size\\\": 0, \\\"snapshot_group_uuid\\\": \\\"string\\\", \\\"storage_container_uuid\\\
+          \": \\\"string\\\"}, \\\"vm_disk_clone_external\\\": {\\\"external_disk_url\\\": \\\"string\\\", \\\"size\\\": 0,\
+          \ \\\"storage_container_uuid\\\": \\\"string\\\"}, \\\"vm_disk_create\\\": {\\\"size\\\": 0, \\\"storage_container_uuid\\\
+          \": \\\"string\\\"}, \\\"vm_disk_passthru_external\\\": {\\\"external_disk_url\\\": \\\"string\\\", \\\"storage_container_uuid\\\
+          \": \\\"string\\\"}}]}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/disks/attach';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"uuid\": \"string\", \"vm_disks\": [{\"disk_address\": {\"device_bus\": \"SCSI\", \"device_index\": 0, \"\
+          device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\": true, \"ndfs_filepath\": \"string\", \"vmdisk_uuid\"\
+          : \"string\", \"volume_group_uuid\": \"string\"}, \"flash_mode_enabled\": true, \"is_cdrom\": true, \"is_empty\"\
+          : true, \"is_scsi_pass_through\": true, \"is_thin_provisioned\": true, \"vm_disk_clone\": {\"disk_address\": {\"\
+          device_bus\": \"SCSI\", \"device_index\": 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\"\
+          : true, \"ndfs_filepath\": \"string\", \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"minimum_size\"\
+          : 0, \"snapshot_group_uuid\": \"string\", \"storage_container_uuid\": \"string\"}, \"vm_disk_clone_external\": {\"\
+          external_disk_url\": \"string\", \"size\": 0, \"storage_container_uuid\": \"string\"}, \"vm_disk_create\": {\"size\"\
+          : 0, \"storage_container_uuid\": \"string\"}, \"vm_disk_passthru_external\": {\"external_disk_url\": \"string\"\
+          , \"storage_container_uuid\": \"string\"}}]}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const\
+          \ data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    create.dto.uhura.VmDiskCloneExternalDTO:
+      type: object
+      properties:
+        external_disk_url:
+          type: string
+        size:
+          format: int64
+          type: integer
+        storage_container_uuid:
+          type: string
+    create.dto.uhura.VMDiskDTO:
+      type: object
+      properties:
+        disk_address:
+          $ref: '#/components/schemas/create.dto.acropolis.VMDiskAddressDTO'
+        flash_mode_enabled:
+          type: boolean
+        is_cdrom:
+          type: boolean
+        is_empty:
+          type: boolean
+        is_scsi_pass_through:
+          type: boolean
+        is_thin_provisioned:
+          type: boolean
+        vm_disk_clone:
+          $ref: '#/components/schemas/create.dto.uhura.VmDiskCloneDTO'
+        vm_disk_clone_external:
+          $ref: '#/components/schemas/create.dto.uhura.VmDiskCloneExternalDTO'
+        vm_disk_create:
+          $ref: '#/components/schemas/create.dto.uhura.VmDiskCreateDTO'
+        vm_disk_passthru_external:
+          $ref: '#/components/schemas/create.dto.uhura.VmDiskPassthruExternalDTO'
+    create.dto.uhura.VmDiskCreateDTO:
+      type: object
+      properties:
+        size:
+          format: int64
+          type: integer
+        storage_container_uuid:
+          type: string
+    create.dto.uhura.VmDiskPassthruExternalDTO:
+      type: object
+      properties:
+        external_disk_url:
+          type: string
+        storage_container_uuid:
+          type: string
+    create.dto.acropolis.VMDiskAddressDTO:
+      type: object
+      properties:
+        device_bus:
+          enum:
+          - SCSI
+          - IDE
+          - PCI
+          - SATA
+          - SPAPR
+          - NVME
+          type: string
+        device_index:
+          format: int32
+          type: integer
+        device_uuid:
+          type: string
+        disk_label:
+          type: string
+        is_cdrom:
+          type: boolean
+        ndfs_filepath:
+          type: string
+        vmdisk_uuid:
+          type: string
+        volume_group_uuid:
+          type: string
+    create.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    create.dto.uhura.VMDiskAttachDTO:
+      type: object
+      properties:
+        uuid:
+          type: string
+        vm_disks:
+          items:
+            $ref: '#/components/schemas/create.dto.uhura.VMDiskDTO'
+          type: array
+    create.dto.uhura.VmDiskCloneDTO:
+      type: object
+      properties:
+        disk_address:
+          $ref: '#/components/schemas/create.dto.acropolis.VMDiskAddressDTO'
+        minimum_size:
+          format: int64
+          type: integer
+        snapshot_group_uuid:
+          type: string
+        storage_container_uuid:
+          type: string

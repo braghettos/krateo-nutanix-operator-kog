@@ -1,0 +1,1284 @@
+openapi: 3.0.0
+info:
+  version: 3.1.0
+  description: "# Introduction\n\n**Representational state transfer ( REST )** Application Programming Interface (API) 3.0\
+    \ is based on an intentful API philosophy. According to the intentful API philosophy the machine should handle the programming\
+    \ instead of the user enabling the datacenter administrator able to focus on the other tasks. You need to specify the\
+    \ end state of an entity and the system will compile and execute a series of steps to achieve the defined end state of\
+    \ the entity. The progress to achieve the desired state is tracked through waits and events. This approach is similar\
+    \ to the Google Kubernetes standard.\n\nAll the entities and the list of entities follow a homogenous specification format\
+    \ resulting in ease of programming despite different entities being involved. Also, this enables the user to get familiar\
+    \ with the APIs quickly.\n\nIntentful APIs reduces the number of action verbs required to achieve the desired state of\
+    \ an entity. Most of the changes can be achieved by defining the desired state of an entity rather than through a series\
+    \ of action verbs.\n\nAll API users should have valid Prism login credentials to send API calls to the Prism server. \
+    \ APIs on nutanix.dev portal are publicly available to all valid users without special permissions for viewing purposes.\n\
+    \nThis document covers APIs that are available in pc2022.11 release.  \n\n## Terminology\n\n| Item                  |\
+    \ Description                                                                                                        \
+    \                                                     |\n| --------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------\
+    \ |\n| Entity                | An object that is managed through an API.                                             \
+    \                                                                                  |\n| Kind                  | Represents\
+    \ the type of entity. For example, VM or alerts.                                                                     \
+    \                                          |\n| Resource Kind         | An entity that represents a physical or virtual\
+    \ infrastructure resource. For example, VM or an application.                                                        \
+    \     |\n| Helper Kind           | An entity that is not an infrastructure resource, but represents the entity that is\
+    \ used along with the infrastructure resources. For example, alert, event, or status. |\n| Basic Resource Kind   | An\
+    \ entity type that is a primary resource. For example, VM.                                                           \
+    \                                                  |\n| Related Resource Kind | An entity type that is automatically defined\
+    \ by the system and is related to the basic Kind entities. For example, vm_snapshot.                                 \
+    \        |\n| Type                  | Represents sub-categories or sub-objects of the top-level resource types. For example,\
+    \ reference.                                                                       |\n| Resource Limit        | An entity\
+    \ type that represents a quota of resources of different types.                                                      \
+    \                                           |\n| Snapshot              | Represents the state of resources and policies\
+    \ of an entity at a particular point of time.                                                                        \
+    \      |\n| Backup                | An automatically created aggregation object that collects all the snapshots for the\
+    \ same object within the same resource pool.                                          |\n| Profile               | A profile\
+    \ is a set of resources and policy specifications that is applied to an entity.                                      \
+    \                                           |\n| Template              | A template is a specification that generates\
+    \ valid entities by providing input parameters.                                                                      \
+    \        |\n| Spec                  | A section in the request json, which represents an entity, that expresses the desired\
+    \ state of the entity.                                                              |\n| Status                | A section\
+    \ in the json representation that expresses the current state of the entity.                                         \
+    \                                           |\n\n## Rules\n\n- The metadata section has fields that relate to all kinds\
+    \ of entities and can be updated instantly by the system.\n- The spec section cannot be updated after initialization by\
+    \ the system without a user or automation intervention.\n- The status section has a copy of the currently enforced version\
+    \ of the spec section and other fields that are managed or updated automatically by the system. Few fields in the status\
+    \ section can be updated by the user as well.\n- The parent_reference field is mandatory for snapshot and backup entities\
+    \ and is present in the normal entities, if the entities are created with the parent_reference field populated (clone\
+    \ or restore).\n- Any field that represents a defined type has the type name as a suffix. For example, backup_factory\
+    \ and vm_reference.\n\n## Known Issues and limitations:\n\nThis section describes some of the issues identified in V3\
+    \ APIs that you might encounter.\n\n- **ENG-321951**- While attempting to get a list of all VMs on Prism Central, we have\
+    \ observed that only AHV VMs are returned, but ESXi VM list is not retrieved.\n\n- **ENG-453487**- Users with insufficient\
+    \ permissions receive an HTTP 200 response instead of an HTTP 403 response for view alert API requests. These users can\
+    \ be like \"Developer\", \"Operator\", or custom roles that do not have sufficient permission to view alerts. This is\
+    \ a generic issue for all V3 API requests with insufficient permissions.\n\n\n### [Nutanix API versions \u2013 What are\
+    \ they and what does each one do?](https://developer.nutanix.com/2019/01/15/nutanix-api-versions-what-are-they-and-what-does-each-one-do/)\n\
+    \n\n### [What to expect post pc.2022.1 release?](https://www.nutanix.dev/api_references/prism-central-v3/#/ZG9jOjM2MzQyMjUz-v3-api-behavior-changes-with-pc-2022-1-release)\n\
+    \n# Getting Started\n\n## Components of a REST API\n\nA REST API request and response can be classified into the following\
+    \ components.\n\nThe request URI consists of {URI-scheme} :// {URI-host} / {<Port-number>/<Base-path>} ? {query-string}.\n\
+    \n| Item                    | Description                                                                            \
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \                                                                         |\n| ----------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\
+    \ |\n| URI scheme              | Indicates the protocol that is used to transmit the request. For example, http or https.\
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \                                                                        |\n| URI host                | Specifies the\
+    \ domain name or IP address of the server where the REST service endpoint is hosted. For example, prism.nutanix.com or\
+    \ 10.11.12.13.                                                                                                       \
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \                              |\n| Port number             | Indicates the port number that is used for HTTP communications\
+    \ from the REST API clients to the REST API server.                                                                  \
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \                                                                                                  |\n| Basepath     \
+    \           | Indicates the URL prefix that is common to all the API server endpoints. For example, for <https://10.11.12.13/PrismGateway/services/rest/v2.0/vms>,\
+    \ the basepath is /PrismGateway/services/rest/v2.0.                                                                  \
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \            |\n| Path parameters         | Path parameters are part of the endpoint. For example, <https://10.11.12.13/PrismGateway/services/rest/v2.0/vms/750eb5ba-2de0-4ca4-8d6f-786364817f94/>,\
+    \ the UUID of the VM (750eb5ba-2de0-4ca4-8d6f-786364817f94) is a path parameter.                                     \
+    \                                                                                                                    \
+    \                                                                                                                    \
+    \         |\n| Query string parameters | Query string parameters appear after a question mark (?) in the endpoint. The\
+    \ question mark followed by the parameters and their values is referred as the query string. In the query string, each\
+    \ parameter is listed one right after the other with an ampersand (&). The order of the query string parameters does not\
+    \ matter. For example, <https://10.11.12.13/PrismGateway/services/rest/v2.0/vms/750eb5ba-2de0-4ca4-8d6f-786364817f94?include_vm_disk_config=true>,\
+    \ the include_vm_disk_config is a query parameter. |\n\nHTTP defines methods to indicate the desired action to be performed\
+    \ on the identified resource.\n\n| Method | Description                                    |\n| ------ | :---------------------------------------------\
+    \ |\n| Get    | Retrieves a resource                           |\n| Post   | Creates a resource                      \
+    \       |\n| Put    | Updates or creates within an existing resource |\n| Delete | Removes the resource              \
+    \             |\n\nHTTP request headers provide meta-information about a request. The request body contains the data that\
+    \ client wants to send to the server. For example, Content-Type and Content-Transfer-Encoding.\n\nHTTP response headers\
+    \ provide meta-information about a response. The response consists of status code (three-digit number), content type,\
+    \ and body of the response.\n\n| Item                | Description                                                   \
+    \                   |\n| ------------------- | :-------------------------------------------------------------------------------\
+    \ |\n| 1xx - Informational | Communicates transfer protocol-level information.                                |\n| 2xx\
+    \ - Success       | Indicates that the client request is successfully accepted.                      |\n| 3xx - Redirection\
+    \   | Indicates that the client must take some additional steps to complete an action. |\n| 4xx - Client Error  | Indicates\
+    \ that there is some error from the client side.                         |\n| 5xx - Server Error  | Indicates that there\
+    \ is some error from the server side.                         |\n\n## Entity Structure\n\nAn entity structure comprises\
+    \ of the following components.\n\n- **Metadata** - Metadata provides high-level information about the related entity including\
+    \ entity uuid, kind, and spec_version.\n- **Status** - Status provides information about the current state of the related\
+    \ entity including entity name, state, and entity-specific status information.\n- **Specification** - For a GET request,\
+    \ the specification section of the JSON response displays similar information as status section. However, for of POST\
+    \ request, the specification section provide details of what should be the desired state of the entity. For example, you\
+    \ can use the following JSON payload to create a basic VM. The payload denotes the minimum parameters required to create\
+    \ a VM by using the V3 APIs. All the missing specification items like CPU and RAM are configured with default values.\n\
+    \n```\n{\n\"spec\":{\n\"name\":\"NewVM\",\n\"resources\":{\n}\n},\n\"metadata\":{\n\"kind\":\"vm\"\n}\n}\n```\n\n# Authentication\n\
+    \nAll requests to the Nutanix REST APIs must be authenticated. The following authentication types are supported.\n\n-\
+    \ **Basic Authentication**: The user provides username and password every time a request is sent as the authentication\
+    \ header.\n- **Session Authentication**: The user credentials are stored in a cookie.\n\n**Cookie Consumption**\n\nTo\
+    \ reduce the number of cookies generated in the system, Nutanix recommends that you make the first API call using basic\
+    \ credentials to receive the cookies and then instead of sending the credentials, cache and send the following cookies\
+    \ to authenticate subsequent requests.\n\n**For Prism Central with IAMv2 enabled:**\n\n- NTNX_MERCURY_IAM_SESSION\n- NTNX_IAM_SESSION\n\
+    - NTNX_MERCURY_IAM_REFRESH_TOKEN\n\n**For Prism Central with IAMv2 disabled or Prism Element:**\n\n- NTNX_IGW_SESSION\n\
+    - NTNX_MERCURY_IGW_SESSION\n- JSESSIONID(If present)\n\n**Note:** Upon cookie expiration, you must send basic credentials\
+    \ again in the next API call, to obtain the new cookies.\n\nThe following are the code snippets to authenticate a user.\n\
+    \n**Python**\n\n```\n#!/usr/bin/env python3.7\nimport urllib3\nimport requests\nfrom base64 import b64encode\nurllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)\n\
+    request_url = 'https://10.0.0.1:9440/api/nutanix/v3/vms/list'\nusername = 'admin'\npassword = 'password'\nencoded_credentials\
+    \ = b64encode(bytes(f'{username}:{password}',\nencoding='ascii')).decode('ascii')\nauth_header = f'Basic {encoded_credentials}'\n\
+    payload = '{\"kind\":\"vm\"}'\nheaders = {'Accept': 'application/json', 'Content-Type': 'application/json',\n'Authorization':\
+    \ f'{auth_header}', 'cache-control': 'no-cache'}\nresponse = requests.request('post', request_url, data=payload, headers=headers,\n\
+    verify=False)\nprint(response.status_code)\n```\n\n**C#**\n\n```\nusing System;\nusing System.Net;\nusing System.Text;\n\
+    namespace ConsoleApp1\n{\nclass Program\n{\nstatic void Main(string[] args)\n{\nstring ClusterUsername = \"admin\";\n\
+    string ClusterPassword = \"Ntnx2017!\";\nstring RequestUrl = \"https://192.168.1.131:9440/api/nutanix/v3/vms/list\";\n\
+    string Payload = \"{\\\"kind\\\":\\\"vm\\\"}\";\nstring AuthHeader = System.Convert.ToBase64String(\nSystem.Text.ASCIIEncoding.ASCII.GetBytes(\n\
+    ClusterUsername + \":\" + ClusterPassword));\nServicePointManager.ServerCertificateValidationCallback = (\n(sender, certificate,\
+    \ chain, sslPolicyErrors) => true);\nServicePointManager.Expect100Continue = true;\nServicePointManager.SecurityProtocol\
+    \ = SecurityProtocolType.Tls12;\nString authHeader = System.Convert.ToBase64String(\nSystem.Text.ASCIIEncoding.ASCII.GetBytes(\n\
+    ClusterUsername + \":\" + ClusterPassword));\nvar request = (HttpWebRequest)WebRequest.Create(RequestUrl);\nvar requestBody\
+    \ = Encoding.ASCII.GetBytes(Payload);\nHttpWebResponse HttpResponse = null;\nrequest.Headers.Add(\"Authorization\", \"\
+    Basic \" + AuthHeader);\nrequest.Headers.Add(\"Accept-Encoding\", \"application/json\");\nrequest.ContentType = \"application/json\"\
+    ;\nrequest.Accept = \"application/json\";\nrequest.Method = \"POST\";\nvar newStream = request.GetRequestStream();\nnewStream.Write(requestBody,\
+    \ 0, requestBody.Length);\nnewStream.Close();\nHttpResponse = (HttpWebResponse)request.GetResponse();\nConsole.WriteLine(HttpResponse.StatusCode);\n\
+    Console.ReadKey();\n}\n}\n}\n```\n\n**PowerShell**\n\n```\n# set the basic properties for the request\n$RequestUri = \"\
+    https://10.0.0.1:9440/api/nutanix/v3/vms/list\"\n$Payload = \"{\"\"kind\"\":\"\"vm\"\"}\"\n$Username = \"admin\"\n$Password\
+    \ = \"password\"\n# create the HTTP Basic Authorization header\n$pair = $Username + \":\" + $Password\n$bytes = [System.Text.Encoding]::ASCII.GetBytes($pair)\n\
+    $base64 = [System.Convert]::ToBase64String($bytes)\n$basicAuthValue = \"Basic $base64\"\n# setup the request headers\n\
+    $Headers = @{\n'Accept' = 'application/json'\n'Authorization' = $basicAuthValue\n'Content-Type' = 'application/json'\n\
+    }\n# disable SSL certification verification\n# you probably shouldn't do this in production ...\nif (-not (\n[System.Management.Automation.PSTypeName]\
+    \ `\n'ServerCertificateValidationCallback').Type)\n{$certCallback = @\"\nusing System;\nusing System.Net;\nusing System.Net.Security;\n\
+    using System.Security.Cryptography.X509Certificates;\npublic class ServerCertificateValidationCallback\n{\npublic static\
+    \ void Ignore()\n{\nif(ServicePointManager.ServerCertificateValidationCallback ==null)\n{\nServicePointManager.ServerCertificateValidationCallback\
+    \ +=\ndelegate\n(\nObject obj,\nX509Certificate certificate,\nX509Chain chain,\nSslPolicyErrors errors\n)\n{\nreturn true;\n\
+    };\n}\n}\n}\n\"@\nAdd-Type $certCallback\n}\n[ServerCertificateValidationCallback]::Ignore()\n[Net.ServicePointManager]::SecurityProtocol\
+    \ = [Net.SecurityProtocolType]::Tls12\n# submit the request\nInvoke-WebRequest `\n-Uri $RequestUri `\n-Headers $Headers\
+    \ `\n-Method \"POST\" `\n-Body $Payload `\n-TimeoutSec 5 `\n-UseBasicParsing `\n-DisableKeepAlive `\n| ConvertFrom-Json\
+    \ | Select *\n```\n\n**PHP**\n\n```\n<?php\n$username = 'admin';\n$password = 'password';\n$ch = curl_init();\ncurl_setopt_array($ch,\
+    \ [\nCURLOPT_RETURNTRANSFER => 1,\nCURLINFO_HEADER_OUT => TRUE,\nCURLOPT_URL => 'https://10.0.0.1:9440/api/nutanix/v3/vms/list',\n\
+    CURLOPT_USERPWD => $username . ':' . $password, CURLOPT_POST => 1, CURLOPT_SSL_VERIFYHOST => FALSE, CURLOPT_SSL_VERIFYPEER\
+    \ => FALSE,\nCURLOPT_HTTPHEADER => [\n'Content-Type: application/json',\n'Accept-Encoding: application/json',\n],\nCURLOPT_POSTFIELDS\
+    \ => json_encode([\n'kind' => 'vm'\n])\n]);\n$result = curl_exec($ch);\ncurl_close($ch);\nif(!$result) {\ndie('Error:\
+    \ \"' . curl_error($ch) . '\". Code: ' . curl_errno($ch));\n}\nelse {\necho($result);\n}\n```\n# pc.2022.1 release\n\n\
+    ## v3 API behavior changes with pc.2022.1 release\n\n\nFrom Prism Central release 2022.1 onwards, the v3 intentful API\
+    \ is enhanced to protect data consistency, especially in concurrent race conditions. As a result of this enhancement,\
+    \ response time for the synchronous API requests is improved and there are some behavior changes from an API consumption\
+    \ perspective. \n\n1.  In the current v3 API workflow, clients will get a synchronous API response that contains task\
+    \ and entity UUID. Post which clients should send GET API on the task periodically until the task succeeds or fails. Clients\
+    \ can also send GET API on the entity. \n  \n    - **Behavioral changes**: Some of the synchronous errors will be reported\
+    \ asynchronously now.  \n    \n    1. **Invalid idempotency UUID error**:\n            \n         **Current API behavior**:\
+    \ If POST API contains invalid idempotency UUID, clients will receive a     synchronous bad request error with an HTTP\
+    \ code 400.\n\n         **Expected change**: If POST API contains invalid idempotency UUID, clients will get a synchronous\
+    \ API response with an HTTP code 202(accepted). GET API on the task will return a bad request error.\n\n    1. **Authorization\
+    \ errors**:\n\n          **Current API behavior**: Clients will get synchronous authorization errors (for example- HTTP\
+    \ code 403 forbidden error).\n\n          **Expected change**: Clients will get a synchronous API response with an HTTP\
+    \ code 202 (accepted). GET API on the task will show an authorization error. \n\n    1. **Incorrect category mapping error**:\n\
+    \n          **Current API behavior**: If an intentful API payload has a project reference and uses categories mapping\
+    \ but the category for the project does not exist, the client will get an error response with an HTTP code 404(not found).\n\
+    \n          **Expected change**: If an intentful API payload has a project reference and uses categories mapping but the\
+    \ category for the project does not exist, the client will receive a synchronous API response with an HTTP code 202 (accepted).\
+    \ GET API on the task will show a \u201Cnot found\u201D error.\n\n    1.  **Invalid user detail error**:\n\n         \
+    \ **Current API behavior**: If an intentful API payload has user_uuid or username in owner_reference but the corresponding\
+    \ user does not exist, the client will receive an API response with an HTTP code 404.\n\n          **Expected change**:\
+    \ If an intentful API payload has user_uuid or username in owner_reference but the corresponding user does not exist,\
+    \ clients will get a synchronous API response with an HTTP code 202(accepted). GET API on the task will show a bad request\
+    \ error.   \n\n    1.  . **Missing user detail error**:\n\n         **Current API behavior**: If an intentful API payload\
+    \ does not have user_uuid or username in owner_reference and the login user does not exist, the client will get an API\
+    \ response with an HTTP code 404.\n\n         **Expected change**: If an intentful API payload does not have user_uuid\
+    \ or username in owner_reference and login user does not exist, clients will get a synchronous API response with an HTTP\
+    \ code 202(accepted). GET API on the task will show a bad request error.\n\n    -  **Format changes** for some of the\
+    \ synchronous API responses:\n        \n        **Current API behavior**: Response to an intentful POST, PUT, or DELETE\
+    \ API will contain tenant_uuid, owner_uuid, owner_username, service_name, session_log_uuid, trace, user_uuid, username,\
+    \ remote_authorization, session_json_dict, incap_req_id, project_reference or category information.\n        \n      \
+    \  **Expected change**: Main processing will occur after a synchronous response to the client. As a result,  synchronous\
+    \ response to an intentful POST, PUT, or DELETE API will not contain tenant_uuid, owner_uuid, owner_username, service_name,\
+    \ session_log_uuid, trace, user_uuid, username, remote_authorization, session_json_dict, incap_req_id, project_reference\
+    \ or category information.\n        \n        If API consumers are expecting these properties in the synchronous response\
+    \ before, they have to submit a GET/LIST request to inspect these properties.\n\n2.  The version control workflow for\
+    \ v3 intentful PUT and DELETE APIs:\n   - **Absolutely no version control check for DELETE APIs**:\n        \n       \
+    \ **Current API behavior**: DELETE API will fail if an incorrect spec_version is provided as one of the request arguments.\n\
+    \        \n        **Expected change**:  DELETE API will always delete the entity. No version control is applicable on\
+    \ the DELETE request.\n  \n   - **Edit conflict error could be reported asynchronously**:\n\n      **Current API behavior**:\
+    \ If v3 PUT APIs are conflicting with v2 PUT APIs on the same entities, the client will receive an HTTP code 409 response\
+    \ for v3 PUT APIs.\n\n     **Expected change**: If v3 PUT APIs are conflicting with v2 PUT APIs on the same entities,\
+    \ the client will receive an HTTP code 202 response for v3 PUT APIs and will receive the task failed response with an\
+    \ edit conflict error asynchronously.\n\n   - **More restrictive version control by using spec_hash**:\n        \n   \
+    \    **Current API behavior**: GET/LIST API will return a response that may contain one of the values for version control,\
+    \ it could be spec_version or spec_hash. spec_version is numeric while spec_hash is a string.\n        \n        Whichever\
+    \ value is provided in the GET/LIST API, the same value should be included in the next PUT API payload of the same entity.\n\
+    \n      **Expected change**: GET/LIST API will provide both spec_hash and spec_version in API response. Use of spec_hash\
+    \ is not enforced but could be enforced in future releases.\n\n \n\n   - **The version control value in the GET API response\
+    \ will not change when a PUT request is in progress**:\n        \n        **Current API behavior**: If there are one GET\
+    \ request and one PUT request on the same entity, the version control value from the GET request response might be different\
+    \ depending on the current state of the entity. The behavior is not deterministic.\n\n        **Expected change**: If\
+    \ there is one GET request and one PUT request on the same entity, the spec_hash value of the GET request response will\
+    \ always be the same as it was before the PUT request until the PUT is completed.\n\n\n 1. V3 intentful POST API and the\
+    \ following GET API:\n   -  **Get API request for new entity**:\n\n      **Current API behavior**: If a POST API fails\
+    \ asynchronously, the following GET API on the same entity will get an HTTP code 202 response with the entity in an error\
+    \ state.\n\n        However, GET API on the same entity after 5+ minutes will show an HTTP code 404 response reporting\
+    \ the entity does not exist.\n\n      **Expected change**: If a POST API fails asynchronously, GET API on the same entity\
+    \ will always show an HTTP code 404 response meaning the entity does not exist.\n  \n\n   - **The intent spec is an entity\
+    \ we created to record previous and ongoing requests from v3 POST/PUT/DELETE APIs**. There should be only one intent spec\
+    \ for each entity if the intent spec exists:\n\n        **Current API behavior:** If the client queries intent spec for\
+    \ an entity immediately after getting an HTTP code 202 response for the v3 POST API on this entity, the intent spec will\
+    \ always be present.\n\n        **Expected change**: If the client queries intent spec for an entity immediately after\
+    \ getting an HTTP code 202 response for the v3 POST API on this entity, the intent spec may not be created yet.\n\n4.\
+    \ Prism Central upgrade to pc.2022.1 and following releases:\n\n      **Current API behavior**: The pending and running\
+    \ API requests will continue to execute after an upgrade.\n\n      **Expected change**: During the pc.2022.1 version upgrade,\
+    \ all pending and running API requests and related tasks will be marked as failed after a restart. This will be shown\
+    \ even though they may be in progress and completed in the middle of the upgrade period.\n      This behavior only applies\
+    \ to upgrades from releases before pc.2022.1 to releases equal to or after pc.2022.1. All future upgrades from pc.2022.1\
+    \ release will remain the same as before where pending and running API requests will continue to execute after an upgrade.\n\
+    \n5. Multiple nodes upgrade:\n  -   pc.2022.1 version can take care of the scenarios where Prism Central has the new version\
+    \ and Prism Element is still at the older version.\n    \n  -   Any task (for existing create, update, delete v3 API operations)\
+    \ that is in running state during the upgrade will be marked failed. This also applies to new requests that come before\
+    \ the upgrade ends. The recommendation is to wait until the upgrade finishes before executing any v3 create, update, delete\
+    \ API.\n   \n6. Schema consistency:\n   - API schema in Prism Central will be used in case there is a\n     discrepancy\
+    \ between Prism Element and Prism Central. There will be a\n     change of behavior when Prism Central has a post pc.2022.1\
+    \ version.\n\n      **Current API behavior**: API responses for POST, PUT, and DELETE API on Prism Central will match\
+    \ API schema on Prism Element.\n\n          **Expected change**: API response for POST, PUT, and DELETE API on Prism Central\
+    \ will match API schema on Prism Central.\n\n# Use Cases          \n\n## Post /VMs\n\nPerform the following procedure\
+    \ to generate the code snippet for creating a VM based on the input parameters.\n\n1. Under **VMs**, click **POST VMs**\
+    \ and navigate to the end of the page.\n2. In the **Code Generation** panel, under the **Settings** tab, enter the value\
+    \ of the following parameters.\n   1. Enter the username of the Prism Central in the **Username** field.\n   2. Enter\
+    \ the password in the **Password** field.\n   3. Enter the IP address of the Prism Central in the **Host** field.\n3.\
+    \ Under the **Body** tab, enter the value of all the required parameters as described in the **Request Body** section.\
+    \ Optionally, you can also enter the values of the optional parameters.\n   1. Under **Specification**, enter the description\
+    \ of VM in a string format against the **description** attribute. The maximum length allowed is 1000 characters only.\n\
+    \   2. Under **Resources** do the following.\n      1. Enter the value of number of logical threads per core in an integer\
+    \ format against the **num_threads_per_core** attribute. The minimum value allowed is 1.\n      2. Enter the value of\
+    \ current or desired power state of the VM in a string format against the **power_state** attribute.\n      3. Enter the\
+    \ value of number of vCPUs per socket in an integer format against the **num_vcpus_per_socket** attribute. The minimun\
+    \ value allowed is 1.\n      4. Enter the value of number of vCPU sockets in an integer format against the **num_sockets**\
+    \ attribute. The minimum value allowed is 1.\n   3. Under **Name**, enter the name of the VM in a string format. The maximum\
+    \ length allowed is 64 characters only.\n   4. Under **Metadata** do the following.\n      1. The **last_update_time**\
+    \ is a read-only attribute indicating UTC date and time in an RFC-339 format, when the VM was last updated in a string\
+    \ format.\n      2. The **kind** is a read-only attribute indicating the kind name in a string format. The default value\
+    \ is VM.\n      3. Enter the value of VM uuid in a string format against the **uuid** attribute. The valid pattern is\
+    \ ^\\[a-fA-F0-9]{8}-\\[a-fA-F0-9]{4}-\\[a-fA-F0-9]{4}-\\[a-fA-F0-9]{4}-\\[a-fAF0-9]{12}$.\n4. Under the **Code Generation**\
+    \ tab, select the scripting languages to view the code snippet of creating a VM.\n\n   You can either select Python or\
+    \ PowerShell or Shell or Go or Java or JavaScript or Node or Obj-C or PHP or Ruby or Swift or C# or C.\n\n   The code\
+    \ snippet appears in the selected scripting language. You can use the code snippet to create a VM in your environment.\n\
+    \n## Put /VMs\n\nPerform the following procedure to generate the code snippet for updating an existing VM based on the\
+    \ input parameters.\n\n1. Under **VMs**, click **PUT VMs** and navigate to the end of the page.\n2. In the **Code Generation**\
+    \ panel, under the **Settings** tab, enter the value of the following parameters.\n   1. Enter the UUID of the VM that\
+    \ needs to be updated in the **UUID** field.\n   2. Enter the username of the Prism Central in the **Username** field.\n\
+    \   3. Enter the password in the **Password** field.\n   4. Enter the IP address of the Prism Central in the **Host**\
+    \ field.\n3. Under the **Body** tab, enter the value of all the required parameters as described in the **Request Body**\
+    \ section. Optionally, you can also enter the values of the optional parameters.\n   1. Under **Specification**, enter\
+    \ the description of VM in a string format against the **description** attribute. The maximum length allowed is 1000 characters\
+    \ only.\n   2. Under **Resources** do the following.\n      1. Enter the value of number of logical threads per core in\
+    \ an integer format against the **num_threads_per_core** attribute. The minimum value allowed is 1.\n      2. Enter the\
+    \ value of current or desired power state of the VM in a string format against the **power_state** attribute.\n      3.\
+    \ Enter the value of number of vCPUs per socket in an integer format against the **num_vcpus_per_socket** attribute. The\
+    \ minimun value allowed is 1.\n      4. Enter the value of number of vCPU sockets in an integer format against the **num_sockets**\
+    \ attribute. The minimum value allowed is 1.\n   3. Under **Name**, enter the name of the VM in a string format. The maximum\
+    \ length allowed is 64 characters only.\n   4. Under **Metadata** do the following.\n      1. The **last_update_time**\
+    \ is a read-only attribute indicating UTC date and time in an RFC-339 format, when the VM was last updated in a string\
+    \ format.\n      2. The **kind** is a read-only attribute indicating the kind name in a string format. The default value\
+    \ is VM.\n      3. Enter the value of VM uuid in a string format against the **uuid** attribute. The valid pattern is\
+    \ ^\\[a-fA-F0-9]{8}-\\[a-fA-F0-9]{4}-\\[a-fA-F0-9]{4}-\\[a-fA-F0-9]{4}-\\[a-fAF0-9]{12}$.\n4. Under the **Code Generation**\
+    \ tab, select the scripting languages to view the code snippet of creating a VM.\n\n   You can either select Python or\
+    \ PowerShell or Shell or Go or Java or JavaScript or Node or Obj-C or PHP or Ruby or Swift or C# or C.\n\n   The code\
+    \ snippet appears in the selected scripting language. You can use the code snippet to update a VM in your environment.\n"
+  title: Nutanix Intentful API
+servers:
+- url: https://ip_address:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /directory_services:
+    post:
+      responses:
+        '202':
+          description: Request Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/directory_service_intent_response'
+      requestBody:
+        $ref: '#/components/requestBodies/directory_service_intent_input'
+      tags:
+      - directory_services
+      summary: Create a new directory service configuration
+      x-ntnx-operations:
+      - add
+      x-ntnx-kind: directory_service
+      description: 'This operation submits a request to create a new directory service configuration based on the input parameters.
+
+        '
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://ip_address:9440/api/nutanix/v3/directory_services \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"metadata\": {\n        \"categories\": {\n            \"property1\"\
+          : \"string\",\n            \"property2\": \"string\"\n        },\n        \"categories_mapping\": {\n          \
+          \  \"property1\": [\n                \"string\"\n            ],\n            \"property2\": [\n                \"\
+          string\"\n            ]\n        },\n        \"owner_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n        },\n        \"project_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n\
+          \        },\n        \"should_force_translate\": true,\n        \"spec_hash\": \"string\",\n        \"spec_version\"\
+          : 0,\n        \"use_categories_mapping\": false,\n        \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n \
+          \   },\n    \"spec\": {\n        \"name\": \"string\",\n        \"resources\": {\n            \"admin_group_reference_list\"\
+          : [\n                {\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n               \
+          \ }\n            ],\n            \"admin_user_reference_list\": [\n                {\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"directory_type\": \"\
+          string\",\n            \"domain_name\": \"string\",\n            \"open_ldap_configuration\": {\n              \
+          \  \"user_configuration\": {\n                    \"user_object_class\": \"string\",\n                    \"user_search_base\"\
+          : \"string\",\n                    \"username_attribute\": \"string\"\n                },\n                \"user_group_configuration\"\
+          : {\n                    \"group_member_attribute\": \"string\",\n                    \"group_member_attribute_value\"\
+          : \"string\",\n                    \"group_object_class\": \"string\",\n                    \"group_search_base\"\
+          : \"string\"\n                }\n            },\n            \"secondary_urls\": [\n                \"string\"\n\
+          \            ],\n            \"service_account\": {\n                \"password\": \"string\",\n               \
+          \ \"username\": \"string\"\n            },\n            \"url\": \"string\"\n        }\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"metadata\"\
+          : {\n        \"categories\": {\n            \"property1\": \"string\",\n            \"property2\": \"string\"\n\
+          \        },\n        \"categories_mapping\": {\n            \"property1\": [\n                \"string\"\n     \
+          \       ],\n            \"property2\": [\n                \"string\"\n            ]\n        },\n        \"owner_reference\"\
+          : {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        },\n        \"project_reference\":\
+          \ {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        },\n        \"should_force_translate\"\
+          : true,\n        \"spec_hash\": \"string\",\n        \"spec_version\": 0,\n        \"use_categories_mapping\": false,\n\
+          \        \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n    },\n    \"spec\": {\n        \"name\": \"string\"\
+          ,\n        \"resources\": {\n            \"admin_group_reference_list\": [\n                {\n                \
+          \    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"admin_user_reference_list\"\
+          : [\n                {\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n               \
+          \ }\n            ],\n            \"directory_type\": \"string\",\n            \"domain_name\": \"string\",\n   \
+          \         \"open_ldap_configuration\": {\n                \"user_configuration\": {\n                    \"user_object_class\"\
+          : \"string\",\n                    \"user_search_base\": \"string\",\n                    \"username_attribute\"\
+          : \"string\"\n                },\n                \"user_group_configuration\": {\n                    \"group_member_attribute\"\
+          : \"string\",\n                    \"group_member_attribute_value\": \"string\",\n                    \"group_object_class\"\
+          : \"string\",\n                    \"group_search_base\": \"string\"\n                }\n            },\n      \
+          \      \"secondary_urls\": [\n                \"string\"\n            ],\n            \"service_account\": {\n \
+          \               \"password\": \"string\",\n                \"username\": \"string\"\n            },\n          \
+          \  \"url\": \"string\"\n        }\n    }\n}' \\\n    --output-document \\\n    - https://ip_address:9440/api/nutanix/v3/directory_services"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"ip_address:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"metadata\": {\n        \"categories\": {\n            \"property1\": \"string\"\
+          ,\n            \"property2\": \"string\"\n        },\n        \"categories_mapping\": {\n            \"property1\"\
+          : [\n                \"string\"\n            ],\n            \"property2\": [\n                \"string\"\n    \
+          \        ]\n        },\n        \"owner_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n        },\n        \"project_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n\
+          \        },\n        \"should_force_translate\": true,\n        \"spec_hash\": \"string\",\n        \"spec_version\"\
+          : 0,\n        \"use_categories_mapping\": false,\n        \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n \
+          \   },\n    \"spec\": {\n        \"name\": \"string\",\n        \"resources\": {\n            \"admin_group_reference_list\"\
+          : [\n                {\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n               \
+          \ }\n            ],\n            \"admin_user_reference_list\": [\n                {\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"directory_type\": \"\
+          string\",\n            \"domain_name\": \"string\",\n            \"open_ldap_configuration\": {\n              \
+          \  \"user_configuration\": {\n                    \"user_object_class\": \"string\",\n                    \"user_search_base\"\
+          : \"string\",\n                    \"username_attribute\": \"string\"\n                },\n                \"user_group_configuration\"\
+          : {\n                    \"group_member_attribute\": \"string\",\n                    \"group_member_attribute_value\"\
+          : \"string\",\n                    \"group_object_class\": \"string\",\n                    \"group_search_base\"\
+          : \"string\"\n                }\n            },\n            \"secondary_urls\": [\n                \"string\"\n\
+          \            ],\n            \"service_account\": {\n                \"password\": \"string\",\n               \
+          \ \"username\": \"string\"\n            },\n            \"url\": \"string\"\n        }\n    }\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"/api/nutanix/v3/directory_services\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\
+          \nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://ip_address:9440/api/nutanix/v3/directory_services\"\n\t\n\tpayload :=  strings.NewReader(`{\"metadata\"\
+          : {\"categories\": {\"property1\": \"string\", \"property2\": \"string\"}, \"categories_mapping\": {\"property1\"\
+          : [\"string\"], \"property2\": [\"string\"]}, \"owner_reference\": {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"project_reference\": {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}, \"should_force_translate\": true,\
+          \ \"spec_hash\": \"string\", \"spec_version\": 0, \"use_categories_mapping\": false, \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"spec\": {\"name\": \"string\", \"resources\": {\"admin_group_reference_list\": [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"admin_user_reference_list\": [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"directory_type\": \"\
+          string\", \"domain_name\": \"string\", \"open_ldap_configuration\": {\"user_configuration\": {\"user_object_class\"\
+          : \"string\", \"user_search_base\": \"string\", \"username_attribute\": \"string\"}, \"user_group_configuration\"\
+          : {\"group_member_attribute\": \"string\", \"group_member_attribute_value\": \"string\", \"group_object_class\"\
+          : \"string\", \"group_search_base\": \"string\"}}, \"secondary_urls\": [\"string\"], \"service_account\": {\"password\"\
+          : \"string\", \"username\": \"string\"}, \"url\": \"string\"}}}`)\n\treq, err := http.NewRequest(\"POST\", url,\
+          \ payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://ip_address:9440/api/nutanix/v3/directory_services\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"metadata\\\": {\\\"categories\\\": {\\\
+          \"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"categories_mapping\\\": {\\\"property1\\\
+          \": [\\\"string\\\"], \\\"property2\\\": [\\\"string\\\"]}, \\\"owner_reference\\\": {\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \"}, \\\"project_reference\\\": {\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}, \\\"should_force_translate\\\
+          \": true, \\\"spec_hash\\\": \\\"string\\\", \\\"spec_version\\\": 0, \\\"use_categories_mapping\\\": false, \\\"\
+          uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}, \\\"spec\\\": {\\\"name\\\": \\\"string\\\", \\\"resources\\\
+          \": {\\\"admin_group_reference_list\\\": [{\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"admin_user_reference_list\\\
+          \": [{\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"directory_type\\\": \\\"string\\\", \\\"\
+          domain_name\\\": \\\"string\\\", \\\"open_ldap_configuration\\\": {\\\"user_configuration\\\": {\\\"user_object_class\\\
+          \": \\\"string\\\", \\\"user_search_base\\\": \\\"string\\\", \\\"username_attribute\\\": \\\"string\\\"}, \\\"\
+          user_group_configuration\\\": {\\\"group_member_attribute\\\": \\\"string\\\", \\\"group_member_attribute_value\\\
+          \": \\\"string\\\", \\\"group_object_class\\\": \\\"string\\\", \\\"group_search_base\\\": \\\"string\\\"}}, \\\"\
+          secondary_urls\\\": [\\\"string\\\"], \\\"service_account\\\": {\\\"password\\\": \\\"string\\\", \\\"username\\\
+          \": \\\"string\\\"}, \\\"url\\\": \\\"string\\\"}}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://ip_address:9440/api/nutanix/v3/directory_services';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"metadata\": {\"categories\": {\"property1\": \"string\", \"property2\": \"string\"}, \"categories_mapping\"\
+          : {\"property1\": [\"string\"], \"property2\": [\"string\"]}, \"owner_reference\": {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"project_reference\": {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}, \"should_force_translate\": true,\
+          \ \"spec_hash\": \"string\", \"spec_version\": 0, \"use_categories_mapping\": false, \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"spec\": {\"name\": \"string\", \"resources\": {\"admin_group_reference_list\": [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"admin_user_reference_list\": [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"directory_type\": \"\
+          string\", \"domain_name\": \"string\", \"open_ldap_configuration\": {\"user_configuration\": {\"user_object_class\"\
+          : \"string\", \"user_search_base\": \"string\", \"username_attribute\": \"string\"}, \"user_group_configuration\"\
+          : {\"group_member_attribute\": \"string\", \"group_member_attribute_value\": \"string\", \"group_object_class\"\
+          : \"string\", \"group_search_base\": \"string\"}}, \"secondary_urls\": [\"string\"], \"service_account\": {\"password\"\
+          : \"string\", \"username\": \"string\"}, \"url\": \"string\"}}}`\n};\n\ntry {\n  const response = await fetch(url,\
+          \ options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+  /directory_services/{uuid}:
+    put:
+      responses:
+        '202':
+          description: Request Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/directory_service_intent_response'
+        '404':
+          description: Invalid UUID provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/directory_service_status'
+      parameters:
+      - $ref: '#/components/parameters/uuid'
+      requestBody:
+        $ref: '#/components/requestBodies/directory_service_intent_input'
+      tags:
+      - directory_services
+      summary: Update a existing directory service configuration
+      x-ntnx-operations:
+      - update
+      x-ntnx-kind: directory_service
+      description: 'This operation submits a request to update a existing directory service configuration based on the input
+        parameters.
+
+        '
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://ip_address:9440/api/nutanix/v3/directory_services/{uuid} \\\n  \
+          \  --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"metadata\": {\n        \"categories\": {\n         \
+          \   \"property1\": \"string\",\n            \"property2\": \"string\"\n        },\n        \"categories_mapping\"\
+          : {\n            \"property1\": [\n                \"string\"\n            ],\n            \"property2\": [\n  \
+          \              \"string\"\n            ]\n        },\n        \"owner_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n        },\n        \"project_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n\
+          \        },\n        \"should_force_translate\": true,\n        \"spec_hash\": \"string\",\n        \"spec_version\"\
+          : 0,\n        \"use_categories_mapping\": false,\n        \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n \
+          \   },\n    \"spec\": {\n        \"name\": \"string\",\n        \"resources\": {\n            \"admin_group_reference_list\"\
+          : [\n                {\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n               \
+          \ }\n            ],\n            \"admin_user_reference_list\": [\n                {\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"directory_type\": \"\
+          string\",\n            \"domain_name\": \"string\",\n            \"open_ldap_configuration\": {\n              \
+          \  \"user_configuration\": {\n                    \"user_object_class\": \"string\",\n                    \"user_search_base\"\
+          : \"string\",\n                    \"username_attribute\": \"string\"\n                },\n                \"user_group_configuration\"\
+          : {\n                    \"group_member_attribute\": \"string\",\n                    \"group_member_attribute_value\"\
+          : \"string\",\n                    \"group_object_class\": \"string\",\n                    \"group_search_base\"\
+          : \"string\"\n                }\n            },\n            \"secondary_urls\": [\n                \"string\"\n\
+          \            ],\n            \"service_account\": {\n                \"password\": \"string\",\n               \
+          \ \"username\": \"string\"\n            },\n            \"url\": \"string\"\n        }\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"metadata\"\
+          : {\n        \"categories\": {\n            \"property1\": \"string\",\n            \"property2\": \"string\"\n\
+          \        },\n        \"categories_mapping\": {\n            \"property1\": [\n                \"string\"\n     \
+          \       ],\n            \"property2\": [\n                \"string\"\n            ]\n        },\n        \"owner_reference\"\
+          : {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        },\n        \"project_reference\":\
+          \ {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        },\n        \"should_force_translate\"\
+          : true,\n        \"spec_hash\": \"string\",\n        \"spec_version\": 0,\n        \"use_categories_mapping\": false,\n\
+          \        \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n    },\n    \"spec\": {\n        \"name\": \"string\"\
+          ,\n        \"resources\": {\n            \"admin_group_reference_list\": [\n                {\n                \
+          \    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"admin_user_reference_list\"\
+          : [\n                {\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n               \
+          \ }\n            ],\n            \"directory_type\": \"string\",\n            \"domain_name\": \"string\",\n   \
+          \         \"open_ldap_configuration\": {\n                \"user_configuration\": {\n                    \"user_object_class\"\
+          : \"string\",\n                    \"user_search_base\": \"string\",\n                    \"username_attribute\"\
+          : \"string\"\n                },\n                \"user_group_configuration\": {\n                    \"group_member_attribute\"\
+          : \"string\",\n                    \"group_member_attribute_value\": \"string\",\n                    \"group_object_class\"\
+          : \"string\",\n                    \"group_search_base\": \"string\"\n                }\n            },\n      \
+          \      \"secondary_urls\": [\n                \"string\"\n            ],\n            \"service_account\": {\n \
+          \               \"password\": \"string\",\n                \"username\": \"string\"\n            },\n          \
+          \  \"url\": \"string\"\n        }\n    }\n}' \\\n    --output-document \\\n    - https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"ip_address:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"metadata\": {\n        \"categories\": {\n            \"property1\": \"string\"\
+          ,\n            \"property2\": \"string\"\n        },\n        \"categories_mapping\": {\n            \"property1\"\
+          : [\n                \"string\"\n            ],\n            \"property2\": [\n                \"string\"\n    \
+          \        ]\n        },\n        \"owner_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n        },\n        \"project_reference\": {\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n\
+          \        },\n        \"should_force_translate\": true,\n        \"spec_hash\": \"string\",\n        \"spec_version\"\
+          : 0,\n        \"use_categories_mapping\": false,\n        \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n \
+          \   },\n    \"spec\": {\n        \"name\": \"string\",\n        \"resources\": {\n            \"admin_group_reference_list\"\
+          : [\n                {\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n               \
+          \ }\n            ],\n            \"admin_user_reference_list\": [\n                {\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"directory_type\": \"\
+          string\",\n            \"domain_name\": \"string\",\n            \"open_ldap_configuration\": {\n              \
+          \  \"user_configuration\": {\n                    \"user_object_class\": \"string\",\n                    \"user_search_base\"\
+          : \"string\",\n                    \"username_attribute\": \"string\"\n                },\n                \"user_group_configuration\"\
+          : {\n                    \"group_member_attribute\": \"string\",\n                    \"group_member_attribute_value\"\
+          : \"string\",\n                    \"group_object_class\": \"string\",\n                    \"group_search_base\"\
+          : \"string\"\n                }\n            },\n            \"secondary_urls\": [\n                \"string\"\n\
+          \            ],\n            \"service_account\": {\n                \"password\": \"string\",\n               \
+          \ \"username\": \"string\"\n            },\n            \"url\": \"string\"\n        }\n    }\n}\"\"\"\n\nconn.request(\"\
+          PUT\",\"/api/nutanix/v3/directory_services/{uuid}\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\
+          \nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          metadata\": {\"categories\": {\"property1\": \"string\", \"property2\": \"string\"}, \"categories_mapping\": {\"\
+          property1\": [\"string\"], \"property2\": [\"string\"]}, \"owner_reference\": {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"project_reference\": {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}, \"should_force_translate\": true,\
+          \ \"spec_hash\": \"string\", \"spec_version\": 0, \"use_categories_mapping\": false, \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"spec\": {\"name\": \"string\", \"resources\": {\"admin_group_reference_list\": [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"admin_user_reference_list\": [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"directory_type\": \"\
+          string\", \"domain_name\": \"string\", \"open_ldap_configuration\": {\"user_configuration\": {\"user_object_class\"\
+          : \"string\", \"user_search_base\": \"string\", \"username_attribute\": \"string\"}, \"user_group_configuration\"\
+          : {\"group_member_attribute\": \"string\", \"group_member_attribute_value\": \"string\", \"group_object_class\"\
+          : \"string\", \"group_search_base\": \"string\"}}, \"secondary_urls\": [\"string\"], \"service_account\": {\"password\"\
+          : \"string\", \"username\": \"string\"}, \"url\": \"string\"}}}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"metadata\\\": {\\\"categories\\\": {\\\
+          \"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"categories_mapping\\\": {\\\"property1\\\
+          \": [\\\"string\\\"], \\\"property2\\\": [\\\"string\\\"]}, \\\"owner_reference\\\": {\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \"}, \\\"project_reference\\\": {\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}, \\\"should_force_translate\\\
+          \": true, \\\"spec_hash\\\": \\\"string\\\", \\\"spec_version\\\": 0, \\\"use_categories_mapping\\\": false, \\\"\
+          uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}, \\\"spec\\\": {\\\"name\\\": \\\"string\\\", \\\"resources\\\
+          \": {\\\"admin_group_reference_list\\\": [{\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"admin_user_reference_list\\\
+          \": [{\\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"directory_type\\\": \\\"string\\\", \\\"\
+          domain_name\\\": \\\"string\\\", \\\"open_ldap_configuration\\\": {\\\"user_configuration\\\": {\\\"user_object_class\\\
+          \": \\\"string\\\", \\\"user_search_base\\\": \\\"string\\\", \\\"username_attribute\\\": \\\"string\\\"}, \\\"\
+          user_group_configuration\\\": {\\\"group_member_attribute\\\": \\\"string\\\", \\\"group_member_attribute_value\\\
+          \": \\\"string\\\", \\\"group_object_class\\\": \\\"string\\\", \\\"group_search_base\\\": \\\"string\\\"}}, \\\"\
+          secondary_urls\\\": [\\\"string\\\"], \\\"service_account\\\": {\\\"password\\\": \\\"string\\\", \\\"username\\\
+          \": \\\"string\\\"}, \\\"url\\\": \\\"string\\\"}}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}';\nconst options = {\n  method:\
+          \ 'PUT',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"metadata\": {\"categories\": {\"property1\": \"string\", \"property2\": \"\
+          string\"}, \"categories_mapping\": {\"property1\": [\"string\"], \"property2\": [\"string\"]}, \"owner_reference\"\
+          : {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}, \"project_reference\": {\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"should_force_translate\": true, \"spec_hash\": \"string\", \"spec_version\": 0, \"use_categories_mapping\"\
+          : false, \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}, \"spec\": {\"name\": \"string\", \"resources\": {\"\
+          admin_group_reference_list\": [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"admin_user_reference_list\"\
+          : [{\"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"directory_type\": \"string\", \"domain_name\": \"string\"\
+          , \"open_ldap_configuration\": {\"user_configuration\": {\"user_object_class\": \"string\", \"user_search_base\"\
+          : \"string\", \"username_attribute\": \"string\"}, \"user_group_configuration\": {\"group_member_attribute\": \"\
+          string\", \"group_member_attribute_value\": \"string\", \"group_object_class\": \"string\", \"group_search_base\"\
+          : \"string\"}}, \"secondary_urls\": [\"string\"], \"service_account\": {\"password\": \"string\", \"username\":\
+          \ \"string\"}, \"url\": \"string\"}}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    delete:
+      responses:
+        '202':
+          description: Request Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/directory_service_intent_response'
+        '404':
+          description: Invalid UUID provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/directory_service_status'
+      parameters:
+      - $ref: '#/components/parameters/uuid'
+      tags:
+      - directory_services
+      summary: Delete a existing directory service configuration
+      x-ntnx-operations:
+      - delete
+      x-ntnx-kind: directory_service
+      description: This operation submits a request to delete a existing directory service configuration.
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://ip_address:9440/api/nutanix/v3/directory_services/{uuid} \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n      \\\n    --output-document \\\n    - https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"ip_address:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/api/nutanix/v3/directory_services/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}';\nconst options = {\n  method:\
+          \ 'DELETE',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry\
+          \ {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/directory_service_intent_response'
+        '404':
+          description: Invalid UUID provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/directory_service_status'
+      parameters:
+      - $ref: '#/components/parameters/uuid'
+      tags:
+      - directory_services
+      summary: Get a existing directory service configuration
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: directory_service
+      description: This operation gets a existing directory service configuration.
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://ip_address:9440/api/nutanix/v3/directory_services/{uuid} \\\n  \
+          \  --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n      \\\n    --output-document \\\n    - https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"ip_address:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/api/nutanix/v3/directory_services/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://ip_address:9440/api/nutanix/v3/directory_services/{uuid}';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+components:
+  parameters:
+    uuid:
+      description: The UUID of the entity.
+      required: true
+      in: path
+      name: uuid
+      schema:
+        type: string
+        format: UUID
+        pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+  requestBodies:
+    directory_service_intent_input:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/directory_service_intent_input'
+      required: true
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    user_reference:
+      description: The reference to a user
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - user
+        name:
+          readOnly: true
+          type: string
+          maxLength: 1024
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a user
+    directory_service:
+      description: The configuration details of the directory service.
+      required:
+      - resources
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the directory service.
+          maxLength: 64
+        resources:
+          description: The details of the directory service.
+          required:
+          - url
+          - domain_name
+          - directory_type
+          - service_account
+          type: object
+          properties:
+            open_ldap_configuration:
+              $ref: '#/components/schemas/open_ldap_configuration'
+            url:
+              type: string
+              description: URL of the directory.
+              maxLength: 2000
+            directory_type:
+              x-ntnx-enum:
+              - ACTIVE_DIRECTORY
+              - OPEN_LDAP
+              type: string
+              description: Type of the directory service.
+            admin_user_reference_list:
+              items:
+                $ref: '#/components/schemas/user_reference'
+              type: array
+              description: 'The list of admin users available in the directory service.
+
+                '
+            secondary_urls:
+              items:
+                type: string
+                maxLength: 2000
+              type: array
+              description: Secondary URLs of the directory
+            domain_name:
+              type: string
+              description: The domain name of the directory service.
+            service_account:
+              $ref: '#/components/schemas/service_account'
+            admin_group_reference_list:
+              items:
+                $ref: '#/components/schemas/user_group_reference'
+              type: array
+              description: 'List of admin user groups available in the directory service.
+
+                '
+          title: Directory service resources
+      title: Directory service
+    open_ldap_configuration:
+      description: Configuration for OpenLDAP directory service.
+      required:
+      - user_configuration
+      - user_group_configuration
+      type: object
+      properties:
+        user_configuration:
+          required:
+          - user_object_class
+          - user_search_base
+          - username_attribute
+          type: object
+          properties:
+            user_search_base:
+              type: string
+              description: The base DN for user search.
+              maxLength: 200
+            user_object_class:
+              type: string
+              description: 'The object class in the OpenLDAP system that corresponds to users.
+
+                '
+              maxLength: 64
+            username_attribute:
+              type: string
+              description: 'Unique identifier for each user which can be used in authentication.
+
+                '
+              maxLength: 64
+        user_group_configuration:
+          required:
+          - group_object_class
+          - group_search_base
+          - group_member_attribute
+          - group_member_attribute_value
+          type: object
+          properties:
+            group_search_base:
+              type: string
+              description: 'The base DN for group search.
+
+                '
+              maxLength: 200
+            group_member_attribute:
+              type: string
+              description: 'The attribute in a group that associates users to the group.
+
+                '
+              maxLength: 64
+            group_object_class:
+              type: string
+              description: 'The object class in the OpenLDAP system that corresponds to groups.
+
+                '
+              maxLength: 64
+            group_member_attribute_value:
+              type: string
+              description: 'The user attribute value that will be used in group entity to associate user to the group.
+
+                '
+              maxLength: 64
+      title: OpenLDAP Configuration.
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    directory_service_def_status:
+      description: Details of the directory service.
+      required:
+      - resources
+      - name
+      type: object
+      properties:
+        state:
+          type: string
+          description: The state of the directory service configuration.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          type: array
+        name:
+          type: string
+          description: Name of the directory service.
+        resources:
+          description: The configuration details of the directory service.
+          required:
+          - url
+          - domain_name
+          - directory_type
+          - service_account
+          type: object
+          properties:
+            open_ldap_configuration:
+              $ref: '#/components/schemas/open_ldap_configuration_def_status'
+            url:
+              type: string
+              description: URL of the directory.
+            directory_type:
+              x-ntnx-enum:
+              - ACTIVE_DIRECTORY
+              - OPEN_LDAP
+              type: string
+              description: Type of the directory service.
+            admin_user_reference_list:
+              items:
+                $ref: '#/components/schemas/user_reference'
+              type: array
+              description: 'The list of admin users available in the directory service.
+
+                '
+            secondary_urls:
+              items:
+                type: string
+              type: array
+              description: Secondary URLs of the directory
+            domain_name:
+              type: string
+              description: The domain name of the directory service.
+            service_account:
+              $ref: '#/components/schemas/service_account'
+            admin_group_reference_list:
+              items:
+                $ref: '#/components/schemas/user_group_reference'
+              type: array
+              description: 'List of admin user groups available in the directory service.
+
+                '
+          title: Directory service resources
+      title: Directory service
+    directory_service_metadata:
+      description: The directory_service kind metadata
+      required:
+      - kind
+      type: object
+      properties:
+        last_update_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when directory_service was last updated
+
+            '
+          format: date-time
+        use_categories_mapping:
+          type: boolean
+          description: 'Client need to specify this field as true if user want to use the
+
+            newer way of assigning the categories. Without this things should work
+
+            as it was earlier.
+
+            '
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - directory_service
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: directory_service uuid
+          format: UUID
+        project_reference:
+          $ref: '#/components/schemas/project_reference'
+        creation_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when directory_service was created
+
+            '
+          format: date-time
+        spec_version:
+          type: integer
+          description: Version number of the latest spec.
+        spec_hash:
+          type: string
+          description: 'Hash of the spec. This will be returned from server.
+
+            '
+        categories_mapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+          description: 'Categories for the directory_service. This allows setting up multiple
+
+            values from a single key. Categories assigned using the older view will be
+
+            present here. This is the new way of assigning categories.
+
+            '
+        should_force_translate:
+          type: boolean
+          description: 'Applied on Prism Central only. Indicate whether force to translate the spec of the fanout request
+            to fit the target cluster API schema.
+
+            '
+        entity_version:
+          readOnly: true
+          type: string
+          description: 'Logical entity version that allows serializing updates to the entity
+
+            across multiple API namespaces.  For kinds that support
+
+            entity_version, it overrides spec_version described above.
+
+            '
+        owner_reference:
+          $ref: '#/components/schemas/user_reference'
+        categories:
+          additionalProperties:
+            type: string
+          type: object
+          description: 'Categories for the directory_service. This allows assigning one value
+
+            of a key to any entity. Changes done in this will be reflected in
+
+            the categories_mapping field.
+
+            '
+        name:
+          readOnly: true
+          type: string
+          description: directory_service name
+          maxLength: 80
+      title: directory_service metadata
+    directory_service_intent_input:
+      description: An intentful representation of a directory_service
+      required:
+      - metadata
+      - spec
+      type: object
+      properties:
+        spec:
+          $ref: '#/components/schemas/directory_service'
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/directory_service_metadata'
+      title: directory_service Intent Entity
+    open_ldap_configuration_def_status:
+      description: Configuration for OpenLDAP directory service.
+      required:
+      - user_configuration
+      - user_group_configuration
+      type: object
+      properties:
+        user_configuration:
+          required:
+          - user_object_class
+          - user_search_base
+          - username_attribute
+          type: object
+          properties:
+            user_search_base:
+              type: string
+              description: The base DN for user search.
+            user_object_class:
+              type: string
+              description: 'The object class in the OpenLDAP system that corresponds to users.
+
+                '
+            username_attribute:
+              type: string
+              description: 'Unique identifier for each user which can be used in authentication.
+
+                '
+        user_group_configuration:
+          required:
+          - group_object_class
+          - group_search_base
+          - group_member_attribute
+          - group_member_attribute_value
+          type: object
+          properties:
+            group_search_base:
+              type: string
+              description: 'The base DN for group search.
+
+                '
+            group_member_attribute:
+              type: string
+              description: 'The attribute in a group that associates users to the group.
+
+                '
+            group_object_class:
+              type: string
+              description: 'The object class in the OpenLDAP system that corresponds to groups.
+
+                '
+            group_member_attribute_value:
+              type: string
+              description: 'The user attribute value that will be used in group entity to associate user to the group.
+
+                '
+      title: OpenLDAP Configuration.
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    user_group_reference:
+      description: The reference to a user_group
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - user_group
+        name:
+          readOnly: true
+          type: string
+          maxLength: 1024
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a user_group
+    project_reference:
+      description: The reference to a project
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - project
+        name:
+          readOnly: true
+          type: string
+          maxLength: 1024
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a project
+    directory_service_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - directory_service
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    service_account:
+      description: Credentials to connect to the directory service.
+      required:
+      - username
+      - password
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username to connect to the directory service.
+        password:
+          type: string
+          description: The password to authenticate the request.
+      title: Directory service service-account
+    directory_service_intent_response:
+      description: Response object for intentful operations on a directory_service
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/directory_service_def_status'
+        spec:
+          $ref: '#/components/schemas/directory_service'
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/directory_service_metadata'
+      title: directory_service Intent Response

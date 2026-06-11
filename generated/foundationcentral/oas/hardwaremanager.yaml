@@ -1,0 +1,385 @@
+openapi: 3.0.0
+info:
+  title: Foundation Central Service
+  description: '# Introduction
+
+
+    **Foundation Central** creates clusters from factory-imaged nodes and reimages existing nodes that are already registered
+    with Foundation Central, remotely from Prism Central. This provides benefits such as creating clusters on remote sites
+    (for example, ROBO), without arranging for a deployment personnel visit.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+    '
+  contact:
+    name: Foundation Central Developers
+    email: foundation@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: '1.0'
+servers:
+- url: /api/fc/v1
+security:
+- BasicAuth: []
+- CookieAuth: []
+paths:
+  /hardware_managers:
+    post:
+      description: Registers a new hardware manager in the Foundation Central. The Foundation Central then uses these instance
+        to discover or image nodes registered to them.
+      tags:
+      - hardware_managers
+      summary: Register a hardware manager
+      operationId: PostHardwareManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/hardware_manager_input'
+        required: true
+      responses:
+        '200':
+          description: A hardware manager is registered.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/hardware_manager_details'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --data '{\n    \"connection_details\": {\n        \"urls\": [\n            \"\
+          string\"\n        ]\n    },\n    \"deployment_type\": \"SAAS\",\n    \"name\": \"string\",\n    \"region\": \"string\"\
+          ,\n    \"type\": \"INTERSIGHT\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --body-data\
+          \ '{\n    \"connection_details\": {\n        \"urls\": [\n            \"string\"\n        ]\n    },\n    \"deployment_type\"\
+          : \"SAAS\",\n    \"name\": \"string\",\n    \"region\": \"string\",\n    \"type\": \"INTERSIGHT\"\n}' \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"connection_details\": {\n        \"urls\": [\n  \
+          \          \"string\"\n        ]\n    },\n    \"deployment_type\": \"SAAS\",\n    \"name\": \"string\",\n    \"\
+          region\": \"string\",\n    \"type\": \"INTERSIGHT\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/fc/v1/hardware_managers\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers\"\n\t\n\tpayload :=  strings.NewReader(`{\"connection_details\"\
+          : {\"urls\": [\"string\"]}, \"deployment_type\": \"SAAS\", \"name\": \"string\", \"region\": \"string\", \"type\"\
+          : \"INTERSIGHT\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .setBody(\"{\\\"connection_details\\\": {\\\"\
+          urls\\\": [\\\"string\\\"]}, \\\"deployment_type\\\": \\\"SAAS\\\", \\\"name\\\": \\\"string\\\", \\\"region\\\"\
+          : \\\"string\\\", \\\"type\\\": \\\"INTERSIGHT\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"connection_details\": {\"urls\": [\"string\"\
+          ]}, \"deployment_type\": \"SAAS\", \"name\": \"string\", \"region\": \"string\", \"type\": \"INTERSIGHT\"}`\n};\n\
+          \ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+  /hardware_managers/{hardware_manager_uuid}:
+    get:
+      description: Fetches a hardware manager based on its UUID.
+      tags:
+      - hardware_managers
+      summary: Get a hardware manager
+      operationId: GetHardwareManager
+      parameters:
+      - description: UUID of the hardware manager that must be fetched.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Details of the hardware manager.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/hardware_manager_details'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+    put:
+      description: Updates the details of a hardware manager registered with Foundation Central.
+      tags:
+      - hardware_managers
+      summary: Update the details of a hardware manager
+      operationId: PutHardwareManager
+      parameters:
+      - description: UUID of the hardware manager that must be updated.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/hardware_manager_update_input'
+        required: true
+      responses:
+        '200':
+          description: Updated the hardware manager details.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/hardware_manager_details'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --data '{\n    \"connection_details\": {\n\
+          \        \"urls\": [\n            \"string\"\n        ]\n    },\n    \"name\": \"string\",\n    \"object_version\"\
+          : 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --body-data\
+          \ '{\n    \"connection_details\": {\n        \"urls\": [\n            \"string\"\n        ]\n    },\n    \"name\"\
+          : \"string\",\n    \"object_version\": 0\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"connection_details\": {\n        \"urls\": [\n  \
+          \          \"string\"\n        ]\n    },\n    \"name\": \"string\",\n    \"object_version\": 0\n}\"\"\"\n\nconn.request(\"\
+          PUT\",\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          connection_details\": {\"urls\": [\"string\"]}, \"name\": \"string\", \"object_version\": 0}`)\n\treq, err := http.NewRequest(\"\
+          PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .setBody(\"{\\\"connection_details\\\": {\\\"\
+          urls\\\": [\\\"string\\\"]}, \\\"name\\\": \\\"string\\\", \\\"object_version\\\": 0}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}';\nconst options\
+          \ = {\n  method: 'PUT',\n  headers: {'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"connection_details\"\
+          : {\"urls\": [\"string\"]}, \"name\": \"string\", \"object_version\": 0}`\n};\n\ntry {\n  const response = await\
+          \ fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+    delete:
+      description: Deletes the hardware manager based on its UUID. You can delete a hardware manager only if there are no
+        corresponding nodes onboarded in Foundation Central.
+      tags:
+      - hardware_managers
+      summary: Delete a hardware manager
+      operationId: DeleteHardwareManager
+      parameters:
+      - description: UUID of the hardware manager that must be deleted.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The requested hardware manager is deleted from Foundation Central.
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}';\nconst options\
+          \ = {\n  method: 'DELETE',\n  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+components:
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      name: X-API-Key
+      in: header
+    APIKeyKubAuth:
+      type: apiKey
+      name: X-API-Key-Kub
+      in: header
+    BasicAuth:
+      type: http
+      scheme: basic
+    CookieAuth:
+      type: apiKey
+      name: Cookie
+      in: header
+    OpenIDAuth:
+      type: apiKey
+      name: code
+      in: query
+  schemas:
+    hardware_manager_details:
+      description: Details of a hardware manager instance.
+      type: object
+      required:
+      - hardware_manager_uuid
+      - name
+      - connection_details
+      - type
+      - object_version
+      - created_timestamp
+      - current_time
+      properties:
+        connection_details:
+          $ref: '#/components/schemas/hardware_manager_conn_details'
+        created_timestamp:
+          description: Time when the hardware manager was registered in Foundation Central.
+          type: string
+          format: date-time
+        current_time:
+          description: Current time of Foundation Central.
+          type: string
+          format: date-time
+        deployment_type:
+          description: Deployment type of the hardware manager instance.
+          type: string
+          enum:
+          - SAAS
+          - ONPREM
+        hardware_manager_uuid:
+          description: UUID of the hardware manager.
+          type: string
+          format: uuid
+        name:
+          description: Name of the hardware manager.
+          type: string
+        object_version:
+          description: Version of the hardware manager used for CAS.
+          type: integer
+          minimum: 0
+        region:
+          description: Region in which the hardware manager is deployed.
+          type: string
+        type:
+          description: Type of the hardware manager.
+          type: string
+          enum:
+          - INTERSIGHT
+    error_response:
+      type: object
+      properties:
+        code:
+          description: HTTP response code from the API.
+          type: integer
+          format: int32
+        message_list:
+          description: Error message in detail.
+          type: array
+          items:
+            type: string
+    hardware_manager_conn_details:
+      description: Details of a connection method to a hardware manager.
+      type: object
+      properties:
+        urls:
+          description: URLs of the hardware manager.
+          type: array
+          maxLength: 1
+          items:
+            type: string
+    hardware_manager_update_input:
+      description: Input parameters for updating a hardware manager.
+      type: object
+      required:
+      - object_version
+      properties:
+        connection_details:
+          $ref: '#/components/schemas/hardware_manager_conn_details'
+        name:
+          description: Name of the hardware manager.
+          type: string
+          maxLength: 40
+        object_version:
+          description: Version of the hardware manager used for CAS.
+          type: integer
+          minimum: 0
+    hardware_manager_input:
+      description: Input parameters for registering a new hardware manager.
+      type: object
+      required:
+      - name
+      - connection_details
+      - type
+      - deployment_type
+      properties:
+        connection_details:
+          $ref: '#/components/schemas/hardware_manager_conn_details'
+        deployment_type:
+          description: Deployment type of the hardware manager instance to be registered.
+          type: string
+          enum:
+          - SAAS
+          - ONPREM
+        name:
+          description: Name of the hardware manager to be registered. All alphanumeric characters are allowed along with special
+            characters dot, hyphen and underscore(., - and _).
+          type: string
+          maxLength: 40
+        region:
+          description: Region in which the hardware manager is deployed.
+          type: string
+        type:
+          description: Type of the hardware manager to be registered.
+          type: string
+          enum:
+          - INTERSIGHT

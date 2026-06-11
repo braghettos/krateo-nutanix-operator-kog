@@ -1,0 +1,3032 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /virtual_disks:
+    get:
+      summary: Get the list of VirtualDisks.
+      description: Get the list of VirtualDisks configured in the cluster.
+      tags:
+      - /virtual_disks
+      operationId: get/virtual_disks/getVirtualDisks
+      parameters:
+      - name: count
+        in: query
+        description: Number of VirtualDisks to retrieve
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filter_criteria
+        in: query
+        description: Filter criteria
+        required: false
+        schema:
+          type: string
+      - name: sort_criteria
+        in: query
+        description: Sort criteria
+        required: false
+        schema:
+          type: string
+      - name: search_string
+        in: query
+        description: Search string
+        required: false
+        schema:
+          type: string
+      - name: search_attribute_list
+        in: query
+        description: Search attribute list
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: projection
+        in: query
+        description: Projections on the attributes
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.appliance.configuration.VirtualDiskDTO_'
+        '500':
+          description: Any internal exception while performing this operation
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks \\\
+          \n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/virtual_disks\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+    put:
+      summary: Update virtual Disk.
+      tags:
+      - /virtual_disks
+      operationId: put/virtual_disks/updateVirtualDisk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update.dto.appliance.configuration.VirtualDiskDTO'
+        description: DTO specifying different parameters for VirtualDisk along with flash mode
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update.dto.appliance.configuration.VirtualDiskDTO'
+        '500':
+          description: Any internal exception while performing this operation
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks \\\
+          \n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"alert_summary\": {\n        \"alert_summaries\": {\n            \"property1\": {\n                \"entities\"\
+          : [\n                    {\n                        \"acknowledged\": true,\n                        \"acknowledged_by_username\"\
+          : \"string\",\n                        \"acknowledged_time_stamp_in_usecs\": 0,\n                        \"affected_entities\"\
+          : [\n                            {\n                                \"entity_name\": \"string\",\n             \
+          \                   \"entity_type\": \"string\",\n                                \"entity_type_display_name\":\
+          \ \"string\",\n                                \"id\": \"string\",\n                                \"uuid\": \"\
+          string\"\n                            }\n                        ],\n                        \"alert_details\":\
+          \ {\n                            \"metric_details\": [\n                                {\n                    \
+          \                \"comparison_operator\": \"string\",\n                                    \"condition_type\": \"\
+          STATIC_THRESHOLD\",\n                                    \"data_type\": \"LONG\",\n                            \
+          \        \"entity_id\": \"string\",\n                                    \"entity_type\": \"string\",\n        \
+          \                            \"metric_category\": \"string\",\n                                    \"metric_display_name\"\
+          : \"string\",\n                                    \"metric_name\": \"string\",\n                              \
+          \      \"metric_value_details\": [\n                                        {\n                                \
+          \            \"metric_threshold_value\": \"string\",\n                                            \"metric_value\"\
+          : \"string\",\n                                            \"state_change_time_stamp_in_usecs\": 0\n           \
+          \                             }\n                                    ],\n                                    \"\
+          unit\": \"string\"\n                                }\n                            ],\n                        \
+          \    \"severity_trails\": [\n                                {\n                                    \"severity\"\
+          : \"string\",\n                                    \"severity_change_timestamp_in_usecs\": 0\n                 \
+          \               }\n                            ]\n                        },\n                        \"alert_title\"\
+          : \"string\",\n                        \"alert_type_uuid\": \"string\",\n                        \"auto_resolved\"\
+          : true,\n                        \"categories\": [\n                            \"string\"\n                   \
+          \     ],\n                        \"check_id\": \"string\",\n                        \"classifications\": [\n  \
+          \                          \"string\"\n                        ],\n                        \"cluster_uuid\": \"\
+          string\",\n                        \"context_types\": [\n                            \"string\"\n              \
+          \          ],\n                        \"context_values\": [\n                            \"string\"\n         \
+          \               ],\n                        \"created_time_stamp_in_usecs\": 0,\n                        \"detailed_message\"\
+          : \"string\",\n                        \"entity_ids\": [\n                            \"string\"\n             \
+          \           ],\n                        \"entity_types\": [\n                            \"string\"\n          \
+          \              ],\n                        \"entity_uuids\": [\n                            \"string\"\n       \
+          \                 ],\n                        \"id\": \"string\",\n                        \"impact\": \"string\"\
+          ,\n                        \"impact_types\": [\n                            \"string\"\n                       \
+          \ ],\n                        \"last_occurrence_time_stamp_in_usecs\": 0,\n                        \"message\":\
+          \ \"string\",\n                        \"node_uuid\": \"string\",\n                        \"operation_type\": \"\
+          string\",\n                        \"originating_cluster_uuid\": \"string\",\n                        \"possible_causes\"\
+          : [\n                            {\n                                \"actions\": \"string\",\n                 \
+          \               \"additional_links\": \"string\",\n                                \"alert_namespace\": \"string\"\
+          ,\n                                \"cause\": \"string\",\n                                \"chart_queries\": {\n\
+          \                                    \"entities\": [\n                                        {\n              \
+          \                              \"actions\": \"string\",\n                                            \"alerts\"\
+          : \"string\",\n                                            \"cadmus\": \"string\",\n                           \
+          \                 \"entities\": \"string\",\n                                            \"help\": \"string\",\n\
+          \                                            \"metadata\": {\n                                                \"\
+          entity_type\": \"PAGE\",\n                                                \"filters\": [\n                     \
+          \                               {\n                                                        \"display_for_rhs\":\
+          \ \"string\",\n                                                        \"lhs\": \"string\",\n                  \
+          \                                      \"operator\": \"string\",\n                                             \
+          \           \"rhs\": \"string\"\n                                                    }\n                       \
+          \                         ],\n                                                \"instances\": [\n               \
+          \                                     {\n                                                        \"additional_fields\"\
+          : {\n                                                            \"property1\": \"string\",\n                  \
+          \                                          \"property2\": \"string\"\n                                         \
+          \               },\n                                                        \"cluster_uuid\": \"string\",\n    \
+          \                                                    \"context_hint_field\": \"string\",\n                     \
+          \                                   \"context_hint_value\": \"string\",\n                                      \
+          \                  \"entity_id\": \"string\",\n                                                        \"entity_name\"\
+          : \"string\",\n                                                        \"entity_type\": \"PAGE\"\n             \
+          \                                       }\n                                                ],\n                \
+          \                                \"title\": \"string\"\n                                            },\n       \
+          \                                     \"perspectives\": [\n                                                {\n \
+          \                                                   \"format\": \"TABLE\",\n                                   \
+          \                 \"metadata\": {\n                                                        \"entity_type\": \"PAGE\"\
+          ,\n                                                        \"filters\": [\n                                    \
+          \                        {\n                                                                \"display_for_rhs\"\
+          : \"string\",\n                                                                \"lhs\": \"string\",\n          \
+          \                                                      \"operator\": \"string\",\n                             \
+          \                                   \"rhs\": \"string\"\n                                                      \
+          \      }\n                                                        ],\n                                         \
+          \               \"instances\": [\n                                                            {\n              \
+          \                                                  \"additional_fields\": {\n                                  \
+          \                                  \"property1\": \"string\",\n                                                \
+          \                    \"property2\": \"string\"\n                                                               \
+          \ },\n                                                                \"cluster_uuid\": \"string\",\n          \
+          \                                                      \"context_hint_field\": \"string\",\n                   \
+          \                                             \"context_hint_value\": \"string\",\n                            \
+          \                                    \"entity_id\": \"string\",\n                                              \
+          \                  \"entity_name\": \"string\",\n                                                              \
+          \  \"entity_type\": \"PAGE\"\n                                                            }\n                  \
+          \                                      ],\n                                                        \"title\": \"\
+          string\"\n                                                    },\n                                             \
+          \       \"query\": null,\n                                                    \"result\": null,\n              \
+          \                                      \"type\": \"string\"\n                                                }\n\
+          \                                            ]\n                                        }\n                    \
+          \                ],\n                                    \"error_info\": {\n                                   \
+          \     \"count\": 0,\n                                        \"entity_list\": [\n                              \
+          \              \"string\"\n                                        ],\n                                        \"\
+          message\": \"string\"\n                                    },\n                                    \"metadata\"\
+          : {\n                                        \"count\": 0,\n                                        \"end_index\"\
+          : 0,\n                                        \"filter_criteria\": \"string\",\n                               \
+          \         \"grand_total_entities\": 0,\n                                        \"next_cursor\": \"string\",\n \
+          \                                       \"page\": 0,\n                                        \"previous_cursor\"\
+          : \"string\",\n                                        \"search_string\": \"string\",\n                        \
+          \                \"sort_criteria\": \"string\",\n                                        \"start_index\": 0,\n \
+          \                                       \"total_entities\": 0\n                                    }\n         \
+          \                       },\n                                \"details\": \"string\",\n                         \
+          \       \"has_global_details\": true,\n                                \"id\": \"string\",\n                   \
+          \             \"num_resolved_count\": 0,\n                                \"parent_cause_id\": \"string\",\n   \
+          \                             \"title\": \"string\",\n                                \"troubleshooting_steps\"\
+          : \"string\"\n                            }\n                        ],\n                        \"resolved\": true,\n\
+          \                        \"resolved_by_username\": \"string\",\n                        \"resolved_time_stamp_in_usecs\"\
+          : 0,\n                        \"service_vmid\": \"string\",\n                        \"severity\": \"string\",\n\
+          \                        \"user_defined\": true\n                    }\n                ],\n                \"error_info\"\
+          : {\n                    \"count\": 0,\n                    \"entity_list\": [\n                        \"string\"\
+          \n                    ],\n                    \"message\": \"string\"\n                },\n                \"metadata\"\
+          : {\n                    \"count\": 0,\n                    \"end_index\": 0,\n                    \"filter_criteria\"\
+          : \"string\",\n                    \"grand_total_entities\": 0,\n                    \"next_cursor\": \"string\"\
+          ,\n                    \"page\": 0,\n                    \"previous_cursor\": \"string\",\n                    \"\
+          search_string\": \"string\",\n                    \"sort_criteria\": \"string\",\n                    \"start_index\"\
+          : 0,\n                    \"total_entities\": 0\n                }\n            },\n            \"property2\": {\n\
+          \                \"entities\": [\n                    {\n                        \"acknowledged\": true,\n     \
+          \                   \"acknowledged_by_username\": \"string\",\n                        \"acknowledged_time_stamp_in_usecs\"\
+          : 0,\n                        \"affected_entities\": [\n                            {\n                        \
+          \        \"entity_name\": \"string\",\n                                \"entity_type\": \"string\",\n          \
+          \                      \"entity_type_display_name\": \"string\",\n                                \"id\": \"string\"\
+          ,\n                                \"uuid\": \"string\"\n                            }\n                       \
+          \ ],\n                        \"alert_details\": {\n                            \"metric_details\": [\n        \
+          \                        {\n                                    \"comparison_operator\": \"string\",\n         \
+          \                           \"condition_type\": \"STATIC_THRESHOLD\",\n                                    \"data_type\"\
+          : \"LONG\",\n                                    \"entity_id\": \"string\",\n                                  \
+          \  \"entity_type\": \"string\",\n                                    \"metric_category\": \"string\",\n        \
+          \                            \"metric_display_name\": \"string\",\n                                    \"metric_name\"\
+          : \"string\",\n                                    \"metric_value_details\": [\n                               \
+          \         {\n                                            \"metric_threshold_value\": \"string\",\n             \
+          \                               \"metric_value\": \"string\",\n                                            \"state_change_time_stamp_in_usecs\"\
+          : 0\n                                        }\n                                    ],\n                       \
+          \             \"unit\": \"string\"\n                                }\n                            ],\n        \
+          \                    \"severity_trails\": [\n                                {\n                               \
+          \     \"severity\": \"string\",\n                                    \"severity_change_timestamp_in_usecs\": 0\n\
+          \                                }\n                            ]\n                        },\n                \
+          \        \"alert_title\": \"string\",\n                        \"alert_type_uuid\": \"string\",\n              \
+          \          \"auto_resolved\": true,\n                        \"categories\": [\n                            \"string\"\
+          \n                        ],\n                        \"check_id\": \"string\",\n                        \"classifications\"\
+          : [\n                            \"string\"\n                        ],\n                        \"cluster_uuid\"\
+          : \"string\",\n                        \"context_types\": [\n                            \"string\"\n          \
+          \              ],\n                        \"context_values\": [\n                            \"string\"\n     \
+          \                   ],\n                        \"created_time_stamp_in_usecs\": 0,\n                        \"\
+          detailed_message\": \"string\",\n                        \"entity_ids\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_types\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_uuids\": [\n                            \"string\"\
+          \n                        ],\n                        \"id\": \"string\",\n                        \"impact\": \"\
+          string\",\n                        \"impact_types\": [\n                            \"string\"\n               \
+          \         ],\n                        \"last_occurrence_time_stamp_in_usecs\": 0,\n                        \"message\"\
+          : \"string\",\n                        \"node_uuid\": \"string\",\n                        \"operation_type\": \"\
+          string\",\n                        \"originating_cluster_uuid\": \"string\",\n                        \"possible_causes\"\
+          : [\n                            {\n                                \"actions\": \"string\",\n                 \
+          \               \"additional_links\": \"string\",\n                                \"alert_namespace\": \"string\"\
+          ,\n                                \"cause\": \"string\",\n                                \"chart_queries\": {\n\
+          \                                    \"entities\": [\n                                        {\n              \
+          \                              \"actions\": \"string\",\n                                            \"alerts\"\
+          : \"string\",\n                                            \"cadmus\": \"string\",\n                           \
+          \                 \"entities\": \"string\",\n                                            \"help\": \"string\",\n\
+          \                                            \"metadata\": {\n                                                \"\
+          entity_type\": \"PAGE\",\n                                                \"filters\": [\n                     \
+          \                               {\n                                                        \"display_for_rhs\":\
+          \ \"string\",\n                                                        \"lhs\": \"string\",\n                  \
+          \                                      \"operator\": \"string\",\n                                             \
+          \           \"rhs\": \"string\"\n                                                    }\n                       \
+          \                         ],\n                                                \"instances\": [\n               \
+          \                                     {\n                                                        \"additional_fields\"\
+          : {\n                                                            \"property1\": \"string\",\n                  \
+          \                                          \"property2\": \"string\"\n                                         \
+          \               },\n                                                        \"cluster_uuid\": \"string\",\n    \
+          \                                                    \"context_hint_field\": \"string\",\n                     \
+          \                                   \"context_hint_value\": \"string\",\n                                      \
+          \                  \"entity_id\": \"string\",\n                                                        \"entity_name\"\
+          : \"string\",\n                                                        \"entity_type\": \"PAGE\"\n             \
+          \                                       }\n                                                ],\n                \
+          \                                \"title\": \"string\"\n                                            },\n       \
+          \                                     \"perspectives\": [\n                                                {\n \
+          \                                                   \"format\": \"TABLE\",\n                                   \
+          \                 \"metadata\": {\n                                                        \"entity_type\": \"PAGE\"\
+          ,\n                                                        \"filters\": [\n                                    \
+          \                        {\n                                                                \"display_for_rhs\"\
+          : \"string\",\n                                                                \"lhs\": \"string\",\n          \
+          \                                                      \"operator\": \"string\",\n                             \
+          \                                   \"rhs\": \"string\"\n                                                      \
+          \      }\n                                                        ],\n                                         \
+          \               \"instances\": [\n                                                            {\n              \
+          \                                                  \"additional_fields\": {\n                                  \
+          \                                  \"property1\": \"string\",\n                                                \
+          \                    \"property2\": \"string\"\n                                                               \
+          \ },\n                                                                \"cluster_uuid\": \"string\",\n          \
+          \                                                      \"context_hint_field\": \"string\",\n                   \
+          \                                             \"context_hint_value\": \"string\",\n                            \
+          \                                    \"entity_id\": \"string\",\n                                              \
+          \                  \"entity_name\": \"string\",\n                                                              \
+          \  \"entity_type\": \"PAGE\"\n                                                            }\n                  \
+          \                                      ],\n                                                        \"title\": \"\
+          string\"\n                                                    },\n                                             \
+          \       \"query\": null,\n                                                    \"result\": null,\n              \
+          \                                      \"type\": \"string\"\n                                                }\n\
+          \                                            ]\n                                        }\n                    \
+          \                ],\n                                    \"error_info\": {\n                                   \
+          \     \"count\": 0,\n                                        \"entity_list\": [\n                              \
+          \              \"string\"\n                                        ],\n                                        \"\
+          message\": \"string\"\n                                    },\n                                    \"metadata\"\
+          : {\n                                        \"count\": 0,\n                                        \"end_index\"\
+          : 0,\n                                        \"filter_criteria\": \"string\",\n                               \
+          \         \"grand_total_entities\": 0,\n                                        \"next_cursor\": \"string\",\n \
+          \                                       \"page\": 0,\n                                        \"previous_cursor\"\
+          : \"string\",\n                                        \"search_string\": \"string\",\n                        \
+          \                \"sort_criteria\": \"string\",\n                                        \"start_index\": 0,\n \
+          \                                       \"total_entities\": 0\n                                    }\n         \
+          \                       },\n                                \"details\": \"string\",\n                         \
+          \       \"has_global_details\": true,\n                                \"id\": \"string\",\n                   \
+          \             \"num_resolved_count\": 0,\n                                \"parent_cause_id\": \"string\",\n   \
+          \                             \"title\": \"string\",\n                                \"troubleshooting_steps\"\
+          : \"string\"\n                            }\n                        ],\n                        \"resolved\": true,\n\
+          \                        \"resolved_by_username\": \"string\",\n                        \"resolved_time_stamp_in_usecs\"\
+          : 0,\n                        \"service_vmid\": \"string\",\n                        \"severity\": \"string\",\n\
+          \                        \"user_defined\": true\n                    }\n                ],\n                \"error_info\"\
+          : {\n                    \"count\": 0,\n                    \"entity_list\": [\n                        \"string\"\
+          \n                    ],\n                    \"message\": \"string\"\n                },\n                \"metadata\"\
+          : {\n                    \"count\": 0,\n                    \"end_index\": 0,\n                    \"filter_criteria\"\
+          : \"string\",\n                    \"grand_total_entities\": 0,\n                    \"next_cursor\": \"string\"\
+          ,\n                    \"page\": 0,\n                    \"previous_cursor\": \"string\",\n                    \"\
+          search_string\": \"string\",\n                    \"sort_criteria\": \"string\",\n                    \"start_index\"\
+          : 0,\n                    \"total_entities\": 0\n                }\n            }\n        },\n        \"count\"\
+          : 0\n    },\n    \"attached_vm_id\": \"string\",\n    \"attached_vm_uuid\": \"string\",\n    \"attached_vmname\"\
+          : \"string\",\n    \"attached_volume_group_id\": \"string\",\n    \"cluster_uuid\": \"string\",\n    \"container_id\"\
+          : \"string\",\n    \"container_uuid\": \"string\",\n    \"datasource_uuid\": \"string\",\n    \"device_uuid\": \"\
+          string\",\n    \"disk_address\": \"string\",\n    \"disk_capacity_in_bytes\": 0,\n    \"flash_mode_enabled\": true,\n\
+          \    \"health_summary\": {\n        \"entity_type_summaries\": [\n            {\n                \"checks_in_error\"\
+          : {\n                    \"property1\": {\n                        \"cluster_level\": [\n                      \
+          \      {\n                                \"entity_name\": \"string\",\n                                \"entity_uuid\"\
+          : \"string\",\n                                \"message\": \"string\"\n                            }\n        \
+          \                ],\n                        \"node_level\": [\n                            {\n                \
+          \                \"entity_name\": \"string\",\n                                \"entity_uuid\": \"string\",\n  \
+          \                              \"message\": \"string\"\n                            }\n                        ]\n\
+          \                    },\n                    \"property2\": {\n                        \"cluster_level\": [\n  \
+          \                          {\n                                \"entity_name\": \"string\",\n                   \
+          \             \"entity_uuid\": \"string\",\n                                \"message\": \"string\"\n          \
+          \                  }\n                        ],\n                        \"node_level\": [\n                  \
+          \          {\n                                \"entity_name\": \"string\",\n                                \"entity_uuid\"\
+          : \"string\",\n                                \"message\": \"string\"\n                            }\n        \
+          \                ]\n                    }\n                },\n                \"detailed_check_summary\": {\n \
+          \                   \"property1\": {},\n                    \"property2\": {}\n                },\n            \
+          \    \"entity_type\": \"PAGE\",\n                \"filter_criteria\": \"string\",\n                \"health_summary\"\
+          : {\n                    \"property1\": 0,\n                    \"property2\": 0\n                }\n          \
+          \  }\n        ],\n        \"health_check_summaries\": {\n            \"property1\": {\n                \"attribute_map\"\
+          : {\n                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n           \
+          \     },\n                \"executed_time_stamp_in_usecs\": 0,\n                \"health_status\": \"Critical\"\
+          ,\n                \"id\": \"string\",\n                \"score\": 0\n            },\n            \"property2\"\
+          : {\n                \"attribute_map\": {\n                    \"property1\": \"string\",\n                    \"\
+          property2\": \"string\"\n                },\n                \"executed_time_stamp_in_usecs\": 0,\n            \
+          \    \"health_status\": \"Critical\",\n                \"id\": \"string\",\n                \"score\": 0\n     \
+          \       }\n        },\n        \"health_status\": \"Critical\"\n    },\n    \"nutanix_nfsfile_path\": \"string\"\
+          ,\n    \"stats\": {\n        \"property1\": \"string\",\n        \"property2\": \"string\"\n    },\n    \"storage_container_id\"\
+          : \"string\",\n    \"storage_container_uuid\": \"string\",\n    \"usage_stats\": {\n        \"property1\": \"string\"\
+          ,\n        \"property2\": \"string\"\n    },\n    \"uuid\": \"string\",\n    \"virtual_disk_id\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"alert_summary\": {\n        \"alert_summaries\": {\n         \
+          \   \"property1\": {\n                \"entities\": [\n                    {\n                        \"acknowledged\"\
+          : true,\n                        \"acknowledged_by_username\": \"string\",\n                        \"acknowledged_time_stamp_in_usecs\"\
+          : 0,\n                        \"affected_entities\": [\n                            {\n                        \
+          \        \"entity_name\": \"string\",\n                                \"entity_type\": \"string\",\n          \
+          \                      \"entity_type_display_name\": \"string\",\n                                \"id\": \"string\"\
+          ,\n                                \"uuid\": \"string\"\n                            }\n                       \
+          \ ],\n                        \"alert_details\": {\n                            \"metric_details\": [\n        \
+          \                        {\n                                    \"comparison_operator\": \"string\",\n         \
+          \                           \"condition_type\": \"STATIC_THRESHOLD\",\n                                    \"data_type\"\
+          : \"LONG\",\n                                    \"entity_id\": \"string\",\n                                  \
+          \  \"entity_type\": \"string\",\n                                    \"metric_category\": \"string\",\n        \
+          \                            \"metric_display_name\": \"string\",\n                                    \"metric_name\"\
+          : \"string\",\n                                    \"metric_value_details\": [\n                               \
+          \         {\n                                            \"metric_threshold_value\": \"string\",\n             \
+          \                               \"metric_value\": \"string\",\n                                            \"state_change_time_stamp_in_usecs\"\
+          : 0\n                                        }\n                                    ],\n                       \
+          \             \"unit\": \"string\"\n                                }\n                            ],\n        \
+          \                    \"severity_trails\": [\n                                {\n                               \
+          \     \"severity\": \"string\",\n                                    \"severity_change_timestamp_in_usecs\": 0\n\
+          \                                }\n                            ]\n                        },\n                \
+          \        \"alert_title\": \"string\",\n                        \"alert_type_uuid\": \"string\",\n              \
+          \          \"auto_resolved\": true,\n                        \"categories\": [\n                            \"string\"\
+          \n                        ],\n                        \"check_id\": \"string\",\n                        \"classifications\"\
+          : [\n                            \"string\"\n                        ],\n                        \"cluster_uuid\"\
+          : \"string\",\n                        \"context_types\": [\n                            \"string\"\n          \
+          \              ],\n                        \"context_values\": [\n                            \"string\"\n     \
+          \                   ],\n                        \"created_time_stamp_in_usecs\": 0,\n                        \"\
+          detailed_message\": \"string\",\n                        \"entity_ids\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_types\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_uuids\": [\n                            \"string\"\
+          \n                        ],\n                        \"id\": \"string\",\n                        \"impact\": \"\
+          string\",\n                        \"impact_types\": [\n                            \"string\"\n               \
+          \         ],\n                        \"last_occurrence_time_stamp_in_usecs\": 0,\n                        \"message\"\
+          : \"string\",\n                        \"node_uuid\": \"string\",\n                        \"operation_type\": \"\
+          string\",\n                        \"originating_cluster_uuid\": \"string\",\n                        \"possible_causes\"\
+          : [\n                            {\n                                \"actions\": \"string\",\n                 \
+          \               \"additional_links\": \"string\",\n                                \"alert_namespace\": \"string\"\
+          ,\n                                \"cause\": \"string\",\n                                \"chart_queries\": {\n\
+          \                                    \"entities\": [\n                                        {\n              \
+          \                              \"actions\": \"string\",\n                                            \"alerts\"\
+          : \"string\",\n                                            \"cadmus\": \"string\",\n                           \
+          \                 \"entities\": \"string\",\n                                            \"help\": \"string\",\n\
+          \                                            \"metadata\": {\n                                                \"\
+          entity_type\": \"PAGE\",\n                                                \"filters\": [\n                     \
+          \                               {\n                                                        \"display_for_rhs\":\
+          \ \"string\",\n                                                        \"lhs\": \"string\",\n                  \
+          \                                      \"operator\": \"string\",\n                                             \
+          \           \"rhs\": \"string\"\n                                                    }\n                       \
+          \                         ],\n                                                \"instances\": [\n               \
+          \                                     {\n                                                        \"additional_fields\"\
+          : {\n                                                            \"property1\": \"string\",\n                  \
+          \                                          \"property2\": \"string\"\n                                         \
+          \               },\n                                                        \"cluster_uuid\": \"string\",\n    \
+          \                                                    \"context_hint_field\": \"string\",\n                     \
+          \                                   \"context_hint_value\": \"string\",\n                                      \
+          \                  \"entity_id\": \"string\",\n                                                        \"entity_name\"\
+          : \"string\",\n                                                        \"entity_type\": \"PAGE\"\n             \
+          \                                       }\n                                                ],\n                \
+          \                                \"title\": \"string\"\n                                            },\n       \
+          \                                     \"perspectives\": [\n                                                {\n \
+          \                                                   \"format\": \"TABLE\",\n                                   \
+          \                 \"metadata\": {\n                                                        \"entity_type\": \"PAGE\"\
+          ,\n                                                        \"filters\": [\n                                    \
+          \                        {\n                                                                \"display_for_rhs\"\
+          : \"string\",\n                                                                \"lhs\": \"string\",\n          \
+          \                                                      \"operator\": \"string\",\n                             \
+          \                                   \"rhs\": \"string\"\n                                                      \
+          \      }\n                                                        ],\n                                         \
+          \               \"instances\": [\n                                                            {\n              \
+          \                                                  \"additional_fields\": {\n                                  \
+          \                                  \"property1\": \"string\",\n                                                \
+          \                    \"property2\": \"string\"\n                                                               \
+          \ },\n                                                                \"cluster_uuid\": \"string\",\n          \
+          \                                                      \"context_hint_field\": \"string\",\n                   \
+          \                                             \"context_hint_value\": \"string\",\n                            \
+          \                                    \"entity_id\": \"string\",\n                                              \
+          \                  \"entity_name\": \"string\",\n                                                              \
+          \  \"entity_type\": \"PAGE\"\n                                                            }\n                  \
+          \                                      ],\n                                                        \"title\": \"\
+          string\"\n                                                    },\n                                             \
+          \       \"query\": null,\n                                                    \"result\": null,\n              \
+          \                                      \"type\": \"string\"\n                                                }\n\
+          \                                            ]\n                                        }\n                    \
+          \                ],\n                                    \"error_info\": {\n                                   \
+          \     \"count\": 0,\n                                        \"entity_list\": [\n                              \
+          \              \"string\"\n                                        ],\n                                        \"\
+          message\": \"string\"\n                                    },\n                                    \"metadata\"\
+          : {\n                                        \"count\": 0,\n                                        \"end_index\"\
+          : 0,\n                                        \"filter_criteria\": \"string\",\n                               \
+          \         \"grand_total_entities\": 0,\n                                        \"next_cursor\": \"string\",\n \
+          \                                       \"page\": 0,\n                                        \"previous_cursor\"\
+          : \"string\",\n                                        \"search_string\": \"string\",\n                        \
+          \                \"sort_criteria\": \"string\",\n                                        \"start_index\": 0,\n \
+          \                                       \"total_entities\": 0\n                                    }\n         \
+          \                       },\n                                \"details\": \"string\",\n                         \
+          \       \"has_global_details\": true,\n                                \"id\": \"string\",\n                   \
+          \             \"num_resolved_count\": 0,\n                                \"parent_cause_id\": \"string\",\n   \
+          \                             \"title\": \"string\",\n                                \"troubleshooting_steps\"\
+          : \"string\"\n                            }\n                        ],\n                        \"resolved\": true,\n\
+          \                        \"resolved_by_username\": \"string\",\n                        \"resolved_time_stamp_in_usecs\"\
+          : 0,\n                        \"service_vmid\": \"string\",\n                        \"severity\": \"string\",\n\
+          \                        \"user_defined\": true\n                    }\n                ],\n                \"error_info\"\
+          : {\n                    \"count\": 0,\n                    \"entity_list\": [\n                        \"string\"\
+          \n                    ],\n                    \"message\": \"string\"\n                },\n                \"metadata\"\
+          : {\n                    \"count\": 0,\n                    \"end_index\": 0,\n                    \"filter_criteria\"\
+          : \"string\",\n                    \"grand_total_entities\": 0,\n                    \"next_cursor\": \"string\"\
+          ,\n                    \"page\": 0,\n                    \"previous_cursor\": \"string\",\n                    \"\
+          search_string\": \"string\",\n                    \"sort_criteria\": \"string\",\n                    \"start_index\"\
+          : 0,\n                    \"total_entities\": 0\n                }\n            },\n            \"property2\": {\n\
+          \                \"entities\": [\n                    {\n                        \"acknowledged\": true,\n     \
+          \                   \"acknowledged_by_username\": \"string\",\n                        \"acknowledged_time_stamp_in_usecs\"\
+          : 0,\n                        \"affected_entities\": [\n                            {\n                        \
+          \        \"entity_name\": \"string\",\n                                \"entity_type\": \"string\",\n          \
+          \                      \"entity_type_display_name\": \"string\",\n                                \"id\": \"string\"\
+          ,\n                                \"uuid\": \"string\"\n                            }\n                       \
+          \ ],\n                        \"alert_details\": {\n                            \"metric_details\": [\n        \
+          \                        {\n                                    \"comparison_operator\": \"string\",\n         \
+          \                           \"condition_type\": \"STATIC_THRESHOLD\",\n                                    \"data_type\"\
+          : \"LONG\",\n                                    \"entity_id\": \"string\",\n                                  \
+          \  \"entity_type\": \"string\",\n                                    \"metric_category\": \"string\",\n        \
+          \                            \"metric_display_name\": \"string\",\n                                    \"metric_name\"\
+          : \"string\",\n                                    \"metric_value_details\": [\n                               \
+          \         {\n                                            \"metric_threshold_value\": \"string\",\n             \
+          \                               \"metric_value\": \"string\",\n                                            \"state_change_time_stamp_in_usecs\"\
+          : 0\n                                        }\n                                    ],\n                       \
+          \             \"unit\": \"string\"\n                                }\n                            ],\n        \
+          \                    \"severity_trails\": [\n                                {\n                               \
+          \     \"severity\": \"string\",\n                                    \"severity_change_timestamp_in_usecs\": 0\n\
+          \                                }\n                            ]\n                        },\n                \
+          \        \"alert_title\": \"string\",\n                        \"alert_type_uuid\": \"string\",\n              \
+          \          \"auto_resolved\": true,\n                        \"categories\": [\n                            \"string\"\
+          \n                        ],\n                        \"check_id\": \"string\",\n                        \"classifications\"\
+          : [\n                            \"string\"\n                        ],\n                        \"cluster_uuid\"\
+          : \"string\",\n                        \"context_types\": [\n                            \"string\"\n          \
+          \              ],\n                        \"context_values\": [\n                            \"string\"\n     \
+          \                   ],\n                        \"created_time_stamp_in_usecs\": 0,\n                        \"\
+          detailed_message\": \"string\",\n                        \"entity_ids\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_types\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_uuids\": [\n                            \"string\"\
+          \n                        ],\n                        \"id\": \"string\",\n                        \"impact\": \"\
+          string\",\n                        \"impact_types\": [\n                            \"string\"\n               \
+          \         ],\n                        \"last_occurrence_time_stamp_in_usecs\": 0,\n                        \"message\"\
+          : \"string\",\n                        \"node_uuid\": \"string\",\n                        \"operation_type\": \"\
+          string\",\n                        \"originating_cluster_uuid\": \"string\",\n                        \"possible_causes\"\
+          : [\n                            {\n                                \"actions\": \"string\",\n                 \
+          \               \"additional_links\": \"string\",\n                                \"alert_namespace\": \"string\"\
+          ,\n                                \"cause\": \"string\",\n                                \"chart_queries\": {\n\
+          \                                    \"entities\": [\n                                        {\n              \
+          \                              \"actions\": \"string\",\n                                            \"alerts\"\
+          : \"string\",\n                                            \"cadmus\": \"string\",\n                           \
+          \                 \"entities\": \"string\",\n                                            \"help\": \"string\",\n\
+          \                                            \"metadata\": {\n                                                \"\
+          entity_type\": \"PAGE\",\n                                                \"filters\": [\n                     \
+          \                               {\n                                                        \"display_for_rhs\":\
+          \ \"string\",\n                                                        \"lhs\": \"string\",\n                  \
+          \                                      \"operator\": \"string\",\n                                             \
+          \           \"rhs\": \"string\"\n                                                    }\n                       \
+          \                         ],\n                                                \"instances\": [\n               \
+          \                                     {\n                                                        \"additional_fields\"\
+          : {\n                                                            \"property1\": \"string\",\n                  \
+          \                                          \"property2\": \"string\"\n                                         \
+          \               },\n                                                        \"cluster_uuid\": \"string\",\n    \
+          \                                                    \"context_hint_field\": \"string\",\n                     \
+          \                                   \"context_hint_value\": \"string\",\n                                      \
+          \                  \"entity_id\": \"string\",\n                                                        \"entity_name\"\
+          : \"string\",\n                                                        \"entity_type\": \"PAGE\"\n             \
+          \                                       }\n                                                ],\n                \
+          \                                \"title\": \"string\"\n                                            },\n       \
+          \                                     \"perspectives\": [\n                                                {\n \
+          \                                                   \"format\": \"TABLE\",\n                                   \
+          \                 \"metadata\": {\n                                                        \"entity_type\": \"PAGE\"\
+          ,\n                                                        \"filters\": [\n                                    \
+          \                        {\n                                                                \"display_for_rhs\"\
+          : \"string\",\n                                                                \"lhs\": \"string\",\n          \
+          \                                                      \"operator\": \"string\",\n                             \
+          \                                   \"rhs\": \"string\"\n                                                      \
+          \      }\n                                                        ],\n                                         \
+          \               \"instances\": [\n                                                            {\n              \
+          \                                                  \"additional_fields\": {\n                                  \
+          \                                  \"property1\": \"string\",\n                                                \
+          \                    \"property2\": \"string\"\n                                                               \
+          \ },\n                                                                \"cluster_uuid\": \"string\",\n          \
+          \                                                      \"context_hint_field\": \"string\",\n                   \
+          \                                             \"context_hint_value\": \"string\",\n                            \
+          \                                    \"entity_id\": \"string\",\n                                              \
+          \                  \"entity_name\": \"string\",\n                                                              \
+          \  \"entity_type\": \"PAGE\"\n                                                            }\n                  \
+          \                                      ],\n                                                        \"title\": \"\
+          string\"\n                                                    },\n                                             \
+          \       \"query\": null,\n                                                    \"result\": null,\n              \
+          \                                      \"type\": \"string\"\n                                                }\n\
+          \                                            ]\n                                        }\n                    \
+          \                ],\n                                    \"error_info\": {\n                                   \
+          \     \"count\": 0,\n                                        \"entity_list\": [\n                              \
+          \              \"string\"\n                                        ],\n                                        \"\
+          message\": \"string\"\n                                    },\n                                    \"metadata\"\
+          : {\n                                        \"count\": 0,\n                                        \"end_index\"\
+          : 0,\n                                        \"filter_criteria\": \"string\",\n                               \
+          \         \"grand_total_entities\": 0,\n                                        \"next_cursor\": \"string\",\n \
+          \                                       \"page\": 0,\n                                        \"previous_cursor\"\
+          : \"string\",\n                                        \"search_string\": \"string\",\n                        \
+          \                \"sort_criteria\": \"string\",\n                                        \"start_index\": 0,\n \
+          \                                       \"total_entities\": 0\n                                    }\n         \
+          \                       },\n                                \"details\": \"string\",\n                         \
+          \       \"has_global_details\": true,\n                                \"id\": \"string\",\n                   \
+          \             \"num_resolved_count\": 0,\n                                \"parent_cause_id\": \"string\",\n   \
+          \                             \"title\": \"string\",\n                                \"troubleshooting_steps\"\
+          : \"string\"\n                            }\n                        ],\n                        \"resolved\": true,\n\
+          \                        \"resolved_by_username\": \"string\",\n                        \"resolved_time_stamp_in_usecs\"\
+          : 0,\n                        \"service_vmid\": \"string\",\n                        \"severity\": \"string\",\n\
+          \                        \"user_defined\": true\n                    }\n                ],\n                \"error_info\"\
+          : {\n                    \"count\": 0,\n                    \"entity_list\": [\n                        \"string\"\
+          \n                    ],\n                    \"message\": \"string\"\n                },\n                \"metadata\"\
+          : {\n                    \"count\": 0,\n                    \"end_index\": 0,\n                    \"filter_criteria\"\
+          : \"string\",\n                    \"grand_total_entities\": 0,\n                    \"next_cursor\": \"string\"\
+          ,\n                    \"page\": 0,\n                    \"previous_cursor\": \"string\",\n                    \"\
+          search_string\": \"string\",\n                    \"sort_criteria\": \"string\",\n                    \"start_index\"\
+          : 0,\n                    \"total_entities\": 0\n                }\n            }\n        },\n        \"count\"\
+          : 0\n    },\n    \"attached_vm_id\": \"string\",\n    \"attached_vm_uuid\": \"string\",\n    \"attached_vmname\"\
+          : \"string\",\n    \"attached_volume_group_id\": \"string\",\n    \"cluster_uuid\": \"string\",\n    \"container_id\"\
+          : \"string\",\n    \"container_uuid\": \"string\",\n    \"datasource_uuid\": \"string\",\n    \"device_uuid\": \"\
+          string\",\n    \"disk_address\": \"string\",\n    \"disk_capacity_in_bytes\": 0,\n    \"flash_mode_enabled\": true,\n\
+          \    \"health_summary\": {\n        \"entity_type_summaries\": [\n            {\n                \"checks_in_error\"\
+          : {\n                    \"property1\": {\n                        \"cluster_level\": [\n                      \
+          \      {\n                                \"entity_name\": \"string\",\n                                \"entity_uuid\"\
+          : \"string\",\n                                \"message\": \"string\"\n                            }\n        \
+          \                ],\n                        \"node_level\": [\n                            {\n                \
+          \                \"entity_name\": \"string\",\n                                \"entity_uuid\": \"string\",\n  \
+          \                              \"message\": \"string\"\n                            }\n                        ]\n\
+          \                    },\n                    \"property2\": {\n                        \"cluster_level\": [\n  \
+          \                          {\n                                \"entity_name\": \"string\",\n                   \
+          \             \"entity_uuid\": \"string\",\n                                \"message\": \"string\"\n          \
+          \                  }\n                        ],\n                        \"node_level\": [\n                  \
+          \          {\n                                \"entity_name\": \"string\",\n                                \"entity_uuid\"\
+          : \"string\",\n                                \"message\": \"string\"\n                            }\n        \
+          \                ]\n                    }\n                },\n                \"detailed_check_summary\": {\n \
+          \                   \"property1\": {},\n                    \"property2\": {}\n                },\n            \
+          \    \"entity_type\": \"PAGE\",\n                \"filter_criteria\": \"string\",\n                \"health_summary\"\
+          : {\n                    \"property1\": 0,\n                    \"property2\": 0\n                }\n          \
+          \  }\n        ],\n        \"health_check_summaries\": {\n            \"property1\": {\n                \"attribute_map\"\
+          : {\n                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n           \
+          \     },\n                \"executed_time_stamp_in_usecs\": 0,\n                \"health_status\": \"Critical\"\
+          ,\n                \"id\": \"string\",\n                \"score\": 0\n            },\n            \"property2\"\
+          : {\n                \"attribute_map\": {\n                    \"property1\": \"string\",\n                    \"\
+          property2\": \"string\"\n                },\n                \"executed_time_stamp_in_usecs\": 0,\n            \
+          \    \"health_status\": \"Critical\",\n                \"id\": \"string\",\n                \"score\": 0\n     \
+          \       }\n        },\n        \"health_status\": \"Critical\"\n    },\n    \"nutanix_nfsfile_path\": \"string\"\
+          ,\n    \"stats\": {\n        \"property1\": \"string\",\n        \"property2\": \"string\"\n    },\n    \"storage_container_id\"\
+          : \"string\",\n    \"storage_container_uuid\": \"string\",\n    \"usage_stats\": {\n        \"property1\": \"string\"\
+          ,\n        \"property2\": \"string\"\n    },\n    \"uuid\": \"string\",\n    \"virtual_disk_id\": \"string\"\n}'\
+          \ \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"alert_summary\"\
+          : {\n        \"alert_summaries\": {\n            \"property1\": {\n                \"entities\": [\n           \
+          \         {\n                        \"acknowledged\": true,\n                        \"acknowledged_by_username\"\
+          : \"string\",\n                        \"acknowledged_time_stamp_in_usecs\": 0,\n                        \"affected_entities\"\
+          : [\n                            {\n                                \"entity_name\": \"string\",\n             \
+          \                   \"entity_type\": \"string\",\n                                \"entity_type_display_name\":\
+          \ \"string\",\n                                \"id\": \"string\",\n                                \"uuid\": \"\
+          string\"\n                            }\n                        ],\n                        \"alert_details\":\
+          \ {\n                            \"metric_details\": [\n                                {\n                    \
+          \                \"comparison_operator\": \"string\",\n                                    \"condition_type\": \"\
+          STATIC_THRESHOLD\",\n                                    \"data_type\": \"LONG\",\n                            \
+          \        \"entity_id\": \"string\",\n                                    \"entity_type\": \"string\",\n        \
+          \                            \"metric_category\": \"string\",\n                                    \"metric_display_name\"\
+          : \"string\",\n                                    \"metric_name\": \"string\",\n                              \
+          \      \"metric_value_details\": [\n                                        {\n                                \
+          \            \"metric_threshold_value\": \"string\",\n                                            \"metric_value\"\
+          : \"string\",\n                                            \"state_change_time_stamp_in_usecs\": 0\n           \
+          \                             }\n                                    ],\n                                    \"\
+          unit\": \"string\"\n                                }\n                            ],\n                        \
+          \    \"severity_trails\": [\n                                {\n                                    \"severity\"\
+          : \"string\",\n                                    \"severity_change_timestamp_in_usecs\": 0\n                 \
+          \               }\n                            ]\n                        },\n                        \"alert_title\"\
+          : \"string\",\n                        \"alert_type_uuid\": \"string\",\n                        \"auto_resolved\"\
+          : true,\n                        \"categories\": [\n                            \"string\"\n                   \
+          \     ],\n                        \"check_id\": \"string\",\n                        \"classifications\": [\n  \
+          \                          \"string\"\n                        ],\n                        \"cluster_uuid\": \"\
+          string\",\n                        \"context_types\": [\n                            \"string\"\n              \
+          \          ],\n                        \"context_values\": [\n                            \"string\"\n         \
+          \               ],\n                        \"created_time_stamp_in_usecs\": 0,\n                        \"detailed_message\"\
+          : \"string\",\n                        \"entity_ids\": [\n                            \"string\"\n             \
+          \           ],\n                        \"entity_types\": [\n                            \"string\"\n          \
+          \              ],\n                        \"entity_uuids\": [\n                            \"string\"\n       \
+          \                 ],\n                        \"id\": \"string\",\n                        \"impact\": \"string\"\
+          ,\n                        \"impact_types\": [\n                            \"string\"\n                       \
+          \ ],\n                        \"last_occurrence_time_stamp_in_usecs\": 0,\n                        \"message\":\
+          \ \"string\",\n                        \"node_uuid\": \"string\",\n                        \"operation_type\": \"\
+          string\",\n                        \"originating_cluster_uuid\": \"string\",\n                        \"possible_causes\"\
+          : [\n                            {\n                                \"actions\": \"string\",\n                 \
+          \               \"additional_links\": \"string\",\n                                \"alert_namespace\": \"string\"\
+          ,\n                                \"cause\": \"string\",\n                                \"chart_queries\": {\n\
+          \                                    \"entities\": [\n                                        {\n              \
+          \                              \"actions\": \"string\",\n                                            \"alerts\"\
+          : \"string\",\n                                            \"cadmus\": \"string\",\n                           \
+          \                 \"entities\": \"string\",\n                                            \"help\": \"string\",\n\
+          \                                            \"metadata\": {\n                                                \"\
+          entity_type\": \"PAGE\",\n                                                \"filters\": [\n                     \
+          \                               {\n                                                        \"display_for_rhs\":\
+          \ \"string\",\n                                                        \"lhs\": \"string\",\n                  \
+          \                                      \"operator\": \"string\",\n                                             \
+          \           \"rhs\": \"string\"\n                                                    }\n                       \
+          \                         ],\n                                                \"instances\": [\n               \
+          \                                     {\n                                                        \"additional_fields\"\
+          : {\n                                                            \"property1\": \"string\",\n                  \
+          \                                          \"property2\": \"string\"\n                                         \
+          \               },\n                                                        \"cluster_uuid\": \"string\",\n    \
+          \                                                    \"context_hint_field\": \"string\",\n                     \
+          \                                   \"context_hint_value\": \"string\",\n                                      \
+          \                  \"entity_id\": \"string\",\n                                                        \"entity_name\"\
+          : \"string\",\n                                                        \"entity_type\": \"PAGE\"\n             \
+          \                                       }\n                                                ],\n                \
+          \                                \"title\": \"string\"\n                                            },\n       \
+          \                                     \"perspectives\": [\n                                                {\n \
+          \                                                   \"format\": \"TABLE\",\n                                   \
+          \                 \"metadata\": {\n                                                        \"entity_type\": \"PAGE\"\
+          ,\n                                                        \"filters\": [\n                                    \
+          \                        {\n                                                                \"display_for_rhs\"\
+          : \"string\",\n                                                                \"lhs\": \"string\",\n          \
+          \                                                      \"operator\": \"string\",\n                             \
+          \                                   \"rhs\": \"string\"\n                                                      \
+          \      }\n                                                        ],\n                                         \
+          \               \"instances\": [\n                                                            {\n              \
+          \                                                  \"additional_fields\": {\n                                  \
+          \                                  \"property1\": \"string\",\n                                                \
+          \                    \"property2\": \"string\"\n                                                               \
+          \ },\n                                                                \"cluster_uuid\": \"string\",\n          \
+          \                                                      \"context_hint_field\": \"string\",\n                   \
+          \                                             \"context_hint_value\": \"string\",\n                            \
+          \                                    \"entity_id\": \"string\",\n                                              \
+          \                  \"entity_name\": \"string\",\n                                                              \
+          \  \"entity_type\": \"PAGE\"\n                                                            }\n                  \
+          \                                      ],\n                                                        \"title\": \"\
+          string\"\n                                                    },\n                                             \
+          \       \"query\": null,\n                                                    \"result\": null,\n              \
+          \                                      \"type\": \"string\"\n                                                }\n\
+          \                                            ]\n                                        }\n                    \
+          \                ],\n                                    \"error_info\": {\n                                   \
+          \     \"count\": 0,\n                                        \"entity_list\": [\n                              \
+          \              \"string\"\n                                        ],\n                                        \"\
+          message\": \"string\"\n                                    },\n                                    \"metadata\"\
+          : {\n                                        \"count\": 0,\n                                        \"end_index\"\
+          : 0,\n                                        \"filter_criteria\": \"string\",\n                               \
+          \         \"grand_total_entities\": 0,\n                                        \"next_cursor\": \"string\",\n \
+          \                                       \"page\": 0,\n                                        \"previous_cursor\"\
+          : \"string\",\n                                        \"search_string\": \"string\",\n                        \
+          \                \"sort_criteria\": \"string\",\n                                        \"start_index\": 0,\n \
+          \                                       \"total_entities\": 0\n                                    }\n         \
+          \                       },\n                                \"details\": \"string\",\n                         \
+          \       \"has_global_details\": true,\n                                \"id\": \"string\",\n                   \
+          \             \"num_resolved_count\": 0,\n                                \"parent_cause_id\": \"string\",\n   \
+          \                             \"title\": \"string\",\n                                \"troubleshooting_steps\"\
+          : \"string\"\n                            }\n                        ],\n                        \"resolved\": true,\n\
+          \                        \"resolved_by_username\": \"string\",\n                        \"resolved_time_stamp_in_usecs\"\
+          : 0,\n                        \"service_vmid\": \"string\",\n                        \"severity\": \"string\",\n\
+          \                        \"user_defined\": true\n                    }\n                ],\n                \"error_info\"\
+          : {\n                    \"count\": 0,\n                    \"entity_list\": [\n                        \"string\"\
+          \n                    ],\n                    \"message\": \"string\"\n                },\n                \"metadata\"\
+          : {\n                    \"count\": 0,\n                    \"end_index\": 0,\n                    \"filter_criteria\"\
+          : \"string\",\n                    \"grand_total_entities\": 0,\n                    \"next_cursor\": \"string\"\
+          ,\n                    \"page\": 0,\n                    \"previous_cursor\": \"string\",\n                    \"\
+          search_string\": \"string\",\n                    \"sort_criteria\": \"string\",\n                    \"start_index\"\
+          : 0,\n                    \"total_entities\": 0\n                }\n            },\n            \"property2\": {\n\
+          \                \"entities\": [\n                    {\n                        \"acknowledged\": true,\n     \
+          \                   \"acknowledged_by_username\": \"string\",\n                        \"acknowledged_time_stamp_in_usecs\"\
+          : 0,\n                        \"affected_entities\": [\n                            {\n                        \
+          \        \"entity_name\": \"string\",\n                                \"entity_type\": \"string\",\n          \
+          \                      \"entity_type_display_name\": \"string\",\n                                \"id\": \"string\"\
+          ,\n                                \"uuid\": \"string\"\n                            }\n                       \
+          \ ],\n                        \"alert_details\": {\n                            \"metric_details\": [\n        \
+          \                        {\n                                    \"comparison_operator\": \"string\",\n         \
+          \                           \"condition_type\": \"STATIC_THRESHOLD\",\n                                    \"data_type\"\
+          : \"LONG\",\n                                    \"entity_id\": \"string\",\n                                  \
+          \  \"entity_type\": \"string\",\n                                    \"metric_category\": \"string\",\n        \
+          \                            \"metric_display_name\": \"string\",\n                                    \"metric_name\"\
+          : \"string\",\n                                    \"metric_value_details\": [\n                               \
+          \         {\n                                            \"metric_threshold_value\": \"string\",\n             \
+          \                               \"metric_value\": \"string\",\n                                            \"state_change_time_stamp_in_usecs\"\
+          : 0\n                                        }\n                                    ],\n                       \
+          \             \"unit\": \"string\"\n                                }\n                            ],\n        \
+          \                    \"severity_trails\": [\n                                {\n                               \
+          \     \"severity\": \"string\",\n                                    \"severity_change_timestamp_in_usecs\": 0\n\
+          \                                }\n                            ]\n                        },\n                \
+          \        \"alert_title\": \"string\",\n                        \"alert_type_uuid\": \"string\",\n              \
+          \          \"auto_resolved\": true,\n                        \"categories\": [\n                            \"string\"\
+          \n                        ],\n                        \"check_id\": \"string\",\n                        \"classifications\"\
+          : [\n                            \"string\"\n                        ],\n                        \"cluster_uuid\"\
+          : \"string\",\n                        \"context_types\": [\n                            \"string\"\n          \
+          \              ],\n                        \"context_values\": [\n                            \"string\"\n     \
+          \                   ],\n                        \"created_time_stamp_in_usecs\": 0,\n                        \"\
+          detailed_message\": \"string\",\n                        \"entity_ids\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_types\": [\n                            \"string\"\
+          \n                        ],\n                        \"entity_uuids\": [\n                            \"string\"\
+          \n                        ],\n                        \"id\": \"string\",\n                        \"impact\": \"\
+          string\",\n                        \"impact_types\": [\n                            \"string\"\n               \
+          \         ],\n                        \"last_occurrence_time_stamp_in_usecs\": 0,\n                        \"message\"\
+          : \"string\",\n                        \"node_uuid\": \"string\",\n                        \"operation_type\": \"\
+          string\",\n                        \"originating_cluster_uuid\": \"string\",\n                        \"possible_causes\"\
+          : [\n                            {\n                                \"actions\": \"string\",\n                 \
+          \               \"additional_links\": \"string\",\n                                \"alert_namespace\": \"string\"\
+          ,\n                                \"cause\": \"string\",\n                                \"chart_queries\": {\n\
+          \                                    \"entities\": [\n                                        {\n              \
+          \                              \"actions\": \"string\",\n                                            \"alerts\"\
+          : \"string\",\n                                            \"cadmus\": \"string\",\n                           \
+          \                 \"entities\": \"string\",\n                                            \"help\": \"string\",\n\
+          \                                            \"metadata\": {\n                                                \"\
+          entity_type\": \"PAGE\",\n                                                \"filters\": [\n                     \
+          \                               {\n                                                        \"display_for_rhs\":\
+          \ \"string\",\n                                                        \"lhs\": \"string\",\n                  \
+          \                                      \"operator\": \"string\",\n                                             \
+          \           \"rhs\": \"string\"\n                                                    }\n                       \
+          \                         ],\n                                                \"instances\": [\n               \
+          \                                     {\n                                                        \"additional_fields\"\
+          : {\n                                                            \"property1\": \"string\",\n                  \
+          \                                          \"property2\": \"string\"\n                                         \
+          \               },\n                                                        \"cluster_uuid\": \"string\",\n    \
+          \                                                    \"context_hint_field\": \"string\",\n                     \
+          \                                   \"context_hint_value\": \"string\",\n                                      \
+          \                  \"entity_id\": \"string\",\n                                                        \"entity_name\"\
+          : \"string\",\n                                                        \"entity_type\": \"PAGE\"\n             \
+          \                                       }\n                                                ],\n                \
+          \                                \"title\": \"string\"\n                                            },\n       \
+          \                                     \"perspectives\": [\n                                                {\n \
+          \                                                   \"format\": \"TABLE\",\n                                   \
+          \                 \"metadata\": {\n                                                        \"entity_type\": \"PAGE\"\
+          ,\n                                                        \"filters\": [\n                                    \
+          \                        {\n                                                                \"display_for_rhs\"\
+          : \"string\",\n                                                                \"lhs\": \"string\",\n          \
+          \                                                      \"operator\": \"string\",\n                             \
+          \                                   \"rhs\": \"string\"\n                                                      \
+          \      }\n                                                        ],\n                                         \
+          \               \"instances\": [\n                                                            {\n              \
+          \                                                  \"additional_fields\": {\n                                  \
+          \                                  \"property1\": \"string\",\n                                                \
+          \                    \"property2\": \"string\"\n                                                               \
+          \ },\n                                                                \"cluster_uuid\": \"string\",\n          \
+          \                                                      \"context_hint_field\": \"string\",\n                   \
+          \                                             \"context_hint_value\": \"string\",\n                            \
+          \                                    \"entity_id\": \"string\",\n                                              \
+          \                  \"entity_name\": \"string\",\n                                                              \
+          \  \"entity_type\": \"PAGE\"\n                                                            }\n                  \
+          \                                      ],\n                                                        \"title\": \"\
+          string\"\n                                                    },\n                                             \
+          \       \"query\": null,\n                                                    \"result\": null,\n              \
+          \                                      \"type\": \"string\"\n                                                }\n\
+          \                                            ]\n                                        }\n                    \
+          \                ],\n                                    \"error_info\": {\n                                   \
+          \     \"count\": 0,\n                                        \"entity_list\": [\n                              \
+          \              \"string\"\n                                        ],\n                                        \"\
+          message\": \"string\"\n                                    },\n                                    \"metadata\"\
+          : {\n                                        \"count\": 0,\n                                        \"end_index\"\
+          : 0,\n                                        \"filter_criteria\": \"string\",\n                               \
+          \         \"grand_total_entities\": 0,\n                                        \"next_cursor\": \"string\",\n \
+          \                                       \"page\": 0,\n                                        \"previous_cursor\"\
+          : \"string\",\n                                        \"search_string\": \"string\",\n                        \
+          \                \"sort_criteria\": \"string\",\n                                        \"start_index\": 0,\n \
+          \                                       \"total_entities\": 0\n                                    }\n         \
+          \                       },\n                                \"details\": \"string\",\n                         \
+          \       \"has_global_details\": true,\n                                \"id\": \"string\",\n                   \
+          \             \"num_resolved_count\": 0,\n                                \"parent_cause_id\": \"string\",\n   \
+          \                             \"title\": \"string\",\n                                \"troubleshooting_steps\"\
+          : \"string\"\n                            }\n                        ],\n                        \"resolved\": true,\n\
+          \                        \"resolved_by_username\": \"string\",\n                        \"resolved_time_stamp_in_usecs\"\
+          : 0,\n                        \"service_vmid\": \"string\",\n                        \"severity\": \"string\",\n\
+          \                        \"user_defined\": true\n                    }\n                ],\n                \"error_info\"\
+          : {\n                    \"count\": 0,\n                    \"entity_list\": [\n                        \"string\"\
+          \n                    ],\n                    \"message\": \"string\"\n                },\n                \"metadata\"\
+          : {\n                    \"count\": 0,\n                    \"end_index\": 0,\n                    \"filter_criteria\"\
+          : \"string\",\n                    \"grand_total_entities\": 0,\n                    \"next_cursor\": \"string\"\
+          ,\n                    \"page\": 0,\n                    \"previous_cursor\": \"string\",\n                    \"\
+          search_string\": \"string\",\n                    \"sort_criteria\": \"string\",\n                    \"start_index\"\
+          : 0,\n                    \"total_entities\": 0\n                }\n            }\n        },\n        \"count\"\
+          : 0\n    },\n    \"attached_vm_id\": \"string\",\n    \"attached_vm_uuid\": \"string\",\n    \"attached_vmname\"\
+          : \"string\",\n    \"attached_volume_group_id\": \"string\",\n    \"cluster_uuid\": \"string\",\n    \"container_id\"\
+          : \"string\",\n    \"container_uuid\": \"string\",\n    \"datasource_uuid\": \"string\",\n    \"device_uuid\": \"\
+          string\",\n    \"disk_address\": \"string\",\n    \"disk_capacity_in_bytes\": 0,\n    \"flash_mode_enabled\": true,\n\
+          \    \"health_summary\": {\n        \"entity_type_summaries\": [\n            {\n                \"checks_in_error\"\
+          : {\n                    \"property1\": {\n                        \"cluster_level\": [\n                      \
+          \      {\n                                \"entity_name\": \"string\",\n                                \"entity_uuid\"\
+          : \"string\",\n                                \"message\": \"string\"\n                            }\n        \
+          \                ],\n                        \"node_level\": [\n                            {\n                \
+          \                \"entity_name\": \"string\",\n                                \"entity_uuid\": \"string\",\n  \
+          \                              \"message\": \"string\"\n                            }\n                        ]\n\
+          \                    },\n                    \"property2\": {\n                        \"cluster_level\": [\n  \
+          \                          {\n                                \"entity_name\": \"string\",\n                   \
+          \             \"entity_uuid\": \"string\",\n                                \"message\": \"string\"\n          \
+          \                  }\n                        ],\n                        \"node_level\": [\n                  \
+          \          {\n                                \"entity_name\": \"string\",\n                                \"entity_uuid\"\
+          : \"string\",\n                                \"message\": \"string\"\n                            }\n        \
+          \                ]\n                    }\n                },\n                \"detailed_check_summary\": {\n \
+          \                   \"property1\": {},\n                    \"property2\": {}\n                },\n            \
+          \    \"entity_type\": \"PAGE\",\n                \"filter_criteria\": \"string\",\n                \"health_summary\"\
+          : {\n                    \"property1\": 0,\n                    \"property2\": 0\n                }\n          \
+          \  }\n        ],\n        \"health_check_summaries\": {\n            \"property1\": {\n                \"attribute_map\"\
+          : {\n                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n           \
+          \     },\n                \"executed_time_stamp_in_usecs\": 0,\n                \"health_status\": \"Critical\"\
+          ,\n                \"id\": \"string\",\n                \"score\": 0\n            },\n            \"property2\"\
+          : {\n                \"attribute_map\": {\n                    \"property1\": \"string\",\n                    \"\
+          property2\": \"string\"\n                },\n                \"executed_time_stamp_in_usecs\": 0,\n            \
+          \    \"health_status\": \"Critical\",\n                \"id\": \"string\",\n                \"score\": 0\n     \
+          \       }\n        },\n        \"health_status\": \"Critical\"\n    },\n    \"nutanix_nfsfile_path\": \"string\"\
+          ,\n    \"stats\": {\n        \"property1\": \"string\",\n        \"property2\": \"string\"\n    },\n    \"storage_container_id\"\
+          : \"string\",\n    \"storage_container_uuid\": \"string\",\n    \"usage_stats\": {\n        \"property1\": \"string\"\
+          ,\n        \"property2\": \"string\"\n    },\n    \"uuid\": \"string\",\n    \"virtual_disk_id\": \"string\"\n}\"\
+          \"\"\n\nconn.request(\"PUT\",\"/PrismGateway/services/rest/v2.0/virtual_disks\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          alert_summary\": {\"alert_summaries\": {\"property1\": {\"entities\": [{\"acknowledged\": true, \"acknowledged_by_username\"\
+          : \"string\", \"acknowledged_time_stamp_in_usecs\": 0, \"affected_entities\": [{\"entity_name\": \"string\", \"\
+          entity_type\": \"string\", \"entity_type_display_name\": \"string\", \"id\": \"string\", \"uuid\": \"string\"}],\
+          \ \"alert_details\": {\"metric_details\": [{\"comparison_operator\": \"string\", \"condition_type\": \"STATIC_THRESHOLD\"\
+          , \"data_type\": \"LONG\", \"entity_id\": \"string\", \"entity_type\": \"string\", \"metric_category\": \"string\"\
+          , \"metric_display_name\": \"string\", \"metric_name\": \"string\", \"metric_value_details\": [{\"metric_threshold_value\"\
+          : \"string\", \"metric_value\": \"string\", \"state_change_time_stamp_in_usecs\": 0}], \"unit\": \"string\"}], \"\
+          severity_trails\": [{\"severity\": \"string\", \"severity_change_timestamp_in_usecs\": 0}]}, \"alert_title\": \"\
+          string\", \"alert_type_uuid\": \"string\", \"auto_resolved\": true, \"categories\": [\"string\"], \"check_id\":\
+          \ \"string\", \"classifications\": [\"string\"], \"cluster_uuid\": \"string\", \"context_types\": [\"string\"],\
+          \ \"context_values\": [\"string\"], \"created_time_stamp_in_usecs\": 0, \"detailed_message\": \"string\", \"entity_ids\"\
+          : [\"string\"], \"entity_types\": [\"string\"], \"entity_uuids\": [\"string\"], \"id\": \"string\", \"impact\":\
+          \ \"string\", \"impact_types\": [\"string\"], \"last_occurrence_time_stamp_in_usecs\": 0, \"message\": \"string\"\
+          , \"node_uuid\": \"string\", \"operation_type\": \"string\", \"originating_cluster_uuid\": \"string\", \"possible_causes\"\
+          : [{\"actions\": \"string\", \"additional_links\": \"string\", \"alert_namespace\": \"string\", \"cause\": \"string\"\
+          , \"chart_queries\": {\"entities\": [{\"actions\": \"string\", \"alerts\": \"string\", \"cadmus\": \"string\", \"\
+          entities\": \"string\", \"help\": \"string\", \"metadata\": {\"entity_type\": \"PAGE\", \"filters\": [{\"display_for_rhs\"\
+          : \"string\", \"lhs\": \"string\", \"operator\": \"string\", \"rhs\": \"string\"}], \"instances\": [{\"additional_fields\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}, \"cluster_uuid\": \"string\", \"context_hint_field\":\
+          \ \"string\", \"context_hint_value\": \"string\", \"entity_id\": \"string\", \"entity_name\": \"string\", \"entity_type\"\
+          : \"PAGE\"}], \"title\": \"string\"}, \"perspectives\": [{\"format\": \"TABLE\", \"metadata\": {\"entity_type\"\
+          : \"PAGE\", \"filters\": [{\"display_for_rhs\": \"string\", \"lhs\": \"string\", \"operator\": \"string\", \"rhs\"\
+          : \"string\"}], \"instances\": [{\"additional_fields\": {\"property1\": \"string\", \"property2\": \"string\"},\
+          \ \"cluster_uuid\": \"string\", \"context_hint_field\": \"string\", \"context_hint_value\": \"string\", \"entity_id\"\
+          : \"string\", \"entity_name\": \"string\", \"entity_type\": \"PAGE\"}], \"title\": \"string\"}, \"query\": null,\
+          \ \"result\": null, \"type\": \"string\"}]}], \"error_info\": {\"count\": 0, \"entity_list\": [\"string\"], \"message\"\
+          : \"string\"}, \"metadata\": {\"count\": 0, \"end_index\": 0, \"filter_criteria\": \"string\", \"grand_total_entities\"\
+          : 0, \"next_cursor\": \"string\", \"page\": 0, \"previous_cursor\": \"string\", \"search_string\": \"string\", \"\
+          sort_criteria\": \"string\", \"start_index\": 0, \"total_entities\": 0}}, \"details\": \"string\", \"has_global_details\"\
+          : true, \"id\": \"string\", \"num_resolved_count\": 0, \"parent_cause_id\": \"string\", \"title\": \"string\", \"\
+          troubleshooting_steps\": \"string\"}], \"resolved\": true, \"resolved_by_username\": \"string\", \"resolved_time_stamp_in_usecs\"\
+          : 0, \"service_vmid\": \"string\", \"severity\": \"string\", \"user_defined\": true}], \"error_info\": {\"count\"\
+          : 0, \"entity_list\": [\"string\"], \"message\": \"string\"}, \"metadata\": {\"count\": 0, \"end_index\": 0, \"\
+          filter_criteria\": \"string\", \"grand_total_entities\": 0, \"next_cursor\": \"string\", \"page\": 0, \"previous_cursor\"\
+          : \"string\", \"search_string\": \"string\", \"sort_criteria\": \"string\", \"start_index\": 0, \"total_entities\"\
+          : 0}}, \"property2\": {\"entities\": [{\"acknowledged\": true, \"acknowledged_by_username\": \"string\", \"acknowledged_time_stamp_in_usecs\"\
+          : 0, \"affected_entities\": [{\"entity_name\": \"string\", \"entity_type\": \"string\", \"entity_type_display_name\"\
+          : \"string\", \"id\": \"string\", \"uuid\": \"string\"}], \"alert_details\": {\"metric_details\": [{\"comparison_operator\"\
+          : \"string\", \"condition_type\": \"STATIC_THRESHOLD\", \"data_type\": \"LONG\", \"entity_id\": \"string\", \"entity_type\"\
+          : \"string\", \"metric_category\": \"string\", \"metric_display_name\": \"string\", \"metric_name\": \"string\"\
+          , \"metric_value_details\": [{\"metric_threshold_value\": \"string\", \"metric_value\": \"string\", \"state_change_time_stamp_in_usecs\"\
+          : 0}], \"unit\": \"string\"}], \"severity_trails\": [{\"severity\": \"string\", \"severity_change_timestamp_in_usecs\"\
+          : 0}]}, \"alert_title\": \"string\", \"alert_type_uuid\": \"string\", \"auto_resolved\": true, \"categories\": [\"\
+          string\"], \"check_id\": \"string\", \"classifications\": [\"string\"], \"cluster_uuid\": \"string\", \"context_types\"\
+          : [\"string\"], \"context_values\": [\"string\"], \"created_time_stamp_in_usecs\": 0, \"detailed_message\": \"string\"\
+          , \"entity_ids\": [\"string\"], \"entity_types\": [\"string\"], \"entity_uuids\": [\"string\"], \"id\": \"string\"\
+          , \"impact\": \"string\", \"impact_types\": [\"string\"], \"last_occurrence_time_stamp_in_usecs\": 0, \"message\"\
+          : \"string\", \"node_uuid\": \"string\", \"operation_type\": \"string\", \"originating_cluster_uuid\": \"string\"\
+          , \"possible_causes\": [{\"actions\": \"string\", \"additional_links\": \"string\", \"alert_namespace\": \"string\"\
+          , \"cause\": \"string\", \"chart_queries\": {\"entities\": [{\"actions\": \"string\", \"alerts\": \"string\", \"\
+          cadmus\": \"string\", \"entities\": \"string\", \"help\": \"string\", \"metadata\": {\"entity_type\": \"PAGE\",\
+          \ \"filters\": [{\"display_for_rhs\": \"string\", \"lhs\": \"string\", \"operator\": \"string\", \"rhs\": \"string\"\
+          }], \"instances\": [{\"additional_fields\": {\"property1\": \"string\", \"property2\": \"string\"}, \"cluster_uuid\"\
+          : \"string\", \"context_hint_field\": \"string\", \"context_hint_value\": \"string\", \"entity_id\": \"string\"\
+          , \"entity_name\": \"string\", \"entity_type\": \"PAGE\"}], \"title\": \"string\"}, \"perspectives\": [{\"format\"\
+          : \"TABLE\", \"metadata\": {\"entity_type\": \"PAGE\", \"filters\": [{\"display_for_rhs\": \"string\", \"lhs\":\
+          \ \"string\", \"operator\": \"string\", \"rhs\": \"string\"}], \"instances\": [{\"additional_fields\": {\"property1\"\
+          : \"string\", \"property2\": \"string\"}, \"cluster_uuid\": \"string\", \"context_hint_field\": \"string\", \"context_hint_value\"\
+          : \"string\", \"entity_id\": \"string\", \"entity_name\": \"string\", \"entity_type\": \"PAGE\"}], \"title\": \"\
+          string\"}, \"query\": null, \"result\": null, \"type\": \"string\"}]}], \"error_info\": {\"count\": 0, \"entity_list\"\
+          : [\"string\"], \"message\": \"string\"}, \"metadata\": {\"count\": 0, \"end_index\": 0, \"filter_criteria\": \"\
+          string\", \"grand_total_entities\": 0, \"next_cursor\": \"string\", \"page\": 0, \"previous_cursor\": \"string\"\
+          , \"search_string\": \"string\", \"sort_criteria\": \"string\", \"start_index\": 0, \"total_entities\": 0}}, \"\
+          details\": \"string\", \"has_global_details\": true, \"id\": \"string\", \"num_resolved_count\": 0, \"parent_cause_id\"\
+          : \"string\", \"title\": \"string\", \"troubleshooting_steps\": \"string\"}], \"resolved\": true, \"resolved_by_username\"\
+          : \"string\", \"resolved_time_stamp_in_usecs\": 0, \"service_vmid\": \"string\", \"severity\": \"string\", \"user_defined\"\
+          : true}], \"error_info\": {\"count\": 0, \"entity_list\": [\"string\"], \"message\": \"string\"}, \"metadata\":\
+          \ {\"count\": 0, \"end_index\": 0, \"filter_criteria\": \"string\", \"grand_total_entities\": 0, \"next_cursor\"\
+          : \"string\", \"page\": 0, \"previous_cursor\": \"string\", \"search_string\": \"string\", \"sort_criteria\": \"\
+          string\", \"start_index\": 0, \"total_entities\": 0}}}, \"count\": 0}, \"attached_vm_id\": \"string\", \"attached_vm_uuid\"\
+          : \"string\", \"attached_vmname\": \"string\", \"attached_volume_group_id\": \"string\", \"cluster_uuid\": \"string\"\
+          , \"container_id\": \"string\", \"container_uuid\": \"string\", \"datasource_uuid\": \"string\", \"device_uuid\"\
+          : \"string\", \"disk_address\": \"string\", \"disk_capacity_in_bytes\": 0, \"flash_mode_enabled\": true, \"health_summary\"\
+          : {\"entity_type_summaries\": [{\"checks_in_error\": {\"property1\": {\"cluster_level\": [{\"entity_name\": \"string\"\
+          , \"entity_uuid\": \"string\", \"message\": \"string\"}], \"node_level\": [{\"entity_name\": \"string\", \"entity_uuid\"\
+          : \"string\", \"message\": \"string\"}]}, \"property2\": {\"cluster_level\": [{\"entity_name\": \"string\", \"entity_uuid\"\
+          : \"string\", \"message\": \"string\"}], \"node_level\": [{\"entity_name\": \"string\", \"entity_uuid\": \"string\"\
+          , \"message\": \"string\"}]}}, \"detailed_check_summary\": {\"property1\": {}, \"property2\": {}}, \"entity_type\"\
+          : \"PAGE\", \"filter_criteria\": \"string\", \"health_summary\": {\"property1\": 0, \"property2\": 0}}], \"health_check_summaries\"\
+          : {\"property1\": {\"attribute_map\": {\"property1\": \"string\", \"property2\": \"string\"}, \"executed_time_stamp_in_usecs\"\
+          : 0, \"health_status\": \"Critical\", \"id\": \"string\", \"score\": 0}, \"property2\": {\"attribute_map\": {\"\
+          property1\": \"string\", \"property2\": \"string\"}, \"executed_time_stamp_in_usecs\": 0, \"health_status\": \"\
+          Critical\", \"id\": \"string\", \"score\": 0}}, \"health_status\": \"Critical\"}, \"nutanix_nfsfile_path\": \"string\"\
+          , \"stats\": {\"property1\": \"string\", \"property2\": \"string\"}, \"storage_container_id\": \"string\", \"storage_container_uuid\"\
+          : \"string\", \"usage_stats\": {\"property1\": \"string\", \"property2\": \"string\"}, \"uuid\": \"string\", \"\
+          virtual_disk_id\": \"string\"}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"alert_summary\\\": {\\\"alert_summaries\\\": {\\\"property1\\\": {\\\"entities\\\": [{\\\"acknowledged\\\"\
+          : true, \\\"acknowledged_by_username\\\": \\\"string\\\", \\\"acknowledged_time_stamp_in_usecs\\\": 0, \\\"affected_entities\\\
+          \": [{\\\"entity_name\\\": \\\"string\\\", \\\"entity_type\\\": \\\"string\\\", \\\"entity_type_display_name\\\"\
+          : \\\"string\\\", \\\"id\\\": \\\"string\\\", \\\"uuid\\\": \\\"string\\\"}], \\\"alert_details\\\": {\\\"metric_details\\\
+          \": [{\\\"comparison_operator\\\": \\\"string\\\", \\\"condition_type\\\": \\\"STATIC_THRESHOLD\\\", \\\"data_type\\\
+          \": \\\"LONG\\\", \\\"entity_id\\\": \\\"string\\\", \\\"entity_type\\\": \\\"string\\\", \\\"metric_category\\\"\
+          : \\\"string\\\", \\\"metric_display_name\\\": \\\"string\\\", \\\"metric_name\\\": \\\"string\\\", \\\"metric_value_details\\\
+          \": [{\\\"metric_threshold_value\\\": \\\"string\\\", \\\"metric_value\\\": \\\"string\\\", \\\"state_change_time_stamp_in_usecs\\\
+          \": 0}], \\\"unit\\\": \\\"string\\\"}], \\\"severity_trails\\\": [{\\\"severity\\\": \\\"string\\\", \\\"severity_change_timestamp_in_usecs\\\
+          \": 0}]}, \\\"alert_title\\\": \\\"string\\\", \\\"alert_type_uuid\\\": \\\"string\\\", \\\"auto_resolved\\\": true,\
+          \ \\\"categories\\\": [\\\"string\\\"], \\\"check_id\\\": \\\"string\\\", \\\"classifications\\\": [\\\"string\\\
+          \"], \\\"cluster_uuid\\\": \\\"string\\\", \\\"context_types\\\": [\\\"string\\\"], \\\"context_values\\\": [\\\"\
+          string\\\"], \\\"created_time_stamp_in_usecs\\\": 0, \\\"detailed_message\\\": \\\"string\\\", \\\"entity_ids\\\"\
+          : [\\\"string\\\"], \\\"entity_types\\\": [\\\"string\\\"], \\\"entity_uuids\\\": [\\\"string\\\"], \\\"id\\\":\
+          \ \\\"string\\\", \\\"impact\\\": \\\"string\\\", \\\"impact_types\\\": [\\\"string\\\"], \\\"last_occurrence_time_stamp_in_usecs\\\
+          \": 0, \\\"message\\\": \\\"string\\\", \\\"node_uuid\\\": \\\"string\\\", \\\"operation_type\\\": \\\"string\\\"\
+          , \\\"originating_cluster_uuid\\\": \\\"string\\\", \\\"possible_causes\\\": [{\\\"actions\\\": \\\"string\\\",\
+          \ \\\"additional_links\\\": \\\"string\\\", \\\"alert_namespace\\\": \\\"string\\\", \\\"cause\\\": \\\"string\\\
+          \", \\\"chart_queries\\\": {\\\"entities\\\": [{\\\"actions\\\": \\\"string\\\", \\\"alerts\\\": \\\"string\\\"\
+          , \\\"cadmus\\\": \\\"string\\\", \\\"entities\\\": \\\"string\\\", \\\"help\\\": \\\"string\\\", \\\"metadata\\\
+          \": {\\\"entity_type\\\": \\\"PAGE\\\", \\\"filters\\\": [{\\\"display_for_rhs\\\": \\\"string\\\", \\\"lhs\\\"\
+          : \\\"string\\\", \\\"operator\\\": \\\"string\\\", \\\"rhs\\\": \\\"string\\\"}], \\\"instances\\\": [{\\\"additional_fields\\\
+          \": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"cluster_uuid\\\": \\\"string\\\"\
+          , \\\"context_hint_field\\\": \\\"string\\\", \\\"context_hint_value\\\": \\\"string\\\", \\\"entity_id\\\": \\\"\
+          string\\\", \\\"entity_name\\\": \\\"string\\\", \\\"entity_type\\\": \\\"PAGE\\\"}], \\\"title\\\": \\\"string\\\
+          \"}, \\\"perspectives\\\": [{\\\"format\\\": \\\"TABLE\\\", \\\"metadata\\\": {\\\"entity_type\\\": \\\"PAGE\\\"\
+          , \\\"filters\\\": [{\\\"display_for_rhs\\\": \\\"string\\\", \\\"lhs\\\": \\\"string\\\", \\\"operator\\\": \\\"\
+          string\\\", \\\"rhs\\\": \\\"string\\\"}], \\\"instances\\\": [{\\\"additional_fields\\\": {\\\"property1\\\": \\\
+          \"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"cluster_uuid\\\": \\\"string\\\", \\\"context_hint_field\\\
+          \": \\\"string\\\", \\\"context_hint_value\\\": \\\"string\\\", \\\"entity_id\\\": \\\"string\\\", \\\"entity_name\\\
+          \": \\\"string\\\", \\\"entity_type\\\": \\\"PAGE\\\"}], \\\"title\\\": \\\"string\\\"}, \\\"query\\\": null, \\\
+          \"result\\\": null, \\\"type\\\": \\\"string\\\"}]}], \\\"error_info\\\": {\\\"count\\\": 0, \\\"entity_list\\\"\
+          : [\\\"string\\\"], \\\"message\\\": \\\"string\\\"}, \\\"metadata\\\": {\\\"count\\\": 0, \\\"end_index\\\": 0,\
+          \ \\\"filter_criteria\\\": \\\"string\\\", \\\"grand_total_entities\\\": 0, \\\"next_cursor\\\": \\\"string\\\"\
+          , \\\"page\\\": 0, \\\"previous_cursor\\\": \\\"string\\\", \\\"search_string\\\": \\\"string\\\", \\\"sort_criteria\\\
+          \": \\\"string\\\", \\\"start_index\\\": 0, \\\"total_entities\\\": 0}}, \\\"details\\\": \\\"string\\\", \\\"has_global_details\\\
+          \": true, \\\"id\\\": \\\"string\\\", \\\"num_resolved_count\\\": 0, \\\"parent_cause_id\\\": \\\"string\\\", \\\
+          \"title\\\": \\\"string\\\", \\\"troubleshooting_steps\\\": \\\"string\\\"}], \\\"resolved\\\": true, \\\"resolved_by_username\\\
+          \": \\\"string\\\", \\\"resolved_time_stamp_in_usecs\\\": 0, \\\"service_vmid\\\": \\\"string\\\", \\\"severity\\\
+          \": \\\"string\\\", \\\"user_defined\\\": true}], \\\"error_info\\\": {\\\"count\\\": 0, \\\"entity_list\\\": [\\\
+          \"string\\\"], \\\"message\\\": \\\"string\\\"}, \\\"metadata\\\": {\\\"count\\\": 0, \\\"end_index\\\": 0, \\\"\
+          filter_criteria\\\": \\\"string\\\", \\\"grand_total_entities\\\": 0, \\\"next_cursor\\\": \\\"string\\\", \\\"\
+          page\\\": 0, \\\"previous_cursor\\\": \\\"string\\\", \\\"search_string\\\": \\\"string\\\", \\\"sort_criteria\\\
+          \": \\\"string\\\", \\\"start_index\\\": 0, \\\"total_entities\\\": 0}}, \\\"property2\\\": {\\\"entities\\\": [{\\\
+          \"acknowledged\\\": true, \\\"acknowledged_by_username\\\": \\\"string\\\", \\\"acknowledged_time_stamp_in_usecs\\\
+          \": 0, \\\"affected_entities\\\": [{\\\"entity_name\\\": \\\"string\\\", \\\"entity_type\\\": \\\"string\\\", \\\
+          \"entity_type_display_name\\\": \\\"string\\\", \\\"id\\\": \\\"string\\\", \\\"uuid\\\": \\\"string\\\"}], \\\"\
+          alert_details\\\": {\\\"metric_details\\\": [{\\\"comparison_operator\\\": \\\"string\\\", \\\"condition_type\\\"\
+          : \\\"STATIC_THRESHOLD\\\", \\\"data_type\\\": \\\"LONG\\\", \\\"entity_id\\\": \\\"string\\\", \\\"entity_type\\\
+          \": \\\"string\\\", \\\"metric_category\\\": \\\"string\\\", \\\"metric_display_name\\\": \\\"string\\\", \\\"metric_name\\\
+          \": \\\"string\\\", \\\"metric_value_details\\\": [{\\\"metric_threshold_value\\\": \\\"string\\\", \\\"metric_value\\\
+          \": \\\"string\\\", \\\"state_change_time_stamp_in_usecs\\\": 0}], \\\"unit\\\": \\\"string\\\"}], \\\"severity_trails\\\
+          \": [{\\\"severity\\\": \\\"string\\\", \\\"severity_change_timestamp_in_usecs\\\": 0}]}, \\\"alert_title\\\": \\\
+          \"string\\\", \\\"alert_type_uuid\\\": \\\"string\\\", \\\"auto_resolved\\\": true, \\\"categories\\\": [\\\"string\\\
+          \"], \\\"check_id\\\": \\\"string\\\", \\\"classifications\\\": [\\\"string\\\"], \\\"cluster_uuid\\\": \\\"string\\\
+          \", \\\"context_types\\\": [\\\"string\\\"], \\\"context_values\\\": [\\\"string\\\"], \\\"created_time_stamp_in_usecs\\\
+          \": 0, \\\"detailed_message\\\": \\\"string\\\", \\\"entity_ids\\\": [\\\"string\\\"], \\\"entity_types\\\": [\\\
+          \"string\\\"], \\\"entity_uuids\\\": [\\\"string\\\"], \\\"id\\\": \\\"string\\\", \\\"impact\\\": \\\"string\\\"\
+          , \\\"impact_types\\\": [\\\"string\\\"], \\\"last_occurrence_time_stamp_in_usecs\\\": 0, \\\"message\\\": \\\"\
+          string\\\", \\\"node_uuid\\\": \\\"string\\\", \\\"operation_type\\\": \\\"string\\\", \\\"originating_cluster_uuid\\\
+          \": \\\"string\\\", \\\"possible_causes\\\": [{\\\"actions\\\": \\\"string\\\", \\\"additional_links\\\": \\\"string\\\
+          \", \\\"alert_namespace\\\": \\\"string\\\", \\\"cause\\\": \\\"string\\\", \\\"chart_queries\\\": {\\\"entities\\\
+          \": [{\\\"actions\\\": \\\"string\\\", \\\"alerts\\\": \\\"string\\\", \\\"cadmus\\\": \\\"string\\\", \\\"entities\\\
+          \": \\\"string\\\", \\\"help\\\": \\\"string\\\", \\\"metadata\\\": {\\\"entity_type\\\": \\\"PAGE\\\", \\\"filters\\\
+          \": [{\\\"display_for_rhs\\\": \\\"string\\\", \\\"lhs\\\": \\\"string\\\", \\\"operator\\\": \\\"string\\\", \\\
+          \"rhs\\\": \\\"string\\\"}], \\\"instances\\\": [{\\\"additional_fields\\\": {\\\"property1\\\": \\\"string\\\"\
+          , \\\"property2\\\": \\\"string\\\"}, \\\"cluster_uuid\\\": \\\"string\\\", \\\"context_hint_field\\\": \\\"string\\\
+          \", \\\"context_hint_value\\\": \\\"string\\\", \\\"entity_id\\\": \\\"string\\\", \\\"entity_name\\\": \\\"string\\\
+          \", \\\"entity_type\\\": \\\"PAGE\\\"}], \\\"title\\\": \\\"string\\\"}, \\\"perspectives\\\": [{\\\"format\\\"\
+          : \\\"TABLE\\\", \\\"metadata\\\": {\\\"entity_type\\\": \\\"PAGE\\\", \\\"filters\\\": [{\\\"display_for_rhs\\\"\
+          : \\\"string\\\", \\\"lhs\\\": \\\"string\\\", \\\"operator\\\": \\\"string\\\", \\\"rhs\\\": \\\"string\\\"}],\
+          \ \\\"instances\\\": [{\\\"additional_fields\\\": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\
+          \"}, \\\"cluster_uuid\\\": \\\"string\\\", \\\"context_hint_field\\\": \\\"string\\\", \\\"context_hint_value\\\"\
+          : \\\"string\\\", \\\"entity_id\\\": \\\"string\\\", \\\"entity_name\\\": \\\"string\\\", \\\"entity_type\\\": \\\
+          \"PAGE\\\"}], \\\"title\\\": \\\"string\\\"}, \\\"query\\\": null, \\\"result\\\": null, \\\"type\\\": \\\"string\\\
+          \"}]}], \\\"error_info\\\": {\\\"count\\\": 0, \\\"entity_list\\\": [\\\"string\\\"], \\\"message\\\": \\\"string\\\
+          \"}, \\\"metadata\\\": {\\\"count\\\": 0, \\\"end_index\\\": 0, \\\"filter_criteria\\\": \\\"string\\\", \\\"grand_total_entities\\\
+          \": 0, \\\"next_cursor\\\": \\\"string\\\", \\\"page\\\": 0, \\\"previous_cursor\\\": \\\"string\\\", \\\"search_string\\\
+          \": \\\"string\\\", \\\"sort_criteria\\\": \\\"string\\\", \\\"start_index\\\": 0, \\\"total_entities\\\": 0}},\
+          \ \\\"details\\\": \\\"string\\\", \\\"has_global_details\\\": true, \\\"id\\\": \\\"string\\\", \\\"num_resolved_count\\\
+          \": 0, \\\"parent_cause_id\\\": \\\"string\\\", \\\"title\\\": \\\"string\\\", \\\"troubleshooting_steps\\\": \\\
+          \"string\\\"}], \\\"resolved\\\": true, \\\"resolved_by_username\\\": \\\"string\\\", \\\"resolved_time_stamp_in_usecs\\\
+          \": 0, \\\"service_vmid\\\": \\\"string\\\", \\\"severity\\\": \\\"string\\\", \\\"user_defined\\\": true}], \\\"\
+          error_info\\\": {\\\"count\\\": 0, \\\"entity_list\\\": [\\\"string\\\"], \\\"message\\\": \\\"string\\\"}, \\\"\
+          metadata\\\": {\\\"count\\\": 0, \\\"end_index\\\": 0, \\\"filter_criteria\\\": \\\"string\\\", \\\"grand_total_entities\\\
+          \": 0, \\\"next_cursor\\\": \\\"string\\\", \\\"page\\\": 0, \\\"previous_cursor\\\": \\\"string\\\", \\\"search_string\\\
+          \": \\\"string\\\", \\\"sort_criteria\\\": \\\"string\\\", \\\"start_index\\\": 0, \\\"total_entities\\\": 0}}},\
+          \ \\\"count\\\": 0}, \\\"attached_vm_id\\\": \\\"string\\\", \\\"attached_vm_uuid\\\": \\\"string\\\", \\\"attached_vmname\\\
+          \": \\\"string\\\", \\\"attached_volume_group_id\\\": \\\"string\\\", \\\"cluster_uuid\\\": \\\"string\\\", \\\"\
+          container_id\\\": \\\"string\\\", \\\"container_uuid\\\": \\\"string\\\", \\\"datasource_uuid\\\": \\\"string\\\"\
+          , \\\"device_uuid\\\": \\\"string\\\", \\\"disk_address\\\": \\\"string\\\", \\\"disk_capacity_in_bytes\\\": 0,\
+          \ \\\"flash_mode_enabled\\\": true, \\\"health_summary\\\": {\\\"entity_type_summaries\\\": [{\\\"checks_in_error\\\
+          \": {\\\"property1\\\": {\\\"cluster_level\\\": [{\\\"entity_name\\\": \\\"string\\\", \\\"entity_uuid\\\": \\\"\
+          string\\\", \\\"message\\\": \\\"string\\\"}], \\\"node_level\\\": [{\\\"entity_name\\\": \\\"string\\\", \\\"entity_uuid\\\
+          \": \\\"string\\\", \\\"message\\\": \\\"string\\\"}]}, \\\"property2\\\": {\\\"cluster_level\\\": [{\\\"entity_name\\\
+          \": \\\"string\\\", \\\"entity_uuid\\\": \\\"string\\\", \\\"message\\\": \\\"string\\\"}], \\\"node_level\\\":\
+          \ [{\\\"entity_name\\\": \\\"string\\\", \\\"entity_uuid\\\": \\\"string\\\", \\\"message\\\": \\\"string\\\"}]}},\
+          \ \\\"detailed_check_summary\\\": {\\\"property1\\\": {}, \\\"property2\\\": {}}, \\\"entity_type\\\": \\\"PAGE\\\
+          \", \\\"filter_criteria\\\": \\\"string\\\", \\\"health_summary\\\": {\\\"property1\\\": 0, \\\"property2\\\": 0}}],\
+          \ \\\"health_check_summaries\\\": {\\\"property1\\\": {\\\"attribute_map\\\": {\\\"property1\\\": \\\"string\\\"\
+          , \\\"property2\\\": \\\"string\\\"}, \\\"executed_time_stamp_in_usecs\\\": 0, \\\"health_status\\\": \\\"Critical\\\
+          \", \\\"id\\\": \\\"string\\\", \\\"score\\\": 0}, \\\"property2\\\": {\\\"attribute_map\\\": {\\\"property1\\\"\
+          : \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"executed_time_stamp_in_usecs\\\": 0, \\\"health_status\\\
+          \": \\\"Critical\\\", \\\"id\\\": \\\"string\\\", \\\"score\\\": 0}}, \\\"health_status\\\": \\\"Critical\\\"},\
+          \ \\\"nutanix_nfsfile_path\\\": \\\"string\\\", \\\"stats\\\": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\
+          \": \\\"string\\\"}, \\\"storage_container_id\\\": \\\"string\\\", \\\"storage_container_uuid\\\": \\\"string\\\"\
+          , \\\"usage_stats\\\": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"uuid\\\": \\\"\
+          string\\\", \\\"virtual_disk_id\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks';\nconst options = {\n\
+          \  method: 'PUT',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"\
+          alert_summary\": {\"alert_summaries\": {\"property1\": {\"entities\": [{\"acknowledged\": true, \"acknowledged_by_username\"\
+          : \"string\", \"acknowledged_time_stamp_in_usecs\": 0, \"affected_entities\": [{\"entity_name\": \"string\", \"\
+          entity_type\": \"string\", \"entity_type_display_name\": \"string\", \"id\": \"string\", \"uuid\": \"string\"}],\
+          \ \"alert_details\": {\"metric_details\": [{\"comparison_operator\": \"string\", \"condition_type\": \"STATIC_THRESHOLD\"\
+          , \"data_type\": \"LONG\", \"entity_id\": \"string\", \"entity_type\": \"string\", \"metric_category\": \"string\"\
+          , \"metric_display_name\": \"string\", \"metric_name\": \"string\", \"metric_value_details\": [{\"metric_threshold_value\"\
+          : \"string\", \"metric_value\": \"string\", \"state_change_time_stamp_in_usecs\": 0}], \"unit\": \"string\"}], \"\
+          severity_trails\": [{\"severity\": \"string\", \"severity_change_timestamp_in_usecs\": 0}]}, \"alert_title\": \"\
+          string\", \"alert_type_uuid\": \"string\", \"auto_resolved\": true, \"categories\": [\"string\"], \"check_id\":\
+          \ \"string\", \"classifications\": [\"string\"], \"cluster_uuid\": \"string\", \"context_types\": [\"string\"],\
+          \ \"context_values\": [\"string\"], \"created_time_stamp_in_usecs\": 0, \"detailed_message\": \"string\", \"entity_ids\"\
+          : [\"string\"], \"entity_types\": [\"string\"], \"entity_uuids\": [\"string\"], \"id\": \"string\", \"impact\":\
+          \ \"string\", \"impact_types\": [\"string\"], \"last_occurrence_time_stamp_in_usecs\": 0, \"message\": \"string\"\
+          , \"node_uuid\": \"string\", \"operation_type\": \"string\", \"originating_cluster_uuid\": \"string\", \"possible_causes\"\
+          : [{\"actions\": \"string\", \"additional_links\": \"string\", \"alert_namespace\": \"string\", \"cause\": \"string\"\
+          , \"chart_queries\": {\"entities\": [{\"actions\": \"string\", \"alerts\": \"string\", \"cadmus\": \"string\", \"\
+          entities\": \"string\", \"help\": \"string\", \"metadata\": {\"entity_type\": \"PAGE\", \"filters\": [{\"display_for_rhs\"\
+          : \"string\", \"lhs\": \"string\", \"operator\": \"string\", \"rhs\": \"string\"}], \"instances\": [{\"additional_fields\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}, \"cluster_uuid\": \"string\", \"context_hint_field\":\
+          \ \"string\", \"context_hint_value\": \"string\", \"entity_id\": \"string\", \"entity_name\": \"string\", \"entity_type\"\
+          : \"PAGE\"}], \"title\": \"string\"}, \"perspectives\": [{\"format\": \"TABLE\", \"metadata\": {\"entity_type\"\
+          : \"PAGE\", \"filters\": [{\"display_for_rhs\": \"string\", \"lhs\": \"string\", \"operator\": \"string\", \"rhs\"\
+          : \"string\"}], \"instances\": [{\"additional_fields\": {\"property1\": \"string\", \"property2\": \"string\"},\
+          \ \"cluster_uuid\": \"string\", \"context_hint_field\": \"string\", \"context_hint_value\": \"string\", \"entity_id\"\
+          : \"string\", \"entity_name\": \"string\", \"entity_type\": \"PAGE\"}], \"title\": \"string\"}, \"query\": null,\
+          \ \"result\": null, \"type\": \"string\"}]}], \"error_info\": {\"count\": 0, \"entity_list\": [\"string\"], \"message\"\
+          : \"string\"}, \"metadata\": {\"count\": 0, \"end_index\": 0, \"filter_criteria\": \"string\", \"grand_total_entities\"\
+          : 0, \"next_cursor\": \"string\", \"page\": 0, \"previous_cursor\": \"string\", \"search_string\": \"string\", \"\
+          sort_criteria\": \"string\", \"start_index\": 0, \"total_entities\": 0}}, \"details\": \"string\", \"has_global_details\"\
+          : true, \"id\": \"string\", \"num_resolved_count\": 0, \"parent_cause_id\": \"string\", \"title\": \"string\", \"\
+          troubleshooting_steps\": \"string\"}], \"resolved\": true, \"resolved_by_username\": \"string\", \"resolved_time_stamp_in_usecs\"\
+          : 0, \"service_vmid\": \"string\", \"severity\": \"string\", \"user_defined\": true}], \"error_info\": {\"count\"\
+          : 0, \"entity_list\": [\"string\"], \"message\": \"string\"}, \"metadata\": {\"count\": 0, \"end_index\": 0, \"\
+          filter_criteria\": \"string\", \"grand_total_entities\": 0, \"next_cursor\": \"string\", \"page\": 0, \"previous_cursor\"\
+          : \"string\", \"search_string\": \"string\", \"sort_criteria\": \"string\", \"start_index\": 0, \"total_entities\"\
+          : 0}}, \"property2\": {\"entities\": [{\"acknowledged\": true, \"acknowledged_by_username\": \"string\", \"acknowledged_time_stamp_in_usecs\"\
+          : 0, \"affected_entities\": [{\"entity_name\": \"string\", \"entity_type\": \"string\", \"entity_type_display_name\"\
+          : \"string\", \"id\": \"string\", \"uuid\": \"string\"}], \"alert_details\": {\"metric_details\": [{\"comparison_operator\"\
+          : \"string\", \"condition_type\": \"STATIC_THRESHOLD\", \"data_type\": \"LONG\", \"entity_id\": \"string\", \"entity_type\"\
+          : \"string\", \"metric_category\": \"string\", \"metric_display_name\": \"string\", \"metric_name\": \"string\"\
+          , \"metric_value_details\": [{\"metric_threshold_value\": \"string\", \"metric_value\": \"string\", \"state_change_time_stamp_in_usecs\"\
+          : 0}], \"unit\": \"string\"}], \"severity_trails\": [{\"severity\": \"string\", \"severity_change_timestamp_in_usecs\"\
+          : 0}]}, \"alert_title\": \"string\", \"alert_type_uuid\": \"string\", \"auto_resolved\": true, \"categories\": [\"\
+          string\"], \"check_id\": \"string\", \"classifications\": [\"string\"], \"cluster_uuid\": \"string\", \"context_types\"\
+          : [\"string\"], \"context_values\": [\"string\"], \"created_time_stamp_in_usecs\": 0, \"detailed_message\": \"string\"\
+          , \"entity_ids\": [\"string\"], \"entity_types\": [\"string\"], \"entity_uuids\": [\"string\"], \"id\": \"string\"\
+          , \"impact\": \"string\", \"impact_types\": [\"string\"], \"last_occurrence_time_stamp_in_usecs\": 0, \"message\"\
+          : \"string\", \"node_uuid\": \"string\", \"operation_type\": \"string\", \"originating_cluster_uuid\": \"string\"\
+          , \"possible_causes\": [{\"actions\": \"string\", \"additional_links\": \"string\", \"alert_namespace\": \"string\"\
+          , \"cause\": \"string\", \"chart_queries\": {\"entities\": [{\"actions\": \"string\", \"alerts\": \"string\", \"\
+          cadmus\": \"string\", \"entities\": \"string\", \"help\": \"string\", \"metadata\": {\"entity_type\": \"PAGE\",\
+          \ \"filters\": [{\"display_for_rhs\": \"string\", \"lhs\": \"string\", \"operator\": \"string\", \"rhs\": \"string\"\
+          }], \"instances\": [{\"additional_fields\": {\"property1\": \"string\", \"property2\": \"string\"}, \"cluster_uuid\"\
+          : \"string\", \"context_hint_field\": \"string\", \"context_hint_value\": \"string\", \"entity_id\": \"string\"\
+          , \"entity_name\": \"string\", \"entity_type\": \"PAGE\"}], \"title\": \"string\"}, \"perspectives\": [{\"format\"\
+          : \"TABLE\", \"metadata\": {\"entity_type\": \"PAGE\", \"filters\": [{\"display_for_rhs\": \"string\", \"lhs\":\
+          \ \"string\", \"operator\": \"string\", \"rhs\": \"string\"}], \"instances\": [{\"additional_fields\": {\"property1\"\
+          : \"string\", \"property2\": \"string\"}, \"cluster_uuid\": \"string\", \"context_hint_field\": \"string\", \"context_hint_value\"\
+          : \"string\", \"entity_id\": \"string\", \"entity_name\": \"string\", \"entity_type\": \"PAGE\"}], \"title\": \"\
+          string\"}, \"query\": null, \"result\": null, \"type\": \"string\"}]}], \"error_info\": {\"count\": 0, \"entity_list\"\
+          : [\"string\"], \"message\": \"string\"}, \"metadata\": {\"count\": 0, \"end_index\": 0, \"filter_criteria\": \"\
+          string\", \"grand_total_entities\": 0, \"next_cursor\": \"string\", \"page\": 0, \"previous_cursor\": \"string\"\
+          , \"search_string\": \"string\", \"sort_criteria\": \"string\", \"start_index\": 0, \"total_entities\": 0}}, \"\
+          details\": \"string\", \"has_global_details\": true, \"id\": \"string\", \"num_resolved_count\": 0, \"parent_cause_id\"\
+          : \"string\", \"title\": \"string\", \"troubleshooting_steps\": \"string\"}], \"resolved\": true, \"resolved_by_username\"\
+          : \"string\", \"resolved_time_stamp_in_usecs\": 0, \"service_vmid\": \"string\", \"severity\": \"string\", \"user_defined\"\
+          : true}], \"error_info\": {\"count\": 0, \"entity_list\": [\"string\"], \"message\": \"string\"}, \"metadata\":\
+          \ {\"count\": 0, \"end_index\": 0, \"filter_criteria\": \"string\", \"grand_total_entities\": 0, \"next_cursor\"\
+          : \"string\", \"page\": 0, \"previous_cursor\": \"string\", \"search_string\": \"string\", \"sort_criteria\": \"\
+          string\", \"start_index\": 0, \"total_entities\": 0}}}, \"count\": 0}, \"attached_vm_id\": \"string\", \"attached_vm_uuid\"\
+          : \"string\", \"attached_vmname\": \"string\", \"attached_volume_group_id\": \"string\", \"cluster_uuid\": \"string\"\
+          , \"container_id\": \"string\", \"container_uuid\": \"string\", \"datasource_uuid\": \"string\", \"device_uuid\"\
+          : \"string\", \"disk_address\": \"string\", \"disk_capacity_in_bytes\": 0, \"flash_mode_enabled\": true, \"health_summary\"\
+          : {\"entity_type_summaries\": [{\"checks_in_error\": {\"property1\": {\"cluster_level\": [{\"entity_name\": \"string\"\
+          , \"entity_uuid\": \"string\", \"message\": \"string\"}], \"node_level\": [{\"entity_name\": \"string\", \"entity_uuid\"\
+          : \"string\", \"message\": \"string\"}]}, \"property2\": {\"cluster_level\": [{\"entity_name\": \"string\", \"entity_uuid\"\
+          : \"string\", \"message\": \"string\"}], \"node_level\": [{\"entity_name\": \"string\", \"entity_uuid\": \"string\"\
+          , \"message\": \"string\"}]}}, \"detailed_check_summary\": {\"property1\": {}, \"property2\": {}}, \"entity_type\"\
+          : \"PAGE\", \"filter_criteria\": \"string\", \"health_summary\": {\"property1\": 0, \"property2\": 0}}], \"health_check_summaries\"\
+          : {\"property1\": {\"attribute_map\": {\"property1\": \"string\", \"property2\": \"string\"}, \"executed_time_stamp_in_usecs\"\
+          : 0, \"health_status\": \"Critical\", \"id\": \"string\", \"score\": 0}, \"property2\": {\"attribute_map\": {\"\
+          property1\": \"string\", \"property2\": \"string\"}, \"executed_time_stamp_in_usecs\": 0, \"health_status\": \"\
+          Critical\", \"id\": \"string\", \"score\": 0}}, \"health_status\": \"Critical\"}, \"nutanix_nfsfile_path\": \"string\"\
+          , \"stats\": {\"property1\": \"string\", \"property2\": \"string\"}, \"storage_container_id\": \"string\", \"storage_container_uuid\"\
+          : \"string\", \"usage_stats\": {\"property1\": \"string\", \"property2\": \"string\"}, \"uuid\": \"string\", \"\
+          virtual_disk_id\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /virtual_disks/{uuid}:
+    get:
+      summary: Get VirtualDisk.
+      description: Get VirtualDisk with the specified Uuid.
+      tags:
+      - /virtual_disks
+      operationId: get/virtual_disks/{uuid}/getVirtualDisk
+      parameters:
+      - name: uuid
+        in: path
+        description: Uuid of the VirtualDisk
+        required: true
+        schema:
+          type: string
+      - name: projection
+        in: query
+        description: Projections on the attributes
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.appliance.configuration.VirtualDiskDTO'
+        '500':
+          description: Any internal exception while performing this operation
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks/{uuid}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/virtual_disks/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/virtual_disks/{uuid}';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.dto.alerts.AlertSummaryDTO:
+      type: object
+      properties:
+        alert_summaries:
+          additionalProperties:
+            $ref: '#/components/schemas/get.base.EntityCollection_get.dto.alerts.AlertDTO_'
+          type: object
+        count:
+          format: int64
+          type: integer
+    get.dto.appliance.configuration.VirtualDiskDTO:
+      type: object
+      properties:
+        alert_summary:
+          $ref: '#/components/schemas/get.dto.alerts.AlertSummaryDTO'
+        attached_vm_id:
+          type: string
+        attached_vm_uuid:
+          type: string
+        attached_vmname:
+          type: string
+        attached_volume_group_id:
+          type: string
+        cluster_uuid:
+          type: string
+        container_id:
+          type: string
+        container_uuid:
+          type: string
+        datasource_uuid:
+          type: string
+        device_uuid:
+          type: string
+        disk_address:
+          type: string
+        disk_capacity_in_bytes:
+          format: int64
+          type: integer
+        flash_mode_enabled:
+          type: boolean
+        health_summary:
+          $ref: '#/components/schemas/get.dto.health.check.HealthSummaryDTO'
+        nutanix_nfsfile_path:
+          type: string
+        stats:
+          additionalProperties:
+            type: string
+          type: object
+        storage_container_id:
+          type: string
+        storage_container_uuid:
+          type: string
+        usage_stats:
+          additionalProperties:
+            type: string
+          type: object
+        uuid:
+          type: string
+        virtual_disk_id:
+          type: string
+    update.dto.alerts.AlertDTO:
+      type: object
+      properties:
+        acknowledged:
+          type: boolean
+        acknowledged_by_username:
+          type: string
+        acknowledged_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        affected_entities:
+          items:
+            $ref: '#/components/schemas/update.dto.alerts.AlertDTO_AffectedEntity'
+          type: array
+        alert_details:
+          $ref: '#/components/schemas/update.dto.alerts.AlertDTO_AlertDetailsDTO'
+        alert_title:
+          type: string
+        alert_type_uuid:
+          type: string
+        auto_resolved:
+          type: boolean
+        categories:
+          items:
+            type: string
+          type: array
+        check_id:
+          type: string
+        classifications:
+          items:
+            type: string
+          type: array
+        cluster_uuid:
+          type: string
+        context_types:
+          items:
+            type: string
+          type: array
+        context_values:
+          items:
+            type: string
+          type: array
+        created_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        detailed_message:
+          type: string
+        entity_ids:
+          items:
+            type: string
+          type: array
+        entity_types:
+          items:
+            type: string
+          type: array
+        entity_uuids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        impact:
+          type: string
+        impact_types:
+          items:
+            type: string
+          type: array
+        last_occurrence_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        message:
+          type: string
+        node_uuid:
+          type: string
+        operation_type:
+          type: string
+        originating_cluster_uuid:
+          type: string
+        possible_causes:
+          items:
+            $ref: '#/components/schemas/update.dto.alerts.AlertCauseDTO'
+          type: array
+        resolved:
+          type: boolean
+        resolved_by_username:
+          type: string
+        resolved_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        service_vmid:
+          type: string
+        severity:
+          type: string
+        user_defined:
+          type: boolean
+    get.dto.alerts.AlertDTO_MetricDetails:
+      type: object
+      properties:
+        comparison_operator:
+          type: string
+        condition_type:
+          enum:
+          - STATIC_THRESHOLD
+          - ANOMALY
+          - SAFETY_ZONE
+          type: string
+        data_type:
+          enum:
+          - LONG
+          - DOUBLE
+          - BOOLEAN
+          - STRING
+          type: string
+        entity_id:
+          type: string
+        entity_type:
+          type: string
+        metric_category:
+          type: string
+        metric_display_name:
+          type: string
+        metric_name:
+          type: string
+        metric_value_details:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_MetricValueDetails'
+          type: array
+        unit:
+          type: string
+    get.base.EntityCollection_get.dto.appliance.configuration.VirtualDiskDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.appliance.configuration.VirtualDiskDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    get.dto.health.check.EntityTypeHealthCheckSummaryDTO:
+      type: object
+      properties:
+        checks_in_error:
+          additionalProperties:
+            $ref: '#/components/schemas/get.dto.health.check.HealthCheckErrorsDTO'
+          type: object
+        detailed_check_summary:
+          additionalProperties:
+            additionalProperties:
+              format: int32
+              type: integer
+            type: object
+          type: object
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filter_criteria:
+          type: string
+        health_summary:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+    get.dto.ResultContentDescriptor:
+      type: object
+      properties:
+        actions:
+          type: string
+        alerts:
+          type: string
+        cadmus:
+          type: string
+        entities:
+          type: string
+        help:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/get.dto.ResultMetadata'
+        perspectives:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultContentDescriptor_Perspective'
+          type: array
+    get.dto.EntityMetadata:
+      type: object
+      properties:
+        additional_fields:
+          additionalProperties:
+            type: string
+          type: object
+        cluster_uuid:
+          type: string
+        context_hint_field:
+          type: string
+        context_hint_value:
+          type: string
+        entity_id:
+          type: string
+        entity_name:
+          type: string
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    update.dto.EntityMetadata:
+      type: object
+      properties:
+        additional_fields:
+          additionalProperties:
+            type: string
+          type: object
+        cluster_uuid:
+          type: string
+        context_hint_field:
+          type: string
+        context_hint_value:
+          type: string
+        entity_id:
+          type: string
+        entity_name:
+          type: string
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+    get.dto.ResultMetadata:
+      type: object
+      properties:
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filters:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultMetadata_Filter'
+          type: array
+        instances:
+          items:
+            $ref: '#/components/schemas/get.dto.EntityMetadata'
+          type: array
+        title:
+          type: string
+    update.dto.alerts.AlertDTO_AlertDetailsDTO:
+      type: object
+      properties:
+        metric_details:
+          items:
+            $ref: '#/components/schemas/update.dto.alerts.AlertDTO_MetricDetails'
+          type: array
+        severity_trails:
+          items:
+            $ref: '#/components/schemas/update.dto.alerts.AlertDTO_SeverityTrail'
+          type: array
+    get.dto.alerts.AlertDTO_SeverityTrail:
+      type: object
+      properties:
+        severity:
+          type: string
+        severity_change_timestamp_in_usecs:
+          format: int64
+          type: integer
+    update.dto.alerts.AlertSummaryDTO:
+      type: object
+      properties:
+        alert_summaries:
+          additionalProperties:
+            $ref: '#/components/schemas/update.base.EntityCollection_update.dto.alerts.AlertDTO_'
+          type: object
+        count:
+          format: int64
+          type: integer
+    update.dto.health.check.HealthSummaryDTO:
+      type: object
+      properties:
+        entity_type_summaries:
+          items:
+            $ref: '#/components/schemas/update.dto.health.check.EntityTypeHealthCheckSummaryDTO'
+          type: array
+        health_check_summaries:
+          additionalProperties:
+            $ref: '#/components/schemas/update.dto.health.check.HealthCheckSummaryDTO'
+          type: object
+        health_status:
+          enum:
+          - Critical
+          - Warning
+          - Good
+          - Unknown
+          - Error
+          type: string
+    get.dto.health.check.ErrorInfoDTO:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_uuid:
+          type: string
+        message:
+          type: string
+    update.dto.health.check.ErrorInfoDTO:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_uuid:
+          type: string
+        message:
+          type: string
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.dto.alerts.AlertDTO_AlertDetailsDTO:
+      type: object
+      properties:
+        metric_details:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_MetricDetails'
+          type: array
+        severity_trails:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_SeverityTrail'
+          type: array
+    get.dto.health.check.HealthSummaryDTO:
+      type: object
+      properties:
+        entity_type_summaries:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.EntityTypeHealthCheckSummaryDTO'
+          type: array
+        health_check_summaries:
+          additionalProperties:
+            $ref: '#/components/schemas/get.dto.health.check.HealthCheckSummaryDTO'
+          type: object
+        health_status:
+          enum:
+          - Critical
+          - Warning
+          - Good
+          - Unknown
+          - Error
+          type: string
+    get.dto.alerts.AlertDTO_MetricValueDetails:
+      type: object
+      properties:
+        metric_threshold_value:
+          type: string
+        metric_value:
+          type: string
+        state_change_time_stamp_in_usecs:
+          format: int64
+          type: integer
+    update.dto.ResultMetadata_Filter:
+      type: object
+      properties:
+        display_for_rhs:
+          type: string
+        lhs:
+          type: string
+        operator:
+          type: string
+        rhs:
+          type: string
+    get.dto.alerts.AlertDTO_AffectedEntity:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_type:
+          type: string
+        entity_type_display_name:
+          type: string
+        id:
+          type: string
+        uuid:
+          type: string
+    update.dto.ResultContentDescriptor:
+      type: object
+      properties:
+        actions:
+          type: string
+        alerts:
+          type: string
+        cadmus:
+          type: string
+        entities:
+          type: string
+        help:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/update.dto.ResultMetadata'
+        perspectives:
+          items:
+            $ref: '#/components/schemas/update.dto.ResultContentDescriptor_Perspective'
+          type: array
+    get.base.EntityCollection_get.dto.alerts.AlertDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    update.dto.alerts.AlertDTO_SeverityTrail:
+      type: object
+      properties:
+        severity:
+          type: string
+        severity_change_timestamp_in_usecs:
+          format: int64
+          type: integer
+    update.dto.alerts.AlertDTO_MetricValueDetails:
+      type: object
+      properties:
+        metric_threshold_value:
+          type: string
+        metric_value:
+          type: string
+        state_change_time_stamp_in_usecs:
+          format: int64
+          type: integer
+    update.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    update.dto.alerts.AlertDTO_MetricDetails:
+      type: object
+      properties:
+        comparison_operator:
+          type: string
+        condition_type:
+          enum:
+          - STATIC_THRESHOLD
+          - ANOMALY
+          - SAFETY_ZONE
+          type: string
+        data_type:
+          enum:
+          - LONG
+          - DOUBLE
+          - BOOLEAN
+          - STRING
+          type: string
+        entity_id:
+          type: string
+        entity_type:
+          type: string
+        metric_category:
+          type: string
+        metric_display_name:
+          type: string
+        metric_name:
+          type: string
+        metric_value_details:
+          items:
+            $ref: '#/components/schemas/update.dto.alerts.AlertDTO_MetricValueDetails'
+          type: array
+        unit:
+          type: string
+    update.dto.appliance.configuration.VirtualDiskDTO:
+      type: object
+      properties:
+        alert_summary:
+          $ref: '#/components/schemas/update.dto.alerts.AlertSummaryDTO'
+        attached_vm_id:
+          type: string
+        attached_vm_uuid:
+          type: string
+        attached_vmname:
+          type: string
+        attached_volume_group_id:
+          type: string
+        cluster_uuid:
+          type: string
+        container_id:
+          type: string
+        container_uuid:
+          type: string
+        datasource_uuid:
+          type: string
+        device_uuid:
+          type: string
+        disk_address:
+          type: string
+        disk_capacity_in_bytes:
+          format: int64
+          type: integer
+        flash_mode_enabled:
+          type: boolean
+        health_summary:
+          $ref: '#/components/schemas/update.dto.health.check.HealthSummaryDTO'
+        nutanix_nfsfile_path:
+          type: string
+        stats:
+          additionalProperties:
+            type: string
+          type: object
+        storage_container_id:
+          type: string
+        storage_container_uuid:
+          type: string
+        usage_stats:
+          additionalProperties:
+            type: string
+          type: object
+        uuid:
+          type: string
+        virtual_disk_id:
+          type: string
+    update.dto.alerts.AlertCauseDTO:
+      type: object
+      properties:
+        actions:
+          type: string
+        additional_links:
+          type: string
+        alert_namespace:
+          type: string
+        cause:
+          type: string
+        chart_queries:
+          $ref: '#/components/schemas/update.base.EntityCollection_update.dto.ResultContentDescriptor_'
+        details:
+          type: string
+        has_global_details:
+          type: boolean
+        id:
+          type: string
+        num_resolved_count:
+          format: int64
+          type: integer
+        parent_cause_id:
+          type: string
+        title:
+          type: string
+        troubleshooting_steps:
+          type: string
+    update.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.dto.health.check.HealthCheckSummaryDTO:
+      type: object
+      properties:
+        attribute_map:
+          additionalProperties:
+            type: string
+          type: object
+        executed_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        health_status:
+          enum:
+          - Critical
+          - Warning
+          - Good
+          - Unknown
+          - Error
+          type: string
+        id:
+          type: string
+        score:
+          format: int64
+          type: integer
+    update.base.EntityCollection_update.dto.ResultContentDescriptor_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/update.dto.ResultContentDescriptor'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/update.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/update.base.Metadata'
+    get.dto.health.check.HealthCheckErrorsDTO:
+      type: object
+      properties:
+        cluster_level:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.ErrorInfoDTO'
+          type: array
+        node_level:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.ErrorInfoDTO'
+          type: array
+    update.dto.ResultMetadata:
+      type: object
+      properties:
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filters:
+          items:
+            $ref: '#/components/schemas/update.dto.ResultMetadata_Filter'
+          type: array
+        instances:
+          items:
+            $ref: '#/components/schemas/update.dto.EntityMetadata'
+          type: array
+        title:
+          type: string
+    get.dto.ResultMetadata_Filter:
+      type: object
+      properties:
+        display_for_rhs:
+          type: string
+        lhs:
+          type: string
+        operator:
+          type: string
+        rhs:
+          type: string
+    update.base.EntityCollection_update.dto.alerts.AlertDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/update.dto.alerts.AlertDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/update.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/update.base.Metadata'
+    get.dto.alerts.AlertCauseDTO:
+      type: object
+      properties:
+        actions:
+          type: string
+        additional_links:
+          type: string
+        alert_namespace:
+          type: string
+        cause:
+          type: string
+        chart_queries:
+          $ref: '#/components/schemas/get.base.EntityCollection_get.dto.ResultContentDescriptor_'
+        details:
+          type: string
+        has_global_details:
+          type: boolean
+        id:
+          type: string
+        num_resolved_count:
+          format: int64
+          type: integer
+        parent_cause_id:
+          type: string
+        title:
+          type: string
+        troubleshooting_steps:
+          type: string
+    update.dto.health.check.HealthCheckErrorsDTO:
+      type: object
+      properties:
+        cluster_level:
+          items:
+            $ref: '#/components/schemas/update.dto.health.check.ErrorInfoDTO'
+          type: array
+        node_level:
+          items:
+            $ref: '#/components/schemas/update.dto.health.check.ErrorInfoDTO'
+          type: array
+    update.dto.alerts.AlertDTO_AffectedEntity:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_type:
+          type: string
+        entity_type_display_name:
+          type: string
+        id:
+          type: string
+        uuid:
+          type: string
+    update.dto.ResultContentDescriptor_Perspective:
+      type: object
+      properties:
+        format:
+          enum:
+          - TABLE
+          - BAR_CHART
+          - PIE_CHART
+          - TIME_SERIES
+          - KEY_VALUE
+          - COUNT
+          - HEALTH_SUMMARY
+          - ALERT_INFO
+          - CAPACITY
+          - OTHER
+          type: string
+        metadata:
+          $ref: '#/components/schemas/update.dto.ResultMetadata'
+        query: {}
+        result: {}
+        type:
+          type: string
+    get.base.EntityCollection_get.dto.ResultContentDescriptor_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultContentDescriptor'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    update.dto.health.check.HealthCheckSummaryDTO:
+      type: object
+      properties:
+        attribute_map:
+          additionalProperties:
+            type: string
+          type: object
+        executed_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        health_status:
+          enum:
+          - Critical
+          - Warning
+          - Good
+          - Unknown
+          - Error
+          type: string
+        id:
+          type: string
+        score:
+          format: int64
+          type: integer
+    get.dto.alerts.AlertDTO:
+      type: object
+      properties:
+        acknowledged:
+          type: boolean
+        acknowledged_by_username:
+          type: string
+        acknowledged_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        affected_entities:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_AffectedEntity'
+          type: array
+        alert_details:
+          $ref: '#/components/schemas/get.dto.alerts.AlertDTO_AlertDetailsDTO'
+        alert_title:
+          type: string
+        alert_type_uuid:
+          type: string
+        auto_resolved:
+          type: boolean
+        categories:
+          items:
+            type: string
+          type: array
+        check_id:
+          type: string
+        classifications:
+          items:
+            type: string
+          type: array
+        cluster_uuid:
+          type: string
+        context_types:
+          items:
+            type: string
+          type: array
+        context_values:
+          items:
+            type: string
+          type: array
+        created_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        detailed_message:
+          type: string
+        entity_ids:
+          items:
+            type: string
+          type: array
+        entity_types:
+          items:
+            type: string
+          type: array
+        entity_uuids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        impact:
+          type: string
+        impact_types:
+          items:
+            type: string
+          type: array
+        last_occurrence_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        message:
+          type: string
+        node_uuid:
+          type: string
+        operation_type:
+          type: string
+        originating_cluster_uuid:
+          type: string
+        possible_causes:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertCauseDTO'
+          type: array
+        resolved:
+          type: boolean
+        resolved_by_username:
+          type: string
+        resolved_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        service_vmid:
+          type: string
+        severity:
+          type: string
+        user_defined:
+          type: boolean
+    get.dto.ResultContentDescriptor_Perspective:
+      type: object
+      properties:
+        format:
+          enum:
+          - TABLE
+          - BAR_CHART
+          - PIE_CHART
+          - TIME_SERIES
+          - KEY_VALUE
+          - COUNT
+          - HEALTH_SUMMARY
+          - ALERT_INFO
+          - CAPACITY
+          - OTHER
+          type: string
+        metadata:
+          $ref: '#/components/schemas/get.dto.ResultMetadata'
+        query: {}
+        result: {}
+        type:
+          type: string
+    update.dto.health.check.EntityTypeHealthCheckSummaryDTO:
+      type: object
+      properties:
+        checks_in_error:
+          additionalProperties:
+            $ref: '#/components/schemas/update.dto.health.check.HealthCheckErrorsDTO'
+          type: object
+        detailed_check_summary:
+          additionalProperties:
+            additionalProperties:
+              format: int32
+              type: integer
+            type: object
+          type: object
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filter_criteria:
+          type: string
+        health_summary:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object

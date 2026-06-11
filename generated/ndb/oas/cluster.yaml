@@ -1,0 +1,593 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /clusters:
+    get:
+      description: 'Get all the clusters associated with NDB.
+
+        '
+      operationId: getAllClusters
+      parameters:
+      - description: Includes the management server-related information, such as vCenter IP address, and more.
+        in: query
+        name: include-management-server-info
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ERACloudDTO'
+                type: array
+          description: Operation completed.
+      summary: Get a list of all Clusters
+      tags:
+      - Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/clusters \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/clusters"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/clusters\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/clusters\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/clusters\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/clusters';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization': 'Basic\
+          \ <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /clusters/{cluster_id}:
+    delete:
+      description: 'Deregisters a cluster from NDB using the Cluster ID in the NDB metadata.
+
+        '
+      operationId: deleteCluster
+      parameters:
+      - description: ID of the cluster to deregister.
+        in: path
+        name: cluster_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses: {}
+      summary: Deregister a Cluster from NDB
+      tags:
+      - Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/clusters/{cluster_id} \\\n    --header 'Authorization: Basic\
+          \ <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/clusters/{cluster_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/clusters/{cluster_id}\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/clusters/{cluster_id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif err\
+          \ != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/clusters/{cluster_id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/clusters/{cluster_id}';\nconst options = {\n  method: 'DELETE',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      operationId: getCluster
+      parameters:
+      - description: ID of the cluster to fetch.
+        in: path
+        name: cluster_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERACloud'
+          description: Operation completed.
+      summary: Get a cluster
+      tags:
+      - Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/clusters/{cluster_id} \\\n    --header 'Authorization: Basic\
+          \ <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/clusters/{cluster_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/clusters/{cluster_id}\", headers=headers)\n\n\
+          res = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/clusters/{cluster_id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err !=\
+          \ nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/clusters/{cluster_id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/clusters/{cluster_id}';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      operationId: updateCluster
+      parameters:
+      - description: ID of the cluster to update.
+        in: path
+        name: cluster_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClusterModel'
+        required: false
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ERACloudDTO'
+          description: Operation completed.
+      summary: Update a Cluster
+      tags:
+      - Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/clusters/{cluster_id} \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\
+          \n    --data '{\n    \"cloudInfo\": {\n        \"clusterIp\": \"192.168.0.1\",\n        \"nameServers\": [\n   \
+          \         \"string\"\n        ],\n        \"ntpServers\": [\n            \"string\"\n        ],\n        \"timezone\"\
+          : \"string\",\n        \"timezoneConfigFile\": \"string\"\n    },\n    \"cloudType\": \"string\",\n    \"dateCreated\"\
+          : \"string\",\n    \"dateModified\": \"string\",\n    \"description\": \"string\",\n    \"fqdns\": [\n        \"\
+          string\"\n    ],\n    \"hypervisorType\": \"string\",\n    \"hypervisorVersion\": \"string\",\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n    \"ip\": \"string\",\n    \"ipAddresses\": [\n        \"192.168.0.1\"\n    ],\n    \"managementServerInfo\"\
+          : {\n        \"ip\": \"192.168.0.1\",\n        \"password\": \"string\",\n        \"status\": \"string\",\n    \
+          \    \"type\": \"string\",\n        \"username\": \"string\",\n        \"version\": \"string\"\n    },\n    \"name\"\
+          : \"string\",\n    \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"password\": \"string\",\n    \"\
+          properties\": [\n        {\n            \"description\": \"string\",\n            \"name\": \"string\",\n      \
+          \      \"refId\": \"string\",\n            \"secure\": false,\n            \"value\": \"string\"\n        }\n  \
+          \  ],\n    \"referenceCount\": 0,\n    \"resourceConfig\": {\n        \"memoryThresholdPercentage\": 0,\n      \
+          \  \"storageThresholdPercentage\": 0\n    },\n    \"status\": \"string\",\n    \"uniqueName\": \"string\",\n   \
+          \ \"username\": \"string\",\n    \"version\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"cloudInfo\"\
+          : {\n        \"clusterIp\": \"192.168.0.1\",\n        \"nameServers\": [\n            \"string\"\n        ],\n \
+          \       \"ntpServers\": [\n            \"string\"\n        ],\n        \"timezone\": \"string\",\n        \"timezoneConfigFile\"\
+          : \"string\"\n    },\n    \"cloudType\": \"string\",\n    \"dateCreated\": \"string\",\n    \"dateModified\": \"\
+          string\",\n    \"description\": \"string\",\n    \"fqdns\": [\n        \"string\"\n    ],\n    \"hypervisorType\"\
+          : \"string\",\n    \"hypervisorVersion\": \"string\",\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n \
+          \   \"ip\": \"string\",\n    \"ipAddresses\": [\n        \"192.168.0.1\"\n    ],\n    \"managementServerInfo\":\
+          \ {\n        \"ip\": \"192.168.0.1\",\n        \"password\": \"string\",\n        \"status\": \"string\",\n    \
+          \    \"type\": \"string\",\n        \"username\": \"string\",\n        \"version\": \"string\"\n    },\n    \"name\"\
+          : \"string\",\n    \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"password\": \"string\",\n    \"\
+          properties\": [\n        {\n            \"description\": \"string\",\n            \"name\": \"string\",\n      \
+          \      \"refId\": \"string\",\n            \"secure\": false,\n            \"value\": \"string\"\n        }\n  \
+          \  ],\n    \"referenceCount\": 0,\n    \"resourceConfig\": {\n        \"memoryThresholdPercentage\": 0,\n      \
+          \  \"storageThresholdPercentage\": 0\n    },\n    \"status\": \"string\",\n    \"uniqueName\": \"string\",\n   \
+          \ \"username\": \"string\",\n    \"version\": \"string\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/clusters/{cluster_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"cloudInfo\": {\n        \"clusterIp\": \"192.168.0.1\",\n        \"nameServers\": [\n      \
+          \      \"string\"\n        ],\n        \"ntpServers\": [\n            \"string\"\n        ],\n        \"timezone\"\
+          : \"string\",\n        \"timezoneConfigFile\": \"string\"\n    },\n    \"cloudType\": \"string\",\n    \"dateCreated\"\
+          : \"string\",\n    \"dateModified\": \"string\",\n    \"description\": \"string\",\n    \"fqdns\": [\n        \"\
+          string\"\n    ],\n    \"hypervisorType\": \"string\",\n    \"hypervisorVersion\": \"string\",\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n    \"ip\": \"string\",\n    \"ipAddresses\": [\n        \"192.168.0.1\"\n    ],\n    \"managementServerInfo\"\
+          : {\n        \"ip\": \"192.168.0.1\",\n        \"password\": \"string\",\n        \"status\": \"string\",\n    \
+          \    \"type\": \"string\",\n        \"username\": \"string\",\n        \"version\": \"string\"\n    },\n    \"name\"\
+          : \"string\",\n    \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"password\": \"string\",\n    \"\
+          properties\": [\n        {\n            \"description\": \"string\",\n            \"name\": \"string\",\n      \
+          \      \"refId\": \"string\",\n            \"secure\": false,\n            \"value\": \"string\"\n        }\n  \
+          \  ],\n    \"referenceCount\": 0,\n    \"resourceConfig\": {\n        \"memoryThresholdPercentage\": 0,\n      \
+          \  \"storageThresholdPercentage\": 0\n    },\n    \"status\": \"string\",\n    \"uniqueName\": \"string\",\n   \
+          \ \"username\": \"string\",\n    \"version\": \"string\"\n}\"\"\"\n\nconn.request(\"PUT\",\"/era/v0.9/clusters/{cluster_id}\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/clusters/{cluster_id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"cloudInfo\": {\"clusterIp\"\
+          : \"192.168.0.1\", \"nameServers\": [\"string\"], \"ntpServers\": [\"string\"], \"timezone\": \"string\", \"timezoneConfigFile\"\
+          : \"string\"}, \"cloudType\": \"string\", \"dateCreated\": \"string\", \"dateModified\": \"string\", \"description\"\
+          : \"string\", \"fqdns\": [\"string\"], \"hypervisorType\": \"string\", \"hypervisorVersion\": \"string\", \"id\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"ip\": \"string\", \"ipAddresses\": [\"192.168.0.1\"], \"managementServerInfo\"\
+          : {\"ip\": \"192.168.0.1\", \"password\": \"string\", \"status\": \"string\", \"type\": \"string\", \"username\"\
+          : \"string\", \"version\": \"string\"}, \"name\": \"string\", \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"password\": \"string\", \"properties\": [{\"description\": \"string\", \"name\": \"string\", \"refId\": \"string\"\
+          , \"secure\": false, \"value\": \"string\"}], \"referenceCount\": 0, \"resourceConfig\": {\"memoryThresholdPercentage\"\
+          : 0, \"storageThresholdPercentage\": 0}, \"status\": \"string\", \"uniqueName\": \"string\", \"username\": \"string\"\
+          , \"version\": \"string\"}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n \
+          \       req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/clusters/{cluster_id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"cloudInfo\\\": {\\\"clusterIp\\\": \\\
+          \"192.168.0.1\\\", \\\"nameServers\\\": [\\\"string\\\"], \\\"ntpServers\\\": [\\\"string\\\"], \\\"timezone\\\"\
+          : \\\"string\\\", \\\"timezoneConfigFile\\\": \\\"string\\\"}, \\\"cloudType\\\": \\\"string\\\", \\\"dateCreated\\\
+          \": \\\"string\\\", \\\"dateModified\\\": \\\"string\\\", \\\"description\\\": \\\"string\\\", \\\"fqdns\\\": [\\\
+          \"string\\\"], \\\"hypervisorType\\\": \\\"string\\\", \\\"hypervisorVersion\\\": \\\"string\\\", \\\"id\\\": \\\
+          \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"ip\\\": \\\"string\\\", \\\"ipAddresses\\\": [\\\"192.168.0.1\\\"\
+          ], \\\"managementServerInfo\\\": {\\\"ip\\\": \\\"192.168.0.1\\\", \\\"password\\\": \\\"string\\\", \\\"status\\\
+          \": \\\"string\\\", \\\"type\\\": \\\"string\\\", \\\"username\\\": \\\"string\\\", \\\"version\\\": \\\"string\\\
+          \"}, \\\"name\\\": \\\"string\\\", \\\"ownerId\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"password\\\
+          \": \\\"string\\\", \\\"properties\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"\
+          refId\\\": \\\"string\\\", \\\"secure\\\": false, \\\"value\\\": \\\"string\\\"}], \\\"referenceCount\\\": 0, \\\
+          \"resourceConfig\\\": {\\\"memoryThresholdPercentage\\\": 0, \\\"storageThresholdPercentage\\\": 0}, \\\"status\\\
+          \": \\\"string\\\", \\\"uniqueName\\\": \\\"string\\\", \\\"username\\\": \\\"string\\\", \\\"version\\\": \\\"\
+          string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/clusters/{cluster_id}';\nconst options = {\n  method: 'PUT',\n  headers: {'Accept':\
+          \ 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"cloudInfo\": {\"clusterIp\": \"192.168.0.1\", \"nameServers\": [\"string\"], \"ntpServers\": [\"string\"\
+          ], \"timezone\": \"string\", \"timezoneConfigFile\": \"string\"}, \"cloudType\": \"string\", \"dateCreated\": \"\
+          string\", \"dateModified\": \"string\", \"description\": \"string\", \"fqdns\": [\"string\"], \"hypervisorType\"\
+          : \"string\", \"hypervisorVersion\": \"string\", \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"ip\": \"string\"\
+          , \"ipAddresses\": [\"192.168.0.1\"], \"managementServerInfo\": {\"ip\": \"192.168.0.1\", \"password\": \"string\"\
+          , \"status\": \"string\", \"type\": \"string\", \"username\": \"string\", \"version\": \"string\"}, \"name\": \"\
+          string\", \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"password\": \"string\", \"properties\": [{\"\
+          description\": \"string\", \"name\": \"string\", \"refId\": \"string\", \"secure\": false, \"value\": \"string\"\
+          }], \"referenceCount\": 0, \"resourceConfig\": {\"memoryThresholdPercentage\": 0, \"storageThresholdPercentage\"\
+          : 0}, \"status\": \"string\", \"uniqueName\": \"string\", \"username\": \"string\", \"version\": \"string\"}`\n\
+          };\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    UpdateClusterModel:
+      properties:
+        cloudInfo:
+          $ref: '#/components/schemas/CloudInfo'
+        cloudType:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        fqdns:
+          items:
+            type: string
+          type: array
+        hypervisorType:
+          type: string
+        hypervisorVersion:
+          type: string
+        id:
+          format: uuid
+          type: string
+        ip:
+          type: string
+        ipAddresses:
+          items:
+            format: ipv4
+            type: string
+          type: array
+        managementServerInfo:
+          $ref: '#/components/schemas/ManagementServerInfo'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        password:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ClusterProperties'
+          type: array
+        referenceCount:
+          format: int32
+          type: integer
+        resourceConfig:
+          $ref: '#/components/schemas/ResourceConfig'
+        status:
+          type: string
+        uniqueName:
+          type: string
+        username:
+          type: string
+        version:
+          type: string
+      type: object
+    EraClusterResourceConfigDTO:
+      properties:
+        memoryThresholdPercentage:
+          format: double
+          type: number
+        storageThresholdPercentage:
+          format: double
+          type: number
+      type: object
+    ManagementServerInfo:
+      properties:
+        ip:
+          format: ipv4
+          type: string
+        password:
+          type: string
+        status:
+          type: string
+        type:
+          type: string
+        username:
+          type: string
+        version:
+          type: string
+      type: object
+    ERACloudInfo:
+      properties:
+        clusterIp:
+          format: ipv4
+          type: string
+        nameServers:
+          items:
+            format: ipv4
+            type: string
+          type: array
+        ntpServers:
+          items:
+            format: ipv4
+            type: string
+          type: array
+        timezone:
+          type: string
+        timezoneConfigFile:
+          type: string
+      type: object
+    ERACloudDTO:
+      properties:
+        allocatedLogicalSizeInMB:
+          format: int64
+          type: integer
+        cloudInfo:
+          $ref: '#/components/schemas/ERACloudInfo'
+        cloudType:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        fqdns:
+          items:
+            type: string
+          type: array
+        hasDbservers:
+          type: boolean
+        hypervisorType:
+          type: string
+        hypervisorVersion:
+          type: string
+        id:
+          format: uuid
+          type: string
+        ip:
+          format: ipv4
+          type: string
+        ipAddresses:
+          items:
+            type: string
+          type: array
+        managementServerInfo:
+          $ref: '#/components/schemas/ERAMgmtServerInfo'
+        name:
+          type: string
+        numberOfNodes:
+          format: int64
+          type: integer
+        ownerId:
+          format: uuid
+          type: string
+        password:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        referenceCount:
+          format: int32
+          type: integer
+        resourceConfig:
+          $ref: '#/components/schemas/EraClusterResourceConfigDTO'
+        status:
+          type: string
+        uniqueName:
+          type: string
+        usedLogicalSizeInMB:
+          format: int64
+          type: integer
+        username:
+          type: string
+        version:
+          type: string
+      type: object
+    ERAMgmtServerInfo:
+      properties:
+        ip:
+          type: string
+        password:
+          type: string
+        status:
+          enum:
+          - READY
+          - UNKNOWN
+          - UNREACHABLE
+          type: string
+        type:
+          type: string
+        username:
+          type: string
+        version:
+          type: string
+      type: object
+    ClusterProperties:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        refId:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    CloudInfo:
+      properties:
+        clusterIp:
+          format: ipv4
+          type: string
+        nameServers:
+          items:
+            type: string
+          type: array
+        ntpServers:
+          items:
+            type: string
+          type: array
+        timezone:
+          type: string
+        timezoneConfigFile:
+          type: string
+      type: object
+    ResourceConfig:
+      properties:
+        memoryThresholdPercentage:
+          format: int32
+          type: integer
+        storageThresholdPercentage:
+          format: int32
+          type: integer
+      type: object
+    ERACloud:
+      properties:
+        allocatedLogicalSizeInMB:
+          format: int64
+          type: integer
+        cloudType:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        fqdns:
+          items:
+            type: string
+          type: array
+        hypervisorType:
+          type: string
+        hypervisorVersion:
+          type: string
+        id:
+          format: uuid
+          type: string
+        ipAddresses:
+          items:
+            type: string
+          type: array
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        uniqueName:
+          type: string
+        usedLogicalSizeInMB:
+          format: int64
+          type: integer
+        version:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

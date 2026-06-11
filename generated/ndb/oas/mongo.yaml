@@ -1,0 +1,179 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /dpcs/{dbserver-cluster-id}/mongos/{mongos-id}:
+    delete:
+      description: 'Deletes a mongos which has not yet been added to a sharded cluster database.
+
+        '
+      operationId: deregisterMongos
+      parameters:
+      - description: ID of the Database server cluster to which the mongos belongs.
+        in: path
+        name: dbserver-cluster-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ID of the mongos to delete.
+        in: path
+        name: mongos-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DatabaseDeregisterInfo'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation completed.
+      summary: Delete a mongos
+      tags:
+      - Database Server Physical Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/dpcs/{dbserver-cluster-id}/mongos/{mongos-id} \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/dpcs/{dbserver-cluster-id}/mongos/{mongos-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/dpcs/{dbserver-cluster-id}/mongos/{mongos-id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/dpcs/{dbserver-cluster-id}/mongos/{mongos-id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\"\
+          , url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/dpcs/{dbserver-cluster-id}/mongos/{mongos-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/dpcs/{dbserver-cluster-id}/mongos/{mongos-id}';\nconst options = {\n  method: 'DELETE',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    DatabaseDeregisterInfo:
+      properties:
+        delete:
+          description: Specifies whether the Database should be deleted from the Database Server.
+          type: boolean
+        deleteTimeMachine:
+          type: boolean
+        remove:
+          description: Specifies that the Database should be cleaned up.
+          type: boolean
+        softRemove:
+          description: No cleanup/deletion Operation should be submitted.
+          type: boolean
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

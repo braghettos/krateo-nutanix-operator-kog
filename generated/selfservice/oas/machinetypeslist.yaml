@@ -1,0 +1,177 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /aws/v1/machine_types/list:
+    post:
+      description: 'List all the AWS machine types. No filters to be mentioned.
+
+        '
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/aws_machine_type_list_metadata'
+        required: true
+      tags:
+      - aws/machine_types
+      x-private: true
+      x-doc-hide: true
+      summary: List all the AWS machine types
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: aws_machine_type
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/aws_machine_type_list_response'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/aws/v1/machine_types/list \\\n \
+          \   --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"filter\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\"\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/aws/v1/machine_types/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/nutanix/v3/aws/v1/machine_types/list\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/aws/v1/machine_types/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          filter\": \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n \
+          \       req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/aws/v1/machine_types/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\"}\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/aws/v1/machine_types/list';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"filter\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    aws_machine_type_list_response:
+      description: AWS VPC entity list.
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/aws_machine_type_resource'
+          type: array
+        api_version:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/aws_machine_type_list_metadata_output'
+      title: aws_machine_type entity list
+    aws_machine_type_def_status:
+      description: aws_machine_type resources status
+      type: object
+      properties:
+        name:
+          type: string
+          description: aws_machine_type name.
+        resources:
+          $ref: '#/components/schemas/aws_machine_type_resources_def_status'
+      title: aws_machine_type resources status
+    aws_machine_type_resource:
+      description: aws_machine_type entity
+      required:
+      - metadata
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/aws_machine_type_def_status'
+        metadata:
+          $ref: '#/components/schemas/aws_machine_type_metadata'
+      title: aws_machine_type
+    aws_machine_type_list_metadata:
+      description: 'All api calls that return a list will have this metadata block as input
+
+        '
+      type: object
+      properties:
+        filter:
+          type: string
+          description: The filter used for the results
+      title: Metadata for aws_machine_type list
+    aws_machine_type_resources_def_status:
+      description: aws_machine_type resources
+      type: object
+      properties:
+        name:
+          type: string
+          description: The machine type name.
+      title: aws_machine_type resources
+    aws_machine_type_metadata:
+      description: The aws_machine_type kind metadata
+      required:
+      - kind
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - aws_machine_type
+        name:
+          readOnly: true
+          type: string
+          description: aws_machine_type name
+      title: aws_machine_type metadata
+    aws_machine_type_list_metadata_output:
+      description: 'All api calls that return a list will have this metadata block
+
+        '
+      type: object
+      properties:
+        filter:
+          type: string
+          description: The filter used for the results
+        total_matches:
+          type: integer
+          description: Total matches found
+        kind:
+          x-ntnx-enum:
+          - aws_machine_type
+          type: string
+          description: The kind name
+      title: Metadata for aws_machine_type list output

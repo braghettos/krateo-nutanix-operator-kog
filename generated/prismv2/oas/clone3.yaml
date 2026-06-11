@@ -1,0 +1,353 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /vms/{uuid}/clone:
+    post:
+      summary: Clone a Virtual Machine.
+      description: Clone a Virtual Machine from a snapshot or Virtual Machine.If a UUID is specified for the cloned Virtual
+        Machine, this operation will be idempotent. If override_network_config is set to true in the clone spec, then the
+        source Virtual Machine s network configuration is overridden by one specified in the nic list. If false, the clone
+        will inherit its basic network configuration from the source, minus MAC and IP address. This is also an asynchronous
+        operation that results in the creation of a task object. The UUID of this task object is returned as the response
+        of this operation. This task can be monitored by using the /tasks/poll API.
+      tags:
+      - /vms
+      operationId: post/vms/{uuid}/clone/cloneVM
+      parameters:
+      - name: uuid
+        in: path
+        description: Id of the Virtual Machine
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.acropolis.VMCloneDTO'
+        description: 'Clone a Virtual Machine '
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/clone\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"container_uuid\": \"string\",\n    \"source_vmlogical_timestamp\": 0,\n    \"spec_list\": [\n        {\n\
+          \            \"boot_config\": {\n                \"boot_device_order\": [\n                    \"string\"\n    \
+          \            ],\n                \"boot_device_type\": \"CDROM\",\n                \"disk_address\": {\n       \
+          \             \"device_bus\": \"SCSI\",\n                    \"device_index\": 0,\n                    \"device_uuid\"\
+          : \"string\",\n                    \"disk_label\": \"string\",\n                    \"is_cdrom\": true,\n      \
+          \              \"ndfs_filepath\": \"string\",\n                    \"vmdisk_uuid\": \"string\",\n              \
+          \      \"volume_group_uuid\": \"string\"\n                },\n                \"hardware_virtualization\": true,\n\
+          \                \"mac_addr\": \"string\",\n                \"secure_boot\": true,\n                \"uefi_boot\"\
+          : true\n            },\n            \"clone_affinity\": true,\n            \"memory_mb\": 0,\n            \"name\"\
+          : \"string\",\n            \"num_cores_per_vcpu\": 0,\n            \"num_vcpus\": 0,\n            \"override_network_config\"\
+          : true,\n            \"uuid\": \"string\",\n            \"vm_nics\": [\n                {\n                    \"\
+          adapter_type\": \"E1000\",\n                    \"ip_address\": \"string\",\n                    \"ip_addresses\"\
+          : [\n                        \"string\"\n                    ],\n                    \"is_connected\": true,\n \
+          \                   \"mac_address\": \"string\",\n                    \"model\": \"string\",\n                 \
+          \   \"network_uuid\": \"string\",\n                    \"nic_uuid\": \"string\",\n                    \"port_id\"\
+          : \"string\",\n                    \"request_ip\": true,\n                    \"requested_ip_address\": \"string\"\
+          ,\n                    \"vlan_mode\": \"Access\"\n                }\n            ]\n        }\n    ],\n    \"storage_container_uuid\"\
+          : \"string\",\n    \"uuid\": \"string\",\n    \"vm_customization_config\": {\n        \"datasource_type\": \"CONFIG_DRIVE_V2\"\
+          ,\n        \"files_to_inject_list\": [\n            {\n                \"destination_path\": \"string\",\n     \
+          \           \"source_path\": \"string\"\n            }\n        ],\n        \"fresh_install\": true,\n        \"\
+          userdata\": \"string\",\n        \"userdata_path\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"container_uuid\": \"string\",\n    \"source_vmlogical_timestamp\"\
+          : 0,\n    \"spec_list\": [\n        {\n            \"boot_config\": {\n                \"boot_device_order\": [\n\
+          \                    \"string\"\n                ],\n                \"boot_device_type\": \"CDROM\",\n        \
+          \        \"disk_address\": {\n                    \"device_bus\": \"SCSI\",\n                    \"device_index\"\
+          : 0,\n                    \"device_uuid\": \"string\",\n                    \"disk_label\": \"string\",\n      \
+          \              \"is_cdrom\": true,\n                    \"ndfs_filepath\": \"string\",\n                    \"vmdisk_uuid\"\
+          : \"string\",\n                    \"volume_group_uuid\": \"string\"\n                },\n                \"hardware_virtualization\"\
+          : true,\n                \"mac_addr\": \"string\",\n                \"secure_boot\": true,\n                \"uefi_boot\"\
+          : true\n            },\n            \"clone_affinity\": true,\n            \"memory_mb\": 0,\n            \"name\"\
+          : \"string\",\n            \"num_cores_per_vcpu\": 0,\n            \"num_vcpus\": 0,\n            \"override_network_config\"\
+          : true,\n            \"uuid\": \"string\",\n            \"vm_nics\": [\n                {\n                    \"\
+          adapter_type\": \"E1000\",\n                    \"ip_address\": \"string\",\n                    \"ip_addresses\"\
+          : [\n                        \"string\"\n                    ],\n                    \"is_connected\": true,\n \
+          \                   \"mac_address\": \"string\",\n                    \"model\": \"string\",\n                 \
+          \   \"network_uuid\": \"string\",\n                    \"nic_uuid\": \"string\",\n                    \"port_id\"\
+          : \"string\",\n                    \"request_ip\": true,\n                    \"requested_ip_address\": \"string\"\
+          ,\n                    \"vlan_mode\": \"Access\"\n                }\n            ]\n        }\n    ],\n    \"storage_container_uuid\"\
+          : \"string\",\n    \"uuid\": \"string\",\n    \"vm_customization_config\": {\n        \"datasource_type\": \"CONFIG_DRIVE_V2\"\
+          ,\n        \"files_to_inject_list\": [\n            {\n                \"destination_path\": \"string\",\n     \
+          \           \"source_path\": \"string\"\n            }\n        ],\n        \"fresh_install\": true,\n        \"\
+          userdata\": \"string\",\n        \"userdata_path\": \"string\"\n    }\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/clone"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"container_uuid\"\
+          : \"string\",\n    \"source_vmlogical_timestamp\": 0,\n    \"spec_list\": [\n        {\n            \"boot_config\"\
+          : {\n                \"boot_device_order\": [\n                    \"string\"\n                ],\n            \
+          \    \"boot_device_type\": \"CDROM\",\n                \"disk_address\": {\n                    \"device_bus\":\
+          \ \"SCSI\",\n                    \"device_index\": 0,\n                    \"device_uuid\": \"string\",\n      \
+          \              \"disk_label\": \"string\",\n                    \"is_cdrom\": true,\n                    \"ndfs_filepath\"\
+          : \"string\",\n                    \"vmdisk_uuid\": \"string\",\n                    \"volume_group_uuid\": \"string\"\
+          \n                },\n                \"hardware_virtualization\": true,\n                \"mac_addr\": \"string\"\
+          ,\n                \"secure_boot\": true,\n                \"uefi_boot\": true\n            },\n            \"clone_affinity\"\
+          : true,\n            \"memory_mb\": 0,\n            \"name\": \"string\",\n            \"num_cores_per_vcpu\": 0,\n\
+          \            \"num_vcpus\": 0,\n            \"override_network_config\": true,\n            \"uuid\": \"string\"\
+          ,\n            \"vm_nics\": [\n                {\n                    \"adapter_type\": \"E1000\",\n           \
+          \         \"ip_address\": \"string\",\n                    \"ip_addresses\": [\n                        \"string\"\
+          \n                    ],\n                    \"is_connected\": true,\n                    \"mac_address\": \"string\"\
+          ,\n                    \"model\": \"string\",\n                    \"network_uuid\": \"string\",\n             \
+          \       \"nic_uuid\": \"string\",\n                    \"port_id\": \"string\",\n                    \"request_ip\"\
+          : true,\n                    \"requested_ip_address\": \"string\",\n                    \"vlan_mode\": \"Access\"\
+          \n                }\n            ]\n        }\n    ],\n    \"storage_container_uuid\": \"string\",\n    \"uuid\"\
+          : \"string\",\n    \"vm_customization_config\": {\n        \"datasource_type\": \"CONFIG_DRIVE_V2\",\n        \"\
+          files_to_inject_list\": [\n            {\n                \"destination_path\": \"string\",\n                \"\
+          source_path\": \"string\"\n            }\n        ],\n        \"fresh_install\": true,\n        \"userdata\": \"\
+          string\",\n        \"userdata_path\": \"string\"\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/vms/{uuid}/clone\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/clone\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          container_uuid\": \"string\", \"source_vmlogical_timestamp\": 0, \"spec_list\": [{\"boot_config\": {\"boot_device_order\"\
+          : [\"string\"], \"boot_device_type\": \"CDROM\", \"disk_address\": {\"device_bus\": \"SCSI\", \"device_index\":\
+          \ 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\": true, \"ndfs_filepath\": \"string\"\
+          , \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"hardware_virtualization\": true, \"mac_addr\"\
+          : \"string\", \"secure_boot\": true, \"uefi_boot\": true}, \"clone_affinity\": true, \"memory_mb\": 0, \"name\"\
+          : \"string\", \"num_cores_per_vcpu\": 0, \"num_vcpus\": 0, \"override_network_config\": true, \"uuid\": \"string\"\
+          , \"vm_nics\": [{\"adapter_type\": \"E1000\", \"ip_address\": \"string\", \"ip_addresses\": [\"string\"], \"is_connected\"\
+          : true, \"mac_address\": \"string\", \"model\": \"string\", \"network_uuid\": \"string\", \"nic_uuid\": \"string\"\
+          , \"port_id\": \"string\", \"request_ip\": true, \"requested_ip_address\": \"string\", \"vlan_mode\": \"Access\"\
+          }]}], \"storage_container_uuid\": \"string\", \"uuid\": \"string\", \"vm_customization_config\": {\"datasource_type\"\
+          : \"CONFIG_DRIVE_V2\", \"files_to_inject_list\": [{\"destination_path\": \"string\", \"source_path\": \"string\"\
+          }], \"fresh_install\": true, \"userdata\": \"string\", \"userdata_path\": \"string\"}}`)\n\treq, err := http.NewRequest(\"\
+          POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/clone\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"container_uuid\\\": \\\"string\\\", \\\"source_vmlogical_timestamp\\\": 0, \\\"spec_list\\\": [{\\\"boot_config\\\
+          \": {\\\"boot_device_order\\\": [\\\"string\\\"], \\\"boot_device_type\\\": \\\"CDROM\\\", \\\"disk_address\\\"\
+          : {\\\"device_bus\\\": \\\"SCSI\\\", \\\"device_index\\\": 0, \\\"device_uuid\\\": \\\"string\\\", \\\"disk_label\\\
+          \": \\\"string\\\", \\\"is_cdrom\\\": true, \\\"ndfs_filepath\\\": \\\"string\\\", \\\"vmdisk_uuid\\\": \\\"string\\\
+          \", \\\"volume_group_uuid\\\": \\\"string\\\"}, \\\"hardware_virtualization\\\": true, \\\"mac_addr\\\": \\\"string\\\
+          \", \\\"secure_boot\\\": true, \\\"uefi_boot\\\": true}, \\\"clone_affinity\\\": true, \\\"memory_mb\\\": 0, \\\"\
+          name\\\": \\\"string\\\", \\\"num_cores_per_vcpu\\\": 0, \\\"num_vcpus\\\": 0, \\\"override_network_config\\\":\
+          \ true, \\\"uuid\\\": \\\"string\\\", \\\"vm_nics\\\": [{\\\"adapter_type\\\": \\\"E1000\\\", \\\"ip_address\\\"\
+          : \\\"string\\\", \\\"ip_addresses\\\": [\\\"string\\\"], \\\"is_connected\\\": true, \\\"mac_address\\\": \\\"\
+          string\\\", \\\"model\\\": \\\"string\\\", \\\"network_uuid\\\": \\\"string\\\", \\\"nic_uuid\\\": \\\"string\\\"\
+          , \\\"port_id\\\": \\\"string\\\", \\\"request_ip\\\": true, \\\"requested_ip_address\\\": \\\"string\\\", \\\"\
+          vlan_mode\\\": \\\"Access\\\"}]}], \\\"storage_container_uuid\\\": \\\"string\\\", \\\"uuid\\\": \\\"string\\\"\
+          , \\\"vm_customization_config\\\": {\\\"datasource_type\\\": \\\"CONFIG_DRIVE_V2\\\", \\\"files_to_inject_list\\\
+          \": [{\\\"destination_path\\\": \\\"string\\\", \\\"source_path\\\": \\\"string\\\"}], \\\"fresh_install\\\": true,\
+          \ \\\"userdata\\\": \\\"string\\\", \\\"userdata_path\\\": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/clone';\nconst options =\
+          \ {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"container_uuid\": \"string\", \"source_vmlogical_timestamp\": 0, \"spec_list\": [{\"boot_config\": {\"boot_device_order\"\
+          : [\"string\"], \"boot_device_type\": \"CDROM\", \"disk_address\": {\"device_bus\": \"SCSI\", \"device_index\":\
+          \ 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\": true, \"ndfs_filepath\": \"string\"\
+          , \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"hardware_virtualization\": true, \"mac_addr\"\
+          : \"string\", \"secure_boot\": true, \"uefi_boot\": true}, \"clone_affinity\": true, \"memory_mb\": 0, \"name\"\
+          : \"string\", \"num_cores_per_vcpu\": 0, \"num_vcpus\": 0, \"override_network_config\": true, \"uuid\": \"string\"\
+          , \"vm_nics\": [{\"adapter_type\": \"E1000\", \"ip_address\": \"string\", \"ip_addresses\": [\"string\"], \"is_connected\"\
+          : true, \"mac_address\": \"string\", \"model\": \"string\", \"network_uuid\": \"string\", \"nic_uuid\": \"string\"\
+          , \"port_id\": \"string\", \"request_ip\": true, \"requested_ip_address\": \"string\", \"vlan_mode\": \"Access\"\
+          }]}], \"storage_container_uuid\": \"string\", \"uuid\": \"string\", \"vm_customization_config\": {\"datasource_type\"\
+          : \"CONFIG_DRIVE_V2\", \"files_to_inject_list\": [{\"destination_path\": \"string\", \"source_path\": \"string\"\
+          }], \"fresh_install\": true, \"userdata\": \"string\", \"userdata_path\": \"string\"}}`\n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+components:
+  schemas:
+    create.dto.acropolis.VMCloneSpecDTO:
+      type: object
+      properties:
+        boot_config:
+          $ref: '#/components/schemas/create.dto.acropolis.BootConfigDTO'
+        clone_affinity:
+          type: boolean
+        memory_mb:
+          format: int64
+          type: integer
+        name:
+          type: string
+        num_cores_per_vcpu:
+          format: int64
+          type: integer
+        num_vcpus:
+          format: int64
+          type: integer
+        override_network_config:
+          type: boolean
+        uuid:
+          type: string
+        vm_nics:
+          items:
+            $ref: '#/components/schemas/create.dto.acropolis.VMNicSpecDTO'
+          type: array
+    create.dto.acropolis.BootConfigDTO:
+      type: object
+      properties:
+        boot_device_order:
+          items:
+            enum:
+            - CDROM
+            - DISK
+            - NIC
+            type: string
+          type: array
+        boot_device_type:
+          enum:
+          - CDROM
+          - DISK
+          - NIC
+          type: string
+        disk_address:
+          $ref: '#/components/schemas/create.dto.acropolis.VMDiskAddressDTO'
+        hardware_virtualization:
+          type: boolean
+        mac_addr:
+          type: string
+        secure_boot:
+          type: boolean
+        uefi_boot:
+          type: boolean
+    create.dto.acropolis.VMCloneDTO:
+      type: object
+      properties:
+        container_uuid:
+          type: string
+        source_vmlogical_timestamp:
+          format: int64
+          type: integer
+        spec_list:
+          items:
+            $ref: '#/components/schemas/create.dto.acropolis.VMCloneSpecDTO'
+          type: array
+        storage_container_uuid:
+          type: string
+        uuid:
+          type: string
+        vm_customization_config:
+          $ref: '#/components/schemas/create.dto.acropolis.VMCustomizationConfigDTO'
+    create.dto.acropolis.VMNicSpecDTO:
+      type: object
+      properties:
+        adapter_type:
+          enum:
+          - E1000
+          - E1000e
+          - PCNet32
+          - Vmxnet
+          - Vmxnet2
+          - Vmxnet3
+          - Unsupported
+          type: string
+        ip_address:
+          type: string
+        ip_addresses:
+          items:
+            type: string
+          type: array
+        is_connected:
+          type: boolean
+        mac_address:
+          type: string
+        model:
+          type: string
+        network_uuid:
+          type: string
+        nic_uuid:
+          type: string
+        port_id:
+          type: string
+        request_ip:
+          type: boolean
+        requested_ip_address:
+          type: string
+        vlan_mode:
+          enum:
+          - Access
+          - Trunked
+          - Untagged
+          type: string
+    create.dto.acropolis.FileToInjectDTO:
+      type: object
+      properties:
+        destination_path:
+          type: string
+        source_path:
+          type: string
+    create.dto.acropolis.VMCustomizationConfigDTO:
+      type: object
+      properties:
+        datasource_type:
+          enum:
+          - CONFIG_DRIVE_V2
+          type: string
+        files_to_inject_list:
+          items:
+            $ref: '#/components/schemas/create.dto.acropolis.FileToInjectDTO'
+          type: array
+        fresh_install:
+          type: boolean
+        userdata:
+          type: string
+        userdata_path:
+          type: string
+    create.dto.acropolis.VMDiskAddressDTO:
+      type: object
+      properties:
+        device_bus:
+          enum:
+          - SCSI
+          - IDE
+          - PCI
+          - SATA
+          - SPAPR
+          - NVME
+          type: string
+        device_index:
+          format: int32
+          type: integer
+        device_uuid:
+          type: string
+        disk_label:
+          type: string
+        is_cdrom:
+          type: boolean
+        ndfs_filepath:
+          type: string
+        vmdisk_uuid:
+          type: string
+        volume_group_uuid:
+          type: string
+    create.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string

@@ -1,0 +1,267 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /resources/networks/{vlan_id}/ip-pool:
+    delete:
+      description: Removes IP address pools from a vLAN. This is applicable only for the Static vLANs.
+      operationId: removeIPAddressPools
+      parameters:
+      - in: path
+        name: vlan_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveIPPoolModel'
+        required: false
+      responses: {}
+      summary: Remove the IP address pools from a vLAN
+      tags:
+      - NDB Resources
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/resources/networks/{vlan_id}/ip-pool \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n      \\\n    --output-document \\\n    - :///era/v0.9/resources/networks/{vlan_id}/ip-pool"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/resources/networks/{vlan_id}/ip-pool\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/resources/networks/{vlan_id}/ip-pool\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\
+          \tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/resources/networks/{vlan_id}/ip-pool\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/resources/networks/{vlan_id}/ip-pool';\nconst options = {\n  method: 'DELETE',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+    post:
+      description: 'Adds IP address pools to a vLAN.
+
+        This is applicable only to Static vLANs.
+
+        '
+      operationId: addIPAddressPools
+      parameters:
+      - in: path
+        name: vlan_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddIPPoolModel'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EraVlanDTO'
+          description: Operation completed.
+      summary: Add IP address pools to a vLAN
+      tags:
+      - NDB Resources
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/resources/networks/{vlan_id}/ip-pool \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json'\
+          \ \\\n    --data '{\n    \"ipPools\": [\n        {\n            \"endIP\": \"192.168.0.1\",\n            \"startIP\"\
+          : \"192.168.0.1\"\n        }\n    ]\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"ipPools\"\
+          : [\n        {\n            \"endIP\": \"192.168.0.1\",\n            \"startIP\": \"192.168.0.1\"\n        }\n \
+          \   ]\n}' \\\n    --output-document \\\n    - :///era/v0.9/resources/networks/{vlan_id}/ip-pool"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"ipPools\": [\n        {\n            \"endIP\": \"192.168.0.1\",\n            \"startIP\": \"\
+          192.168.0.1\"\n        }\n    ]\n}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/resources/networks/{vlan_id}/ip-pool\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/resources/networks/{vlan_id}/ip-pool\"\n\t\n\tpayload :=  strings.NewReader(`{\"ipPools\": [{\"\
+          endIP\": \"192.168.0.1\", \"startIP\": \"192.168.0.1\"}]}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/resources/networks/{vlan_id}/ip-pool\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"ipPools\\\": [{\\\"endIP\\\": \\\"192.168.0.1\\\
+          \", \\\"startIP\\\": \\\"192.168.0.1\\\"}]}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/resources/networks/{vlan_id}/ip-pool';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"ipPools\": [{\"endIP\": \"192.168.0.1\", \"startIP\": \"192.168.0.1\"}]}`\n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+components:
+  schemas:
+    EraIPAddressPool:
+      properties:
+        endIP:
+          type: string
+        id:
+          format: uuid
+          type: string
+        ipAddresses:
+          items:
+            $ref: '#/components/schemas/EraIPAddress'
+          type: array
+        lastModified:
+          type: string
+        modifiedBy:
+          type: string
+        startIP:
+          type: string
+      type: object
+    EraIPAddress:
+      properties:
+        alertID:
+          type: string
+        alertMessage:
+          type: string
+        dbserverID:
+          format: uuid
+          type: string
+        dbserverName:
+          type: string
+        ip:
+          type: string
+        profileID:
+          type: string
+        profileName:
+          type: string
+        status:
+          enum:
+          - Available
+          - Reserved
+          - InUse
+          - Error
+          type: string
+      type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    RemoveIpPools:
+      properties:
+        id:
+          type: string
+      type: object
+    IpPools:
+      properties:
+        endIP:
+          format: ipv4
+          type: string
+        startIP:
+          format: ipv4
+          type: string
+      type: object
+    EraVlanDTO:
+      properties:
+        clusterId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        ipAddresses:
+          items:
+            $ref: '#/components/schemas/EraIPAddress'
+          type: array
+        ipPools:
+          items:
+            $ref: '#/components/schemas/EraIPAddressPool'
+          type: array
+        managed:
+          type: boolean
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        propertiesMap:
+          additionalProperties:
+            type: string
+          type: object
+        type:
+          type: string
+        vlanUUID:
+          format: uuid
+          type: string
+      type: object
+    AddIPPoolModel:
+      properties:
+        ipPools:
+          items:
+            $ref: '#/components/schemas/IpPools'
+          type: array
+      type: object
+    RemoveIPPoolModel:
+      properties:
+        ipPools:
+          items:
+            $ref: '#/components/schemas/RemoveIpPools'
+          type: array
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

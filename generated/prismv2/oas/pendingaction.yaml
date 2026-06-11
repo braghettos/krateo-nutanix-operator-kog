@@ -1,0 +1,147 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /protection_domains/pending_actions:
+    get:
+      summary: Get list of pending actions.
+      description: Get list of pending actions in the cluster.
+      tags:
+      - /protection_domains
+      operationId: get/protection_domains/pending_actions/getPendingActions
+      parameters:
+      - name: protection_domain_names
+        in: query
+        description: Names of Protection Domains
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/get.dto.dr.PdPendingActionsDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/pending_actions\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/pending_actions"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/protection_domains/pending_actions\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/pending_actions\"\n\t \n\treq,\
+          \ err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/pending_actions\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/pending_actions';\n\
+          const options = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.dto.dr.PdPendingActionsDTO_PendingEntityRestore:
+      type: object
+      properties:
+        name:
+          type: string
+        path_prefix:
+          type: string
+        replace_entity:
+          type: boolean
+        snapshot_id:
+          type: string
+    get.dto.dr.PdPendingActionsDTO_PendingChangeMode:
+      type: object
+      properties:
+        failover_remote:
+          type: string
+        mode_type:
+          enum:
+          - ACTIVATE_PD
+          - DEACTIVATE_PD
+          - MIGRATE_PD
+          type: string
+        snapshot_id:
+          type: string
+    get.dto.dr.PdPendingActionsDTO_PendingReplication:
+      type: object
+      properties:
+        remote_site:
+          type: string
+        snapshot_ids:
+          items:
+            type: string
+          type: array
+    get.dto.dr.PdPendingActionsDTO:
+      type: object
+      properties:
+        has_pending_actions:
+          type: boolean
+        marked_for_removal:
+          type: boolean
+        pending_change_mode:
+          $ref: '#/components/schemas/get.dto.dr.PdPendingActionsDTO_PendingChangeMode'
+        pending_nfs_files_restore:
+          items:
+            $ref: '#/components/schemas/get.dto.dr.PdPendingActionsDTO_PendingEntityRestore'
+          type: array
+        pending_replications:
+          items:
+            $ref: '#/components/schemas/get.dto.dr.PdPendingActionsDTO_PendingReplication'
+          type: array
+        pending_vms_restore:
+          items:
+            $ref: '#/components/schemas/get.dto.dr.PdPendingActionsDTO_PendingEntityRestore'
+          type: array
+        protection_domain_name:
+          type: string
+        to_be_removed_nfs_files:
+          items:
+            type: string
+          type: array
+        to_be_removed_snapshots:
+          items:
+            type: string
+          type: array
+        to_be_removed_vms:
+          items:
+            type: string
+          type: array

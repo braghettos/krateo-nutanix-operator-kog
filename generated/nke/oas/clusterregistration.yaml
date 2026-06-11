@@ -1,0 +1,543 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-alpha.1/k8s/cluster-registrations:
+    get:
+      description: Get all the Kubernetes cluster registration objects.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: List all of the Kubernetes cluster registrations
+      operationId: K8sClusterRegistrationList
+      responses:
+        '200':
+          description: Kubernetes cluster list request is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_registration_list'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-alpha.1/k8s/cluster-registrations\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations';\nconst options = {\n \
+          \ method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+    post:
+      description: Register a Kubernetes cluster with the provided configuration.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Register a new Kubernetes cluster
+      operationId: CreateK8sClusterRegistration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1.1.0_k8s_create_cluster_registration_request'
+        required: true
+      responses:
+        '202':
+          description: Kubernetes cluster registration is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_create_cluster_registration_response'
+        '400':
+          description: Bad parameters specified in request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Invalid reference supplied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '409':
+          description: The Kubernetes cluster name is not unique.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '412':
+          description: Kubernetes cluster pre-deployment checks failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n \
+          \   \"categories_mapping\": {},\n    \"k8s_distribution\": \"string\",\n    \"metadata\": {\n        \"api_version\"\
+          : \"v1.0.0\"\n    },\n    \"name\": \"prod-cluster\",\n    \"uuid\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"categories_mapping\": {},\n    \"k8s_distribution\": \"string\"\
+          ,\n    \"metadata\": {\n        \"api_version\": \"v1.0.0\"\n    },\n    \"name\": \"prod-cluster\",\n    \"uuid\"\
+          : \"string\"\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"categories_mapping\"\
+          : {},\n    \"k8s_distribution\": \"string\",\n    \"metadata\": {\n        \"api_version\": \"v1.0.0\"\n    },\n\
+          \    \"name\": \"prod-cluster\",\n    \"uuid\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/karbon/v1-alpha.1/k8s/cluster-registrations\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          categories_mapping\": {}, \"k8s_distribution\": \"string\", \"metadata\": {\"api_version\": \"v1.0.0\"}, \"name\"\
+          : \"prod-cluster\", \"uuid\": \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err !=\
+          \ nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\"\
+          , \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"categories_mapping\\\": {}, \\\"k8s_distribution\\\": \\\"string\\\", \\\"metadata\\\": {\\\"api_version\\\"\
+          : \\\"v1.0.0\\\"}, \\\"name\\\": \\\"prod-cluster\\\", \\\"uuid\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations';\nconst options = {\n \
+          \ method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"\
+          categories_mapping\": {}, \"k8s_distribution\": \"string\", \"metadata\": {\"api_version\": \"v1.0.0\"}, \"name\"\
+          : \"prod-cluster\", \"uuid\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const\
+          \ data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /karbon/v1-alpha.1/k8s/cluster-registrations/{id}:
+    get:
+      description: Get the Kubernetes cluster registration details.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Get the Kubernetes cluster registration details
+      operationId: GetK8sClusterRegistration
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Get request for the Kubernetes cluster is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_registration'
+        '400':
+          description: Invalid Kubernetes cluster ID specified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}';\nconst options =\
+          \ {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry\
+          \ {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    delete:
+      description: Unregister the Kubernetes cluster.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Unregister the Kubernetes cluster
+      operationId: DeleteK8sClusterRegistration
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Forcefully unregister a cluster, bypassing all pre-checks (for example, verifying that Flow network policies
+          are applied to the Kubernetes cluster).
+        name: force
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '202':
+          description: Kubernetes cluster un-registration operation is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_registration_delete_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '412':
+          description: The operation failed due to the current state of the Kubernetes cluster.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}';\nconst options =\
+          \ {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    patch:
+      description: Update Kubernetes cluster registration.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Update the Kubernetes cluster registration
+      operationId: PatchK8sClusterRegistration
+      parameters:
+      - description: Kubernetes cluster registration UUID.
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1.1.0_k8s_cluster_kubeconfig_update_request'
+        description: Update the cluster registration parameters.
+        required: true
+      responses:
+        '202':
+          description: Kubernetes cluster kubeconfig upload is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_kubeconfig_update_response'
+        '400':
+          description: Invalid input data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster registration is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '409':
+          description: Kubernetes cluster registration update operation is already in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PATCH \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"kubeconfig\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PATCH \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"kubeconfig\": \"string\"\n}' \\\n    --output-document \\\n  \
+          \  - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"kubeconfig\"\
+          : \"string\"\n}\"\"\"\n\nconn.request(\"PATCH\",\"/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\", payload,\
+          \ headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          kubeconfig\": \"string\"}`)\n\treq, err := http.NewRequest(\"PATCH\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n \
+          \       req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PATCH\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"kubeconfig\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}';\nconst options =\
+          \ {\n  method: 'PATCH',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"kubeconfig\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_k8s_cluster_addon_info_mapping:
+      description: Addons information for this Kubernetes cluster. This allows setting up multiple values from a single key.
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/v1.1.0_k8s_cluster_addon_info'
+    v1.1.0_k8s_cluster_kubeconfig_update_request:
+      description: Request to update the kubeconfig for a Kubernetes cluster.
+      type: object
+      required:
+      - kubeconfig
+      properties:
+        kubeconfig:
+          description: Base64 encoded kubeconfig YAML content.
+          type: string
+    v1.1.0_k8s_create_cluster_registration_request:
+      type: object
+      required:
+      - metadata
+      - name
+      - uuid
+      - categories_mapping
+      - k8s_distribution
+      properties:
+        categories_mapping:
+          $ref: '#/components/schemas/v1.1.0_k8s_cluster_categories_mapping'
+        k8s_distribution:
+          description: The type of 3rd party Kubernetes cluster.
+          type: string
+        metadata:
+          $ref: '#/components/schemas/v1.1.0_metadata'
+        name:
+          description: Unique name of the Kubernetes cluster.
+          type: string
+          maxLength: 40
+          minLength: 1
+          pattern: '[a-z0-9]([-a-z0-9]*[a-z0-9])?'
+        uuid:
+          description: The UUID of the Kubernetes cluster.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+    v1.1.0_k8s_cluster_registration:
+      description: Kubernetes cluster registration details.
+      type: object
+      required:
+      - name
+      properties:
+        addons_info:
+          $ref: '#/components/schemas/v1.1.0_k8s_cluster_addon_info_mapping'
+        categories_mapping:
+          $ref: '#/components/schemas/v1.1.0_k8s_cluster_categories_mapping'
+        cluster_info:
+          $ref: '#/components/schemas/v1.1.0_k8s_cluster_info_mapping'
+        k8s_distribution:
+          description: The type of 3rd party Kubernetes cluster.
+          type: string
+        name:
+          description: The Kubernetes cluster name.
+          type: string
+          maxLength: 40
+          minLength: 1
+        status:
+          description: Kubernetes cluster registration status.
+          type: string
+        uuid:
+          description: The UUID of the Kubernetes cluster.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+    v1.1.0_k8s_cluster_info_mapping:
+      description: Cluster information for this Kubernetes cluster. This allows setting up multiple values from a single key.
+      type: object
+      additionalProperties:
+        type: string
+    v1.1.0_metadata:
+      type: object
+      required:
+      - api_version
+      properties:
+        api_version:
+          description: NKE API version.
+          type: string
+          pattern: ^v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+    v1.1.0_k8s_cluster_addon_info:
+      description: Addons information for this Kubernetes cluster. This allows setting up multiple values from a single key.
+      type: object
+      additionalProperties:
+        type: string
+    v1.1.0_k8s_cluster_registration_delete_response:
+      type: object
+      required:
+      - task_uuid
+      properties:
+        cluster_name:
+          description: The name of the Kubernetes cluster that is deleted.
+          type: string
+        cluster_uuid:
+          description: The UUID of the Kubernetes cluster that is deleted.
+          type: string
+        task_uuid:
+          description: The UUID of the task tracking the Kubernetes cluster deletion.
+          type: string
+    v1.1.0_k8s_create_cluster_registration_response:
+      type: object
+      required:
+      - task_uuid
+      - cluster_name
+      - cluster_uuid
+      properties:
+        cluster_name:
+          type: string
+        cluster_uuid:
+          type: string
+        task_uuid:
+          type: string
+    v1.1.0_k8s_cluster_registration_list:
+      description: Kubernetes cluster registrations list response.
+      type: array
+      items:
+        $ref: '#/components/schemas/v1.1.0_k8s_cluster_registration'
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_k8s_cluster_categories_mapping:
+      description: Categories for this Kubernetes cluster. This allows setting up multiple values from a single key.
+      type: object
+      additionalProperties:
+        type: string
+    v1.1.0_k8s_cluster_kubeconfig_update_response:
+      type: object
+      required:
+      - task_uuid
+      properties:
+        task_uuid:
+          type: string

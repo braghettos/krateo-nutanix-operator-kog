@@ -1,0 +1,2516 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /dpcs:
+    get:
+      operationId: getAllDBServerClusters
+      parameters:
+      - description: Specifies the type of identifier provided in the 'value' parameter.
+        in: query
+        name: value-type
+        schema:
+          enum:
+          - id
+          type: string
+      - description: It holds the corresponding value for the 'value-type'.
+        in: query
+        name: value
+        schema:
+          type: string
+      - description: Indicates additional details of the associated Databases in the response.
+        in: query
+        name: load-databases
+        schema:
+          type: boolean
+      - description: Indicates additional details of the Clones in the response.
+        in: query
+        name: load-clones
+        schema:
+          type: boolean
+      - description: Indicates additional details of the metrics (memory, compute, etc.) in the response.
+        in: query
+        name: load-metrics
+        schema:
+          type: boolean
+      - description: Includes additional Database Server Cluster details in the response.
+        in: query
+        name: detailed
+        schema:
+          type: boolean
+      - description: Get entity(s) if it satisfies query criteria irrespective of status (including DELETED, etc).
+        in: query
+        name: any-status
+        schema:
+          type: boolean
+      - in: query
+        name: time-zone
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ERADBServerClusterDTO'
+                type: array
+          description: Operation completed.
+      summary: Get a list of Database Server Clusters
+      tags:
+      - Database Server Physical Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/dpcs \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/dpcs"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/dpcs\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/dpcs\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/dpcs\")\n\
+          \  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/dpcs';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization': 'Basic\
+          \ <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /dpcs/{dbserver-cluster-id}:
+    delete:
+      operationId: deregisterDBServerCluster
+      parameters:
+      - in: path
+        name: dbserver-cluster-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/DeregisterDBServerClusterModel'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation completed.
+      summary: Deregister a Database Server Cluster
+      tags:
+      - Database Server Physical Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/dpcs/{dbserver-cluster-id} \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/dpcs/{dbserver-cluster-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/dpcs/{dbserver-cluster-id}\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/dpcs/{dbserver-cluster-id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/dpcs/{dbserver-cluster-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/dpcs/{dbserver-cluster-id}';\nconst options = {\n  method: 'DELETE',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      operationId: getDBServerCluster
+      parameters:
+      - description: It holds a corresponding value for the value-type.
+        in: path
+        name: dbserver-cluster-id
+        required: true
+        schema:
+          type: string
+      - description: Specifies the type of identifier provided in the 'value' parameter.
+        in: query
+        name: value-type
+        schema:
+          enum:
+          - id
+          type: string
+      - description: Includes additional Database details in the response.
+        in: query
+        name: load-databases
+        schema:
+          type: boolean
+      - description: Includes additional Clone details in the response.
+        in: query
+        name: load-clones
+        schema:
+          type: boolean
+      - description: Includes additional metrics information associated with the Database Server Physical Cluster in the response.
+        in: query
+        name: load-metrics
+        schema:
+          type: boolean
+      - description: Includes additional Database Server Cluster details in the response.
+        in: query
+        name: detailed
+        schema:
+          type: boolean
+      - description: Get entity(s) if it satisfies query criteria irrespective of status (including DELETED, etc).
+        in: query
+        name: any-status
+        schema:
+          type: boolean
+      - description: The time zone identifier (e.g. 'America/New_York', 'UTC') used to convert timestamps in the response
+          to the client's local time zone.
+        in: query
+        name: time-zone
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERADBServerClusterDTO'
+          description: Operation completed.
+      summary: Get Database Server Cluster details
+      tags:
+      - Database Server Physical Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/dpcs/{dbserver-cluster-id} \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/dpcs/{dbserver-cluster-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/dpcs/{dbserver-cluster-id}\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/dpcs/{dbserver-cluster-id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err\
+          \ != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/dpcs/{dbserver-cluster-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/dpcs/{dbserver-cluster-id}';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      operationId: updateDBServerClusterPartially
+      parameters:
+      - in: path
+        name: dbserver-cluster-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDBServerClusterModel'
+        description: Payload required to update the Database Server Cluster.
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERADBServerClusterDTO'
+          description: Operation completed.
+      summary: Update a Database Server cluster
+      tags:
+      - Database Server Physical Clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/dpcs/{dbserver-cluster-id} \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\
+          \n    --data '{\n    \"description\": \"string\",\n    \"name\": \"string\",\n    \"resetDescription\": false,\n\
+          \    \"resetName\": false,\n    \"resetTags\": false,\n    \"tags\": [\n        {\n            \"tagId\": \"string\"\
+          ,\n            \"value\": \"string\"\n        }\n    ]\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"description\"\
+          : \"string\",\n    \"name\": \"string\",\n    \"resetDescription\": false,\n    \"resetName\": false,\n    \"resetTags\"\
+          : false,\n    \"tags\": [\n        {\n            \"tagId\": \"string\",\n            \"value\": \"string\"\n  \
+          \      }\n    ]\n}' \\\n    --output-document \\\n    - :///era/v0.9/dpcs/{dbserver-cluster-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"description\": \"string\",\n    \"name\": \"string\",\n    \"resetDescription\": false,\n  \
+          \  \"resetName\": false,\n    \"resetTags\": false,\n    \"tags\": [\n        {\n            \"tagId\": \"string\"\
+          ,\n            \"value\": \"string\"\n        }\n    ]\n}\"\"\"\n\nconn.request(\"PUT\",\"/era/v0.9/dpcs/{dbserver-cluster-id}\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/dpcs/{dbserver-cluster-id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"description\": \"string\"\
+          , \"name\": \"string\", \"resetDescription\": false, \"resetName\": false, \"resetTags\": false, \"tags\": [{\"\
+          tagId\": \"string\", \"value\": \"string\"}]}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\tif err\
+          \ != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\"\
+          , \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"\
+          Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/dpcs/{dbserver-cluster-id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"description\\\": \\\"string\\\", \\\"\
+          name\\\": \\\"string\\\", \\\"resetDescription\\\": false, \\\"resetName\\\": false, \\\"resetTags\\\": false, \\\
+          \"tags\\\": [{\\\"tagId\\\": \\\"string\\\", \\\"value\\\": \\\"string\\\"}]}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/dpcs/{dbserver-cluster-id}';\nconst options = {\n  method: 'PUT',\n  headers: {'Accept':\
+          \ 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"description\": \"string\", \"name\": \"string\", \"resetDescription\": false, \"resetName\": false, \"resetTags\"\
+          : false, \"tags\": [{\"tagId\": \"string\", \"value\": \"string\"}]}`\n};\n\ntry {\n  const response = await fetch(url,\
+          \ options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  schemas:
+    UpdateDBServerClusterModel:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        resetDescription:
+          type: boolean
+        resetName:
+          type: boolean
+        resetTags:
+          type: boolean
+        tags:
+          items:
+            $ref: '#/components/schemas/Tags'
+          type: array
+      type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERACloneNewDTO:
+      properties:
+        clone:
+          type: boolean
+        clustered:
+          type: boolean
+        databaseClusterType:
+          type: string
+        databaseName:
+          type: string
+        databaseNodes:
+          items:
+            $ref: '#/components/schemas/ERADatabaseNodeDTO'
+          type: array
+        databaseStatus:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverLogicalClusterId:
+          format: uuid
+          type: string
+        dbserverlogicalCluster:
+          $ref: '#/components/schemas/ERADBServerLogicalClusterDTO'
+        description:
+          type: string
+        eraCreated:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADatabaseInfo'
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDatabaseExpiryPolicy'
+        metadata:
+          $ref: '#/components/schemas/ERADatabaseMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        parentTimeMachine:
+          $ref: '#/components/schemas/ERATimeMachineNewDTO'
+        parentTimeMachineId:
+          format: uuid
+          type: string
+        placeholder:
+          type: boolean
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachine:
+          $ref: '#/components/schemas/ERATimeMachineNewDTO'
+        timeMachineId:
+          format: uuid
+          type: string
+        timeZone:
+          type: string
+        type:
+          type: string
+      type: object
+    EraScheduleDTO:
+      description: Defines a backup schedule. Note - All properties are mandatory. If continuous schedule is not needed, you
+        must still specify a valid object, with enabled=false. Omitting the object/property is not permitted.
+      properties:
+        continuousSchedule:
+          $ref: '#/components/schemas/EraContinuousSchedule'
+        continuousScheduleEnabled:
+          type: boolean
+        dailySchedule:
+          $ref: '#/components/schemas/EraDailySchedule'
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        globalPolicy:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        monthlySchedule:
+          $ref: '#/components/schemas/EraMonthlySchedule'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        quartelySchedule:
+          $ref: '#/components/schemas/EraQuarterlySchedule'
+        referenceCount:
+          format: int32
+          type: integer
+        snapshotTimeOfDay:
+          $ref: '#/components/schemas/ERAScheduleTime'
+        startTime:
+          type: string
+        systemPolicy:
+          type: boolean
+        uniqueName:
+          type: string
+        weeklySchedule:
+          $ref: '#/components/schemas/EraWeeklySchedule'
+        yearlySchedule:
+          $ref: '#/components/schemas/EraYearlySchedule'
+      type: object
+    DeregisterDBServerClusterModel:
+      properties:
+        dbservers:
+          $ref: '#/components/schemas/Dbservers'
+        delete:
+          description: Specifies the VMs that need to be deleted.
+          type: boolean
+        forced:
+          type: boolean
+        remove:
+          type: boolean
+        softRemove:
+          description: Specifies that no cleanup/deletion Operation should be submitted.
+          type: boolean
+      type: object
+    ERADBServerMetadata:
+      properties:
+        associatedTimeMachines:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        clustered:
+          type: boolean
+        databaseType:
+          type: string
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        eraDriveInitialised:
+          type: boolean
+        info:
+          properties: {}
+          type: object
+        markedForDeletion:
+          type: boolean
+        physicalEraDrive:
+          type: boolean
+        provisionOperationId:
+          format: uuid
+          type: string
+        secureInfo:
+          properties: {}
+          type: object
+        singleInstance:
+          type: boolean
+      type: object
+    EraStaticEaPolicy:
+      properties:
+        any:
+          type: boolean
+        preferPrimary:
+          type: boolean
+        preferSecondary:
+          type: boolean
+        prefrenceString:
+          type: string
+        primaryOnly:
+          type: boolean
+        secondaryOnly:
+          type: boolean
+      type: object
+    ERADatabaseNodeDTO:
+      properties:
+        activated:
+          type: boolean
+        databaseId:
+          format: uuid
+          type: string
+        databaseStatus:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverId:
+          format: uuid
+          type: string
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADatabaseNodeInfo'
+        metadata:
+          $ref: '#/components/schemas/ERADatabaseNodeMetadata'
+        name:
+          type: string
+        ownerId:
+          type: string
+        primary:
+          type: boolean
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        protectionDomain:
+          $ref: '#/components/schemas/ERAProtectionDomainDTO'
+        protectionDomainId:
+          format: uuid
+          type: string
+        softwareInstallationId:
+          format: uuid
+          type: string
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        validEaState:
+          type: boolean
+      type: object
+    ERADatabaseCommonDTO:
+      properties:
+        clone:
+          type: boolean
+        clustered:
+          type: boolean
+        databaseClusterType:
+          type: string
+        databaseName:
+          type: string
+        databaseNodes:
+          items:
+            $ref: '#/components/schemas/ERADatabaseNodeDTO'
+          type: array
+        databaseStatus:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverLogicalClusterId:
+          format: uuid
+          type: string
+        dbserverlogicalCluster:
+          $ref: '#/components/schemas/ERADBServerLogicalClusterDTO'
+        description:
+          type: string
+        eraCreated:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADatabaseInfo'
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDatabaseExpiryPolicy'
+        metadata:
+          $ref: '#/components/schemas/ERADatabaseMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        parentTimeMachineId:
+          format: uuid
+          type: string
+        placeholder:
+          type: boolean
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachineId:
+          format: uuid
+          type: string
+        timeZone:
+          type: string
+        type:
+          type: string
+      type: object
+    ERAApplicationDTO:
+      properties:
+        applicationSlaPolicyId:
+          format: uuid
+          type: string
+        applicationSlaPolicyName:
+          type: string
+        applicationSlaTemplateId:
+          format: uuid
+          type: string
+        applicationSlaTemplateName:
+          type: string
+        clientId:
+          format: uuid
+          type: string
+        clone:
+          type: boolean
+        cloudId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        hostIP:
+          format: ipv4
+          type: string
+        hostStatus:
+          type: string
+        hostTimeZone:
+          type: string
+        id:
+          format: uuid
+          type: string
+        isInternal:
+          type: boolean
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDatabaseExpiryPolicy'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        parentTimeMachineId:
+          format: uuid
+          type: string
+        parentTimeMachineName:
+          type: string
+        policyStartTime:
+          type: string
+        primaryHost:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachineId:
+          format: uuid
+          type: string
+        timeMachineInfo:
+          $ref: '#/components/schemas/EraTimeMachineInfo'
+        type:
+          type: string
+        uniqueName:
+          type: string
+      type: object
+    ERATimeMachineNewDTO:
+      properties:
+        clone:
+          type: boolean
+        clones:
+          items:
+            $ref: '#/components/schemas/ERACloneNewDTO'
+          type: array
+        clustered:
+          type: boolean
+        continuousRecoveryEnabled:
+          type: boolean
+        database:
+          $ref: '#/components/schemas/ERADatabaseCommonDTO'
+        databaseId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        eaStatus:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERATimeMachineInfo'
+        logDrive:
+          $ref: '#/components/schemas/EraLogDriveDTO'
+        logDriveId:
+          format: uuid
+          type: string
+        metadata:
+          $ref: '#/components/schemas/ERATimeMachineMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        schedule:
+          $ref: '#/components/schemas/EraScheduleDTO'
+        scheduleId:
+          format: uuid
+          type: string
+        scope:
+          type: string
+        sla:
+          $ref: '#/components/schemas/EraSlaDTO'
+        slaId:
+          format: uuid
+          type: string
+        slaSet:
+          type: boolean
+        snapshotableState:
+          type: boolean
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        type:
+          type: string
+        zeroSla:
+          type: boolean
+      type: object
+    ERAVMInfo:
+      properties:
+        hypervisorCpuUsagePpm:
+          items:
+            format: int64
+            type: integer
+          type: array
+        lastUpdatedTimeInUTC:
+          type: string
+        numCoresPerVCPU:
+          format: int64
+          type: integer
+        numVCPUs:
+          format: int64
+          type: integer
+      type: object
+    EraLogDriveDTO:
+      properties:
+        clusterId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          additionalProperties:
+            properties: {}
+            type: object
+          type: object
+        logDisks:
+          items:
+            $ref: '#/components/schemas/EraLogDriveDiskDTO'
+          type: array
+        message:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/ERADriveMetadata'
+        ownerId:
+          format: uuid
+          type: string
+        path:
+          type: string
+        protectionDomainId:
+          format: uuid
+          type: string
+        status:
+          type: string
+        timeMachineId:
+          format: uuid
+          type: string
+        totalSize:
+          format: int32
+          type: integer
+        usedSize:
+          format: int32
+          type: integer
+        vgUuid:
+          format: uuid
+          type: string
+      type: object
+    ERADatabaseNodeInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    ERADatabaseMetadata:
+      properties:
+        createdDbservers:
+          items:
+            type: string
+          type: array
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        info:
+          properties: {}
+          type: object
+        lastLogCatchUpForRestoreOperationId:
+          type: string
+        lastRefreshTimestamp:
+          type: string
+        lastRequestedRefreshTimestamp:
+          type: string
+        logCatchUpForRestoreDispatched:
+          type: boolean
+        secureInfo:
+          properties: {}
+          type: object
+        stateBeforeRefresh:
+          type: string
+        stateBeforeRestore:
+          type: string
+        stateBeforeScaling:
+          type: string
+        tmActivateOperationId:
+          type: string
+      type: object
+    ERASnapshotInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    DeregisterInfo:
+      properties:
+        message:
+          type: string
+        operations:
+          items:
+            type: string
+          type: array
+      type: object
+    EraLCMConfigInfoEraDbServerExpiryPolicy:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/EraDbServerExpiryPolicy'
+        postDeleteCommand:
+          $ref: '#/components/schemas/EraPostDeleteCommand'
+        preDeleteCommand:
+          $ref: '#/components/schemas/EraPreDeleteCommand'
+        refreshDetails:
+          $ref: '#/components/schemas/EraEntityRefreshPolicy'
+      type: object
+    EraLogDriveDiskDTO:
+      properties:
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        eraLogDriveId:
+          format: uuid
+          type: string
+        id:
+          type: string
+        info:
+          additionalProperties:
+            properties: {}
+            type: object
+          type: object
+        message:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        status:
+          type: string
+        totalSize:
+          format: int32
+          type: integer
+        usedSize:
+          format: int32
+          type: integer
+        vdiskUuid:
+          format: uuid
+          type: string
+      type: object
+    EraYearlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+        month:
+          type: string
+        monthValue:
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+          type: string
+      type: object
+    ERADatabaseNodeMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+        stateBeforeRestore:
+          type: string
+      type: object
+    ERADatabaseInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    EraTagValueDTO:
+      properties:
+        entityId:
+          type: string
+        entityType:
+          enum:
+          - DATABASE
+          - TIME_MACHINE
+          - DATABASE_SERVER
+          - CLONE
+          type: string
+        tagId:
+          type: string
+        tagName:
+          type: string
+        value:
+          type: string
+      type: object
+    EraDriveDTO:
+      properties:
+        clusterId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        eraCreated:
+          type: boolean
+        eraDisks:
+          items:
+            $ref: '#/components/schemas/EraDriveDiskDTO'
+          type: array
+        hostId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          additionalProperties:
+            properties: {}
+            type: object
+          type: object
+        message:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/ERADriveMetadata'
+        ownerId:
+          format: uuid
+          type: string
+        path:
+          type: string
+        protectionDomainId:
+          type: string
+        status:
+          type: string
+        totalSize:
+          format: int32
+          type: integer
+        usedSize:
+          format: int32
+          type: integer
+        vgUuid:
+          format: uuid
+          type: string
+      type: object
+    ERALogicalDBServerMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        info:
+          properties: {}
+          type: object
+        lastNominationFailed:
+          type: boolean
+        lastNominationTime:
+          type: string
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    EraDbServerExpiryPolicy:
+      properties:
+        deleteVM:
+          type: boolean
+        effectiveTimestamp:
+          type: string
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+        expiryTimestamp:
+          type: string
+        remindBeforeInDays:
+          format: int32
+          type: integer
+        userCreated:
+          type: boolean
+      type: object
+    EraLCMConfigInfoEraDatabaseExpiryPolicy:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/EraDatabaseExpiryPolicy'
+        postDeleteCommand:
+          $ref: '#/components/schemas/EraPostDeleteCommand'
+        preDeleteCommand:
+          $ref: '#/components/schemas/EraPreDeleteCommand'
+        refreshDetails:
+          $ref: '#/components/schemas/EraEntityRefreshPolicy'
+      type: object
+    EraTimeMachineInfo:
+      properties:
+        autoTuneLogDrive:
+          type: boolean
+        description:
+          type: string
+        name:
+          type: string
+        schedule:
+          $ref: '#/components/schemas/EraScheduleDTO'
+        scheduleId:
+          format: uuid
+          type: string
+        slaId:
+          format: uuid
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        unlimitedLogDrive:
+          type: boolean
+      type: object
+    ERACloneDTO:
+      properties:
+        applicationSlaPolicyId:
+          format: uuid
+          type: string
+        applicationSlaPolicyName:
+          type: string
+        applicationSlaTemplateId:
+          format: uuid
+          type: string
+        applicationSlaTemplateName:
+          type: string
+        clientId:
+          format: uuid
+          type: string
+        clone:
+          type: boolean
+        cloneHost:
+          type: string
+        cloudId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        hostIP:
+          format: ipv4
+          type: string
+        hostId:
+          format: uuid
+          type: string
+        hostStatus:
+          type: string
+        hostTimeZone:
+          type: string
+        id:
+          format: uuid
+          type: string
+        isInternal:
+          type: boolean
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDatabaseExpiryPolicy'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        parentTimeMachineId:
+          format: uuid
+          type: string
+        parentTimeMachineName:
+          type: string
+        policyStartTime:
+          type: string
+        primaryHost:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachine:
+          $ref: '#/components/schemas/ERATimeMachineDTO'
+        timeMachineId:
+          format: uuid
+          type: string
+        timeMachineInfo:
+          $ref: '#/components/schemas/EraTimeMachineInfo'
+        type:
+          type: string
+        uniqueName:
+          type: string
+      type: object
+    EraSlaDTO:
+      properties:
+        continuousRetention:
+          format: int32
+          type: integer
+        dailyRetention:
+          format: int32
+          type: integer
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        monthlyRetention:
+          format: int32
+          type: integer
+        name:
+          type: string
+        ownerId:
+          type: string
+        quarterlyRetention:
+          format: int32
+          type: integer
+        referenceCount:
+          format: int32
+          type: integer
+        systemSla:
+          type: boolean
+        uniqueName:
+          type: string
+        weeklyRetention:
+          format: int32
+          type: integer
+        yearlyRetention:
+          format: int32
+          type: integer
+      type: object
+    ERAScheduleTime:
+      properties:
+        extra:
+          type: boolean
+        hours:
+          format: int32
+          type: integer
+        minutes:
+          format: int32
+          type: integer
+        repeatIntervalInMinutes:
+          format: int32
+          type: integer
+        seconds:
+          format: int32
+          type: integer
+        validScheduleTime:
+          type: boolean
+      type: object
+    EraEntityRefreshPolicy:
+      properties:
+        lastRefreshDate:
+          type: string
+        nextRefreshDate:
+          type: string
+        refreshDateTimezone:
+          type: string
+        refreshInDays:
+          format: int32
+          type: integer
+        refreshInHours:
+          format: int32
+          type: integer
+        refreshInMonths:
+          format: int32
+          type: integer
+        refreshTime:
+          type: string
+      type: object
+    snapshotStatus:
+      description: The status of the snapshot
+      enum:
+      - ACTIVE
+      - PENDING
+      - DELETED
+      type: string
+    ERAGoldCopyDTO:
+      properties:
+        associatedTimeMachineId:
+          type: string
+        cloudId:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        eraGoldCopySnapShotList:
+          additionalProperties:
+            $ref: '#/components/schemas/ERASnapshot'
+          type: object
+        goldCopyMode:
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        policyId:
+          type: string
+        primaryHost:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        protectionDomain:
+          $ref: '#/components/schemas/ERAProtectionDomainDTO'
+        protectionDomainId:
+          type: string
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        type:
+          type: string
+      type: object
+    ERASnapshotMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        fromTimeStamp:
+          type: string
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+        toTimeStamp:
+          type: string
+      type: object
+    EraQuarterlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+        startMonth:
+          type: string
+        startMonthValue:
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+          type: string
+      type: object
+    ERADBServerClusterDTO:
+      properties:
+        clusterStatus:
+          type: string
+        databaseType:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverLogicalClusters:
+          items:
+            $ref: '#/components/schemas/ERADBServerLogicalClusterDTO'
+          type: array
+        dbservers:
+          items:
+            $ref: '#/components/schemas/ERADBServerDTO'
+          type: array
+        description:
+          type: string
+        eraCreated:
+          type: boolean
+        fqdns:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADBServerClusterInfo'
+        ipAddresses:
+          items:
+            type: string
+          type: array
+        metadata:
+          $ref: '#/components/schemas/ERADBServerClusterMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        physicalClusterName:
+          type: string
+        placeholder:
+          type: boolean
+        platformType:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+      type: object
+    ERATimeMachineMetadata:
+      properties:
+        authorizedDbservers:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        autoHeal:
+          type: boolean
+        autoHealLogCatchupCount:
+          format: int32
+          type: integer
+        autoHealSnapshotCount:
+          format: int32
+          type: integer
+        capabilityResetTime:
+          type: string
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        firstSnapshotCaptured:
+          type: boolean
+        firstSnapshotDispatched:
+          type: boolean
+        info:
+          properties: {}
+          type: object
+        lastAutoSnapshotOperationId:
+          type: string
+        lastAutoSnapshotTime:
+          type: string
+        lastEaBreakdownTime:
+          type: string
+        lastHealSnapshotOperation:
+          type: string
+        lastHealSystemTriggered:
+          type: boolean
+        lastHealTime:
+          type: string
+        lastHealthAlertedTime:
+          type: string
+        lastLogCatchupOperationId:
+          type: string
+        lastLogCatchupTime:
+          type: string
+        lastPauseByForce:
+          type: boolean
+        lastPauseReason:
+          type: string
+        lastPauseTime:
+          type: string
+        lastResumeTime:
+          type: string
+        lastSnapshotOperationId:
+          type: string
+        lastSnapshotTime:
+          type: string
+        lastSuccessfulLogCatchupOperationId:
+          type: string
+        lastSuccessfulSnapshotOperationId:
+          type: string
+        logCatchupSuccessiveFailureCount:
+          format: int32
+          type: integer
+        secureInfo:
+          properties: {}
+          type: object
+        snapshotSuccessiveFailureCount:
+          format: int32
+          type: integer
+        stateBeforeRestore:
+          type: string
+      type: object
+    ERASoftwareInstallationMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    EraDailySchedule:
+      properties:
+        enabled:
+          type: boolean
+      type: object
+    snapshotType:
+      description: he type of the snapshot (used to determine retention policies)
+      enum:
+      - CONTINUOUS
+      - NONE
+      - CONTINUOUS_EXTRA
+      - TRANSIENT
+      - CONTINUOUS_RETRY
+      - DISCRETE
+      - MANUAL
+      - HOURLY
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
+      type: string
+    ERASoftwareInstallationDTO:
+      properties:
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverId:
+          format: uuid
+          type: string
+        eraCreated:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        info:
+          properties: {}
+          type: object
+        metadata:
+          $ref: '#/components/schemas/ERASoftwareInstallationMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        softwareProfileId:
+          format: uuid
+          type: string
+        softwareProfileVersionId:
+          format: uuid
+          type: string
+        type:
+          type: string
+        version:
+          type: string
+      type: object
+    EraVmInfo:
+      properties:
+        distribution:
+          type: string
+        osType:
+          type: string
+        osVersion:
+          type: string
+      type: object
+    Tags:
+      properties:
+        tagId:
+          type: string
+        value:
+          type: string
+      type: object
+    ERADatabaseDTO:
+      properties:
+        clone:
+          type: boolean
+        clustered:
+          type: boolean
+        databaseClusterType:
+          type: string
+        databaseName:
+          type: string
+        databaseNodes:
+          items:
+            $ref: '#/components/schemas/ERADatabaseNodeDTO'
+          type: array
+        databaseStatus:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverLogicalClusterId:
+          format: uuid
+          type: string
+        description:
+          type: string
+        eraCreated:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADatabaseInfo'
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDatabaseExpiryPolicy'
+        metadata:
+          $ref: '#/components/schemas/ERADatabaseMetadata'
+        name:
+          type: string
+        ownerId:
+          type: string
+        parentTimeMachineId:
+          format: uuid
+          type: string
+        placeholder:
+          type: boolean
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachine:
+          $ref: '#/components/schemas/ERATimeMachineNewDTO'
+          description: The associated Time Machine object. Loaded conditionally when `detailed=true` query parameter is used.
+        timeMachineId:
+          format: uuid
+          type: string
+        timeZone:
+          type: string
+        type:
+          type: string
+      type: object
+    ERADBServerClusterMetadata:
+      properties:
+        createdDbservers:
+          items:
+            type: string
+          type: array
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        info:
+          properties: {}
+          type: object
+        provisionOperationId:
+          format: uuid
+          type: string
+        secureInfo:
+          properties: {}
+          type: object
+        vmUuids:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+      type: object
+    EraPreDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    ERADriveMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    ERAMemoryInfo:
+      properties:
+        lastUpdatedTimeInUTC:
+          type: string
+        memory:
+          format: int64
+          type: integer
+        memoryUsagePpm:
+          items:
+            format: int64
+            type: integer
+          type: array
+        unit:
+          enum:
+          - B
+          - KB
+          - MB
+          - GB
+          - TB
+          type: string
+      type: object
+    ERALogicalDBServerInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    ERADBServerLogicalClusterDTO:
+      properties:
+        clones:
+          items:
+            $ref: '#/components/schemas/ERACloneNewDTO'
+          type: array
+        databaseType:
+          type: string
+        databases:
+          items:
+            $ref: '#/components/schemas/ERADatabaseDTO'
+          type: array
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverCluster:
+          $ref: '#/components/schemas/ERADBServerClusterDTO'
+        dbserverClusterId:
+          format: uuid
+          type: string
+        description:
+          type: string
+        eaDbserverId:
+          format: uuid
+          type: string
+        eaStatus:
+          type: string
+        eraActivePolicy:
+          $ref: '#/components/schemas/EraActivePolicy'
+        eraCreated:
+          type: boolean
+        fqdns:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADBServerLogicalClusterInfo'
+        ipAddresses:
+          items:
+            type: string
+          type: array
+        logicalDbservers:
+          items:
+            $ref: '#/components/schemas/ERALogicalDBServerDTO'
+          type: array
+        metadata:
+          $ref: '#/components/schemas/ERADBServerLogicalClusterMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        placeholder:
+          type: boolean
+        primaryNodes:
+          items:
+            $ref: '#/components/schemas/ERALogicalDBServerDTO'
+          type: array
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        secondaryNodes:
+          items:
+            $ref: '#/components/schemas/ERALogicalDBServerDTO'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        type:
+          type: string
+      type: object
+    ERATimeMachineDTO:
+      properties:
+        activeSlaAndSchedule:
+          type: boolean
+        application:
+          $ref: '#/components/schemas/ERAApplicationDTO'
+        applicationName:
+          type: string
+        applicationType:
+          type: string
+        clones:
+          items:
+            $ref: '#/components/schemas/ERACloneNewDTO'
+          type: array
+        cloudId:
+          type: string
+        continuousRecoveryEnabled:
+          type: boolean
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        eraApplicationId:
+          format: uuid
+          type: string
+        eraGoldCopyId:
+          format: uuid
+          type: string
+        goldCopy:
+          $ref: '#/components/schemas/ERAGoldCopyDTO'
+        id:
+          format: uuid
+          type: string
+        isInternal:
+          type: boolean
+        logDrive:
+          $ref: '#/components/schemas/EraLogDriveDTO'
+        logDriveId:
+          type: string
+        name:
+          type: string
+        operationHistory:
+          $ref: '#/components/schemas/EraTMOperationHistory'
+        ownerId:
+          format: uuid
+          type: string
+        policyId:
+          format: uuid
+          type: string
+        policyName:
+          type: string
+        policyStartTime:
+          type: string
+        primaryHost:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        resetPolicy:
+          type: boolean
+        resetSla:
+          type: boolean
+        schedule:
+          $ref: '#/components/schemas/EraScheduleDTO'
+        scope:
+          type: string
+        sla:
+          $ref: '#/components/schemas/EraSlaDTO'
+        slaEnabled:
+          type: boolean
+        slaId:
+          format: uuid
+          type: string
+        slaName:
+          type: string
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        type:
+          type: string
+        uniqueName:
+          type: string
+      type: object
+    ERADBServerClusterInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    ERADBServerMetric:
+      properties:
+        compute:
+          $ref: '#/components/schemas/ERAVMInfo'
+        lastUpdatedTimeInUTC:
+          type: string
+        memory:
+          $ref: '#/components/schemas/ERAMemoryInfo'
+        storage:
+          $ref: '#/components/schemas/ERAStorageInfo'
+      type: object
+    ERASnapshot:
+      properties:
+        appInfoVersion:
+          type: string
+        applicableTypeFrequencies:
+          items:
+            $ref: '#/components/schemas/snapshotType'
+          type: array
+        applicableTypes:
+          items:
+            $ref: '#/components/schemas/snapshotType'
+          type: array
+        databaseNodeId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERASnapshotInfo'
+        metadata:
+          $ref: '#/components/schemas/ERASnapshotMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        protectionDomainId:
+          format: uuid
+          type: string
+        snapshotId:
+          format: uuid
+          type: string
+        snapshotTimeStamp:
+          type: string
+        snapshotUuid:
+          format: uuid
+          type: string
+        status:
+          $ref: '#/components/schemas/snapshotStatus'
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachineId:
+          format: uuid
+          type: string
+        type:
+          $ref: '#/components/schemas/snapshotType'
+        typeFrequency:
+          $ref: '#/components/schemas/snapshotType'
+      type: object
+    EraWeeklySchedule:
+      properties:
+        dayOfWeek:
+          type: string
+        dayOfWeekValue:
+          enum:
+          - SUNDAY
+          - MONDAY
+          - TUESDAY
+          - WEDNESDAY
+          - THURSDAY
+          - FRIDAY
+          - SATURDAY
+          type: string
+        enabled:
+          type: boolean
+      type: object
+    EraMonthlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+      type: object
+    EraContinuousSchedule:
+      properties:
+        enabled:
+          type: boolean
+        logBackupInterval:
+          format: int32
+          type: integer
+        logBackupRepeatIntervalInMinutes:
+          format: int32
+          type: integer
+        snapshotRepeatIntervalInMinutes:
+          format: int32
+          type: integer
+        snapshotsPerDay:
+          format: int32
+          type: integer
+      type: object
+    ERALogicalDBServerDTO:
+      properties:
+        backupPriority:
+          format: int32
+          type: integer
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserver:
+          $ref: '#/components/schemas/ERADBServerDTO'
+        dbserverId:
+          format: uuid
+          type: string
+        dbserverLogicalClusterId:
+          format: uuid
+          type: string
+        eraActive:
+          type: boolean
+        info:
+          $ref: '#/components/schemas/ERALogicalDBServerInfo'
+        metadata:
+          $ref: '#/components/schemas/ERALogicalDBServerMetadata'
+        primary:
+          type: boolean
+        status:
+          type: string
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    EraDriveDiskDTO:
+      properties:
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        eraCreated:
+          type: boolean
+        eraDriveId:
+          format: uuid
+          type: string
+        id:
+          type: string
+        info:
+          additionalProperties:
+            properties: {}
+            type: object
+          type: object
+        message:
+          type: string
+        ownerId:
+          type: string
+        status:
+          type: string
+        timeMachineId:
+          format: uuid
+          type: string
+        totalSize:
+          format: int32
+          type: integer
+        type:
+          type: string
+        usedSize:
+          format: int32
+          type: integer
+        vdiskUuid:
+          format: uuid
+          type: string
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    ERADBServerLogicalClusterInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    ERATimeMachineInfo:
+      properties:
+        incompatibleLogs:
+          type: boolean
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    EraTMOperationHistory:
+      properties:
+        autoCorrectLogCatchupCount:
+          format: int32
+          type: integer
+        autoCorrectSnapshotCount:
+          format: int32
+          type: integer
+      type: object
+    EraPostDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    EraActivePolicy:
+      properties:
+        driverDriven:
+          type: boolean
+        electionMessage:
+          type: string
+        staticEaPolicy:
+          $ref: '#/components/schemas/EraStaticEaPolicy'
+      type: object
+    ERAProtectionDomainDTO:
+      properties:
+        assocEntities:
+          items:
+            type: string
+          type: array
+        cloudId:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        eraCreated:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        ownerId:
+          type: string
+        primaryHost:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        type:
+          type: string
+      type: object
+    ERAStorageInfo:
+      properties:
+        allocatedSize:
+          format: int64
+          type: integer
+        controllerAvgIoLatencyUsecs:
+          items:
+            format: int64
+            type: integer
+          type: array
+        controllerNumIops:
+          items:
+            format: int64
+            type: integer
+          type: array
+        lastUpdatedTimeInUTC:
+          type: string
+        size:
+          format: int64
+          type: integer
+        unit:
+          enum:
+          - B
+          - KB
+          - MB
+          - GB
+          - TB
+          type: string
+        usedSize:
+          format: int64
+          type: integer
+      type: object
+    ERADBServerLogicalClusterMetadata:
+      properties:
+        clusterBreakDownTimeForEa:
+          type: string
+        databaseType:
+          type: string
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        eaMessage:
+          type: string
+        info:
+          properties: {}
+          type: object
+        lastEaNodeId:
+          format: uuid
+          type: string
+        lastNominatedEaNodeId:
+          format: uuid
+          type: string
+        reEvaluateEa:
+          type: boolean
+        scaledUpDbservers:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        secureInfo:
+          properties: {}
+          type: object
+        stickyEaDbserverId:
+          format: uuid
+          type: string
+        toBeRemovedDbservers:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+    EraDatabaseExpiryPolicy:
+      properties:
+        deleteDatabase:
+          type: boolean
+        deleteTimeMachine:
+          type: boolean
+        deleteVM:
+          type: boolean
+        effectiveTimestamp:
+          type: string
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+        expiryTimestamp:
+          type: string
+        remindBeforeInDays:
+          format: int32
+          type: integer
+        userCreated:
+          type: boolean
+      type: object
+    ERADBServerDTO:
+      properties:
+        accessKey:
+          type: string
+        accessKeyId:
+          type: string
+        associatedTimeMachineIds:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        associated_time_machine_id:
+          format: uuid
+          type: string
+        clientId:
+          format: uuid
+          type: string
+        clones:
+          items:
+            $ref: '#/components/schemas/ERACloneDTO'
+          type: array
+        clustered:
+          type: boolean
+        clusteredClones:
+          items:
+            $ref: '#/components/schemas/ERADatabaseDTO'
+          type: array
+        clusteredDatabases:
+          items:
+            $ref: '#/components/schemas/ERADatabaseDTO'
+          type: array
+        databaseType:
+          type: string
+        databases:
+          items:
+            $ref: '#/components/schemas/ERADatabaseDTO'
+          type: array
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverClusterId:
+          format: uuid
+          type: string
+        dbserverInValidEaState:
+          type: boolean
+        description:
+          type: string
+        eraCreated:
+          type: boolean
+        eraDrive:
+          $ref: '#/components/schemas/EraDriveDTO'
+        eraDriveId:
+          format: uuid
+          type: string
+        eraVersion:
+          type: string
+        fqdns:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADBServerInfo'
+        ipAddresses:
+          items:
+            type: string
+          type: array
+        is_server_driven:
+          type: boolean
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDbServerExpiryPolicy'
+        macAddresses:
+          items:
+            type: string
+          type: array
+        metadata:
+          $ref: '#/components/schemas/ERADBServerMetadata'
+        metric:
+          $ref: '#/components/schemas/ERADBServerMetric'
+        name:
+          type: string
+        nxClusterId:
+          format: uuid
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        placeholder:
+          type: boolean
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        requestedVersion:
+          type: string
+        singleInstaceClones:
+          items:
+            $ref: '#/components/schemas/ERADatabaseDTO'
+          type: array
+        singleInstaceDatabases:
+          items:
+            $ref: '#/components/schemas/ERADatabaseDTO'
+          type: array
+        singleIp:
+          type: string
+        softwareInstallations:
+          items:
+            $ref: '#/components/schemas/ERASoftwareInstallationDTO'
+          type: array
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        time_machine_info:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          enum:
+          - DBSERVER
+          - ERA_SERVER
+          - API_SERVER
+          - ERA_AGENT
+          type: string
+        vmClusterName:
+          type: string
+        vmClusterUuid:
+          format: uuid
+          type: string
+        vmInfo:
+          $ref: '#/components/schemas/EraVmInfo'
+        vmTimeZone:
+          type: string
+        workingDirectory:
+          type: string
+      type: object
+    Dbservers:
+      properties:
+        delete:
+          description: Specifies whether the Database Server VM has to be deleted from the cluster.
+          type: boolean
+        remove:
+          description: Specifies that the Database Server should be cleaned up.
+          type: boolean
+      type: object
+    ERADBServerInfo:
+      properties:
+        clustered:
+          type: boolean
+        info:
+          properties: {}
+          type: object
+        physicalEraDrive:
+          type: boolean
+        secureInfo:
+          properties: {}
+          type: object
+        singleInstance:
+          type: boolean
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

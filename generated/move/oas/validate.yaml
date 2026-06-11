@@ -1,0 +1,1231 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/providers/{id}/validate:
+    post:
+      description: Validate provider information. The API can validate credentials and check permissions associated with the
+        provider. <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/81b0a14d-c937-4872-b792-d46484ee8905/validate
+      operationId: validateProvider
+      parameters:
+      - description: Provider UUID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderEntity'
+            aos: {}
+            aws: {}
+      security:
+      - Bearer: []
+      summary: Validate provider information
+      tags:
+      - Provider
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/providers/{id}/validate \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/providers/{id}/validate"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{}\"\"\"\n\nconn.request(\"POST\",\"//move/v2/providers/{id}/validate\", payload, headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/providers/{id}/validate\"\n\t \n\treq, err := http.NewRequest(\"POST\",\
+          \ url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\")\n   \
+          \     req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/providers/{id}/validate\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/providers/{id}/validate';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    AzureNetwork:
+      description: Azure network information.
+      properties:
+        Location:
+          description: Location name.
+          type: string
+        Name:
+          description: Network name.
+          type: string
+        ResourceGroup:
+          description: Resource group name.
+          type: string
+        Subnet:
+          additionalProperties:
+            $ref: '#/components/schemas/AzureSubnetNetworks'
+          type: object
+        VnetId:
+          description: Virtual network Id.
+          type: string
+      type: object
+    AzureAccessInfo:
+      description: Azure Access information.
+      properties:
+        ClientID:
+          description: Client Id for the Move application registered in Azure Active Directory services.
+          type: string
+        ClientSecret:
+          description: Client Secret for the Move application registered in Azure Active Directory services.
+          type: string
+        SubscriptionID:
+          description: Subscription Id of the Azure account.
+          type: string
+        TenantID:
+          description: Azure Tenant's Id.
+          type: string
+      required:
+      - SubscriptionID
+      - TenantID
+      - ClientID
+      - ClientSecret
+      type: object
+    AWSAccessInfo:
+      description: AWS Access information.
+      properties:
+        AccessKey:
+          description: AWS Access Key.
+          type: string
+        SecretKey:
+          description: AWS Secret Key.
+          type: string
+      required:
+      - AccessKey
+      - SecretKey
+      type: object
+    VDDKProperties:
+      description: VDDK properties.
+      properties:
+        LibUploaded:
+          description: Flag to indicate if the VDDK library is uploaded.
+          type: boolean
+        Version:
+          description: VDDK library version required by the provider.
+          type: string
+      type: object
+    AOSProject:
+      description: AOS project properties.
+      properties:
+        ClusterList:
+          description: Cluster list.
+          items:
+            type: string
+          type: array
+        ErrorList:
+          description: Error list.
+          items:
+            type: string
+          type: array
+        Name:
+          description: Project name.
+          type: string
+        RunbookList:
+          description: Runbooks list.
+          items:
+            type: string
+          type: array
+        SubnetList:
+          description: Subnet list.
+          items:
+            type: string
+          type: array
+        UUID:
+          description: Project UUID.
+          format: uuid
+          type: string
+        UserList:
+          description: User list.
+          items:
+            type: string
+          type: array
+        VpcList:
+          description: Subnet list.
+          items:
+            type: string
+          type: array
+        VpcTunnelList:
+          description: AOS VPC tunnel list.
+          items:
+            type: string
+          type: array
+      type: object
+    OtherFilesAccessInfo:
+      description: Other files server access information.
+      properties:
+        IPorFQDN:
+          description: Other files server IP Address or FQDN.
+          type: string
+        Password:
+          description: Other files server password.
+          type: string
+        TargetName:
+          description: Name of the target nutanix files server.
+          type: string
+        TargetUUID:
+          description: UUID of target nutanix files server.
+          format: uuid
+          type: string
+        Username:
+          description: Other files server username.
+          type: string
+      required:
+      - IPorFQDN
+      - TargetUUID
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    NsxAccessInfo:
+      description: NSX Access information.
+      properties:
+        IPorFQDN:
+          description: NSX IP address or FQDN.
+          type: string
+        Password:
+          description: NSX password.
+          type: string
+        Username:
+          description: NSX user name.
+          type: string
+      required:
+      - IPorFQDN
+      - Username
+      - Password
+      type: object
+    RunbookTask:
+      description: Information about the runbook task.
+      properties:
+        AdditionalProperties:
+          additionalProperties: true
+          description: Runbook task additional properties.
+          type: object
+        MessageList:
+          description: List of messages for the runbook task.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+        Name:
+          description: Runbook task name.
+          type: string
+        Type:
+          description: Runbook task type.
+          type: string
+        UUID:
+          description: Runbook task UUID.
+          type: string
+      type: object
+    TargetCluster:
+      description: Target cluster information.
+      properties:
+        CompatibleTargetTypes:
+          description: Compatible target types.
+          items:
+            description: Compatible target types.
+            type: string
+          type: array
+        Containers:
+          description: Target cluster container information.
+          items:
+            $ref: '#/components/schemas/Container'
+          type: array
+        HypervisorTypes:
+          description: Type of target cluster hypervisors.
+          items:
+            $ref: '#/components/schemas/HypervisorType'
+          type: array
+        IPorFQDN:
+          description: Target cluster IP address or FQDN.
+          type: string
+        Name:
+          description: Target cluster name.
+          type: string
+        Networks:
+          description: Target cluster network information.
+          items:
+            $ref: '#/components/schemas/TargetNetwork'
+          type: array
+        RegisteredVCIPAddress:
+          description: Registered vCenter IP address.
+          type: string
+        SupportedCpuModels:
+          description: Supported CPU models for the target cluster.
+          items:
+            $ref: '#/components/schemas/CpuModel'
+          type: array
+        TargetUUID:
+          description: Target UUID.
+          format: uuid
+          type: string
+        Type:
+          description: Target cluster type.
+          type: string
+        UUID:
+          description: Target cluster UUID.
+          format: uuid
+          type: string
+        Version:
+          description: Target version.
+          type: string
+        Vpcs:
+          description: Target cluster VPC information.
+          items:
+            $ref: '#/components/schemas/TargetVpc'
+          type: array
+      type: object
+    ProviderMetaData:
+      description: Provider metadata.
+      properties:
+        Count:
+          type: integer
+        CreationTime:
+          description: Provider creation time.
+          type: string
+        IsInventoryLoading:
+          description: Provider inventory status.
+          type: boolean
+        Kind:
+          description: Provider type.
+          type: string
+        LastInventoryRefreshTime:
+          description: Last inventory refresh time.
+          type: string
+        LastUpdateTime:
+          description: Provider last updated time.
+          type: string
+        Name:
+          description: Provider name.
+          type: string
+        NumDiscoveredNodes:
+          description: Number of discovered nodes in provider.
+          type: integer
+        NumDiscoveredWorkloads:
+          description: Number of discovered workloads in provider.
+          type: integer
+        NumMigratedWorkloads:
+          description: Number of migrated workloads from the provider.
+          type: integer
+        SpecVersion:
+          description: Provider version.
+          type: string
+        UUID:
+          description: UUID of the provider.
+          format: uuid
+          type: string
+      type: object
+    RegisteredApplication:
+      description: Move application (service principal) registered on Azure AD.
+      properties:
+        Application:
+          description: Name of the AD application.
+          type: string
+        Subscription:
+          description: Name of the Azure subscription.
+          type: string
+        Tenant:
+          description: Name of the Azure tenant.
+          type: string
+      type: object
+    Container:
+      description: Container information.
+      properties:
+        FreeBytes:
+          description: Container free bytes.
+          type: string
+        IsNutanixManaged:
+          description: Flag to indicate if Nutanix manages the container.
+          type: boolean
+        Name:
+          description: Container name.
+          type: string
+        TotalBytes:
+          description: Container total bytes.
+          type: string
+        UUID:
+          description: Container UUID.
+          format: uuid
+          type: string
+        UsedBytes:
+          description: Container used bytes.
+          type: string
+      type: object
+    ESXProperties:
+      description: ESX Properties.
+      properties:
+        VddkProperties:
+          description: Required VDDK library and their status.
+          items:
+            $ref: '#/components/schemas/VDDKProperties'
+          type: array
+        Version:
+          description: ESX Version.
+          type: string
+      type: object
+    User:
+      description: User information.
+      properties:
+        Name:
+          description: User name.
+          type: string
+        UUID:
+          description: User UUID.
+          format: uuid
+          type: string
+      type: object
+    AwsSecurityGroup:
+      description: AWS security group information.
+      properties:
+        IsDefault:
+          description: Flag to indicate if the security group is the default security group for the VPC.
+          type: boolean
+        Name:
+          description: Security group name.
+          type: string
+        SgID:
+          description: Security group Id.
+          type: string
+        VpcID:
+          description: VPC Id.
+          type: string
+      type: object
+    SplMessage:
+      description: Move application message.
+      properties:
+        Message:
+          description: Contents of the message.
+          type: string
+        Title:
+          description: Title of the message.
+          type: string
+        Type:
+          description: Type of the message.
+          enum:
+          - INFO
+          - WARN
+          - ERROR
+          type: string
+      type: object
+    AzureProperties:
+      description: Azure Properties.
+      properties:
+        AvailableRegions:
+          description: Regions available.
+          items:
+            $ref: '#/components/schemas/AzureRegion'
+          type: array
+        RegionsWithInstances:
+          description: Regions available with VMs.
+          items:
+            $ref: '#/components/schemas/AzureRegion'
+          type: array
+        RegisteredApplication:
+          $ref: '#/components/schemas/RegisteredApplication'
+      type: object
+    RunbookVariableRegex:
+      description: Regular expression to which runbook variable value should adhere to.
+      properties:
+        ShouldValidate:
+          description: Flag to indicate whether runbook variable value should be validated against the regular expression.
+          type: boolean
+        Value:
+          description: Value of regular expression.
+          type: string
+      type: object
+    HyperVAccessInfo:
+      description: HyperV Access information.
+      properties:
+        IPorFQDN:
+          description: HyperV IP address or FQDN.
+          type: string
+        Password:
+          description: HyperV password.
+          type: string
+        Username:
+          description: HyperV user name.
+          type: string
+      required:
+      - IPorFQDN
+      - Username
+      - Password
+      type: object
+    PCAccessInfo:
+      description: Prism Central access information.
+      properties:
+        IPorFQDN:
+          description: Prism Central IP Address or FQDN.
+          type: string
+        Password:
+          description: Prism Central password.
+          type: string
+        Username:
+          description: Prism Central username.
+          type: string
+      type: object
+    HyperVProperties:
+      description: HyperV Properties.
+      properties:
+        Version:
+          description: HyperV Version.
+          type: string
+      type: object
+    AOSCCProperties:
+      description: Properties for AOS Cluster Conversion provider.
+      properties:
+        ClusterUuid:
+          description: Cluster UUID.
+          format: uuid
+          type: string
+      type: object
+    AzureNetworkSecurityGroup:
+      description: Azure network security group information.
+      properties:
+        Location:
+          description: Location name.
+          type: string
+        Name:
+          description: Network security group name.
+          type: string
+        NsgID:
+          description: Network security group Id.
+          type: string
+        ResourceGroup:
+          description: Resource group name.
+          type: string
+      type: object
+    AhvVpcSubnetProps:
+      description: AHV VPC subnet information.
+      properties:
+        IPPool:
+          description: AHV VPC Subnet IPPool information.
+          items:
+            type: string
+          type: array
+        Name:
+          description: VPC subnet name.
+          type: string
+        UUID:
+          description: VPC subnet UUID.
+          type: string
+        WarningMsg:
+          description: VPC subnet warning message.
+          type: string
+      type: object
+    AzureSubnetNetworks:
+      description: Azure subnet network list.
+      items:
+        $ref: '#/components/schemas/AzureSubnetNetwork'
+      type: array
+    NsxProperties:
+      description: NSX Properties.
+      properties:
+        Version:
+          description: NSX Version.
+          type: string
+      type: object
+    RunbookVariableOptions:
+      description: Choices for variable value and type of choices.
+      properties:
+        AdditionalProperties:
+          additionalProperties: true
+          description: EScript/HTTP request information for dynamic variables.
+          type: object
+        Choices:
+          description: Choices for variable value.
+          items:
+            type: string
+          type: array
+        Type:
+          description: Whether choices are predefined, script based, or HTTP request based.
+          enum:
+          - PREDEFINED
+          - EXEC
+          - HTTP
+          type: string
+      type: object
+    AhvVpcTunnelProps:
+      description: AOS VPC tunnel information.
+      properties:
+        Name:
+          description: VPC tunnel name.
+          type: string
+        UUID:
+          description: VPC tunnel UUID.
+          type: string
+      type: object
+    AzureSubnetNetwork:
+      description: Azure subnet information.
+      properties:
+        Ipv4Cidr:
+          description: IPv4 settings.
+          type: string
+        Ipv6Cidr:
+          description: IPv6 settings.
+          type: string
+        Name:
+          description: Subnet name.
+          type: string
+        SubnetID:
+          description: Subnet Id.
+          type: string
+      type: object
+    TargetNetwork:
+      description: Target network information.
+      properties:
+        IPPool:
+          description: AHV VPC Subnet IPPool information.
+          items:
+            type: string
+          type: array
+        IsIpamEnabled:
+          description: Flag to determine if the network has IPAM enabled.
+          type: boolean
+        Name:
+          description: Target network name.
+          type: string
+        UUID:
+          description: Target network UUID.
+          type: string
+        WarningMsg:
+          description: Target network warning message.
+          type: string
+      type: object
+    CpuModel:
+      description: CPU model information.
+      properties:
+        IsDefault:
+          description: Flag to indicate if this is the default CPU model.
+          type: boolean
+        Name:
+          description: CPU model name.
+          type: string
+        UUID:
+          description: CPU model UUID.
+          type: string
+        Vendor:
+          description: CPU model vendor.
+          type: string
+      type: object
+    FilesProperties:
+      description: Files properties.
+      properties:
+        FileserverID:
+          description: Nutanix fileserver Id.
+          type: string
+        SupportedProtocols:
+          items:
+            description: Supported share protocols by file server.
+            type: string
+          type: array
+        TenantID:
+          description: Tenant Id to be used for all files APIs.
+          type: string
+      type: object
+    HyperVSettings:
+      description: HyperV Settings.
+      properties:
+        OverrideAgent:
+          type: boolean
+      type: object
+    Runbook:
+      description: Structure of runbook.
+      properties:
+        Description:
+          description: Runbook description.
+          type: string
+        ErrorList:
+          description: List of error messages for runbook, runbook variables and runbook tasks.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+        IsSupported:
+          description: Flag to indicate if the runbook execution is supported using Move.
+          type: boolean
+        MessageList:
+          description: List of messages for the runbook.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+        Name:
+          description: Runbook name.
+          type: string
+        ProjectUUID:
+          description: UUID of the project under which the runbook is present.
+          type: string
+        TaskList:
+          description: List of tasks present in the runbook.
+          items:
+            $ref: '#/components/schemas/RunbookTask'
+          type: array
+        UUID:
+          description: UUID of the runbook.
+          type: string
+        VariableList:
+          description: List of variables present in the runbook.
+          items:
+            $ref: '#/components/schemas/RunbookVariable'
+          type: array
+        WarningList:
+          description: List of warning messages for runbook, runbook variables and runbook tasks.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+      type: object
+    TargetVpc:
+      description: Target VPC information.
+      properties:
+        Name:
+          description: Target VPC name.
+          type: string
+        UUID:
+          description: Target VPC UUID.
+          type: string
+        VPCSubnets:
+          description: AHV VPC subnet information.
+          items:
+            $ref: '#/components/schemas/AhvVpcSubnetProps'
+          type: array
+        VPCTunnel:
+          $ref: '#/components/schemas/AhvVpcTunnelProps'
+      type: object
+    Provider:
+      description: Information to add provider.
+      properties:
+        AOSAccessInfo:
+          $ref: '#/components/schemas/AOSAccessInfo'
+        AOSCCAccessInfo:
+          $ref: '#/components/schemas/AOSAccessInfo'
+        AOSCCProperties:
+          $ref: '#/components/schemas/AOSCCProperties'
+        AOSProperties:
+          $ref: '#/components/schemas/AOSProperties'
+        AWSAccessInfo:
+          $ref: '#/components/schemas/AWSAccessInfo'
+        AWSProperties:
+          $ref: '#/components/schemas/AWSProperties'
+        AzureAccessInfo:
+          $ref: '#/components/schemas/AzureAccessInfo'
+        AzureProperties:
+          $ref: '#/components/schemas/AzureProperties'
+        CompatibleTargetTypes:
+          description: List of compatible target types.
+          items:
+            type: string
+          type: array
+        ESXAccessInfo:
+          $ref: '#/components/schemas/ESXAccessInfo'
+        ESXProperties:
+          $ref: '#/components/schemas/ESXProperties'
+        FilesAccessInfo:
+          $ref: '#/components/schemas/FilesAccessInfo'
+        FilesProperties:
+          $ref: '#/components/schemas/FilesProperties'
+        HyperVAccessInfo:
+          $ref: '#/components/schemas/HyperVAccessInfo'
+        HyperVProperties:
+          $ref: '#/components/schemas/HyperVProperties'
+        HyperVSettings:
+          $ref: '#/components/schemas/HyperVSettings'
+        InventoryErrors:
+          description: List of errors occurred during the given provider inventory collection.
+          items:
+            type: string
+          type: array
+        IsInventoryLoading:
+          description: Provider inventory status.
+          type: boolean
+        Name:
+          description: Provider name.
+          type: string
+        NsxAccessInfo:
+          $ref: '#/components/schemas/NsxAccessInfo'
+        NsxProperties:
+          $ref: '#/components/schemas/NsxProperties'
+        OtherFilesAccessInfo:
+          $ref: '#/components/schemas/OtherFilesAccessInfo'
+        OverrideType:
+          description: Specify the provider type explicitly for the provider instead of allowing the provider type to be detected
+            automatically by Move when adding a provider. For internal use only.
+          type: string
+        PermissionsError:
+          $ref: '#/components/schemas/PermissionsError'
+        Roles:
+          description: Supported provider roles.
+          items:
+            type: string
+          type: array
+        SpProviderIds:
+          description: List of SP provider IDs.
+          items:
+            type: string
+          type: array
+        Type:
+          description: Provider type.
+          type: string
+        TypeDescription:
+          description: Provider type.
+          type: string
+        UUID:
+          description: UUID of the provider.
+          format: uuid
+          type: string
+        Version:
+          description: Provider version.
+          type: string
+        VmProviderIds:
+          description: List of VM provider IDs.
+          items:
+            type: string
+          type: array
+      required:
+      - Name
+      - Type
+      type: object
+    Region:
+      description: AWS region information.
+      properties:
+        AvailabilityZones:
+          items:
+            description: Availability zone under a region.
+            type: string
+          type: array
+        ID:
+          description: AWS region Id.
+          type: string
+        Name:
+          description: AWS region name.
+          type: string
+        Networks:
+          items:
+            $ref: '#/components/schemas/AwsNetwork'
+          type: array
+      type: object
+    RegisteredVCAccessInfo:
+      description: Access information for the registered vCenter in AOS.
+      properties:
+        IPAddress:
+          description: vCenter IP Address.
+          type: string
+        Password:
+          description: vCenter password.
+          type: string
+        Username:
+          description: vCenter username.
+          type: string
+      required:
+      - IPAddress
+      - Username
+      - Password
+      type: object
+    ProviderEntity:
+      description: Provider information.
+      properties:
+        APIVersion:
+          description: Move API version
+          type: string
+        MetaData:
+          $ref: '#/components/schemas/ProviderMetaData'
+        Spec:
+          $ref: '#/components/schemas/Provider'
+        TaskUuid:
+          description: Task UUID for provider related operations.
+          type: string
+        Type:
+          description: Provider type.
+          type: string
+      type: object
+    AOSProperties:
+      description: AOS Properties.
+      properties:
+        AddFNSProvider:
+          description: Flag to indicate to also add as FNS provider.
+          type: boolean
+        CategoriesMapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: Prism Central categories mapping.
+          type: object
+        Clusters:
+          description: AOS cluster information.
+          items:
+            $ref: '#/components/schemas/TargetCluster'
+          type: array
+        Errors:
+          description: List of errors.
+          items:
+            $ref: '#/components/schemas/Error'
+          type: array
+        FeaturesStatus:
+          description: List of statuses of different features.
+          items:
+            $ref: '#/components/schemas/FeatureStatus'
+          type: array
+        Projects:
+          description: AOS projects list.
+          items:
+            $ref: '#/components/schemas/AOSProject'
+          type: array
+        Runbooks:
+          description: List of runbooks.
+          items:
+            $ref: '#/components/schemas/Runbook'
+          type: array
+        Users:
+          description: List of users.
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+        Version:
+          description: AOS Version.
+          type: string
+      type: object
+    AwsSubnetNetwork:
+      description: AWS subnet information.
+      properties:
+        Ipv4Cidr:
+          description: IPv4 settings.
+          type: string
+        Ipv6Cidr:
+          description: IPv6 settings.
+          type: string
+        Name:
+          description: Subnet name.
+          type: string
+        SubnetID:
+          description: Subnet Id.
+          type: string
+      type: object
+    AzureRegion:
+      description: Azure region information.
+      properties:
+        ID:
+          description: Azure region Id.
+          type: string
+        Name:
+          description: Azure region name.
+          type: string
+        NetworkSecurityGroups:
+          items:
+            $ref: '#/components/schemas/AzureNetworkSecurityGroup'
+          type: array
+        Networks:
+          items:
+            $ref: '#/components/schemas/AzureNetwork'
+          type: array
+        ResourceGroups:
+          items:
+            description: Resource groups under a region.
+            type: string
+          type: array
+      type: object
+    AwsNetwork:
+      description: AWS network information.
+      properties:
+        IsDefault:
+          description: Flag to indicate if the network is the default network.
+          type: boolean
+        Name:
+          description: Network name.
+          type: string
+        SecurityGroups:
+          description: Security group information.
+          items:
+            $ref: '#/components/schemas/AwsSecurityGroup'
+          type: array
+        State:
+          description: Network status.
+          type: string
+        Subnet:
+          additionalProperties:
+            $ref: '#/components/schemas/AwsSubnetNetworks'
+          type: object
+        VpcId:
+          description: Virtual private cloud Id.
+          type: string
+      type: object
+    AOSAccessInfo:
+      description: AOS access information.
+      properties:
+        IPorFQDN:
+          description: AOS IP Address or FQDN.
+          type: string
+        Password:
+          description: AOS password.
+          type: string
+        RegisteredVCAccessInfo:
+          items:
+            $ref: '#/components/schemas/RegisteredVCAccessInfo'
+          type: array
+        Username:
+          description: AOS user name.
+          type: string
+      required:
+      - IPorFQDN
+      - Username
+      - Password
+      type: object
+    ContextEntry:
+      description: AWS context entry.
+      properties:
+        ContextKeyName:
+          description: The full name of a condition context key, including the service prefix. For example, aws:SourceIp or
+            s3:VersionId.
+          type: string
+        ContextKeyType:
+          description: The data type of the value (or values) specified in the ContextKeyValues parameter.
+          enum:
+          - string
+          - stringList
+          - numeric
+          - numericList
+          - boolean
+          - booleanList
+          - ip
+          - ipList
+          - binary
+          - binaryList
+          - date
+          - dateList
+          type: string
+        ContextKeyValues:
+          description: The value (or values) to provide to the simulation when the key is referenced by a condition element
+            in an input policy.
+          items:
+            type: string
+          type: array
+      type: object
+    HypervisorType:
+      description: Hypervisor type.
+      type: string
+    FilesAccessInfo:
+      description: Nutanix files server access information.
+      properties:
+        IPorFQDN:
+          description: Nutanix files server IP address or FQDN.
+          type: string
+        PCAccessInfo:
+          $ref: '#/components/schemas/PCAccessInfo'
+        Password:
+          description: Nutanix files server password.
+          type: string
+        Username:
+          description: Nutanix files server username.
+          type: string
+      required:
+      - IPorFQDN
+      type: object
+    RunbookVariable:
+      description: Information about runbook variable.
+      properties:
+        DataType:
+          description: Runbook variable data type.
+          enum:
+          - BASE
+          - LIST
+          - SINGLE_SELECT_LIST
+          type: string
+        Description:
+          description: Runbook variable description.
+          type: string
+        IsDynamic:
+          description: Falg to indicate if the runbook variable choices are determined using EScript or HTTP request.
+          type: boolean
+        IsEditable:
+          description: Flag to indicate if the runbook variable value is editable.
+          type: boolean
+        IsHidden:
+          description: Flag to indicate if the runbook variable is hidden.
+          type: boolean
+        IsMandatory:
+          description: Flag to indicate if the runbook variable value is mandatory.
+          type: boolean
+        IsSecret:
+          description: Flag to indicate if the runbook variable value is a secret.
+          type: boolean
+        Label:
+          description: Runbook variable label.
+          type: string
+        MessageList:
+          description: List of messages for the runbook variable.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+        Name:
+          description: Runbook variable name.
+          type: string
+        Options:
+          $ref: '#/components/schemas/RunbookVariableOptions'
+        Regex:
+          $ref: '#/components/schemas/RunbookVariableRegex'
+        UUID:
+          description: Runbook variable UUID.
+          type: string
+        Value:
+          description: Runbook variable value. For arrays, the array elements are separated by comma delimiter.
+          type: string
+        ValueType:
+          description: Runbook variable value type.
+          enum:
+          - STRING
+          - INT
+          - DATE
+          - TIME
+          - DATE_TIME
+          - MULTILINE_STRING
+          type: string
+      type: object
+    ESXAccessInfo:
+      description: ESX Access information.
+      properties:
+        IPorFQDN:
+          description: ESX IP address or FQDN.
+          type: string
+        Password:
+          description: ESX password.
+          type: string
+        Username:
+          description: ESX user name.
+          type: string
+      required:
+      - IPorFQDN
+      - Username
+      - Password
+      type: object
+    AWSProperties:
+      description: AWS Properties.
+      properties:
+        AvailableRegions:
+          description: Regions available.
+          items:
+            $ref: '#/components/schemas/Region'
+          type: array
+        ContextEntries:
+          description: Context entries to use for IAM permission checks.
+          items:
+            $ref: '#/components/schemas/ContextEntry'
+          type: array
+        RegionsWithInstances:
+          description: Regions available with instances.
+          items:
+            $ref: '#/components/schemas/Region'
+          type: array
+      type: object
+    FeatureStatus:
+      properties:
+        IsEnabled:
+          description: Flag to indicate if the feature is enabled.
+          type: boolean
+        Name:
+          description: Feature name.
+          type: string
+        Version:
+          description: Feature version.
+          type: string
+      type: object
+    AwsSubnetNetworks:
+      description: AWS subnet network list.
+      items:
+        $ref: '#/components/schemas/AwsSubnetNetwork'
+      type: array
+    PermissionsError:
+      description: Permissions error.
+      properties:
+        ErrorMsg:
+          description: Error message.
+          type: string
+        Source:
+          description: Missing source permissions for the provider.
+          items:
+            type: string
+          type: array
+        Target:
+          description: Missing target permissions for the provider.
+          items:
+            type: string
+          type: array
+      type: object

@@ -1,0 +1,563 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /ops-managers:
+    get:
+      description: Get all the Ops Managers registered in NDB.
+      operationId: getAllOpsManagers
+      parameters:
+      - description: The maximum numbers of Ops manager(s) to return.
+        in: query
+        name: limit
+        schema:
+          type: integer
+      - description: The number of Ops manager(s) skipped before selecting the next set of Ops manager(s).
+        in: query
+        name: offset
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/EraPaginationResponse'
+                - properties:
+                    entities:
+                      items:
+                        $ref: '#/components/schemas/OpsManager'
+                      type: array
+                  type: object
+          description: Returns a list of Ops Managers.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Get all the Ops Managers.
+      tags:
+      - Ops Manager
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/ops-managers \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/ops-managers"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/ops-managers\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/ops-managers\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\
+          \tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"\
+          Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/ops-managers\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/ops-managers';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      operationId: registerOpsManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpsManagerRegistrationRequest'
+        description: Payload required to register an Ops manager.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation completed.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Register a new Ops manager with NDB.
+      tags:
+      - Ops Manager
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/ops-managers \\\n    --header 'Accept: application/json' \\\
+          \n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n\
+          \    --data '{\n    \"apiPrivateKey\": \"string\",\n    \"apiPublicKey\": \"string\",\n    \"description\": \"string\"\
+          ,\n    \"host\": \"string\",\n    \"name\": \"string\",\n    \"port\": 0,\n    \"protocol\": \"http\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"apiPrivateKey\"\
+          : \"string\",\n    \"apiPublicKey\": \"string\",\n    \"description\": \"string\",\n    \"host\": \"string\",\n\
+          \    \"name\": \"string\",\n    \"port\": 0,\n    \"protocol\": \"http\"\n}' \\\n    --output-document \\\n    -\
+          \ :///era/v0.9/ops-managers"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"apiPrivateKey\": \"string\",\n    \"apiPublicKey\": \"string\",\n    \"description\": \"string\"\
+          ,\n    \"host\": \"string\",\n    \"name\": \"string\",\n    \"port\": 0,\n    \"protocol\": \"http\"\n}\"\"\"\n\
+          \nconn.request(\"POST\",\"/era/v0.9/ops-managers\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\
+          \nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/ops-managers\"\n\t\n\tpayload :=  strings.NewReader(`{\"apiPrivateKey\": \"string\", \"apiPublicKey\"\
+          : \"string\", \"description\": \"string\", \"host\": \"string\", \"name\": \"string\", \"port\": 0, \"protocol\"\
+          : \"http\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"\
+          application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/ops-managers\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"apiPrivateKey\\\": \\\"string\\\", \\\
+          \"apiPublicKey\\\": \\\"string\\\", \\\"description\\\": \\\"string\\\", \\\"host\\\": \\\"string\\\", \\\"name\\\
+          \": \\\"string\\\", \\\"port\\\": 0, \\\"protocol\\\": \\\"http\\\"}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/ops-managers';\nconst options = {\n  method: 'POST',\n  headers: {'Accept': 'application/json',\
+          \ 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:  `{\"apiPrivateKey\"\
+          : \"string\", \"apiPublicKey\": \"string\", \"description\": \"string\", \"host\": \"string\", \"name\": \"string\"\
+          , \"port\": 0, \"protocol\": \"http\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /ops-managers/{ops-manager-id}:
+    delete:
+      description: Delete the Ops Manager with the specified ID. If the Ops Manager has one or more associated databases,
+        the operation is blocked and an HTTP 500 error is returned.
+      operationId: deleteOpsManagerById
+      parameters:
+      - description: The unique identifier of the Ops manager to delete.
+        in: path
+        name: ops-manager-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          description: Ops Manager with specified Id is deleted successfully. No content to return.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Delete Ops manager by ID
+      tags:
+      - Ops Manager
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/ops-managers/{ops-manager-id} \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/ops-managers/{ops-manager-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/ops-managers/{ops-manager-id}\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/ops-managers/{ops-manager-id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/ops-managers/{ops-manager-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/ops-managers/{ops-manager-id}';\nconst options = {\n  method: 'DELETE',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      description: Fetch an Ops manager with the specified ID. Use 'detailed=true' to include credential details.
+      operationId: getOpsManagerById
+      parameters:
+      - description: The unique identifier of the Ops manager to retrieve.
+        in: path
+        name: ops-manager-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: When true, returns Ops Manager information along with credential details, including the public key and
+          masked private key.
+        in: query
+        name: detailed
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpsManager'
+          description: Returns the Ops Manager with the given ID.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Retrieve Ops manager by ID.
+      tags:
+      - Ops Manager
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/ops-managers/{ops-manager-id} \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/ops-managers/{ops-manager-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/ops-managers/{ops-manager-id}\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/ops-managers/{ops-manager-id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/ops-managers/{ops-manager-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/ops-managers/{ops-manager-id}';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      description: Update Ops manager with the specified ID. When the Ops Manager is associated to one or more databases,
+        modifications to the host, port or protocol are restricted. In all other cases, updates of all configuration fields
+        are permissible.
+      operationId: updateOpsManagerById
+      parameters:
+      - description: The unique identifier of the Ops manager to update.
+        in: path
+        name: ops-manager-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpsManagerRegistrationRequest'
+        description: Payload required to update an Ops manager.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation submitted successfully. Returns a task info summary for tracking the update operation.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Update Ops manager by ID
+      tags:
+      - Ops Manager
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/ops-managers/{ops-manager-id} \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\
+          \n    --data '{\n    \"apiPrivateKey\": \"string\",\n    \"apiPublicKey\": \"string\",\n    \"description\": \"\
+          string\",\n    \"host\": \"string\",\n    \"name\": \"string\",\n    \"port\": 0,\n    \"protocol\": \"http\"\n\
+          }'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"apiPrivateKey\"\
+          : \"string\",\n    \"apiPublicKey\": \"string\",\n    \"description\": \"string\",\n    \"host\": \"string\",\n\
+          \    \"name\": \"string\",\n    \"port\": 0,\n    \"protocol\": \"http\"\n}' \\\n    --output-document \\\n    -\
+          \ :///era/v0.9/ops-managers/{ops-manager-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"apiPrivateKey\": \"string\",\n    \"apiPublicKey\": \"string\",\n    \"description\": \"string\"\
+          ,\n    \"host\": \"string\",\n    \"name\": \"string\",\n    \"port\": 0,\n    \"protocol\": \"http\"\n}\"\"\"\n\
+          \nconn.request(\"PUT\",\"/era/v0.9/ops-managers/{ops-manager-id}\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/ops-managers/{ops-manager-id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"apiPrivateKey\": \"\
+          string\", \"apiPublicKey\": \"string\", \"description\": \"string\", \"host\": \"string\", \"name\": \"string\"\
+          , \"port\": 0, \"protocol\": \"http\"}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"\
+          application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"\
+          Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/ops-managers/{ops-manager-id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"apiPrivateKey\\\": \\\"string\\\", \\\
+          \"apiPublicKey\\\": \\\"string\\\", \\\"description\\\": \\\"string\\\", \\\"host\\\": \\\"string\\\", \\\"name\\\
+          \": \\\"string\\\", \\\"port\\\": 0, \\\"protocol\\\": \\\"http\\\"}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/ops-managers/{ops-manager-id}';\nconst options = {\n  method: 'PUT',\n  headers:\
+          \ {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"apiPrivateKey\": \"string\", \"apiPublicKey\": \"string\", \"description\": \"string\", \"host\":\
+          \ \"string\", \"name\": \"string\", \"port\": 0, \"protocol\": \"http\"}`\n};\n\ntry {\n  const response = await\
+          \ fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    OpsManagerRegistrationRequest:
+      description: This model is used for both registration and update of an ops-manager
+      properties:
+        apiPrivateKey:
+          description: Private key for asymmetric authentication
+          type: string
+        apiPublicKey:
+          description: Public key for asymmetric authentication
+          type: string
+        description:
+          description: An optional field to describe the ops-manager registered
+          type: string
+        host:
+          description: IP address or hostname of the ops-manager server
+          type: string
+        name:
+          description: The name of the ops-manager
+          type: string
+        port:
+          description: Port at which ops-manager server is listening
+          format: int32
+          type: integer
+        protocol:
+          description: Protocol for communicating with the ops-manager
+          enum:
+          - http
+          - https
+          type: string
+      required:
+      - name
+      - protocol
+      - host
+      - port
+      - apiPublicKey
+      - apiPrivateKey
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    OpsManager:
+      properties:
+        associatedDbCount:
+          description: Number of associated databases
+          format: int32
+          type: integer
+        dateCreated:
+          description: Time at which ops-manager is created
+          format: date-time
+          type: string
+        dateModified:
+          description: Time at which ops-manager is last modified
+          format: date-time
+          type: string
+        description:
+          description: An optional field to describe the ops-manager registered
+          type: string
+        host:
+          description: IP address or hostname of the ops-manager server
+          type: string
+        id:
+          description: Unique identifier for the ops-manager
+          format: uuid
+          type: string
+        name:
+          description: The name of the ops-manager
+          type: string
+        ownerId:
+          description: ID of NDB user who owns it
+          format: uuid
+          type: string
+        port:
+          description: Port at which ops-manager server is listening
+          format: int32
+          type: integer
+        secure:
+          description: True if https, otherwise false
+          type: boolean
+        status:
+          description: The current status of the ops-manager
+          enum:
+          - up
+          - down
+          - initializing
+          - updating
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+    EraPaginationResponse:
+      properties:
+        count:
+          format: int32
+          type: integer
+        entities:
+          items:
+            type: object
+          type: array
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

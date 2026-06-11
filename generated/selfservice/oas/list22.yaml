@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /meter/projects/list:
+    post:
+      responses:
+        '200':
+          description: Request Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/meter_list_response'
+      requestBody:
+        $ref: '#/components/requestBodies/meter_list_request'
+      tags:
+      - Meter
+      x-private: false
+      x-doc-hide: false
+      summary: Filter API to get cumulative stats at Project level
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: meter
+      description: 'Filter API to get cumulative stats at Project level
+
+        '
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/meter/projects/list \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"filter\": \"string\",\n    \"length\": null,\n    \"offset\": null\n\
+          }'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\",\n    \"length\": null,\n    \"offset\": null\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/meter/projects/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\",\n    \"length\": null,\n    \"offset\": null\n}\"\"\"\n\n\
+          conn.request(\"POST\",\"/api/nutanix/v3/meter/projects/list\", payload, headers)\n\nres = conn.getresponse()\ndata\
+          \ = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/meter/projects/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"filter\"\
+          : \"string\", \"length\": null, \"offset\": null}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/meter/projects/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\", \\\"length\\\
+          \": null, \\\"offset\\\": null}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/meter/projects/list';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"filter\": \"string\", \"length\": null, \"offset\": null}`\n};\n\ntry {\n  const response = await\
+          \ fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  requestBodies:
+    meter_list_request:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/meter_list_request'
+      description: Request body
+      required: true
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    meter_list_response:
+      type: object
+      description: Response object from the meter service
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/meter_list_response_entity'
+          type: array
+        message_list:
+          items:
+            type: string
+          type: array
+        metadata:
+          type: object
+          properties:
+            length:
+              type: number
+            total:
+              type: number
+            offset:
+              type: number
+    meter_list_request:
+      type: object
+      description: Request object for getting meter data
+      properties:
+        filter:
+          type: string
+        length:
+          type: number
+        offset:
+          type: number
+    cluster_capacity:
+      type: object
+      description: Total and utilized resources of the cluster
+      properties:
+        vcpu_capacity:
+          type: integer
+          format: int64
+        memory_usage:
+          type: integer
+          format: int64
+        storage_usage:
+          type: integer
+          format: int64
+        storage_capacity:
+          type: integer
+          format: int64
+        memory_capacity:
+          type: integer
+          format: int64
+        vcpu_usage:
+          type: integer
+          format: int64
+    metering_entry:
+      type: object
+      description: Response is an array of entities, utilized and total resources
+      properties:
+        entities:
+          additionalProperties:
+            type: string
+          type: object
+        utilized:
+          $ref: '#/components/schemas/meter_resources'
+        capacity:
+          $ref: '#/components/schemas/cluster_capacity'
+        reserved:
+          $ref: '#/components/schemas/meter_resources'
+        cluster_capacity:
+          $ref: '#/components/schemas/cluster_capacity'
+    meter_status:
+      type: object
+      description: Empty status object
+      title: Empty status object
+    meter_list_response_entity:
+      type: object
+      description: Wrapper for entities in response
+      properties:
+        status:
+          type: object
+          properties:
+            resources:
+              $ref: '#/components/schemas/metering_entry'
+        spec:
+          type: object
+        metadata:
+          type: object
+    meter_resources:
+      type: object
+      description: Resources which are metered at the moment
+      properties:
+        vcpu:
+          type: integer
+          format: int64
+        disk:
+          type: integer
+          format: int64
+        memory:
+          type: integer
+          format: int64

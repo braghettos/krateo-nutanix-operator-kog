@@ -1,0 +1,260 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /encryptions/tde/kms/{kms-id}/cfg/{cfg-id}/clone:
+    post:
+      description: 'Clones an existing KMS configuration to create a new one.
+
+        '
+      operationId: cloneKMSConfig
+      parameters:
+      - in: path
+        name: kms-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ID of the source KMS configuration to clone from.
+        in: path
+        name: cfg-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloneKMSConfigRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KMSConfig'
+          description: KMS configuration successfully cloned
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request - Invalid input parameters
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized - Invalid or missing authentication
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden - Insufficient permissions
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found - KMS or KMS configuration not found
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflict - Name already exists
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error
+      summary: Clone an existing KMS Configuration
+      tags:
+      - KMS
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}/clone \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"description\": \"Cloned configuration for production environment\"\
+          ,\n    \"name\": \"Production-KMS-Config-Clone\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"description\"\
+          : \"Cloned configuration for production environment\",\n    \"name\": \"Production-KMS-Config-Clone\"\n}' \\\n \
+          \   --output-document \\\n    - :///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}/clone"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"description\": \"Cloned configuration for production environment\",\n    \"name\": \"Production-KMS-Config-Clone\"\
+          \n}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}/clone\", payload, headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}/clone\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          description\": \"Cloned configuration for production environment\", \"name\": \"Production-KMS-Config-Clone\"}`)\n\
+          \treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}/clone\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"description\\\": \\\"Cloned configuration\
+          \ for production environment\\\", \\\"name\\\": \\\"Production-KMS-Config-Clone\\\"}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/encryptions/tde/kms/{kms-id}/cfg/{cfg-id}/clone';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"description\": \"Cloned configuration for production environment\", \"name\"\
+          : \"Production-KMS-Config-Clone\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data =\
+          \ await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    KMSCertificate:
+      properties:
+        data:
+          type: string
+        fileName:
+          type: string
+        password:
+          type: string
+      type: object
+    KMSConfigDetails:
+      properties:
+        certificates:
+          additionalProperties:
+            $ref: '#/components/schemas/KMSCertificate'
+          type: object
+        credentials:
+          additionalProperties:
+            type: string
+          type: object
+        keys:
+          additionalProperties:
+            type: string
+          type: object
+      type: object
+      writeOnly: true
+    KMSConfig:
+      properties:
+        databaseCount:
+          readOnly: true
+          type: integer
+        databaseType:
+          type: string
+        dateCreated:
+          readOnly: true
+          type: string
+        dateModified:
+          readOnly: true
+          type: string
+        description:
+          type: string
+        details:
+          $ref: '#/components/schemas/KMSConfigDetails'
+          type: object
+        id:
+          format: uuid
+          readOnly: true
+          type: string
+        kmsId:
+          format: uuid
+          readOnly: true
+          type: string
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          readOnly: true
+          type: string
+        status:
+          readOnly: true
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+    CloneKMSConfigRequest:
+      properties:
+        description:
+          description: Description for the new KMS configuration. If not provided, the description from the source KMS configuration
+            will be used.
+          maxLength: 1000
+          type: string
+        name:
+          description: Name for the new KMS configuration. Must not be blank and should be unique.
+          maxLength: 255
+          minLength: 1
+          type: string
+      required:
+      - name
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

@@ -1,0 +1,261 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /databases/{database-id}/associate-ops-manager:
+    post:
+      description: Associating the database with MongoDB Ops Manager will enable the management, monitoring, backup, and visualization
+        of the database
+      operationId: associateOpsManager
+      parameters:
+      - description: The ID of the database to which Ops Manager will be associated.
+        in: path
+        name: database-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssociateOpsManagerRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation completed.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Initiate the task for associating the database with MongoDB Ops Manager
+      tags:
+      - Databases
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/databases/{database-id}/associate-ops-manager \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"mmsApiKey\": \"string\",\n    \"omAgentDownloadUrl\": \"string\",\n\
+          \    \"omAgentLogStorageSizeInGB\": 0,\n    \"omDBUserName\": \"string\",\n    \"omDBUserPassword\": \"string\"\
+          ,\n    \"omGroupId\": \"string\",\n    \"omOrgId\": \"string\",\n    \"opsMgrId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"mmsApiKey\"\
+          : \"string\",\n    \"omAgentDownloadUrl\": \"string\",\n    \"omAgentLogStorageSizeInGB\": 0,\n    \"omDBUserName\"\
+          : \"string\",\n    \"omDBUserPassword\": \"string\",\n    \"omGroupId\": \"string\",\n    \"omOrgId\": \"string\"\
+          ,\n    \"opsMgrId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/databases/{database-id}/associate-ops-manager"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"mmsApiKey\": \"string\",\n    \"omAgentDownloadUrl\": \"string\",\n    \"omAgentLogStorageSizeInGB\"\
+          : 0,\n    \"omDBUserName\": \"string\",\n    \"omDBUserPassword\": \"string\",\n    \"omGroupId\": \"string\",\n\
+          \    \"omOrgId\": \"string\",\n    \"opsMgrId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"/era/v0.9/databases/{database-id}/associate-ops-manager\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/databases/{database-id}/associate-ops-manager\"\n\t\n\tpayload :=  strings.NewReader(`{\"mmsApiKey\"\
+          : \"string\", \"omAgentDownloadUrl\": \"string\", \"omAgentLogStorageSizeInGB\": 0, \"omDBUserName\": \"string\"\
+          , \"omDBUserPassword\": \"string\", \"omGroupId\": \"string\", \"omOrgId\": \"string\", \"opsMgrId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n\
+          \    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/databases/{database-id}/associate-ops-manager\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"mmsApiKey\\\": \\\"string\\\", \\\"omAgentDownloadUrl\\\
+          \": \\\"string\\\", \\\"omAgentLogStorageSizeInGB\\\": 0, \\\"omDBUserName\\\": \\\"string\\\", \\\"omDBUserPassword\\\
+          \": \\\"string\\\", \\\"omGroupId\\\": \\\"string\\\", \\\"omOrgId\\\": \\\"string\\\", \\\"opsMgrId\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/databases/{database-id}/associate-ops-manager';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"mmsApiKey\": \"string\", \"omAgentDownloadUrl\": \"string\", \"omAgentLogStorageSizeInGB\": 0, \"\
+          omDBUserName\": \"string\", \"omDBUserPassword\": \"string\", \"omGroupId\": \"string\", \"omOrgId\": \"string\"\
+          , \"opsMgrId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    AssociateOpsManagerRequest:
+      properties:
+        mmsApiKey:
+          description: API key generated in Ops Manager to communicate with it.
+          type: string
+        omAgentDownloadUrl:
+          description: URL to download OM Agent from Ops Manager
+          type: string
+        omAgentLogStorageSizeInGB:
+          description: Size of the Ops Manager Agent's log storage. This is optional, with a default size of 5 GB.
+          format: int32
+          type: integer
+        omDBUserName:
+          description: Optional database username for Ops Manager; defaults to mmsAgent if not specified.
+          type: string
+        omDBUserPassword:
+          description: Optional database user password for Ops Manager; defaults to a randomly generated 16-character value.
+          type: string
+        omGroupId:
+          description: The id of the group or project in Ops Manager.
+          type: string
+        omOrgId:
+          description: The id of the organisation in Ops Manager.
+          type: string
+        opsMgrId:
+          description: The id of the Ops Manager registered in NDB.
+          format: uuid
+          type: string
+      required:
+      - opsMgrId
+      - omOrgId
+      - omGroupId
+      - mmsApiKey
+      - omAgentDownloadUrl
+      type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

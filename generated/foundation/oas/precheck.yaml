@@ -1,0 +1,941 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: foundation@nutanix.com
+    name: Foundation Developers
+  description: '# Foundation
+
+
+    Foundation is a Nutanix provided tool used for bootstrapping, imaging, and deployment of Nutanix clusters. The imaging
+    process will install the desired version of the AOS software and the hypervisor of your choice. One of the ways to use
+    Foundation services is to make use of the APIs provided by Foundation.
+
+
+    Foundation provides seven categories of APIs, namely, General APIs, File Management APIs, Networking APIs, Imaging and
+    Cluster Creation APIs, UCS Managed Mode APIs, Foundation Upgrade APIs and Factory APIs.
+
+
+    However, most of these APIs find their use in internal scenarios. Some APIs that find most relevance in the customer scenario
+    are image_nodes, pre_check, reboot_to_phoenix, reboot_from_phoenix, progress, phoenix_network_status, abort_session, get_progress_sessions
+    among others.
+
+
+
+    - Foundation Version: 5.10
+
+
+
+    ## Terminology
+
+
+    Some of the acronyms frequently used in the API descriptions are listed below:
+
+
+    - **FVM** - Foundation Virtual Machine, A VM that has Foundation service running on it.
+
+    - **BMC** - Baseboard management controller.
+
+    - **IPMI** - Intelligent Platform Management Interface.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+
+    '
+  license:
+    name: 'Copyright Nutanix Inc. All rights reserved
+
+      '
+  title: Foundation REST API
+  version: '5.10'
+servers:
+- url: /foundation
+security: []
+paths:
+  /pre_check:
+    post:
+      description: 'Checks all the parameters and configurations
+
+        that are used to call image_nodes.
+
+        '
+      requestBody:
+        $ref: '#/components/requestBodies/imaging_parameters'
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/http_code_200_with_session_id'
+        '500':
+          description: Raised in case of any errors
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/http_error_500'
+      summary: Run all pre-imaging validations
+      tags:
+      - Imaging and Cluster Creation APIs
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/foundation/pre_check \\\n    --data '{\n    \"\
+          blocks\": [\n        {\n            \"block_id\": \"string\",\n            \"nodes\": [\n                {\n   \
+          \                 \"bond_lacp_rate\": \"string\",\n                    \"bond_mode\": \"string\",\n            \
+          \        \"bond_uplinks\": [\n                        \"string\"\n                    ],\n                    \"\
+          cluster_id\": null,\n                    \"current_cvm_vlan_tag\": null,\n                    \"current_network_interface\"\
+          : \"string\",\n                    \"cvm_boot_drive_source\": \"layout\",\n                    \"cvm_gb_ram\": null,\n\
+          \                    \"cvm_ip\": \"192.168.0.1\",\n                    \"cvm_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n                    \"cvm_num_vcpus\": 0,\n                    \"device_hint\": \"string\",\n               \
+          \     \"exlude_boot_serial\": \"string\",\n                    \"hypervisor\": \"string\",\n                   \
+          \ \"hypervisor_hostname\": \"string\",\n                    \"hypervisor_ip\": \"192.168.0.1\",\n              \
+          \      \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n                    \"hypervisor_licenses\"\
+          : [\n                        \"string\"\n                    ],\n                    \"image_delay\": null,\n  \
+          \                  \"image_now\": true,\n                    \"image_successful\": true,\n                    \"\
+          ipmi_configure_now\": true,\n                    \"ipmi_ip\": \"192.168.0.1\",\n                    \"ipmi_mac\"\
+          : \"string\",\n                    \"ipv6_address\": \"string\",\n                    \"ipv6_interface\": \"string\"\
+          ,\n                    \"maximise_so_cvm_vcpus\": true,\n                    \"mitigate_low_boot_space\": true,\n\
+          \                    \"node_position\": \"string\",\n                    \"node_serial\": \"string\",\n        \
+          \            \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n                    \"rdma_mac_addr\"\
+          : \"string\",\n                    \"rdma_passthrough\": true,\n                    \"rdma_port_passthrough\": true,\n\
+          \                    \"ucsm_managed_mode\": \"string\",\n                    \"ucsm_node_serial\": \"string\",\n\
+          \                    \"ucsm_params\": {\n                        \"keep_ucsm_settings\": true,\n               \
+          \         \"mac_pool\": \"string\",\n                        \"native_vlan\": true,\n                        \"\
+          org_name\": \"string\",\n                        \"vlan_name\": \"string\"\n                    },\n           \
+          \         \"vswitches\": [\n                        {\n                            \"bond_mode\": \"string\",\n\
+          \                            \"lacp\": \"string\",\n                            \"mtu\": 0,\n                  \
+          \          \"name\": \"string\",\n                            \"other_config\": [\n                            \
+          \    \"string\"\n                            ],\n                            \"uplinks\": [\n                  \
+          \              \"string\"\n                            ]\n                        }\n                    ]\n   \
+          \             }\n            ]\n        }\n    ],\n    \"clusters\": [\n        {\n            \"backplane_netmask\"\
+          : \"192.168.0.1\",\n            \"backplane_subnet\": \"192.168.0.1\",\n            \"backplane_vlan\": null,\n\
+          \            \"cluster_external_ip\": \"192.168.0.1\",\n            \"cluster_init_now\": true,\n            \"\
+          cluster_init_successful\": true,\n            \"cluster_members\": [\n                \"string\"\n            ],\n\
+          \            \"cluster_name\": \"string\",\n            \"cluster_password\": \"string\",\n            \"cvm_dns_servers\"\
+          : \"string\",\n            \"cvm_ntp_servers\": \"string\",\n            \"enable_ns\": true,\n            \"external_access_keys\"\
+          : [\n                \"string\"\n            ],\n            \"hypervisor_ntp_servers\": \"string\",\n         \
+          \   \"lockdown_mode\": true,\n            \"placement_policy_name\": \"string\",\n            \"prism_central_details\"\
+          : {\n                \"ip\": \"192.168.0.1\",\n                \"password\": \"string\",\n                \"port\"\
+          : 9440,\n                \"username\": \"string\"\n            },\n            \"redundancy_factor\": 0,\n     \
+          \       \"register_to_prism_central\": false,\n            \"single_node_cluster\": true,\n            \"ssh_using_password\"\
+          : true\n        }\n    ],\n    \"cvm_gateway\": \"192.168.0.1\",\n    \"cvm_netmask\": \"192.168.0.1\",\n    \"\
+          enable_ipv6_on_hypervisor\": false,\n    \"enable_luks\": true,\n    \"eos_metadata\": {\n        \"account_name\"\
+          : [\n            \"string\"\n        ],\n        \"config_id\": \"string\",\n        \"email\": \"user@example.com\"\
+          \n    },\n    \"fc_settings\": {\n        \"fc_metadata\": {\n            \"api_key\": \"string\",\n           \
+          \ \"fc_ip\": \"string\"\n        },\n        \"foundation_central\": true\n    },\n    \"hyperv_external_vnic\"\
+          : \"string\",\n    \"hyperv_external_vswitch\": \"string\",\n    \"hyperv_product_key\": \"string\",\n    \"hyperv_sku\"\
+          : \"string\",\n    \"hypervisor_gateway\": \"192.168.0.1\",\n    \"hypervisor_iso\": {\n        \"esx\": {\n   \
+          \         \"checksum\": \"string\",\n            \"filename\": \"string\"\n        },\n        \"hyperv\": {\n \
+          \           \"checksum\": \"string\",\n            \"filename\": \"string\"\n        },\n        \"kvm\": {\n  \
+          \          \"checksum\": \"string\",\n            \"filename\": \"string\"\n        },\n        \"xen\": {\n   \
+          \         \"checksum\": \"string\",\n            \"filename\": \"string\"\n        }\n    },\n    \"hypervisor_nameserver\"\
+          : \"string\",\n    \"hypervisor_netmask\": \"192.168.0.1\",\n    \"hypervisor_password\": \"string\",\n    \"install_script\"\
+          : \"string\",\n    \"ipmi_password\": \"string\",\n    \"ipmi_user\": \"string\",\n    \"layout_egg_uuid\": \"string\"\
+          ,\n    \"nos_package\": \"string\",\n    \"nutant_user_data\": {\n        \"password\": \"string\",\n        \"\
+          ssh_keys\": [\n            \"string\"\n        ]\n    },\n    \"skip_hypervisor\": true,\n    \"skip_iso_validation\"\
+          : true,\n    \"svm_rescue_args\": [\n        \"string\"\n    ],\n    \"tests\": {\n        \"run_ncc\": true,\n\
+          \        \"run_syscheck\": true\n    },\n    \"ucsm_ip\": \"192.168.0.1\",\n    \"ucsm_password\": \"string\",\n\
+          \    \"ucsm_user\": \"string\",\n    \"unc_password\": \"string\",\n    \"unc_path\": \"string\",\n    \"unc_username\"\
+          : \"string\",\n    \"xen_config_type\": \"string\",\n    \"xs_master_ip\": \"192.168.0.1\",\n    \"xs_master_label\"\
+          : \"string\",\n    \"xs_master_password\": \"string\",\n    \"xs_master_username\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --body-data '{\n    \"blocks\": [\n        {\n            \"block_id\"\
+          : \"string\",\n            \"nodes\": [\n                {\n                    \"bond_lacp_rate\": \"string\",\n\
+          \                    \"bond_mode\": \"string\",\n                    \"bond_uplinks\": [\n                     \
+          \   \"string\"\n                    ],\n                    \"cluster_id\": null,\n                    \"current_cvm_vlan_tag\"\
+          : null,\n                    \"current_network_interface\": \"string\",\n                    \"cvm_boot_drive_source\"\
+          : \"layout\",\n                    \"cvm_gb_ram\": null,\n                    \"cvm_ip\": \"192.168.0.1\",\n   \
+          \                 \"cvm_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n                    \"cvm_num_vcpus\"\
+          : 0,\n                    \"device_hint\": \"string\",\n                    \"exlude_boot_serial\": \"string\",\n\
+          \                    \"hypervisor\": \"string\",\n                    \"hypervisor_hostname\": \"string\",\n   \
+          \                 \"hypervisor_ip\": \"192.168.0.1\",\n                    \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n                    \"hypervisor_licenses\": [\n                        \"string\"\n                    ],\n\
+          \                    \"image_delay\": null,\n                    \"image_now\": true,\n                    \"image_successful\"\
+          : true,\n                    \"ipmi_configure_now\": true,\n                    \"ipmi_ip\": \"192.168.0.1\",\n\
+          \                    \"ipmi_mac\": \"string\",\n                    \"ipv6_address\": \"string\",\n            \
+          \        \"ipv6_interface\": \"string\",\n                    \"maximise_so_cvm_vcpus\": true,\n               \
+          \     \"mitigate_low_boot_space\": true,\n                    \"node_position\": \"string\",\n                 \
+          \   \"node_serial\": \"string\",\n                    \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n                    \"rdma_mac_addr\": \"string\",\n                    \"rdma_passthrough\": true,\n       \
+          \             \"rdma_port_passthrough\": true,\n                    \"ucsm_managed_mode\": \"string\",\n       \
+          \             \"ucsm_node_serial\": \"string\",\n                    \"ucsm_params\": {\n                      \
+          \  \"keep_ucsm_settings\": true,\n                        \"mac_pool\": \"string\",\n                        \"\
+          native_vlan\": true,\n                        \"org_name\": \"string\",\n                        \"vlan_name\":\
+          \ \"string\"\n                    },\n                    \"vswitches\": [\n                        {\n        \
+          \                    \"bond_mode\": \"string\",\n                            \"lacp\": \"string\",\n           \
+          \                 \"mtu\": 0,\n                            \"name\": \"string\",\n                            \"\
+          other_config\": [\n                                \"string\"\n                            ],\n                \
+          \            \"uplinks\": [\n                                \"string\"\n                            ]\n       \
+          \                 }\n                    ]\n                }\n            ]\n        }\n    ],\n    \"clusters\"\
+          : [\n        {\n            \"backplane_netmask\": \"192.168.0.1\",\n            \"backplane_subnet\": \"192.168.0.1\"\
+          ,\n            \"backplane_vlan\": null,\n            \"cluster_external_ip\": \"192.168.0.1\",\n            \"\
+          cluster_init_now\": true,\n            \"cluster_init_successful\": true,\n            \"cluster_members\": [\n\
+          \                \"string\"\n            ],\n            \"cluster_name\": \"string\",\n            \"cluster_password\"\
+          : \"string\",\n            \"cvm_dns_servers\": \"string\",\n            \"cvm_ntp_servers\": \"string\",\n    \
+          \        \"enable_ns\": true,\n            \"external_access_keys\": [\n                \"string\"\n           \
+          \ ],\n            \"hypervisor_ntp_servers\": \"string\",\n            \"lockdown_mode\": true,\n            \"\
+          placement_policy_name\": \"string\",\n            \"prism_central_details\": {\n                \"ip\": \"192.168.0.1\"\
+          ,\n                \"password\": \"string\",\n                \"port\": 9440,\n                \"username\": \"\
+          string\"\n            },\n            \"redundancy_factor\": 0,\n            \"register_to_prism_central\": false,\n\
+          \            \"single_node_cluster\": true,\n            \"ssh_using_password\": true\n        }\n    ],\n    \"\
+          cvm_gateway\": \"192.168.0.1\",\n    \"cvm_netmask\": \"192.168.0.1\",\n    \"enable_ipv6_on_hypervisor\": false,\n\
+          \    \"enable_luks\": true,\n    \"eos_metadata\": {\n        \"account_name\": [\n            \"string\"\n    \
+          \    ],\n        \"config_id\": \"string\",\n        \"email\": \"user@example.com\"\n    },\n    \"fc_settings\"\
+          : {\n        \"fc_metadata\": {\n            \"api_key\": \"string\",\n            \"fc_ip\": \"string\"\n     \
+          \   },\n        \"foundation_central\": true\n    },\n    \"hyperv_external_vnic\": \"string\",\n    \"hyperv_external_vswitch\"\
+          : \"string\",\n    \"hyperv_product_key\": \"string\",\n    \"hyperv_sku\": \"string\",\n    \"hypervisor_gateway\"\
+          : \"192.168.0.1\",\n    \"hypervisor_iso\": {\n        \"esx\": {\n            \"checksum\": \"string\",\n     \
+          \       \"filename\": \"string\"\n        },\n        \"hyperv\": {\n            \"checksum\": \"string\",\n   \
+          \         \"filename\": \"string\"\n        },\n        \"kvm\": {\n            \"checksum\": \"string\",\n    \
+          \        \"filename\": \"string\"\n        },\n        \"xen\": {\n            \"checksum\": \"string\",\n     \
+          \       \"filename\": \"string\"\n        }\n    },\n    \"hypervisor_nameserver\": \"string\",\n    \"hypervisor_netmask\"\
+          : \"192.168.0.1\",\n    \"hypervisor_password\": \"string\",\n    \"install_script\": \"string\",\n    \"ipmi_password\"\
+          : \"string\",\n    \"ipmi_user\": \"string\",\n    \"layout_egg_uuid\": \"string\",\n    \"nos_package\": \"string\"\
+          ,\n    \"nutant_user_data\": {\n        \"password\": \"string\",\n        \"ssh_keys\": [\n            \"string\"\
+          \n        ]\n    },\n    \"skip_hypervisor\": true,\n    \"skip_iso_validation\": true,\n    \"svm_rescue_args\"\
+          : [\n        \"string\"\n    ],\n    \"tests\": {\n        \"run_ncc\": true,\n        \"run_syscheck\": true\n\
+          \    },\n    \"ucsm_ip\": \"192.168.0.1\",\n    \"ucsm_password\": \"string\",\n    \"ucsm_user\": \"string\",\n\
+          \    \"unc_password\": \"string\",\n    \"unc_path\": \"string\",\n    \"unc_username\": \"string\",\n    \"xen_config_type\"\
+          : \"string\",\n    \"xs_master_ip\": \"192.168.0.1\",\n    \"xs_master_label\": \"string\",\n    \"xs_master_password\"\
+          : \"string\",\n    \"xs_master_username\": \"string\"\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/foundation/pre_check"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {}\n\npayload\
+          \ =  \"\"\"{\n    \"blocks\": [\n        {\n            \"block_id\": \"string\",\n            \"nodes\": [\n  \
+          \              {\n                    \"bond_lacp_rate\": \"string\",\n                    \"bond_mode\": \"string\"\
+          ,\n                    \"bond_uplinks\": [\n                        \"string\"\n                    ],\n       \
+          \             \"cluster_id\": null,\n                    \"current_cvm_vlan_tag\": null,\n                    \"\
+          current_network_interface\": \"string\",\n                    \"cvm_boot_drive_source\": \"layout\",\n         \
+          \           \"cvm_gb_ram\": null,\n                    \"cvm_ip\": \"192.168.0.1\",\n                    \"cvm_ipv6_address\"\
+          : \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n                    \"cvm_num_vcpus\": 0,\n                    \"\
+          device_hint\": \"string\",\n                    \"exlude_boot_serial\": \"string\",\n                    \"hypervisor\"\
+          : \"string\",\n                    \"hypervisor_hostname\": \"string\",\n                    \"hypervisor_ip\":\
+          \ \"192.168.0.1\",\n                    \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n                    \"hypervisor_licenses\": [\n                        \"string\"\n                    ],\n\
+          \                    \"image_delay\": null,\n                    \"image_now\": true,\n                    \"image_successful\"\
+          : true,\n                    \"ipmi_configure_now\": true,\n                    \"ipmi_ip\": \"192.168.0.1\",\n\
+          \                    \"ipmi_mac\": \"string\",\n                    \"ipv6_address\": \"string\",\n            \
+          \        \"ipv6_interface\": \"string\",\n                    \"maximise_so_cvm_vcpus\": true,\n               \
+          \     \"mitigate_low_boot_space\": true,\n                    \"node_position\": \"string\",\n                 \
+          \   \"node_serial\": \"string\",\n                    \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n                    \"rdma_mac_addr\": \"string\",\n                    \"rdma_passthrough\": true,\n       \
+          \             \"rdma_port_passthrough\": true,\n                    \"ucsm_managed_mode\": \"string\",\n       \
+          \             \"ucsm_node_serial\": \"string\",\n                    \"ucsm_params\": {\n                      \
+          \  \"keep_ucsm_settings\": true,\n                        \"mac_pool\": \"string\",\n                        \"\
+          native_vlan\": true,\n                        \"org_name\": \"string\",\n                        \"vlan_name\":\
+          \ \"string\"\n                    },\n                    \"vswitches\": [\n                        {\n        \
+          \                    \"bond_mode\": \"string\",\n                            \"lacp\": \"string\",\n           \
+          \                 \"mtu\": 0,\n                            \"name\": \"string\",\n                            \"\
+          other_config\": [\n                                \"string\"\n                            ],\n                \
+          \            \"uplinks\": [\n                                \"string\"\n                            ]\n       \
+          \                 }\n                    ]\n                }\n            ]\n        }\n    ],\n    \"clusters\"\
+          : [\n        {\n            \"backplane_netmask\": \"192.168.0.1\",\n            \"backplane_subnet\": \"192.168.0.1\"\
+          ,\n            \"backplane_vlan\": null,\n            \"cluster_external_ip\": \"192.168.0.1\",\n            \"\
+          cluster_init_now\": true,\n            \"cluster_init_successful\": true,\n            \"cluster_members\": [\n\
+          \                \"string\"\n            ],\n            \"cluster_name\": \"string\",\n            \"cluster_password\"\
+          : \"string\",\n            \"cvm_dns_servers\": \"string\",\n            \"cvm_ntp_servers\": \"string\",\n    \
+          \        \"enable_ns\": true,\n            \"external_access_keys\": [\n                \"string\"\n           \
+          \ ],\n            \"hypervisor_ntp_servers\": \"string\",\n            \"lockdown_mode\": true,\n            \"\
+          placement_policy_name\": \"string\",\n            \"prism_central_details\": {\n                \"ip\": \"192.168.0.1\"\
+          ,\n                \"password\": \"string\",\n                \"port\": 9440,\n                \"username\": \"\
+          string\"\n            },\n            \"redundancy_factor\": 0,\n            \"register_to_prism_central\": false,\n\
+          \            \"single_node_cluster\": true,\n            \"ssh_using_password\": true\n        }\n    ],\n    \"\
+          cvm_gateway\": \"192.168.0.1\",\n    \"cvm_netmask\": \"192.168.0.1\",\n    \"enable_ipv6_on_hypervisor\": false,\n\
+          \    \"enable_luks\": true,\n    \"eos_metadata\": {\n        \"account_name\": [\n            \"string\"\n    \
+          \    ],\n        \"config_id\": \"string\",\n        \"email\": \"user@example.com\"\n    },\n    \"fc_settings\"\
+          : {\n        \"fc_metadata\": {\n            \"api_key\": \"string\",\n            \"fc_ip\": \"string\"\n     \
+          \   },\n        \"foundation_central\": true\n    },\n    \"hyperv_external_vnic\": \"string\",\n    \"hyperv_external_vswitch\"\
+          : \"string\",\n    \"hyperv_product_key\": \"string\",\n    \"hyperv_sku\": \"string\",\n    \"hypervisor_gateway\"\
+          : \"192.168.0.1\",\n    \"hypervisor_iso\": {\n        \"esx\": {\n            \"checksum\": \"string\",\n     \
+          \       \"filename\": \"string\"\n        },\n        \"hyperv\": {\n            \"checksum\": \"string\",\n   \
+          \         \"filename\": \"string\"\n        },\n        \"kvm\": {\n            \"checksum\": \"string\",\n    \
+          \        \"filename\": \"string\"\n        },\n        \"xen\": {\n            \"checksum\": \"string\",\n     \
+          \       \"filename\": \"string\"\n        }\n    },\n    \"hypervisor_nameserver\": \"string\",\n    \"hypervisor_netmask\"\
+          : \"192.168.0.1\",\n    \"hypervisor_password\": \"string\",\n    \"install_script\": \"string\",\n    \"ipmi_password\"\
+          : \"string\",\n    \"ipmi_user\": \"string\",\n    \"layout_egg_uuid\": \"string\",\n    \"nos_package\": \"string\"\
+          ,\n    \"nutant_user_data\": {\n        \"password\": \"string\",\n        \"ssh_keys\": [\n            \"string\"\
+          \n        ]\n    },\n    \"skip_hypervisor\": true,\n    \"skip_iso_validation\": true,\n    \"svm_rescue_args\"\
+          : [\n        \"string\"\n    ],\n    \"tests\": {\n        \"run_ncc\": true,\n        \"run_syscheck\": true\n\
+          \    },\n    \"ucsm_ip\": \"192.168.0.1\",\n    \"ucsm_password\": \"string\",\n    \"ucsm_user\": \"string\",\n\
+          \    \"unc_password\": \"string\",\n    \"unc_path\": \"string\",\n    \"unc_username\": \"string\",\n    \"xen_config_type\"\
+          : \"string\",\n    \"xs_master_ip\": \"192.168.0.1\",\n    \"xs_master_label\": \"string\",\n    \"xs_master_password\"\
+          : \"string\",\n    \"xs_master_username\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/foundation/pre_check\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/foundation/pre_check\"\n\t\n\tpayload :=  strings.NewReader(`{\"blocks\": [{\"block_id\"\
+          : \"string\", \"nodes\": [{\"bond_lacp_rate\": \"string\", \"bond_mode\": \"string\", \"bond_uplinks\": [\"string\"\
+          ], \"cluster_id\": null, \"current_cvm_vlan_tag\": null, \"current_network_interface\": \"string\", \"cvm_boot_drive_source\"\
+          : \"layout\", \"cvm_gb_ram\": null, \"cvm_ip\": \"192.168.0.1\", \"cvm_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          , \"cvm_num_vcpus\": 0, \"device_hint\": \"string\", \"exlude_boot_serial\": \"string\", \"hypervisor\": \"string\"\
+          , \"hypervisor_hostname\": \"string\", \"hypervisor_ip\": \"192.168.0.1\", \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          , \"hypervisor_licenses\": [\"string\"], \"image_delay\": null, \"image_now\": true, \"image_successful\": true,\
+          \ \"ipmi_configure_now\": true, \"ipmi_ip\": \"192.168.0.1\", \"ipmi_mac\": \"string\", \"ipv6_address\": \"string\"\
+          , \"ipv6_interface\": \"string\", \"maximise_so_cvm_vcpus\": true, \"mitigate_low_boot_space\": true, \"node_position\"\
+          : \"string\", \"node_serial\": \"string\", \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          , \"rdma_mac_addr\": \"string\", \"rdma_passthrough\": true, \"rdma_port_passthrough\": true, \"ucsm_managed_mode\"\
+          : \"string\", \"ucsm_node_serial\": \"string\", \"ucsm_params\": {\"keep_ucsm_settings\": true, \"mac_pool\": \"\
+          string\", \"native_vlan\": true, \"org_name\": \"string\", \"vlan_name\": \"string\"}, \"vswitches\": [{\"bond_mode\"\
+          : \"string\", \"lacp\": \"string\", \"mtu\": 0, \"name\": \"string\", \"other_config\": [\"string\"], \"uplinks\"\
+          : [\"string\"]}]}]}], \"clusters\": [{\"backplane_netmask\": \"192.168.0.1\", \"backplane_subnet\": \"192.168.0.1\"\
+          , \"backplane_vlan\": null, \"cluster_external_ip\": \"192.168.0.1\", \"cluster_init_now\": true, \"cluster_init_successful\"\
+          : true, \"cluster_members\": [\"string\"], \"cluster_name\": \"string\", \"cluster_password\": \"string\", \"cvm_dns_servers\"\
+          : \"string\", \"cvm_ntp_servers\": \"string\", \"enable_ns\": true, \"external_access_keys\": [\"string\"], \"hypervisor_ntp_servers\"\
+          : \"string\", \"lockdown_mode\": true, \"placement_policy_name\": \"string\", \"prism_central_details\": {\"ip\"\
+          : \"192.168.0.1\", \"password\": \"string\", \"port\": 9440, \"username\": \"string\"}, \"redundancy_factor\": 0,\
+          \ \"register_to_prism_central\": false, \"single_node_cluster\": true, \"ssh_using_password\": true}], \"cvm_gateway\"\
+          : \"192.168.0.1\", \"cvm_netmask\": \"192.168.0.1\", \"enable_ipv6_on_hypervisor\": false, \"enable_luks\": true,\
+          \ \"eos_metadata\": {\"account_name\": [\"string\"], \"config_id\": \"string\", \"email\": \"user@example.com\"\
+          }, \"fc_settings\": {\"fc_metadata\": {\"api_key\": \"string\", \"fc_ip\": \"string\"}, \"foundation_central\":\
+          \ true}, \"hyperv_external_vnic\": \"string\", \"hyperv_external_vswitch\": \"string\", \"hyperv_product_key\":\
+          \ \"string\", \"hyperv_sku\": \"string\", \"hypervisor_gateway\": \"192.168.0.1\", \"hypervisor_iso\": {\"esx\"\
+          : {\"checksum\": \"string\", \"filename\": \"string\"}, \"hyperv\": {\"checksum\": \"string\", \"filename\": \"\
+          string\"}, \"kvm\": {\"checksum\": \"string\", \"filename\": \"string\"}, \"xen\": {\"checksum\": \"string\", \"\
+          filename\": \"string\"}}, \"hypervisor_nameserver\": \"string\", \"hypervisor_netmask\": \"192.168.0.1\", \"hypervisor_password\"\
+          : \"string\", \"install_script\": \"string\", \"ipmi_password\": \"string\", \"ipmi_user\": \"string\", \"layout_egg_uuid\"\
+          : \"string\", \"nos_package\": \"string\", \"nutant_user_data\": {\"password\": \"string\", \"ssh_keys\": [\"string\"\
+          ]}, \"skip_hypervisor\": true, \"skip_iso_validation\": true, \"svm_rescue_args\": [\"string\"], \"tests\": {\"\
+          run_ncc\": true, \"run_syscheck\": true}, \"ucsm_ip\": \"192.168.0.1\", \"ucsm_password\": \"string\", \"ucsm_user\"\
+          : \"string\", \"unc_password\": \"string\", \"unc_path\": \"string\", \"unc_username\": \"string\", \"xen_config_type\"\
+          : \"string\", \"xs_master_ip\": \"192.168.0.1\", \"xs_master_label\": \"string\", \"xs_master_password\": \"string\"\
+          , \"xs_master_username\": \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/foundation/pre_check\"\
+          )\n  .setBody(\"{\\\"blocks\\\": [{\\\"block_id\\\": \\\"string\\\", \\\"nodes\\\": [{\\\"bond_lacp_rate\\\": \\\
+          \"string\\\", \\\"bond_mode\\\": \\\"string\\\", \\\"bond_uplinks\\\": [\\\"string\\\"], \\\"cluster_id\\\": null,\
+          \ \\\"current_cvm_vlan_tag\\\": null, \\\"current_network_interface\\\": \\\"string\\\", \\\"cvm_boot_drive_source\\\
+          \": \\\"layout\\\", \\\"cvm_gb_ram\\\": null, \\\"cvm_ip\\\": \\\"192.168.0.1\\\", \\\"cvm_ipv6_address\\\": \\\"\
+          2001:0db8:85a3:0000:0000:8a2e:0370:7334\\\", \\\"cvm_num_vcpus\\\": 0, \\\"device_hint\\\": \\\"string\\\", \\\"\
+          exlude_boot_serial\\\": \\\"string\\\", \\\"hypervisor\\\": \\\"string\\\", \\\"hypervisor_hostname\\\": \\\"string\\\
+          \", \\\"hypervisor_ip\\\": \\\"192.168.0.1\\\", \\\"hypervisor_ipv6_address\\\": \\\"2001:0db8:85a3:0000:0000:8a2e:0370:7334\\\
+          \", \\\"hypervisor_licenses\\\": [\\\"string\\\"], \\\"image_delay\\\": null, \\\"image_now\\\": true, \\\"image_successful\\\
+          \": true, \\\"ipmi_configure_now\\\": true, \\\"ipmi_ip\\\": \\\"192.168.0.1\\\", \\\"ipmi_mac\\\": \\\"string\\\
+          \", \\\"ipv6_address\\\": \\\"string\\\", \\\"ipv6_interface\\\": \\\"string\\\", \\\"maximise_so_cvm_vcpus\\\"\
+          : true, \\\"mitigate_low_boot_space\\\": true, \\\"node_position\\\": \\\"string\\\", \\\"node_serial\\\": \\\"\
+          string\\\", \\\"phoenix_ipv6_address\\\": \\\"2001:0db8:85a3:0000:0000:8a2e:0370:7334\\\", \\\"rdma_mac_addr\\\"\
+          : \\\"string\\\", \\\"rdma_passthrough\\\": true, \\\"rdma_port_passthrough\\\": true, \\\"ucsm_managed_mode\\\"\
+          : \\\"string\\\", \\\"ucsm_node_serial\\\": \\\"string\\\", \\\"ucsm_params\\\": {\\\"keep_ucsm_settings\\\": true,\
+          \ \\\"mac_pool\\\": \\\"string\\\", \\\"native_vlan\\\": true, \\\"org_name\\\": \\\"string\\\", \\\"vlan_name\\\
+          \": \\\"string\\\"}, \\\"vswitches\\\": [{\\\"bond_mode\\\": \\\"string\\\", \\\"lacp\\\": \\\"string\\\", \\\"\
+          mtu\\\": 0, \\\"name\\\": \\\"string\\\", \\\"other_config\\\": [\\\"string\\\"], \\\"uplinks\\\": [\\\"string\\\
+          \"]}]}]}], \\\"clusters\\\": [{\\\"backplane_netmask\\\": \\\"192.168.0.1\\\", \\\"backplane_subnet\\\": \\\"192.168.0.1\\\
+          \", \\\"backplane_vlan\\\": null, \\\"cluster_external_ip\\\": \\\"192.168.0.1\\\", \\\"cluster_init_now\\\": true,\
+          \ \\\"cluster_init_successful\\\": true, \\\"cluster_members\\\": [\\\"string\\\"], \\\"cluster_name\\\": \\\"string\\\
+          \", \\\"cluster_password\\\": \\\"string\\\", \\\"cvm_dns_servers\\\": \\\"string\\\", \\\"cvm_ntp_servers\\\":\
+          \ \\\"string\\\", \\\"enable_ns\\\": true, \\\"external_access_keys\\\": [\\\"string\\\"], \\\"hypervisor_ntp_servers\\\
+          \": \\\"string\\\", \\\"lockdown_mode\\\": true, \\\"placement_policy_name\\\": \\\"string\\\", \\\"prism_central_details\\\
+          \": {\\\"ip\\\": \\\"192.168.0.1\\\", \\\"password\\\": \\\"string\\\", \\\"port\\\": 9440, \\\"username\\\": \\\
+          \"string\\\"}, \\\"redundancy_factor\\\": 0, \\\"register_to_prism_central\\\": false, \\\"single_node_cluster\\\
+          \": true, \\\"ssh_using_password\\\": true}], \\\"cvm_gateway\\\": \\\"192.168.0.1\\\", \\\"cvm_netmask\\\": \\\"\
+          192.168.0.1\\\", \\\"enable_ipv6_on_hypervisor\\\": false, \\\"enable_luks\\\": true, \\\"eos_metadata\\\": {\\\"\
+          account_name\\\": [\\\"string\\\"], \\\"config_id\\\": \\\"string\\\", \\\"email\\\": \\\"user@example.com\\\"},\
+          \ \\\"fc_settings\\\": {\\\"fc_metadata\\\": {\\\"api_key\\\": \\\"string\\\", \\\"fc_ip\\\": \\\"string\\\"}, \\\
+          \"foundation_central\\\": true}, \\\"hyperv_external_vnic\\\": \\\"string\\\", \\\"hyperv_external_vswitch\\\":\
+          \ \\\"string\\\", \\\"hyperv_product_key\\\": \\\"string\\\", \\\"hyperv_sku\\\": \\\"string\\\", \\\"hypervisor_gateway\\\
+          \": \\\"192.168.0.1\\\", \\\"hypervisor_iso\\\": {\\\"esx\\\": {\\\"checksum\\\": \\\"string\\\", \\\"filename\\\
+          \": \\\"string\\\"}, \\\"hyperv\\\": {\\\"checksum\\\": \\\"string\\\", \\\"filename\\\": \\\"string\\\"}, \\\"\
+          kvm\\\": {\\\"checksum\\\": \\\"string\\\", \\\"filename\\\": \\\"string\\\"}, \\\"xen\\\": {\\\"checksum\\\": \\\
+          \"string\\\", \\\"filename\\\": \\\"string\\\"}}, \\\"hypervisor_nameserver\\\": \\\"string\\\", \\\"hypervisor_netmask\\\
+          \": \\\"192.168.0.1\\\", \\\"hypervisor_password\\\": \\\"string\\\", \\\"install_script\\\": \\\"string\\\", \\\
+          \"ipmi_password\\\": \\\"string\\\", \\\"ipmi_user\\\": \\\"string\\\", \\\"layout_egg_uuid\\\": \\\"string\\\"\
+          , \\\"nos_package\\\": \\\"string\\\", \\\"nutant_user_data\\\": {\\\"password\\\": \\\"string\\\", \\\"ssh_keys\\\
+          \": [\\\"string\\\"]}, \\\"skip_hypervisor\\\": true, \\\"skip_iso_validation\\\": true, \\\"svm_rescue_args\\\"\
+          : [\\\"string\\\"], \\\"tests\\\": {\\\"run_ncc\\\": true, \\\"run_syscheck\\\": true}, \\\"ucsm_ip\\\": \\\"192.168.0.1\\\
+          \", \\\"ucsm_password\\\": \\\"string\\\", \\\"ucsm_user\\\": \\\"string\\\", \\\"unc_password\\\": \\\"string\\\
+          \", \\\"unc_path\\\": \\\"string\\\", \\\"unc_username\\\": \\\"string\\\", \\\"xen_config_type\\\": \\\"string\\\
+          \", \\\"xs_master_ip\\\": \\\"192.168.0.1\\\", \\\"xs_master_label\\\": \\\"string\\\", \\\"xs_master_password\\\
+          \": \\\"string\\\", \\\"xs_master_username\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/foundation/pre_check';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {},\n  body:  `{\"blocks\": [{\"block_id\": \"string\", \"nodes\": [{\"bond_lacp_rate\": \"string\", \"bond_mode\"\
+          : \"string\", \"bond_uplinks\": [\"string\"], \"cluster_id\": null, \"current_cvm_vlan_tag\": null, \"current_network_interface\"\
+          : \"string\", \"cvm_boot_drive_source\": \"layout\", \"cvm_gb_ram\": null, \"cvm_ip\": \"192.168.0.1\", \"cvm_ipv6_address\"\
+          : \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"cvm_num_vcpus\": 0, \"device_hint\": \"string\", \"exlude_boot_serial\"\
+          : \"string\", \"hypervisor\": \"string\", \"hypervisor_hostname\": \"string\", \"hypervisor_ip\": \"192.168.0.1\"\
+          , \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"hypervisor_licenses\": [\"string\"\
+          ], \"image_delay\": null, \"image_now\": true, \"image_successful\": true, \"ipmi_configure_now\": true, \"ipmi_ip\"\
+          : \"192.168.0.1\", \"ipmi_mac\": \"string\", \"ipv6_address\": \"string\", \"ipv6_interface\": \"string\", \"maximise_so_cvm_vcpus\"\
+          : true, \"mitigate_low_boot_space\": true, \"node_position\": \"string\", \"node_serial\": \"string\", \"phoenix_ipv6_address\"\
+          : \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"rdma_mac_addr\": \"string\", \"rdma_passthrough\": true, \"rdma_port_passthrough\"\
+          : true, \"ucsm_managed_mode\": \"string\", \"ucsm_node_serial\": \"string\", \"ucsm_params\": {\"keep_ucsm_settings\"\
+          : true, \"mac_pool\": \"string\", \"native_vlan\": true, \"org_name\": \"string\", \"vlan_name\": \"string\"}, \"\
+          vswitches\": [{\"bond_mode\": \"string\", \"lacp\": \"string\", \"mtu\": 0, \"name\": \"string\", \"other_config\"\
+          : [\"string\"], \"uplinks\": [\"string\"]}]}]}], \"clusters\": [{\"backplane_netmask\": \"192.168.0.1\", \"backplane_subnet\"\
+          : \"192.168.0.1\", \"backplane_vlan\": null, \"cluster_external_ip\": \"192.168.0.1\", \"cluster_init_now\": true,\
+          \ \"cluster_init_successful\": true, \"cluster_members\": [\"string\"], \"cluster_name\": \"string\", \"cluster_password\"\
+          : \"string\", \"cvm_dns_servers\": \"string\", \"cvm_ntp_servers\": \"string\", \"enable_ns\": true, \"external_access_keys\"\
+          : [\"string\"], \"hypervisor_ntp_servers\": \"string\", \"lockdown_mode\": true, \"placement_policy_name\": \"string\"\
+          , \"prism_central_details\": {\"ip\": \"192.168.0.1\", \"password\": \"string\", \"port\": 9440, \"username\": \"\
+          string\"}, \"redundancy_factor\": 0, \"register_to_prism_central\": false, \"single_node_cluster\": true, \"ssh_using_password\"\
+          : true}], \"cvm_gateway\": \"192.168.0.1\", \"cvm_netmask\": \"192.168.0.1\", \"enable_ipv6_on_hypervisor\": false,\
+          \ \"enable_luks\": true, \"eos_metadata\": {\"account_name\": [\"string\"], \"config_id\": \"string\", \"email\"\
+          : \"user@example.com\"}, \"fc_settings\": {\"fc_metadata\": {\"api_key\": \"string\", \"fc_ip\": \"string\"}, \"\
+          foundation_central\": true}, \"hyperv_external_vnic\": \"string\", \"hyperv_external_vswitch\": \"string\", \"hyperv_product_key\"\
+          : \"string\", \"hyperv_sku\": \"string\", \"hypervisor_gateway\": \"192.168.0.1\", \"hypervisor_iso\": {\"esx\"\
+          : {\"checksum\": \"string\", \"filename\": \"string\"}, \"hyperv\": {\"checksum\": \"string\", \"filename\": \"\
+          string\"}, \"kvm\": {\"checksum\": \"string\", \"filename\": \"string\"}, \"xen\": {\"checksum\": \"string\", \"\
+          filename\": \"string\"}}, \"hypervisor_nameserver\": \"string\", \"hypervisor_netmask\": \"192.168.0.1\", \"hypervisor_password\"\
+          : \"string\", \"install_script\": \"string\", \"ipmi_password\": \"string\", \"ipmi_user\": \"string\", \"layout_egg_uuid\"\
+          : \"string\", \"nos_package\": \"string\", \"nutant_user_data\": {\"password\": \"string\", \"ssh_keys\": [\"string\"\
+          ]}, \"skip_hypervisor\": true, \"skip_iso_validation\": true, \"svm_rescue_args\": [\"string\"], \"tests\": {\"\
+          run_ncc\": true, \"run_syscheck\": true}, \"ucsm_ip\": \"192.168.0.1\", \"ucsm_password\": \"string\", \"ucsm_user\"\
+          : \"string\", \"unc_password\": \"string\", \"unc_path\": \"string\", \"unc_username\": \"string\", \"xen_config_type\"\
+          : \"string\", \"xs_master_ip\": \"192.168.0.1\", \"xs_master_label\": \"string\", \"xs_master_password\": \"string\"\
+          , \"xs_master_username\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  requestBodies:
+    imaging_parameters:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/imaging_parameters'
+      required: true
+  schemas:
+    prism_central_details:
+      description: Details of Prism Central
+      properties:
+        ip:
+          description: IP Address of Prism Central.
+          format: ipv4
+          type: string
+        password:
+          description: Password for Prism Central.
+          type: string
+        port:
+          description: Port of Prism Central. Default is 9440.
+          type: integer
+        username:
+          description: Username for Prism Central.
+          type: string
+      type: object
+    http_code_200_with_session_id:
+      properties:
+        session_id:
+          description: Imaging session ID.
+          type: string
+      type: object
+    http_error_500:
+      description: HTTP error 500 description.
+      properties:
+        error:
+          properties:
+            details:
+              description: Error details.
+              type: object
+            message:
+              description: Error message.
+              type: string
+            session_id:
+              description: Imaging session ID.
+              type: string
+          type: object
+      type: object
+    block:
+      description: Block details.
+      properties:
+        block_id:
+          description: Block ID.
+          type: string
+        nodes:
+          description: Details of the nodes.
+          items:
+            $ref: '#/components/schemas/node'
+          type: array
+      type: object
+    hypervisor_iso:
+      description: Hypervisor ISO.
+      properties:
+        esx:
+          $ref: '#/components/schemas/hypervisor_iso_properties'
+        hyperv:
+          $ref: '#/components/schemas/hypervisor_iso_properties'
+        kvm:
+          $ref: '#/components/schemas/hypervisor_iso_properties'
+        xen:
+          $ref: '#/components/schemas/hypervisor_iso_properties'
+      type: object
+    node:
+      description: Node properties.
+      properties:
+        bond_lacp_rate:
+          description: Slow or fast if lacp if being used at the switch.
+          type: string
+        bond_mode:
+          description: Dynamic if using LACP, static for LAG.
+          type: string
+        bond_uplinks:
+          description: MAC Addresses of NICs in a team/bond.
+          items:
+            description: Mac Address of NIC in a team/bond.
+            type: string
+          type: array
+        cluster_id:
+          description: ID of cluster.
+        current_cvm_vlan_tag:
+          description: Current CVM VLAN tag.
+        current_network_interface:
+          description: CVM current network interface.
+          type: string
+        cvm_boot_drive_source:
+          description: 'Defines how to choose the CVM boot disks. This is an experimental feature.
+
+            By default, the value is set to layout; the hypervisor value is supported only
+
+            with the AHV hypervisor.
+
+            For diskless CVM imaging on nodes with data disks, select the hypervisor as a the value.
+
+            '
+          enum:
+          - layout
+          - hypervisor
+          type: string
+          x-internal: true
+        cvm_gb_ram:
+          description: RAM capacity of CVM in GB.
+          format: int32
+          type: number
+        cvm_ip:
+          description: CVM IP address.
+          format: ipv4
+          type: string
+        cvm_ipv6_address:
+          description: Global IPv6 address of CVM.
+          format: ipv6
+          type: string
+        cvm_num_vcpus:
+          description: Number of CVM vCPUs.
+          type: integer
+        device_hint:
+          description: Use "vm_installer" to enable CVM imaging from standalone.
+          type: string
+        exlude_boot_serial:
+          description: Serial of boot device to be excluded (used by NX G6 platforms).
+          type: string
+        hypervisor:
+          description: Type of hypervisor.
+          type: string
+        hypervisor_hostname:
+          description: Hypervisor Hostname.
+          type: string
+        hypervisor_ip:
+          description: Hypervisor IP address.
+          format: ipv4
+          type: string
+        hypervisor_ipv6_address:
+          description: Global IPv6 address of hypervisor.
+          format: ipv6
+          type: string
+        hypervisor_licenses:
+          description: 'List of licenses in string format for hypervisor.
+
+            '
+          items:
+            description: License in string format as it should be applied to hypervisor.
+            type: string
+          type: array
+        image_delay:
+          description: Imaging delay.
+          format: int32
+          type: number
+        image_now:
+          description: If the node should be imaged now.
+          type: boolean
+        image_successful:
+          description: If imaging is successful.
+          type: boolean
+        ipmi_configure_now:
+          description: Whether IPMI should be configured.
+          type: boolean
+        ipmi_ip:
+          description: IPMI IP address.
+          format: ipv4
+          type: string
+        ipmi_mac:
+          description: IPMI MAC address.
+          type: string
+        ipv6_address:
+          description: IPv6 link local address.
+          type: string
+        ipv6_interface:
+          description: Ipv6 interface.
+          type: string
+        maximise_so_cvm_vcpus:
+          description: Maximise the number of vCPUs allocated to the CVM in a storage node, default to true.
+          type: boolean
+        mitigate_low_boot_space:
+          description: Relocate bootbank files to make space for phoenix files.
+          type: boolean
+          x-doc-hide: true
+          x-internal: true
+        node_position:
+          description: Position of the node in the block.
+          type: string
+        node_serial:
+          description: Serial number of the node.
+          type: string
+        phoenix_ipv6_address:
+          description: Global IPv6 address of Phoenix.
+          format: ipv6
+          type: string
+        rdma_mac_addr:
+          description: Mac address of nic to be used for RDMA.
+          type: string
+        rdma_passthrough:
+          description: Passthru RDMA nic to CVM if possible, default to false.
+          type: boolean
+        rdma_port_passthrough:
+          description: Passthru single port from RDMA NIC to CVM, default to false.
+          type: boolean
+        ucsm_managed_mode:
+          description: UCSM managed mode.
+          type: string
+        ucsm_node_serial:
+          description: UCSM node serial.
+          type: string
+        ucsm_params:
+          $ref: '#/components/schemas/ucsm_params'
+        vswitches:
+          description: 'vswitch configuration. Foundation will auto-calculate this in most
+
+            cases. Provide it only if you want to override foundation''s defaults.
+
+            '
+          items:
+            $ref: '#/components/schemas/vswitch'
+          type: array
+      type: object
+    cluster:
+      properties:
+        backplane_netmask:
+          description: Backplane netmask.
+          format: ipv4
+          type: string
+        backplane_subnet:
+          description: Backplane subnet address.
+          format: ipv4
+          type: string
+        backplane_vlan:
+          description: Backplane VLAN.
+        cluster_external_ip:
+          description: External IP of the cluster.
+          format: ipv4
+          type: string
+        cluster_init_now:
+          description: If cluster should be created.
+          type: boolean
+        cluster_init_successful:
+          description: If cluster initialization was successful.
+          type: boolean
+        cluster_members:
+          description: Members in the cluster.
+          items:
+            description: Cluster items.
+            type: string
+          type: array
+        cluster_name:
+          description: Name of the cluster.
+          type: string
+        cluster_password:
+          description: Cluster password to be set on the CVMs and hypervisors for specific users. The list of accounts, for
+            which the password will be set, depends on the AOS version installed on the nodes.
+          type: string
+        cvm_dns_servers:
+          description: DNS servers of CVM.
+          type: string
+        cvm_ntp_servers:
+          description: NTP servers of CVM.
+          type: string
+        enable_ns:
+          description: If network segmentation should be enabled.
+          type: boolean
+        external_access_keys:
+          description: User's public key which has ssh access to CVM.
+          items:
+            description: List of external keys.
+            type: string
+          type: array
+        hypervisor_ntp_servers:
+          description: NTP servers of hypervisor.
+          type: string
+        lockdown_mode:
+          description: Disables SSH access to the cluster.
+          type: boolean
+        placement_policy_name:
+          description: Cluster placement policy to be used by the cluster. Supported values are rf2_default, rf3_default,
+            rf3_1n2d and rf3_adaptive.
+          type: string
+        prism_central_details:
+          $ref: '#/components/schemas/prism_central_details'
+        redundancy_factor:
+          description: Cluster Redundancy Factor. This field is deprecated in favor of the `placement_policy_name` attribute
+            and will not be used for AOS 6.9 and above.
+          type: integer
+        register_to_prism_central:
+          description: True if cluster must be registered to Prism Central. Otherwise, false.
+          type: boolean
+        single_node_cluster:
+          description: If it is a single node cluster.
+          type: boolean
+        ssh_using_password:
+          description: Allows ssh access to the cluster using password authentication if ssh_using_password is true.
+          type: boolean
+      type: object
+    vswitch:
+      description: Vswitch configuration.
+      properties:
+        bond_mode:
+          description: Bond_mode such as balance-tcp, active-backup, etc.
+          type: string
+        lacp:
+          description: Status of LACP.
+          type: string
+        mtu:
+          description: MTU of the vswitch. Applicable only for AHV.
+          type: integer
+        name:
+          description: Name of the vswitch.
+          type: string
+        other_config:
+          description: Auxillary lacp configurations. Applicable only for AHV.
+          items:
+            description: Auxillary lacp configuration.
+            type: string
+          type: array
+        uplinks:
+          description: MAC Addresses of NICs in a team/bond.
+          items:
+            description: Mac Address of NIC in a team/bond.
+            type: string
+          type: array
+      type: object
+    fc_settings:
+      description: Foundation Central specific settings.
+      properties:
+        fc_metadata:
+          description: Foundation Central metadata which will be transferred to the newly imaged node.
+          properties:
+            api_key:
+              description: Api_key which the node uses to register itself with foundation central.
+              type: string
+            fc_ip:
+              description: IP address of foundation central.
+              type: string
+          type: object
+        foundation_central:
+          description: If this attribute is set to True, FC workflow will be invoked.
+          type: boolean
+      type: object
+    imaging_parameters:
+      description: Imaging Parameters.
+      properties:
+        blocks:
+          description: Block level parameters.
+          items:
+            $ref: '#/components/schemas/block'
+          type: array
+        clusters:
+          description: Cluster parameters.
+          items:
+            $ref: '#/components/schemas/cluster'
+          type: array
+        cvm_gateway:
+          description: CVM gateway.
+          format: ipv4
+          type: string
+        cvm_netmask:
+          description: CVM netmask.
+          format: ipv4
+          type: string
+        enable_ipv6_on_hypervisor:
+          description: If true, IPv6 will be enabled on AHV. CVM has IPv6 enabled by default.
+          type: boolean
+          x-doc-hide: true
+          x-internal: true
+        enable_luks:
+          description: If true, LUKS encryption will be enabled on CVM and AHV. This is not applicable to other hypervisors.
+            The default value is false. Not supported for compute only nodes.
+          type: boolean
+        eos_metadata:
+          $ref: '#/components/schemas/eos_metadata'
+        fc_settings:
+          $ref: '#/components/schemas/fc_settings'
+        hyperv_external_vnic:
+          description: Hyperv External virtual network adapter name.
+          type: string
+        hyperv_external_vswitch:
+          description: Hyperv External vswitch name.
+          type: string
+        hyperv_product_key:
+          description: Hyperv product key .
+          type: string
+        hyperv_sku:
+          description: Hyperv SKU.
+          type: string
+        hypervisor_gateway:
+          description: Hypervisor gateway.
+          format: ipv4
+          type: string
+        hypervisor_iso:
+          $ref: '#/components/schemas/hypervisor_iso'
+        hypervisor_nameserver:
+          description: Hypervisor nameserver .
+          type: string
+        hypervisor_netmask:
+          description: Hypervisor netmask.
+          format: ipv4
+          type: string
+        hypervisor_password:
+          description: Hypervisor password.
+          type: string
+        install_script:
+          description: Install script.
+          type: string
+        ipmi_password:
+          description: IPMI password.
+          type: string
+        ipmi_user:
+          description: IPMI username.
+          type: string
+        layout_egg_uuid:
+          description: ID of the custom layout which needs to be passed to imaging request.
+          type: string
+        nos_package:
+          description: NOS package.
+          type: string
+        nutant_user_data:
+          description: Configuration data for creating nutant users in QA deployments.
+          properties:
+            password:
+              description: The password for the nutant user.
+              type: string
+            ssh_keys:
+              description: A list of SSH keys associated with the nutant user.
+              items:
+                type: string
+              type: array
+          type: object
+          x-doc-hide: true
+          x-internal: true
+        skip_hypervisor:
+          description: If hypervisor installation should be skipped.
+          type: boolean
+        skip_iso_validation:
+          description: If true, skip the ISO validation process.
+          type: boolean
+        svm_rescue_args:
+          description: Arguments to be passed to svm_rescue for AOS installation. Ensure that the arguments provided are supported
+            by the AOS version used for imaging.
+          items:
+            description: Argument of the form --<argument>[=<value>].
+            type: string
+          type: array
+        tests:
+          $ref: '#/components/schemas/tests'
+        ucsm_ip:
+          description: UCSM IP address.
+          format: ipv4
+          type: string
+        ucsm_password:
+          description: UCSM password.
+          type: string
+        ucsm_user:
+          description: UCSM username.
+          type: string
+        unc_password:
+          description: UNC password.
+          type: string
+        unc_path:
+          description: UNC Path.
+          type: string
+        unc_username:
+          description: UNC username.
+          type: string
+        xen_config_type:
+          description: Xen config types.
+          type: string
+        xs_master_ip:
+          description: Xen server master IP address.
+          format: ipv4
+          type: string
+        xs_master_label:
+          description: Xen server master label.
+          type: string
+        xs_master_password:
+          description: Xen server master password.
+          type: string
+        xs_master_username:
+          description: Xen server master username.
+          type: string
+      required:
+      - blocks
+      type: object
+    tests:
+      description: Types of tests to be performed.
+      properties:
+        run_ncc:
+          description: Whether NCC checks should run.
+          type: boolean
+        run_syscheck:
+          description: Whether system checks should run.
+          type: boolean
+      type: object
+    eos_metadata:
+      description: Contains user data from Eos portal.
+      properties:
+        account_name:
+          items:
+            description: Account to which Eos user belongs to.
+            type: string
+          type: array
+        config_id:
+          description: Id of the Eos config uploaded in foundation GUI.
+          type: string
+        email:
+          description: Email address of the user who downloaded Eos config.
+          format: email
+          type: string
+      type: object
+    hypervisor_iso_properties:
+      description: Details of hypervisor ISO.
+      properties:
+        checksum:
+          description: Checksum for ISO file.
+          type: string
+        filename:
+          description: Filename of hypervisor ISO.
+          type: string
+      type: object
+    ucsm_params:
+      description: UCSM parameters.
+      properties:
+        keep_ucsm_settings:
+          description: Whether UCSM settings should be kept.
+          type: boolean
+        mac_pool:
+          description: Mac address pool.
+          type: string
+        native_vlan:
+          description: If the VLAN is native.
+          type: boolean
+        org_name:
+          description: UCSM organisation name.
+          type: string
+        vlan_name:
+          description: Name of VLAN.
+          type: string
+      required:
+      - keep_ucsm_settings
+      - mac_pool
+      - vlan_name
+      - native_vlan
+      - org_name
+      type: object

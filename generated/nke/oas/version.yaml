@@ -1,0 +1,131 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /k8s/cluster/{uuid}/k8s_upgrade/versions:
+    get:
+      operationId: GetK8sUpgradeVersions
+      parameters:
+      - description: UUID of the Kubernetes cluster.
+        in: path
+        name: uuid
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Fetched the compatible versions to upgrade.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/0.1.0_k8s_fetch_upgrade_version_response'
+        '400':
+          description: Invalid parameters specified in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/0.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/0.1.0_error_response'
+        '404':
+          description: Specified Kubernetes cluster does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/0.1.0_error_response'
+      summary: Fetch the list of compatible ntnx-k8s package versions to upgrade Kubernetes and/or addons
+      tags:
+      - NKE_Upgrade_API_Reference_upgrade
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/k8s/cluster/{uuid}/k8s_upgrade/versions \\\n   \
+          \ --header 'Accept: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev/k8s/cluster/{uuid}/k8s_upgrade/versions"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\"\n}\n \nconn.request(\"GET\",\"/k8s/cluster/{uuid}/k8s_upgrade/versions\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/k8s/cluster/{uuid}/k8s_upgrade/versions\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err\
+          \ != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody,\
+          \ err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/k8s/cluster/{uuid}/k8s_upgrade/versions\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/k8s/cluster/{uuid}/k8s_upgrade/versions';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    0.1.0_error_response:
+      properties:
+        message_list:
+          additionalProperties:
+            type: string
+          type: object
+        status_code:
+          type: integer
+      type: object
+    0.1.0_k8s_fetch_upgrade_version_response:
+      properties:
+        compatible_versions:
+          items:
+            description: List of compatible ntnx-k8s package versions (the Kubernetes version is a part of it) to upgrade
+              the Kubernetes and/or addons.
+            type: string
+          type: array
+        cur_version:
+          description: Current Kubernetes version.
+          type: string
+      type: object

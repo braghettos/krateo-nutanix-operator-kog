@@ -1,0 +1,2544 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/plans/list:
+    post:
+      description: Lists the details of all migration plans.<br/><br/> Set the includeVMdetails flag in the input for the
+        API response to include VM details corresponding to each migration plan in the MigrationPlanSummary. <br/> The API
+        retrieves the following information for each migration plan:</br> <ul><li>Migration plan name</li> <li>Migration plan
+        UUID</li> <li>Source provider information</li> <li>Target provider information</li> <li>Network mappings</li> <li>Schedule
+        settings</li> <li>Workload</li></ul> <b>Sample API Syntax:</b> https://move.address/move/v2/plans/list
+      operationId: getPlans
+      parameters:
+      - description: Include VM details in the API response from each migration plan in MigrationPlanSummary (deprecated).
+        in: query
+        name: IncludeVMDetails
+        schema:
+          type: boolean
+      - description: Include entity details in the API response from each migration plan in MigrationPlanSummary (Higher priority
+          than IncludeVMDetails).
+        in: query
+        name: IncludeEntityDetails
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MigrationPlanFilter'
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/MigrationPlanFilter'
+        description: Filter the list of migration plans by providing input migration plan object.
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanEntities'
+      security:
+      - Bearer: []
+      summary: List details of all migration plans
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/plans/list \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json,\
+          \ application/octet-stream' \\\n    --data '{\n    \"EntityType\": \"VM\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json, application/octet-stream' \\\n \
+          \   --body-data '{\n    \"EntityType\": \"VM\"\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/plans/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json,\
+          \ application/octet-stream\"\n}\n\npayload =  \"\"\"{\n    \"EntityType\": \"VM\"\n}\"\"\"\n\nconn.request(\"POST\"\
+          ,\"//move/v2/plans/list\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"\
+          utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"EntityType\": \"VM\"\
+          }`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"\
+          Authorization\", \"Bearer <your_access_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json, application/octet-stream\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/plans/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json, application/octet-stream\")\n  .setBody(\"{\\\"EntityType\\\
+          \": \\\"VM\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/list';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type': 'application/json,\
+          \ application/octet-stream'},\n  body:  `{\"EntityType\": \"VM\"}`\n};\n\ntry {\n  const response = await fetch(url,\
+          \ options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    EntityPausedStatus:
+      description: Returns information about paused entities.
+      properties:
+        PausedTime:
+          description: Time of pausing migration (in milliseconds).
+          format: int64
+          type: integer
+        State:
+          description: State of migration before getting paused.
+          format: int64
+          type: integer
+      type: object
+    ScanData:
+      properties:
+        CompletedAt:
+          description: Unix timestamp indicating when the scanning process was completed.
+          format: int64
+          type: integer
+        ScanningError:
+          description: Any error message encountered during the scanning process.
+          type: string
+        ScanningPercentage:
+          description: The percentage of completion for the scanning process.
+          format: int32
+          maximum: 100
+          minimum: 0
+          type: integer
+        ScanningStatus:
+          description: The current status of the scanning process, for example, "StatusInProgress", "StatusCompleted", and
+            so on.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+        StartedAt:
+          description: Unix timestamp indicating when the scanning process started.
+          format: int64
+          type: integer
+        TotalBytes:
+          description: The total size of scanned files in bytes.
+          format: int64
+          type: integer
+        TotalDirs:
+          description: The total number of directories scanned.
+          format: int32
+          type: integer
+        TotalFiles:
+          description: The total number of files scanned.
+          format: int32
+          type: integer
+      type: object
+    TaskAssociatedEntity:
+      description: Entity associated with a task.
+      properties:
+        Type:
+          description: Entity type.
+          type: integer
+        Uuid:
+          description: Entity UUID.
+          format: uuid
+          type: string
+      type: object
+    IterationStatus:
+      description: Iteration status.
+      properties:
+        BytesPerSec:
+          description: Bytes copied per second.
+          format: uint64
+          type: integer
+        CopiedDataSizeInBytes:
+          description: Size of copied data in bytes.
+          format: uint64
+          type: integer
+        CopiedDirectories:
+          description: Number of directories copied.
+          format: uint64
+          type: integer
+        CopiedFiles:
+          description: Number of files copied.
+          format: uint64
+          type: integer
+        ElapsedTime:
+          $ref: '#/components/schemas/ElapsedTime'
+        EndTime:
+          description: End time of an iteration (in Unix time unit of nanoseconds).
+          format: int64
+          type: integer
+        ErrorMessage:
+          description: Error message.
+          type: string
+        EstimatedTimeToCompleteInSecs:
+          description: Time to complete iteration in seconds.
+          format: int64
+          type: integer
+        FailedDirectories:
+          description: Number of directories that could not be migrated.
+          format: uint64
+          type: integer
+        FailedFiles:
+          description: Number of files that could not be migrated.
+          format: uint64
+          type: integer
+        FilesScannedPerSec:
+          description: Files scanned per second.
+          format: uint64
+          type: integer
+        IterationNumber:
+          description: Iteration number.
+          format: int64
+          type: integer
+        IterationType:
+          description: Defines the type of iteration.
+          format: int
+          type: integer
+        NodeJobStatusInfo:
+          description: Status of jobs for iteration on nodes.
+          items:
+            $ref: '#/components/schemas/NodeJobStatusInfo'
+          type: array
+        ProgressPercentage:
+          description: The completion status of the iterations in percentage.
+          format: float64
+          type: number
+        ScannedFiles:
+          description: Number of files scanned per second.
+          format: uint64
+          type: integer
+        ScanningPercentage:
+          description: The progress of the scanning process in percentage.
+          format: float64
+          type: number
+        SkippedFiles:
+          description: Number of files skipped.
+          format: uint64
+          type: integer
+        SourcePath:
+          description: Source path.
+          type: string
+        StartTime:
+          description: Start time of an iteration (in Unix time unit of nanoseconds).
+          format: int64
+          type: integer
+        State:
+          description: Files state.
+          format: int64
+          type: integer
+        Status:
+          description: Files status.
+          format: int64
+          type: integer
+        StatusMessage:
+          description: Status message of iteration.
+          type: string
+        TargetPath:
+          description: Target path.
+          type: string
+        WarningMessage:
+          description: Warning message.
+          type: string
+      type: object
+    VMRunbookInput:
+      description: Input for the runbooks to be executed on a target VM after migration.
+      properties:
+        UUID:
+          description: UUID of the runbook.
+          format: uuid
+          type: string
+        Variables:
+          description: Runbook variables information and input.
+          items:
+            properties:
+              IsSecret:
+                description: Flag indicating if a variable is secret.
+                type: boolean
+              UUID:
+                description: Runbook variable UUID.
+                format: uuid
+                type: string
+              Value:
+                description: Runbook variable input. For multi-value (array) input, separate the elements of the array using
+                  comma (,).
+                type: string
+            required:
+            - UUID
+            type: object
+          type: array
+      required:
+      - UUID
+      type: object
+    AOSCCProviderAttrs:
+      description: AOS provider attributes.
+      properties:
+        ClusterUUID:
+          description: AOS cluster UUID.
+          format: uuid
+          type: string
+      type: object
+    SplMessage:
+      description: Move application message.
+      properties:
+        Message:
+          description: Contents of the message.
+          type: string
+        Title:
+          description: Title of the message.
+          type: string
+        Type:
+          description: Type of the message.
+          enum:
+          - INFO
+          - WARN
+          - ERROR
+          type: string
+      type: object
+    MSchedule:
+      description: Migration schedule.
+      properties:
+        RWEndTimeAtEpochSec:
+          description: Migration plan end time
+          format: int64
+          type: integer
+        RWStartTimeAtEpochSec:
+          description: Migration plan start time
+          format: int64
+          type: integer
+        ScheduleAtEpochSec:
+          description: Migration plan scheduled at time
+          format: int64
+          type: integer
+      type: object
+    NicConfigMode:
+      description: VM's NICs configuration mode at VM level. Denotes how the IPs are to be configured for the target, "retain"
+        means to keep as in source, "dhcp" means to use DHCP protocol to get IP, and "custom" means to set static IP values
+        as provided manually. This value takes precedence over the value of 'SkipIPRetention' and 'PlanLevelNicConfigMode'.
+      enum:
+      - retain
+      - dhcp
+      - custom
+      type: string
+    DiskConfig:
+      description: Details of disk-related properties.
+      properties:
+        AddCdrom:
+          description: Flag to denote whether to add CD-ROM on the migrated VM if it is not in the source VM. The options
+            SkipCdrom and AddCdrom cannot be true simulataneously. The valid values are true and false.
+          type: boolean
+      type: object
+    VMCustomizedNicsMetaInfo:
+      description: Meta info on a VM's NICs such as its mode, configured explicitly etc. Note that as part of the request
+        body, the client can avoid "VmUuid" and "IsConfigured" as they will be ignored by the server.
+      properties:
+        AssignIpViaAPI:
+          description: Flag to indicate whether to assign IP to a VM via API of Prism Central while retaining/customising
+            IP on the Target VPC networks. This is false by default and user can turn it off by overriding vm setting in VM
+            Prep Stage.
+          type: boolean
+        ConfigMode:
+          $ref: '#/components/schemas/NicConfigMode'
+        IsConfigured:
+          description: Denotes if the mode and details were explicitly configured by user.
+          type: boolean
+        VmUuid:
+          description: VM UUID in Move.
+          type: string
+      required:
+      - ConfigMode
+      type: object
+    SecurityPolicySettings:
+      description: Security policy settings.
+      properties:
+        AddToSecurityPolicy:
+          description: Flag set by user indicating that the VMs to be migrated need to be attached to associated security
+            policies.
+          type: boolean
+        AssociatedPlans:
+          description: The list of plans associated with this migration plan. Especially to relate the security policy migration
+            plan and VM migration plan.
+          items:
+            $ref: '#/components/schemas/MigrationPlanMinimalInfo'
+          type: array
+      type: object
+    NetworkMapping:
+      description: Information about the source and target networks.
+      properties:
+        SourceNetworkID:
+          description: Identifies the source provider network.
+          type: string
+        TargetNetworkID:
+          description: Identifies the target provider network.
+          type: string
+        TargetSecurityGroupIDs:
+          description: Identifies the target security groups for AWS and Azure. Only one security group is allowed for Azure,
+            and a maximum of five security groups are allowed for AWS.
+          items:
+            type: string
+          type: array
+        TargetSubnetID:
+          description: Identifies the target subnet for AWS, Azure, and AHV VPC
+          type: string
+        TestNetworkID:
+          description: Identifies target provider network where the "Test" operation should be performed.
+          type: string
+        TestSecurityGroupIDs:
+          description: Identifies the test security groups for AWS and Azure. Only one security group is allowed for Azure,
+            and a maximum of five security groups are allowed for AWS.
+          items:
+            type: string
+          type: array
+        TestSubnetID:
+          description: Identifies the test subnet for AWS, Azure, and AHV VPC
+          type: string
+      type: object
+    ElapsedTime:
+      properties:
+        Days:
+          description: Days Elapsed.
+          format: int64
+          type: integer
+        Hours:
+          description: Hours Elapsed.
+          format: int64
+          type: integer
+        Minutes:
+          description: Minutes Elapsed.
+          format: int64
+          type: integer
+        Seconds:
+          description: Seconds Elapsed.
+          format: int64
+          type: integer
+      type: object
+    NetworkInventory:
+      description: Network Inventory information.
+      properties:
+        Devices:
+          description: List of devices in the network.
+          items:
+            format: int32
+            type: integer
+          type: array
+        ID:
+          description: Network Id.
+          type: string
+        IpAddresses:
+          description: List of IP addresses of devices in this network.
+          items:
+            type: string
+          type: array
+        MacIDs:
+          description: List of MAC addresses of devices in this network.
+          items:
+            type: string
+          type: array
+        Name:
+          description: Network name.
+          type: string
+        VPC:
+          $ref: '#/components/schemas/VpcProps'
+      type: object
+    MigrationPlanSummary:
+      description: Summary of migration plan.
+      properties:
+        Actions:
+          description: Available actions.
+          items:
+            type: string
+          type: array
+        AllActions:
+          description: All actions available for the migration plan.
+          items:
+            type: string
+          type: array
+        AssociatedPlans:
+          description: The list of plans associated with this migration plan. Especially to relate the security policy migration
+            plan and the VM migration plan.
+          items:
+            $ref: '#/components/schemas/MigrationPlanMinimalInfo'
+          type: array
+        ConversionPlanStartTaskDetails:
+          $ref: '#/components/schemas/ConversionPlanStartTaskDetails'
+        ConversionPlanSummary:
+          $ref: '#/components/schemas/ConversionPlanSummary'
+        ConversionStatus:
+          $ref: '#/components/schemas/ConversionStatus'
+        CreatedTime:
+          description: Time of creation of migration plan.
+          format: int64
+          type: integer
+        DataInBytes:
+          description: Data in bytes.
+          format: uint64
+          type: integer
+        ElapsedTime:
+          $ref: '#/components/schemas/ElapsedTime'
+        ErrorReasons:
+          items:
+            description: Error message
+            type: string
+          type: array
+        FilesStateCounts:
+          $ref: '#/components/schemas/FilesStateCounts'
+        FilesStatus:
+          description: Status of individual files subplans that are a part of the migration plan.
+          items:
+            $ref: '#/components/schemas/FilesStatus'
+          type: array
+        IamName:
+          description: IAM provider name for the migration plan owner.
+          type: string
+        MigratedDataInBytes:
+          description: Data migrated in bytes.
+          format: uint64
+          type: integer
+        Name:
+          description: Name of migration plan.
+          type: string
+        NumEntities:
+          description: Number of entities in the migration plan.
+          format: int64
+          type: integer
+        NumVMs:
+          description: Number of VMs in the migration plan (deprecated).
+          format: int64
+          type: integer
+        Owner:
+          description: Username of the user who created migration plan.
+          type: string
+        Schedule:
+          $ref: '#/components/schemas/MSchedule'
+        SourceInfo:
+          $ref: '#/components/schemas/MigrationPlanProviderInfo'
+        SpStateCounts:
+          $ref: '#/components/schemas/SpStateCounts'
+        SpStatus:
+          description: Status of individual Security Policies that are a part of the migration plan.
+          items:
+            $ref: '#/components/schemas/SpStatus'
+          type: array
+        State:
+          description: Migration plan state
+          format: int64
+          type: integer
+        StateInfoMessage:
+          description: State information message for the migration plan.
+          type: string
+        StateString:
+          description: Migration plan state string
+          enum:
+          - MigrationPlanStateUninitialized
+          - MigrationPlanStateValidation
+          - MigrationPlanStateScheduled
+          - MigrationPlanStatePreparation
+          - MigrationPlanStateInProgress
+          - MigrationPlanStatePaused
+          - MigrationPlanStateCancelled
+          - MigrationPlanStateCompleted
+          - MigrationPlanStateFailed
+          - MigrationPlanStateValidationFailed
+          - MigrationPlanStateCancelling
+          - MigrationPlanStateDeleting
+          - MigrationPlanStateDeletionFailed
+          - MigrationPlanStateCreateShare
+          - MigrationPlanStateSavedAsDraft
+          - MigrationPlanStatePauseInProgress
+          - MigrationPlanStateStageValidation
+          - MigrationPlanStateStageValidationFailed
+          - MigrationPlanStateFederationInProgress
+          - MigrationPlanStateFederationCompleted
+          - MigrationPlanStateFederationFailed
+          type: string
+        Status:
+          description: Status of migration plan.
+          format: int64
+          type: integer
+        StatusString:
+          description: Migration plan status string
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+        TargetInfo:
+          $ref: '#/components/schemas/MigrationPlanProviderInfo'
+        UUID:
+          description: UUID of migration plan.
+          format: uuid
+          type: string
+        VMStateCounts:
+          $ref: '#/components/schemas/VMStateCounts'
+        VMStatus:
+          description: Status of individual VMs that are a part of the migration plan.
+          items:
+            $ref: '#/components/schemas/VMStatus'
+          type: array
+        ValidationWarnings:
+          description: Warnings during migration
+          items:
+            $ref: '#/components/schemas/ValidationWarning'
+          type: array
+        WarningMessages:
+          description: Warning messages
+          type: string
+      type: object
+    RunbookRunlog:
+      description: Runbook run log URL with runbook name and UUID.
+      properties:
+        RunbookName:
+          description: Runbook name.
+          type: string
+        RunbookUuid:
+          description: UUID of the runbook.
+          type: string
+        RunlogURL:
+          description: Runbook run log URL.
+          type: string
+      type: object
+    VMCustomizedNicsInfo:
+      description: VM's customized IP configurations for all NICs. If its field "MetaInfo.ConfigMode" is "custom", then its
+        field "NicsInfo" is mandatory.
+      properties:
+        MetaInfo:
+          $ref: '#/components/schemas/VMCustomizedNicsMetaInfo'
+        NicsInfo:
+          items:
+            $ref: '#/components/schemas/VMCustomizedNicInfo'
+          type: array
+      required:
+      - MetaInfo
+      type: object
+    MSettings:
+      description: Settings for migration.
+      properties:
+        Bandwidth:
+          description: Bandwidth to be used for migration.
+          format: int64
+          type: integer
+        CategoriesMapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: Categories mapping (for frontend only).
+          type: object
+        Federation:
+          description: Flag to indicate if the migration plan is a federation plan.
+          type: boolean
+        GuestPrepMode:
+          description: Specify the mode for VM migration.
+          type: string
+        IsConfigPending:
+          description: Flag to indicate if the migration plan is pending configuration.
+          type: boolean
+        NicConfigMode:
+          $ref: '#/components/schemas/PlanLevelNicConfigMode'
+        Owner:
+          description: VM owner (for frontend only).
+          type: string
+        Project:
+          description: Project UUID for the target VMs.
+          format: uuid
+          type: string
+        Schedule:
+          $ref: '#/components/schemas/MSchedule'
+        SkipIPRetentionUI:
+          description: Migration plan level flag to indicate if the static IP retention should be skipped (for manual script
+            regeneration).
+          type: boolean
+        SkipUninstallGuestToolsUI:
+          description: Migration plan level flag to denote if the guest tools will not be uninstalled in the migrated VMs
+            (for manual script regeneration).
+          type: boolean
+        SourceTargetCategoriesMap:
+          description: Mapping between source and target provider categories.
+          items:
+            $ref: '#/components/schemas/SourceTargetCategoriesMapElement'
+          type: array
+        VMTimeZone:
+          description: Time zone configuration for the VM hardware clock (this will be enforced on all the VMs unless overridden
+            at the VM level).
+          type: string
+      type: object
+    VpcProps:
+      description: VPC-related properties of the source VM.
+      properties:
+        ID:
+          description: VPC identifier.
+          type: string
+        Name:
+          description: VPC name.
+          type: string
+      type: object
+    ConversionPlanStartTaskDetails:
+      properties:
+        UploadAhvIsoTask:
+          properties:
+            IsIsoUploadRequired:
+              description: Flag to indicate if ISO upload is required.
+              type: boolean
+            TaskDetails:
+              $ref: '#/components/schemas/TaskSpec'
+          type: object
+        UploadEsxIsoTask:
+          properties:
+            IsIsoUploadRequired:
+              description: Flag to indicate if ISO upload is required.
+              type: boolean
+            TaskDetails:
+              $ref: '#/components/schemas/TaskSpec'
+          type: object
+        ValidateConversionTask:
+          $ref: '#/components/schemas/TaskSpec'
+        ValidateConversionTaskBeforePlanStart:
+          $ref: '#/components/schemas/TaskSpec'
+        VmPreparationTask:
+          $ref: '#/components/schemas/TaskSpec'
+      type: object
+    EntityInfo:
+      description: The intra Prism Central security policy rule of a secured entity used during the translation of security
+        policies.
+      properties:
+        NsxGroupUuid:
+          description: The UUID of the respective group in NSX. This would serve as the identifier for the whole object.
+          type: string
+        SubType:
+          description: The sub type of the secured entity, such as a Category.
+          type: string
+        Type:
+          description: The type of the secured entity, such as a VM.
+          type: string
+        Value:
+          description: The value of the secured entity such as a category "AppType:CategorySe1"
+          type: string
+      type: object
+    ScheduleCutoverOptions:
+      description: ScheduleCutover Options
+      properties:
+        Autocutover:
+          description: Set schedule cutover to auto cutover.
+          type: boolean
+        EndDateTime:
+          description: End date and time information.
+          type: string
+        StartDateTime:
+          description: Start date and time information.
+          type: string
+        Timezone:
+          description: Required to store for UI.
+          type: string
+      type: object
+    VMConversionEntity:
+      description: VM conversion entity.
+      properties:
+        VMSpec:
+          $ref: '#/components/schemas/VMInventory'
+      type: object
+    ShareMigrationCustomizationConfig:
+      description: Configuration for customizing the migration of shares.
+      properties:
+        AdvancedNFSOptions:
+          $ref: '#/components/schemas/AdvancedNFSOptions'
+        MigrationMode:
+          description: The permissible values for the Migration mode - Sync, Mirror.
+          enum:
+          - Sync
+          - Mirror
+          type: string
+        ScanSourceSharePath:
+          description: Indicates whether the migration process should scan the source share path before commencement.
+          type: boolean
+        ShouldAllowUnknownSids:
+          description: A flag to indicate whether unknown SIDS should be allowed during migration instead of failing it.
+          type: boolean
+        ShouldIgnoreFilesAtRoot:
+          description: A flag to indicate whether the files at the root should be ignored while migration instead of failing
+            it.
+          type: boolean
+        ShouldIgnoreLongTldNames:
+          description: A flag to indicate whether the long TLD name should be ignored while migration instead of failing it.
+          type: boolean
+        ShouldSkipJunctionsPoints:
+          description: A flag to indicate whether the junction points should be skipped while migration instead of failing
+            it.
+          type: boolean
+      type: object
+    ShareMapping:
+      properties:
+        CreateTargetShare:
+          description: Indicates whether we need to create a target share.
+          type: boolean
+        ErrorString:
+          description: Error occured while validating the mapping.
+          type: string
+        ProtocolType:
+          description: Protocol to be used for share migration.
+          type: string
+        ShareMigrationCustomizationConfig:
+          $ref: '#/components/schemas/ShareMigrationCustomizationConfig'
+        SourcePath:
+          description: Source directory to be migrated to target file server.
+          type: string
+        SourceShareReference:
+          properties:
+            IsNestedPath:
+              description: Flag to indicate if source share path is nested inside any externally visible share.
+              type: boolean
+            UUID:
+              description: Source share UUID.
+              format: uuid
+              type: string
+          type: object
+        TargetPath:
+          description: Target directory location on the file server.
+          type: string
+        TargetShareConfig:
+          $ref: '#/components/schemas/TargetShareConfig'
+        TargetShareReference:
+          properties:
+            IsNestedPath:
+              description: Flag to indicate if target share path is nested inside any externally visible share.
+              type: boolean
+            UUID:
+              description: Target share UUID.
+              format: uuid
+              type: string
+          type: object
+        UUID:
+          description: Share mapping UUID.
+          format: uuid
+          type: string
+        Unchanged:
+          description: Indicated if there are any changes in this share mapping.
+          type: boolean
+        ValidationStatus:
+          description: Status of the validation.
+          type: string
+      type: object
+    TaskList:
+      description: List of tasks.
+      items:
+        $ref: '#/components/schemas/TaskEntity'
+      type: array
+    NsxSecurityPolicy:
+      description: The NSX security policy info used during the translation of security policies.
+      properties:
+        PolicyName:
+          description: The NSX security policy name.
+          type: string
+        PolicyUuid:
+          description: The NSX security policy UUID.
+          type: string
+      type: object
+    NFSProperties:
+      description: Additional properties of NFS share.
+      properties:
+        squashType:
+          description: Squash type of the mount target.
+          enum:
+          - ROOT_SQUASH
+          - ALL_SQUASH
+          - NONE
+          type: string
+      type: object
+    TaskSpec:
+      description: Task entity.
+      properties:
+        ChildTasks:
+          $ref: '#/components/schemas/TaskList'
+        Description:
+          description: Task description.
+          type: string
+        EndTime:
+          description: Task end time.
+          type: string
+        Entities:
+          $ref: '#/components/schemas/TaskAssociatedEntities'
+        Messages:
+          $ref: '#/components/schemas/TaskMessages'
+        ParentTaskUuid:
+          description: Parent task UUID.
+          format: uuid
+          type: string
+        Payload:
+          description: Task payload as json string.
+          type: string
+        PercentComplete:
+          description: Task completion percentage.
+          type: integer
+        StartTime:
+          description: Task start time.
+          type: string
+        Status:
+          description: Task status.
+          type: integer
+        Type:
+          description: Task type.
+          type: integer
+        Uuid:
+          description: Task UUID.
+          format: uuid
+          type: string
+      type: object
+    MetaData:
+      description: Metadata information
+      properties:
+        Count:
+          type: integer
+        CreationTime:
+          description: Token creation time.
+          type: string
+        Kind:
+          type: string
+        LastUpdateTime:
+          description: Last updated time.
+          type: string
+        Name:
+          description: User name
+          type: string
+        SpecVersion:
+          description: Specification version
+          type: string
+        UUID:
+          description: UUID
+          format: uuid
+          type: string
+      type: object
+    VMStatus:
+      description: VM status.
+      properties:
+        Actions:
+          description: Available actions on VM in current state.
+          items:
+            type: string
+          type: array
+        CopiedDataSizeInBytes:
+          description: Size of copied VM data in Bytes.
+          format: uint64
+          type: integer
+        ETAInSecs:
+          description: Time in seconds.
+          format: int64
+          type: integer
+        ErrorMessage:
+          description: Error Message.
+          type: string
+        ID:
+          description: VM Id.
+          type: string
+        LastCutoverError:
+          description: Error during last cutover.
+          type: string
+        LastTestError:
+          description: Error during last test migration.
+          type: string
+        MigratedDataSizeInBytes:
+          description: Size of migrated VM data in Bytes.
+          format: uint64
+          type: integer
+        Name:
+          description: VM name.
+          type: string
+        PausedStatus:
+          $ref: '#/components/schemas/EntityPausedStatus'
+        PowerState:
+          description: VM Power State.
+          type: string
+        Progress:
+          description: Progress of VM in migration plan.
+          format: int64
+          type: integer
+        ProgressPercentage:
+          description: Progress percentage of VM in migration plan.
+          format: float64
+          type: number
+        RunbookRunlogs:
+          description: Includes runbook run log URLs, UUIDs, and names.
+          items:
+            $ref: '#/components/schemas/RunbookRunlog'
+          type: array
+        ScheduleCutover:
+          $ref: '#/components/schemas/ScheduleCutoverPlanConfig'
+        State:
+          description: VM State.
+          format: int64
+          type: integer
+        StateString:
+          description: VM migration state string.
+          enum:
+          - VMMigrationStateUninitialized
+          - VMMigrationStateScheduled
+          - VMMigrationStateSourcePreparation
+          - VMMigrationStateTargetPreparation
+          - VMMigrationStateDataSeeding
+          - VMMigrationStateReadyToCutover
+          - VMMigrationStateCutoverLastSync
+          - VMMigrationStateCutoverTargetVMConfiguration
+          - VMMigrationStatePaused
+          - VMMigrationStateSourceCutover
+          - VMMigrationStateTargetCutover
+          - VMMigrationStateSourceCleanup
+          - VMMigrationStateTargetCleanup
+          - VMMigrationStateCancelled
+          - VMMigrationStateCompleted
+          - VMMigrationStateFailed
+          - VMMigrationStateCutoverInProgress
+          - VMMigrationStateDiscarded
+          - VMMigrationStateCancelling
+          - VMMigrationStateInProgress
+          - VMMigrationStateTestLastSync
+          - VMMigrationStateSourceTest
+          - VMMigrationStateTargetTest
+          - VMMigrationStateTested
+          - VMMigrationStateTargetTestCleanup
+          - VMMigrationStateUndoTestInProgress
+          - VMMigrationStateCleanupFailed
+          - VMMigrationStatePostMigrationOperations
+          - VMMigrationStatePostMigrationOperationsFailed
+          - VMMigrationStateScheduledCutover
+          - VMMigrationStateCutoverQueued
+          type: string
+        Status:
+          description: VM status.
+          format: int64
+          type: integer
+        StatusString:
+          description: VM migration status string.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+        SubEvents:
+          description: Sub-Events.
+          items:
+            $ref: '#/components/schemas/SubEvents'
+          type: array
+        TestVmConsoleLink:
+          description: Test VM console link.
+          type: string
+        TestVmLink:
+          description: Test VM link.
+          type: string
+        TestVmPowerState:
+          description: Test VM Power State.
+          type: string
+        TestVmWarningMessage:
+          description: Test VM warning message.
+          type: string
+        TotalDataSizeInBytes:
+          description: Size of total VM data in Bytes.
+          format: uint64
+          type: integer
+        UUID:
+          description: VM UUID.
+          format: uuid
+          type: string
+        VmConsoleLink:
+          description: VM console link.
+          type: string
+        VmLink:
+          description: VM link.
+          type: string
+        WarningMessage:
+          description: Warning Message.
+          type: string
+      type: object
+    VMInventory:
+      description: VM Inventory information.
+      properties:
+        AdditionalProperties:
+          additionalProperties:
+            type: string
+          type: object
+        AssociatedCategories:
+          description: The list of categories associated with the Virtual Machine.
+          items:
+            type: string
+          type: array
+        AssociatedPolicies:
+          description: The list of NSX security policies associated with the Virtual Machine.
+          items:
+            $ref: '#/components/schemas/NsxPolicyToFnsPolicyMinimal'
+          type: array
+        Categories:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        ClusterName:
+          type: string
+        DatacenterName:
+          type: string
+        ErrorMessages:
+          items:
+            type: string
+          type: array
+        HostName:
+          type: string
+        HostUuid:
+          format: uuid
+          type: string
+        HypervisorType:
+          description: Type of hypervisor.
+          type: string
+        InternalUuid:
+          type: string
+        MemoryMB:
+          format: uint32
+          type: integer
+        MigrationSupportStatus:
+          format: uint64
+          type: integer
+        MigrationSupportWarningStatus:
+          format: uint64
+          type: integer
+        Networks:
+          items:
+            $ref: '#/components/schemas/NetworkInventory'
+          type: array
+        Nics:
+          properties:
+            NicsInfo:
+              items:
+                $ref: '#/components/schemas/VmNicInfo'
+              type: array
+          type: object
+        NumCDROMs:
+          format: uint32
+          type: integer
+        NumCPU:
+          format: uint32
+          type: integer
+        NumCoresPerSocket:
+          format: uint32
+          type: integer
+        NumEthernetCards:
+          format: uint32
+          type: integer
+        OSType:
+          type: string
+        OverallCpuDemandInMHz:
+          format: uint32
+          type: integer
+        PowerState:
+          type: string
+        RecID:
+          format: int64
+          type: integer
+        SourceUuid:
+          type: string
+        StorageAllocatedInBytes:
+          format: uint64
+          type: integer
+        StorageUsedInBytes:
+          format: uint64
+          type: integer
+        VMName:
+          type: string
+        VMUuid:
+          type: string
+        VmID:
+          type: string
+        WarningMessages:
+          items:
+            type: string
+          type: array
+      type: object
+    NodeEntity:
+      description: Node inventory details.
+      properties:
+        AdditionalProperties:
+          additionalProperties:
+            type: string
+          type: object
+        CpuCapacityInHz:
+          description: CPU capacity in Hz.
+          format: int64
+          type: integer
+        HypervisorType:
+          description: Hypervisor type.
+          type: string
+        HypervisorVersion:
+          description: Hypervisor version.
+          type: string
+        MemoryCapacityInBytes:
+          description: Memory in bytes.
+          format: int64
+          type: integer
+        NodeName:
+          description: Node name.
+          type: string
+        NodeUuid:
+          description: Node UUID.
+          format: uuid
+          type: string
+        NumCpuCores:
+          description: Number of CPU cores.
+          type: integer
+        NumCpuSockets:
+          description: Number of CPU sockets.
+          type: integer
+        NumCpuThreads:
+          description: Number of CPU threads.
+          type: integer
+        NumVms:
+          description: Number of VMs managed by the node.
+          type: integer
+        RecID:
+          description: Record ID.
+          format: int64
+          type: integer
+        ServiceVmIp:
+          description: Service VM IP.
+          type: string
+        SourceUuid:
+          description: Source UUID.
+          format: uuid
+          type: string
+        StorageCapacityInBytes:
+          description: Storage in bytes.
+          format: int64
+          type: integer
+        UsedStorageInBytes:
+          description: Used storage in bytes.
+          format: int64
+          type: integer
+      type: object
+    AWSProviderAttrs:
+      description: AWS provider attributes.
+      properties:
+        AgentNetworkID:
+          description: AWS Move agent network.
+          type: string
+        AvailabilityZone:
+          description: AWS availability zone.
+          type: string
+        RegionID:
+          description: AWS region ID.
+          type: string
+      type: object
+    AOSProviderAttrs:
+      description: AOS provider attributes.
+      properties:
+        ClusterUUID:
+          description: AOS cluster UUID.
+          format: uuid
+          type: string
+        ContainerUUID:
+          description: AOS container UUID.
+          format: uuid
+          type: string
+      type: object
+    ConversionPlanSummary:
+      description: Conversion plan summary.
+      properties:
+        AbortStarted:
+          description: Flag to indicate if the abort has started.
+          type: boolean
+        CurrentStageStatus:
+          $ref: '#/components/schemas/StageConversionStatus'
+        NumNodes:
+          description: Number of nodes in the conversion plan.
+          type: integer
+        NumStages:
+          description: Number of stages in the conversion plan.
+          type: integer
+        NumVMs:
+          description: Number of VMs in the conversion plan.
+          type: integer
+        SourceHypervisor:
+          description: Source hypervisor.
+          enum:
+          - kvm
+          - esx
+          type: string
+        TargetHypervisor:
+          description: Target hypervisor.
+          enum:
+          - kvm
+          - esx
+          type: string
+      type: object
+    ScheduleCutoverPlanConfig:
+      description: Plan and workload UUIDs.
+      properties:
+        ScheduleCutoverFlag:
+          description: Schedule cutover flag.
+          type: boolean
+        ScheduleCutoverOptions:
+          $ref: '#/components/schemas/ScheduleCutoverOptions'
+      required:
+      - ScheduleCutoverFlag
+      type: object
+    ProviderInfo:
+      description: Provider information.
+      properties:
+        AOSCCProviderAttrs:
+          $ref: '#/components/schemas/AOSCCProviderAttrs'
+        AOSProviderAttrs:
+          $ref: '#/components/schemas/AOSProviderAttrs'
+        AWSProviderAttrs:
+          $ref: '#/components/schemas/AWSProviderAttrs'
+        AssociatedProviders:
+          description: List of providers associated with the provider.
+          items:
+            type: string
+          type: array
+        AzureProviderAttrs:
+          $ref: '#/components/schemas/AzureProviderAttrs'
+        ProviderUUID:
+          description: UUID of the provider.
+          format: uuid
+          type: string
+      type: object
+    PlanEntities:
+      description: Migration plan entities.
+      properties:
+        APIVersion:
+          type: string
+        Entities:
+          items:
+            $ref: '#/components/schemas/PlanEntity'
+          type: array
+        MetaData:
+          $ref: '#/components/schemas/PlanEntitiesMetaData'
+      type: object
+    ConversionStatus:
+      properties:
+        StagesConversionStatus:
+          additionalProperties:
+            $ref: '#/components/schemas/StageConversionStatus'
+          description: Mapping of stage UUIDs to stage conversion status.
+      type: object
+    MigrationPlanProviderInfo:
+      description: Migration plan provider information
+      properties:
+        AWSProviderAttrs:
+          $ref: '#/components/schemas/AWSProviderAttrs'
+        AzureProviderAttrs:
+          $ref: '#/components/schemas/AzureProviderAttrs'
+        Cluster:
+          $ref: '#/components/schemas/MigrationPlanProviderInfo'
+        Name:
+          description: Provider Name.
+          type: string
+        Type:
+          description: Provider type.
+          type: string
+        UUID:
+          description: UUID of the provider.
+          format: uuid
+          type: string
+      type: object
+    VMCustomizeType:
+      description: Defines the way customizable properties are synchronized on the target side. The default value is "static".
+        When set to the "replicate" value, the customizable properties of the target VM would be the same as those of the
+        source at the time of the cutover. When set to "static", the value remains as set by the user.
+      enum:
+      - replicate
+      - static
+      type: string
+    NodeVMOrder:
+      properties:
+        Metadata:
+          $ref: '#/components/schemas/NodeVMOrderMetadata'
+        NodeVMOrderMapping:
+          additionalProperties:
+            $ref: '#/components/schemas/NodeVMOrderStage'
+          description: Mapping of step number with the node VM order stage.
+          type: object
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    VMStateCounts:
+      properties:
+        Cancelled:
+          description: Number of VMs in canceled state.
+          format: int64
+          type: integer
+        Completed:
+          description: Number of VMs in cutover completed state.
+          format: int64
+          type: integer
+        CompletedWithErrors:
+          description: Number of VMs in post migration operations failed state.
+          format: int64
+          type: integer
+        CutoverInProgress:
+          description: Number of VMs in cutover in progress state.
+          format: int64
+          type: integer
+        DataSeeding:
+          description: Number of VMs in data seeding state.
+          format: int64
+          type: integer
+        Discarded:
+          description: Number of VMs in discarded state.
+          format: int64
+          type: integer
+        Failed:
+          description: Number of VMs in failed state.
+          format: int64
+          type: integer
+        Paused:
+          description: Number of VMs in paused state.
+          format: int64
+          type: integer
+        PostMigration:
+          description: Number of VMs in post migration operations state.
+          format: int64
+          type: integer
+        ReadyToCutover:
+          description: Number of VMs ready for cutover.
+          format: int64
+          type: integer
+        ScheduledCutover:
+          description: Number of VMs scheduled for cutover.
+          format: int64
+          type: integer
+        TestInProgress:
+          description: Number of VMs in test migration state.
+          format: int64
+          type: integer
+        Tested:
+          description: Number of VMs tested.
+          format: int64
+          type: integer
+        Warning:
+          description: Number of VMs containing warnings.
+          format: int64
+          type: integer
+      type: object
+    MigrationPlanFilter:
+      description: List of migration plans to be fetched.
+      properties:
+        EntityType:
+          description: Entity type filter.
+          enum:
+          - VM
+          - Files
+          - SecurityPolicy
+          - Conversion
+          type: string
+      type: object
+    SubEvents:
+      properties:
+        Description:
+          description: Sub-Event Description.
+          type: string
+        Name:
+          description: Sub-Event Name.
+          type: string
+        State:
+          description: Sub-Event State.
+          format: int64
+          type: integer
+        Status:
+          description: Sub-Event status.
+          format: int64
+          type: integer
+      type: object
+    FilesStateCounts:
+      properties:
+        Cancelled:
+          description: Count of entities in a canceled state.
+          format: int64
+          type: integer
+        Completed:
+          description: Count of entities in cutover completed state.
+          format: int64
+          type: integer
+        CutoverInProgress:
+          description: Count of entities in cutover in progress state.
+          format: int64
+          type: integer
+        DataSeeding:
+          description: Count of entities in data seeding state.
+          format: int64
+          type: integer
+        Discarded:
+          description: Count of entities in the discarded state.
+          format: int64
+          type: integer
+        Failed:
+          description: Count of entities in the failed state.
+          format: int64
+          type: integer
+        PartiallyCompleted:
+          description: Count of entities that are partially completed.
+          format: int64
+          type: integer
+        Paused:
+          description: Count of entities in a paused state.
+          format: int64
+          type: integer
+        ReadyToCutover:
+          description: Count of entities in ready to cutover state.
+          format: int64
+          type: integer
+        Uninitailised:
+          description: Count of entities in an uninitialized state.
+          format: int64
+          type: integer
+        Validated:
+          description: Count of entities that were validated.
+          format: int64
+          type: integer
+        Validating:
+          description: Count of entities that are being validated.
+          format: int64
+          type: integer
+        ValidationFailed:
+          description: Count of entities with validation failed state.
+          format: int64
+          type: integer
+      type: object
+    NsxPolicyToFnsPolicyMinimal:
+      description: Minimal information about the NSX security policy  translated to the FNS policy.
+      properties:
+        FnsSplitPoliciesNames:
+          description: List of names of the split policies in FNS corresponding to given NSX policy.
+          items:
+            type: string
+          type: array
+        Nsx:
+          $ref: '#/components/schemas/NsxSecurityPolicy'
+      type: object
+    VirtualMachine:
+      properties:
+        AllowUVMOps:
+          description: Flag to indicate if the user VM operations are allowed. For example- VirtIO installation, static IP
+            retention, and so on.
+          type: boolean
+        ApcConfig:
+          $ref: '#/components/schemas/ApcConfig'
+        CategoriesMapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: Categories mapping that will be assigned to the target VM
+          type: object
+        CreatePublicIpAddress:
+          description: Indicate whether the migrated VM should have a public IP address. This flag is only valid for Azure
+            and AWS target providers. The valid values are true and false.
+          type: boolean
+        DiskConfig:
+          $ref: '#/components/schemas/DiskConfig'
+        EnableMemoryOvercommit:
+          description: Flag to denote whether the migrated VM will have memory overcommit enabled. The valid values are true
+            and false.
+          type: boolean
+        GuestPrepMode:
+          description: Select migration preparation mode as manual, auto, or offline.
+          enum:
+          - manual
+          - auto
+          - offline
+          type: string
+        InstallNGT:
+          description: Install NGT on VM.
+          type: boolean
+        Owner:
+          description: Owner of the target VM. Only applicable if a project is assigned to the VM.
+          type: string
+        PowerOffForpRDMtovRDMConversion:
+          description: Flag to determine whether to automatically power off the VM to convert PRDM disks to vRDM when migrating
+            from ESXi.
+          type: boolean
+        RetainMacAddress:
+          description: Flag to indicate whether the migrated VM should have the same MAC address. The valid values are true
+            and false.
+          type: boolean
+        RetainUserData:
+          description: Flag to indicate whether the migrated VM should have the same user data string. The valid values are
+            true and false.
+          type: boolean
+        Runbooks:
+          description: Runbooks that will be executed on the target VM after migration. Only one runbook can be executed per
+            VM. This is only applicable if a project is assigned to the VM.
+          items:
+            $ref: '#/components/schemas/VMRunbookInput'
+          type: array
+        ScheduleCutover:
+          $ref: '#/components/schemas/ScheduleCutoverPlanConfig'
+        SkipCdrom:
+          description: Flag to denote whether the migrated VM will skip CD-ROM addition. The options SkipCdrom and AddCdrom
+            cannot be true simulataneously. The valid values are true and false.
+          type: boolean
+        SkipIPRetention:
+          description: Flag to indicate if the static IP should be retained in the user VM. Set the 'AllowUVMOps' flag to
+            override this flag entry. This field is deprecated, instead refer 'NicConfigMode'.
+          type: boolean
+        TimeZone:
+          description: Time zone configuration for VM hardware clock.
+          type: string
+        UninstallGuestTools:
+          description: Flag to denote if the guest tools will be uninstalled in the migrated VM. Examples of the guest tools
+            are VMware Tools, Open VM Tools and so on.
+          type: boolean
+        VMCustomizationConfig:
+          $ref: '#/components/schemas/VMCustomizationConfig'
+        VMCustomizeType:
+          $ref: '#/components/schemas/VMCustomizeType'
+        VMCustomizedNicsInfo:
+          $ref: '#/components/schemas/VMCustomizedNicsInfo'
+        VMPriority:
+          description: The VM priority to be used for scheduling/QoS.
+          enum:
+          - High
+          - Medium
+          - Low
+          type: string
+        VMReference:
+          properties:
+            UUID:
+              description: VM UUID
+              format: uuid
+              type: string
+            VMID:
+              description: VM Id
+              type: string
+          type: object
+      type: object
+    StageConversionStatus:
+      properties:
+        Messages:
+          description: List of messages for the stage conversion.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+        NodesConversionStatus:
+          additionalProperties:
+            $ref: '#/components/schemas/NodeConversionStatus'
+          description: Mapping of node UUIDs to node conversion status.
+        PercentageComplete:
+          description: Percentage complete for the stage.
+          format: int64
+          type: integer
+        StageIndex:
+          description: Stage index in the conversion plan.
+          format: int64
+          type: integer
+        State:
+          description: Stage conversion state.
+          format: int64
+          type: integer
+        StateString:
+          description: Stage conversion state string.
+          enum:
+          - ConversionStageStateUninitialized
+          - ConversionStageStateInProgress
+          - ConversionStageStateRollbackInProgress
+          - ConversionStageStateFailed
+          - ConversionStageStateCompleted
+          - ConversionStageStateAborting
+          - ConversionStageStateAbortCompleted
+          - ConversionStageStateRollbackFailed
+          type: string
+        Status:
+          description: Stage conversion status.
+          format: int64
+          type: integer
+        StatusString:
+          description: Stage conversion status string.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+        VMsConversionStatus:
+          additionalProperties:
+            $ref: '#/components/schemas/VMConversionStatus'
+          description: Mapping of VM UUIDs to VM conversion status.
+      type: object
+    MigrationPlanMinimalInfo:
+      description: Minimal information of a migration plan.
+      properties:
+        Name:
+          description: Migration plan name.
+          type: string
+        UUID:
+          description: Migration plan UUID.
+          format: uuid
+          type: string
+      type: object
+    VmCustomizedIpInfo:
+      description: VM-NIC's IP-related information such as IP-address, netmask, gateway, and DNS.
+      properties:
+        DnsIps:
+          description: Comma separated DNS IPs, such as '8.8.8.8,8.8.4.4'
+          type: string
+        Gateway:
+          description: The gateway to be used in the target VM for the specific network interface. The user should provide
+            only one gateway for a network interface. If the network interface has multiple IP addresses then only the first
+            IPInfo is expected to have the gateway.
+          type: string
+        PrefixLength:
+          description: The number denoting the subnet mask in CIDR notation for the target IP address, i.e.  for a CIDR notation
+            "10.10.10.10/24", "24" is the prefix length.
+          format: int32
+          maximum: 32
+          minimum: 0
+          type: integer
+        SourceIpAddress:
+          description: The IP address, in IPv4 notation, in the source VM.
+          type: string
+        TargetIpAddress:
+          description: The IP address, in IPv4 notation, in the target VM.
+          type: string
+      required:
+      - SourceIpAddress
+      - TargetIpAddress
+      - PrefixLength
+      type: object
+    PlanEntity:
+      properties:
+        APIVersion:
+          description: Move API version
+          type: string
+        IsUpdatePlanFlow:
+          description: Indicates whether the update plan is called as part of the create plan. Assigned values can be False
+            or True
+          type: boolean
+        MetaData:
+          $ref: '#/components/schemas/MigrationPlanSummary'
+        Spec:
+          $ref: '#/components/schemas/Plan'
+        Type:
+          description: Plan type.
+          type: string
+      type: object
+    ApcConfig:
+      description: Advanced Processor Capability settings.
+      properties:
+        Enabled:
+          description: Flag to indicate if APC is enabled.
+          type: boolean
+        UUID:
+          description: CPU model reference UUID for APC configuration.
+          type: string
+      type: object
+    AWSVMConfig:
+      description: Custom EC2 instance properties.
+      properties:
+        AMIID:
+          type: string
+        InstanceType:
+          type: string
+      type: object
+    VmNicInfo:
+      description: Source VM's NIC related information such as network, device id, IP conf, MAC etc.
+      properties:
+        IpsConf:
+          items:
+            $ref: '#/components/schemas/VmIpConf'
+          type: array
+        Mac:
+          description: MAC address of the particular NIC.
+          type: string
+        NetworkName:
+          description: The name of the network connected to the particular NIC.
+          type: string
+      type: object
+    FilesStatus:
+      description: Files status.
+      properties:
+        Actions:
+          description: Available actions on files subplan in the current state.
+          items:
+            type: string
+          type: array
+        BaseIterBytesCopiedPerSecond:
+          description: Bytes copied per second.
+          format: uint64
+          type: integer
+        BaseIteration:
+          $ref: '#/components/schemas/IterationStatus'
+        CopiedDataSizeInBytes:
+          description: Size of copied data in bytes.
+          format: uint64
+          type: integer
+        CopiedDirectories:
+          description: Total number of directories copied.
+          format: uint64
+          type: integer
+        CopiedFiles:
+          description: Total number of files copied.
+          format: uint64
+          type: integer
+        ElapsedTime:
+          $ref: '#/components/schemas/ElapsedTime'
+        ErrorMessage:
+          description: Error message.
+          type: string
+        FailedDirectoriesCount:
+          description: Total number of directories that could not be migrated.
+          format: uint64
+          type: integer
+        FailedFilesCount:
+          description: Total number of files that could not be migrated.
+          format: uint64
+          type: integer
+        FilesScanned:
+          description: Total number of files scanned.
+          format: uint64
+          type: integer
+        FilesSkipped:
+          description: Total number of files skipped.
+          format: uint64
+          type: integer
+        ID:
+          description: Share mapping Id.
+          type: string
+        IterationStatus:
+          description: Status of last n iterations.
+          items:
+            $ref: '#/components/schemas/IterationStatus'
+          type: array
+        LastCutoverError:
+          description: Error during last cutover.
+          type: string
+        NumIterations:
+          description: Number of iterations triggered.
+          format: uint64
+          type: integer
+        PausedStatus:
+          $ref: '#/components/schemas/EntityPausedStatus'
+        ReplicationType:
+          description: Replication of shares.
+          format: string
+          type: string
+        ScanData:
+          $ref: '#/components/schemas/ScanData'
+        SourcePath:
+          description: Source path.
+          type: string
+        SourceProtocol:
+          description: Source protocol(s) of source provider.
+          items:
+            type: string
+          type: array
+        State:
+          description: 'Files state [Uninitialized(0), Scheduled(1), DataSeeding(4), IncrementalDataSeeding(5), ReadyToCutover(6),
+            ReadyToCutoverWithFailedFiles(7),
+
+            PauseInProgress(8), Paused(9), CutoverLastSync(10), CutoverInProgress(11), Cleanup(12), Canceling(14), Canceled(15),
+            Discarded(16), Completed(17)
+
+            PartiallyCompleted(18), Failed(19), ManualSync(21), StartDataSeeding(22), ResumeInProgress(23), RetringFailedFiles(24)]
+
+            '
+          format: int64
+          type: integer
+        Status:
+          description: Files status [StatusUnknown(0), StatusInProgress(1), StatusFailed(2), StatusCompleted(3), StatusAborted(4),
+            StatusPaused(5), StatusAborting(6)]
+          format: int64
+          type: integer
+        SubEvents:
+          description: Subevents of a files subplan.
+          items:
+            $ref: '#/components/schemas/SubEvents'
+          type: array
+        TargetPath:
+          description: Target path.
+          type: string
+        TargetProtocol:
+          description: Target protocol(s) of target provider.
+          items:
+            type: string
+          type: array
+        UUID:
+          description: Share mapping UUID.
+          format: uuid
+          type: string
+        WarningMessage:
+          description: Warning message.
+          type: string
+      type: object
+    PlanEntitiesMetaData:
+      description: Plan metadata
+      properties:
+        CreationTime:
+          description: Plan creation time.
+          type: string
+        FilesStateCounts:
+          $ref: '#/components/schemas/FilesStateCounts'
+        Kind:
+          type: string
+        LastUpdateTime:
+          description: Plan last updated time.
+          type: string
+        MigratedDataInBytes:
+          description: The aggregate size of successfully migrated data, measured in bytes, for VMs and files within the listed
+            migration plans.
+          format: uint64
+          type: integer
+        Name:
+          description: Plan name
+          type: string
+        SpStateCounts:
+          $ref: '#/components/schemas/SpStateCounts'
+        SpecVersion:
+          description: Plan spec version
+          type: string
+        UUID:
+          description: Plan UUID
+          format: uuid
+          type: string
+        VMStateCounts:
+          $ref: '#/components/schemas/VMStateCounts'
+      type: object
+    VMCustomizedNicInfo:
+      description: VM's NIC related information such as network, device id, IP conf, MAC etc.
+      properties:
+        IpsInfo:
+          items:
+            $ref: '#/components/schemas/VmCustomizedIpInfo'
+          type: array
+        Mac:
+          description: MAC address of the particular NIC
+          type: string
+        NetworkName:
+          description: The name of the network connected to the particular NIC
+          type: string
+      required:
+      - IpsInfo
+      - Mac
+      - NetworkName
+      type: object
+    NodeConversionStatus:
+      properties:
+        Actions:
+          description: List of allowed actions for the node conversion.
+          items:
+            type: string
+          type: array
+        AllActions:
+          description: List of all actions for the node conversion.
+          items:
+            type: string
+          type: array
+        Messages:
+          description: List of messages for the node conversion.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+        PercentageComplete:
+          description: Percentage complete for the node conversion.
+          format: int64
+          type: integer
+        State:
+          description: Node conversion state.
+          format: int64
+          type: integer
+        StateString:
+          description: Node conversion state string.
+          enum:
+          - ConversionNodeStateUninitialized
+          - ConversionNodeStateInProgress
+          - ConversionNodeStateFailed
+          - ConversionNodeStateCompleted
+          - ConversionNodeStateRollbackInProgress
+          - ConversionNodeStateRollbackCompleted
+          - ConversionNodeStateRollbackFailed
+          - ConversionNodeStateAborting
+          - ConversionNodeStateAbortCompleted
+          type: string
+        Status:
+          description: Node conversion status.
+          format: int64
+          type: integer
+        StatusString:
+          description: Node conversion status string.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+      type: object
+    Plan:
+      description: Plan information
+      properties:
+        Name:
+          description: Migration plan Name.
+          type: string
+        NetworkMappings:
+          items:
+            $ref: '#/components/schemas/NetworkMapping'
+          type: array
+        SecurityPolicySettings:
+          $ref: '#/components/schemas/SecurityPolicySettings'
+        Settings:
+          $ref: '#/components/schemas/MSettings'
+        SourceInfo:
+          $ref: '#/components/schemas/ProviderInfo'
+        TargetInfo:
+          $ref: '#/components/schemas/ProviderInfo'
+        UUID:
+          description: Migration plan UUID.
+          format: uuid
+          type: string
+        Workload:
+          description: Migration plan Workload.
+          properties:
+            ConversionWorkload:
+              $ref: '#/components/schemas/ConversionWorkload'
+            SecurityPolicies:
+              items:
+                $ref: '#/components/schemas/SecurityPolicyInPlan'
+              type: array
+            Shares:
+              items:
+                $ref: '#/components/schemas/ShareMapping'
+              type: array
+            Type:
+              enum:
+              - VM
+              - Share
+              - SecurityPolicy
+              - Conversion
+              type: string
+            VMs:
+              items:
+                $ref: '#/components/schemas/VirtualMachine'
+              type: array
+          type: object
+      type: object
+    SourceTargetCategoriesMapElement:
+      description: Source and target category map element
+      properties:
+        SourceKey:
+          description: Source category key
+          type: string
+        SourceValue:
+          description: Source category value
+          type: string
+        TargetKey:
+          description: Target category key
+          type: string
+        TargetValue:
+          description: Source category value
+          type: string
+      type: object
+    VMConversionStatus:
+      properties:
+        Actions:
+          description: List of allowed actions for the VM conversion.
+          items:
+            type: string
+          type: array
+        AllActions:
+          description: List of all actions for the VM conversion.
+          items:
+            type: string
+          type: array
+        Messages:
+          description: List of messages for the VM conversion.
+          items:
+            $ref: '#/components/schemas/SplMessage'
+          type: array
+        PercentageComplete:
+          description: Percentage complete for the VM conversion.
+          format: int64
+          type: integer
+        State:
+          description: VM conversion state.
+          format: int64
+          type: integer
+        StateString:
+          description: VM conversion state string.
+          enum:
+          - ConversionVMStateUninitialized
+          - ConversionVMStateInProgress
+          - ConversionVMStateFailed
+          - ConversionVMStateCompleted
+          - ConversionVMStateRollbackInProgress
+          - ConversionVMStateRollbackCompleted
+          - ConversionVMStateRollbackFailed
+          - ConversionVMStateIgnoring
+          - ConversionVMStateIgnored
+          - ConversionVMStateAborting
+          - ConversionVMStateAbortCompleted
+          type: string
+        Status:
+          description: VM conversion status.
+          format: int64
+          type: integer
+        StatusString:
+          description: VM conversion status string.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+      type: object
+    NodeVMOrderMetadata:
+      description: Node VM order metadata.
+      properties:
+        IsDefault:
+          description: Flag to indicate if the node VM order is default.
+          type: boolean
+        MigrationPlanUuid:
+          description: Migration plan UUID.
+          format: uuid
+          type: string
+        NumNodes:
+          description: Number of nodes in the node VM order.
+          type: integer
+        NumStages:
+          description: Number of stages in the node VM order.
+          type: integer
+        NumVMs:
+          description: Number of VMs in the node VM order.
+          type: integer
+      type: object
+    NodeVMOrderStage:
+      description: Node VM order stage.
+      properties:
+        AbortTaskDetails:
+          $ref: '#/components/schemas/TaskEntity'
+        RollbackTaskDetails:
+          $ref: '#/components/schemas/TaskEntity'
+        SourceHypervisor:
+          description: Source hypervisor.
+          enum:
+          - kvm
+          - esx
+          type: string
+        Spec:
+          $ref: '#/components/schemas/NodeVMOrderStageSpec'
+        StageType:
+          description: Stage type.
+          enum:
+          - ConvertNode
+          - ConvertVMs
+          type: string
+        StageUuid:
+          description: Stage UUID.
+          format: uuid
+          type: string
+        TargetHypervisor:
+          description: Target hypervisor.
+          enum:
+          - kvm
+          - esx
+          type: string
+        TaskDetails:
+          $ref: '#/components/schemas/TaskEntity'
+      type: object
+    SpStateCounts:
+      properties:
+        Completed:
+          description: Count of Security Policies in completed state.
+          format: int64
+          type: integer
+        CompletedWithErrors:
+          description: Count of Security Policies in post migration operations failed state.
+          format: int64
+          type: integer
+        Discarded:
+          description: Count of Security Policies in discarded state.
+          format: int64
+          type: integer
+        Failed:
+          description: Count of Security Policies in failed state.
+          format: int64
+          type: integer
+        Warning:
+          description: Count of Security Policies containing warnings.
+          format: int64
+          type: integer
+      type: object
+    AzureVMConfig:
+      description: Custom VM instance properties.
+      properties:
+        DiskCategory:
+          type: string
+        VMSize:
+          type: string
+      type: object
+    TaskAssociatedEntities:
+      description: List of entities associated with the task.
+      items:
+        $ref: '#/components/schemas/TaskAssociatedEntity'
+      type: array
+    SpStatus:
+      description: Security Policy status.
+      properties:
+        Actions:
+          description: Available actions on Security Policy in current state.
+          items:
+            type: string
+          type: array
+        ETAInSecs:
+          description: Time in seconds.
+          format: int64
+          type: integer
+        ErrorMessage:
+          description: Error Message.
+          type: string
+        FnsSplitPoliciesStatus:
+          description: List of split policies minimal information i.e. Name and Mode.
+          items:
+            $ref: '#/components/schemas/FnsSplitPolicyStatus'
+          type: array
+        IsPartiallyMigratable:
+          description: Flag to indicate if the Nsx policy is partially migratable.
+          type: boolean
+        NsxName:
+          description: Nsx Security Policy name.
+          type: string
+        NsxUUID:
+          description: Nsx Security Policy UUID.
+          format: uuid
+          type: string
+        Progress:
+          description: Progress of Security Policy in migration plan.
+          format: int64
+          type: integer
+        State:
+          description: Security Policy State.
+          format: int64
+          type: integer
+        StateString:
+          description: Security Policy migration state string.
+          enum:
+          - SpMigrationStateUninitialized
+          - SpMigrationStateFailed
+          - SpMigrationStateInProgress
+          - SpMigrationStateDiscarded
+          - SpMigrationStateCompleted
+          type: string
+        Status:
+          description: Security Policy status.
+          format: int64
+          type: integer
+        StatusString:
+          description: Security Policy migration status string.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+        WarningMessage:
+          description: Warning Message.
+          type: string
+      type: object
+    NodeJobStatusInfo:
+      description: Status of job on nutanix files server nodes.
+      properties:
+        status:
+          description: Nutanix files node job status.
+          type: string
+      type: object
+    AzureProviderAttrs:
+      description: Azure provider attributes.
+      properties:
+        RegionID:
+          description: Azure region ID.
+          type: string
+        ResourceGroup:
+          description: Azure resource group.
+          type: string
+      type: object
+    VMCustomizationConfig:
+      description: Configuration for customizing the target VM.
+      properties:
+        AWSVMConfig:
+          $ref: '#/components/schemas/AWSVMConfig'
+        AzureVMConfig:
+          $ref: '#/components/schemas/AzureVMConfig'
+      type: object
+    TaskMessages:
+      description: List of task messages.
+      items:
+        $ref: '#/components/schemas/SplMessage'
+      type: array
+    ConversionWorkload:
+      description: Conversion workload details.
+      properties:
+        NodeVMOrder:
+          $ref: '#/components/schemas/NodeVMOrder'
+        Nodes:
+          additionalProperties:
+            $ref: '#/components/schemas/NodeEntity'
+          description: Mapping of node UUIDs to node entity for conversion plan.
+        VMs:
+          additionalProperties:
+            $ref: '#/components/schemas/VMConversionEntity'
+          description: Mapping of VM UUIDs to VM entity for conversion plan.
+      type: object
+    ValidationWarning:
+      description: Warnings during the migration plan validation.
+      properties:
+        Code:
+          description: Warning code.
+          type: integer
+        Message:
+          description: Warning message.
+          type: string
+        WarningType:
+          description: Warning type.
+          type: string
+      type: object
+    PlanLevelNicConfigMode:
+      description: VM's NICs configuration mode at Plan level. Denotes how the IPs are to be configured for the target, "retain"
+        means to keep as in source, "dhcp" means to use DHCP protocol to get IP. The custom option is given only at the VM
+        level. This value takes precedence over the value of 'SkipIPRetention'.
+      enum:
+      - retain
+      - dhcp
+      type: string
+    SecurityPolicyInPlan:
+      description: Security policy information required for migration.
+      properties:
+        ErrorString:
+          description: Error occured while validating.
+          type: string
+        SpUuid:
+          description: Security policy UUID.
+          type: string
+      type: object
+    TaskEntity:
+      description: Task details output.
+      properties:
+        APIVersion:
+          description: Move API version.
+          type: string
+        MetaData:
+          $ref: '#/components/schemas/MetaData'
+        Spec:
+          $ref: '#/components/schemas/TaskSpec'
+      type: object
+    TargetShareConfig:
+      properties:
+        NFSProperties:
+          $ref: '#/components/schemas/NFSProperties'
+        ProtocolType:
+          description: Protocol type of target share.
+          enum:
+          - NFS
+          - SMB
+          type: string
+        ShareType:
+          description: Supported mount target types.
+          enum:
+          - HOMES
+          - GENERAL
+          - DISTRIBUTED
+          - STANDARD
+          type: string
+        TargetShareName:
+          description: Name of target share.
+          type: string
+      type: object
+    FnsSplitPolicyStatus:
+      description: Minimal information about the FNS split policy.
+      properties:
+        ErrorMessage:
+          description: Error message if any.
+          type: string
+        PolicyMode:
+          description: FNS mode for the split security policy.
+          enum:
+          - Save
+          - Monitor
+          - Enforce
+          type: string
+        PolicyName:
+          description: Name of the split policy in FNS.
+          type: string
+        SecuredEntities:
+          description: List of secured entities in the FNS Security Policy.
+          items:
+            $ref: '#/components/schemas/EntityInfo'
+          type: array
+        State:
+          description: Security Policy State.
+          format: int64
+          type: integer
+        StateString:
+          description: Security Policy migration state string.
+          enum:
+          - SpMigrationStateUninitialized
+          - SpMigrationStateFailed
+          - SpMigrationStateInProgress
+          - SpMigrationStateDiscarded
+          - SpMigrationStateCompleted
+          type: string
+        Status:
+          description: Status of the split policy.
+          format: int64
+          type: integer
+        StatusString:
+          description: Status string of the split policy.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+      type: object
+    NodeVMOrderStageSpec:
+      description: Node VM order stage spec.
+      properties:
+        NodeUuid:
+          description: Node UUID for the stage.
+          format: uuid
+          type: string
+        VMUuids:
+          description: VM UUIDs for the stage.
+          items:
+            format: uuid
+            type: string
+          type: array
+      type: object
+    AdvancedNFSOptions:
+      description: Custom NFS share migration options.
+      properties:
+        AuthType:
+          description: The permissible values for the NFS authentication type - Sys, None.
+          enum:
+          - Sys
+          - None
+          type: string
+        HardLinkOptimization:
+          description: Flag to indicate whether to optimize migration using hard links.
+          type: boolean
+      type: object
+    VmIpConf:
+      description: IP address information for the source VM NIC, such as IP address, netmask, gateway, and DNS.
+      properties:
+        DnsIps:
+          description: Comma separated DNS IPs, such as '8.8.8.8,8.8.4.4'
+          type: string
+        Gateway:
+          description: The gateway for the given IP address.
+          type: string
+        IpAddress:
+          description: The IP address in IPv4 notation.
+          type: string
+        PrefixLength:
+          description: The number denoting the subnet mask in CIDR notation for the given IP address, i.e.  for a CIDR notation
+            "10.10.10.10/24", "24" is the prefix length. Valid value x such that 0 <= x <= 32.
+          format: int32
+          maximum: 32
+          minimum: 0
+          type: integer
+      type: object

@@ -1,0 +1,244 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /aws/v1/images/list:
+    post:
+      description: 'List AWS AMIs . Supported filters are:
+
+        - account_uuid
+
+        - region
+
+        - is-public
+
+        - name
+
+        - image-id
+
+        Use account_uuid to list images on a particular account.
+
+        Use account_uuid and region filters together to list images
+
+        belonging to a particular region.
+
+        Provide name to limit the results to
+
+        those AMI names containing the provided name
+
+        Provide image-ids to limit the results to
+
+        corresponding AMIs
+
+        '
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/aws_image_list_metadata'
+        required: true
+      tags:
+      - aws/images
+      x-private: true
+      x-doc-hide: true
+      summary: List all AWS AMIs.
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: aws_image
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/aws_image_list_response'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/aws/v1/images/list \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"filter\": \"string\",\n    \"kind\": \"aws_image\",\n    \"length\"\
+          : 1,\n    \"offset\": 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\",\n    \"kind\": \"aws_image\",\n    \"length\": 1,\n    \"offset\": 0,\n    \"sort_attribute\": \"\
+          string\",\n    \"sort_order\": \"string\"\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/aws/v1/images/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\",\n    \"kind\": \"aws_image\",\n    \"length\": 1,\n    \"\
+          offset\": 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\"\
+          ,\"/api/nutanix/v3/aws/v1/images/list\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"\
+          utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/aws/v1/images/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"filter\"\
+          : \"string\", \"kind\": \"aws_image\", \"length\": 1, \"offset\": 0, \"sort_attribute\": \"string\", \"sort_order\"\
+          : \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"\
+          application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/aws/v1/images/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\", \\\"kind\\\
+          \": \\\"aws_image\\\", \\\"length\\\": 1, \\\"offset\\\": 0, \\\"sort_attribute\\\": \\\"string\\\", \\\"sort_order\\\
+          \": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/aws/v1/images/list';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"filter\": \"string\", \"kind\": \"aws_image\", \"length\": 1, \"offset\": 0, \"sort_attribute\": \"\
+          string\", \"sort_order\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    aws_image_list_response:
+      description: AWS VPC entity list.
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/aws_image_resource'
+          type: array
+        api_version:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/aws_image_list_metadata_output'
+      title: aws_image entity list
+    sort_order:
+      x-ntnx-enum:
+      - ASCENDING
+      - DESCENDING
+      description: The sort order in which results are returned
+      title: Sort order
+    aws_image_def_status:
+      description: aws_image resources status
+      type: object
+      properties:
+        name:
+          type: string
+          description: aws_image name.
+        resources:
+          $ref: '#/components/schemas/aws_image_resources_def_status'
+      title: aws_image resources status
+    aws_image_list_metadata_output:
+      description: 'All api calls that return a list will have this metadata block
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - aws_image
+          type: string
+          description: The kind name
+        total_matches:
+          type: integer
+          description: Total matches found
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter used for the results
+        length:
+          type: integer
+          description: The number of records retrieved relative to the offset
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          type: integer
+          description: Offset from the start of the entity list
+      title: Metadata for aws_image list output
+    aws_image_list_metadata:
+      description: 'All api calls that return a list will have this metadata block as input
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - aws_image
+          type: string
+          description: The kind name
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter in FIQL syntax used for the results.
+        length:
+          minimum: 1
+          type: integer
+          description: The number of records to retrieve relative to the offset
+          format: int32
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          minimum: 0
+          type: integer
+          description: Offset from the start of the entity list
+          format: int32
+      title: Metadata for aws_image list
+    aws_image_resource:
+      description: aws_image entity
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/aws_image_def_status'
+      title: aws_image
+    aws_image_resources_def_status:
+      description: AWS image resources
+      type: object
+      properties:
+        root_device_type:
+          type: string
+          description: Root device type (e.g. ebs, instance-store)
+        hypervisor:
+          type: string
+          description: The supported hypervisor.
+        virtualization_type:
+          type: string
+          description: Type of virtualization supported.
+        platform:
+          type: string
+          description: Platform of the image (e.g. Windows)
+        root_device_name:
+          type: string
+          description: Root device name (e.g. /dev/sda1, /dev/sda2)
+        id:
+          pattern: ^ami-[a-f0-9]{1,17}$
+          type: string
+          description: The AWS ID of the AMI.
+        architecture:
+          type: string
+          description: Architecture of the AWS image (e.g. i386, x86_64)
+      title: AWS image resources

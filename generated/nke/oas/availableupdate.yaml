@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-beta.1/k8s/clusters/available-updates:
+    get:
+      description: "List the details of the available node OS images and Nutanix Kubernetes releases for upgrade of all the\
+        \ Kubernetes clusters.\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-beta.1/k8s/clusters/available-updates."
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: List the available updates of the node OS images and Nutanix Kubernetes releases
+      operationId: K8sClusterListAvailableUpdates
+      responses:
+        '200':
+          description: Request to get available updates for all Kubernetes clusters is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_clusters_available_updates_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/available-updates\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/available-updates"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-beta.1/k8s/clusters/available-updates\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/available-updates\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/available-updates\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/available-updates';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_k8s_cluster_available_updates_response:
+      description: Available updates for node OS images and Nutanix Kubernetes releases for a Kubernetes cluster.
+      type: object
+      properties:
+        name:
+          description: The Kubernetes cluster name.
+          type: string
+          maxLength: 40
+          minLength: 1
+          pattern: ^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]))*([A-Za-z]|[A-Za-z][A-Za-z0-9-]*[A-Za-z0-9])$
+        node_os_images:
+          description: Metadata of available node OS images for the Kubernetes cluster upgrade.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_node_os_image'
+        ntnx_k8s_releases:
+          description: Metadata of available Nutanix Kubernetes releases for the Kubernetes cluster upgrade.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_ntnx_k8s_release'
+        uuid:
+          description: The UUID of the Kubernetes cluster.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+    v1.1.0_ntnx_k8s_release:
+      type: object
+      properties:
+        image_uuid:
+          description: Image UUID.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        image_version:
+          description: OS Image name of the corrosponding capi image for the given k8s version. Empty string in non-capi use
+            cases.
+          type: string
+        release_date:
+          description: Release Date of Nutanix Kubernetes in the ISO 8601 format.(YYYY-MM-DDThh:mm:ss.sssZ).
+          type: string
+          format: date-time
+        release_notes_url:
+          description: URL of the Release Notes for the Nutanix Kubernetes release.
+          type: string
+        version:
+          description: Nutanix Kubernetes release version in semantic version format.
+          type: string
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_node_os_image:
+      type: object
+      properties:
+        image_uuid:
+          description: Image UUID.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        release_date:
+          description: Release Date of Nutanix OS image in the ISO 8601 format.(YYYY-MM-DDThh:mm:ss.sssZ).
+          type: string
+          format: date-time
+        release_notes_url:
+          description: URL of the Release Notes for the Nutanix OS release.
+          type: string
+        version:
+          description: Version of the particular OS flavor of the node OS image.
+          type: string
+    v1.1.0_k8s_clusters_available_updates_response:
+      description: List the responses of the available updates for node OS images and Nutanix Kubernetes releases for all
+        the Kubernetes clusters.
+      type: array
+      items:
+        $ref: '#/components/schemas/v1.1.0_k8s_cluster_available_updates_response'

@@ -1,0 +1,513 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /blueprints/{uuid}/simple_launch:
+    post:
+      responses:
+        '200':
+          description: Request Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/blueprint_launch2_response'
+        '404':
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/blueprint_status'
+      parameters:
+      - name: uuid
+        required: true
+        in: path
+        description: Blueprint UUID to be launched
+        schema:
+          type: string
+          format: UUID
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/blueprint_launch2_input'
+        required: true
+      tags:
+      - Blueprints
+      x-private: false
+      x-doc-hide: false
+      summary: Launch the blueprint
+      x-ntnx-operations:
+      - launch
+      x-ntnx-kind: blueprint
+      description: 'Launch the given blueprint.
+
+        '
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/blueprints/{uuid}/simple_launch\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n  \
+          \  --header 'Content-Type: application/json' \\\n    --data '{\n    \"spec\": {\n        \"app_description\": \"\
+          string\",\n        \"app_name\": \"string\",\n        \"app_profile_reference\": {\n            \"kind\": \"app_profile\"\
+          ,\n            \"name\": \"string\",\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        },\n\
+          \        \"runtime_editables\": {\n            \"action_list\": [\n                {\n                    \"description\"\
+          : \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\",\n          \
+          \          \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"\
+          app_profile\": {\n                \"description\": \"string\",\n                \"name\": \"string\",\n        \
+          \        \"type\": \"string\",\n                \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n           \
+          \ },\n            \"credential_list\": [\n                {\n                    \"description\": \"string\",\n\
+          \                    \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"deployment_list\":\
+          \ [\n                {\n                    \"description\": \"string\",\n                    \"name\": \"string\"\
+          ,\n                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"package_list\": [\n                {\n                    \"\
+          description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\"\
+          ,\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n \
+          \           \"restore_config_list\": [\n                {\n                    \"description\": \"string\",\n  \
+          \                  \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"service_list\": [\n\
+          \                {\n                    \"description\": \"string\",\n                    \"name\": \"string\",\n\
+          \                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"snapshot_config_list\": [\n                {\n              \
+          \      \"description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"\
+          string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n         \
+          \   ],\n            \"substrate_list\": [\n                {\n                    \"description\": \"string\",\n\
+          \                    \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"task_list\": [\n  \
+          \              {\n                    \"description\": \"string\",\n                    \"name\": \"string\",\n\
+          \                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"variable_list\": [\n                {\n                    \"\
+          description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\"\
+          ,\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ]\n  \
+          \      }\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"spec\"\
+          : {\n        \"app_description\": \"string\",\n        \"app_name\": \"string\",\n        \"app_profile_reference\"\
+          : {\n            \"kind\": \"app_profile\",\n            \"name\": \"string\",\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n        },\n        \"runtime_editables\": {\n            \"action_list\": [\n                {\n            \
+          \        \"description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\":\
+          \ \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n     \
+          \       ],\n            \"app_profile\": {\n                \"description\": \"string\",\n                \"name\"\
+          : \"string\",\n                \"type\": \"string\",\n                \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n            },\n            \"credential_list\": [\n                {\n                    \"description\": \"\
+          string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\",\n              \
+          \      \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"deployment_list\"\
+          : [\n                {\n                    \"description\": \"string\",\n                    \"name\": \"string\"\
+          ,\n                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"package_list\": [\n                {\n                    \"\
+          description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\"\
+          ,\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n \
+          \           \"restore_config_list\": [\n                {\n                    \"description\": \"string\",\n  \
+          \                  \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"service_list\": [\n\
+          \                {\n                    \"description\": \"string\",\n                    \"name\": \"string\",\n\
+          \                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"snapshot_config_list\": [\n                {\n              \
+          \      \"description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"\
+          string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n         \
+          \   ],\n            \"substrate_list\": [\n                {\n                    \"description\": \"string\",\n\
+          \                    \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"task_list\": [\n  \
+          \              {\n                    \"description\": \"string\",\n                    \"name\": \"string\",\n\
+          \                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"variable_list\": [\n                {\n                    \"\
+          description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\"\
+          ,\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ]\n  \
+          \      }\n    }\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/blueprints/{uuid}/simple_launch"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"spec\": {\n        \"app_description\": \"string\",\n        \"app_name\": \"string\"\
+          ,\n        \"app_profile_reference\": {\n            \"kind\": \"app_profile\",\n            \"name\": \"string\"\
+          ,\n            \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        },\n        \"runtime_editables\": {\n\
+          \            \"action_list\": [\n                {\n                    \"description\": \"string\",\n         \
+          \           \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"app_profile\": {\n                \"description\": \"string\"\
+          ,\n                \"name\": \"string\",\n                \"type\": \"string\",\n                \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n            },\n            \"credential_list\": [\n                {\n                    \"description\": \"\
+          string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\",\n              \
+          \      \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"deployment_list\"\
+          : [\n                {\n                    \"description\": \"string\",\n                    \"name\": \"string\"\
+          ,\n                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"package_list\": [\n                {\n                    \"\
+          description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\"\
+          ,\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n \
+          \           \"restore_config_list\": [\n                {\n                    \"description\": \"string\",\n  \
+          \                  \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"service_list\": [\n\
+          \                {\n                    \"description\": \"string\",\n                    \"name\": \"string\",\n\
+          \                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"snapshot_config_list\": [\n                {\n              \
+          \      \"description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"\
+          string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n         \
+          \   ],\n            \"substrate_list\": [\n                {\n                    \"description\": \"string\",\n\
+          \                    \"name\": \"string\",\n                    \"type\": \"string\",\n                    \"uuid\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ],\n            \"task_list\": [\n  \
+          \              {\n                    \"description\": \"string\",\n                    \"name\": \"string\",\n\
+          \                    \"type\": \"string\",\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n                }\n            ],\n            \"variable_list\": [\n                {\n                    \"\
+          description\": \"string\",\n                    \"name\": \"string\",\n                    \"type\": \"string\"\
+          ,\n                    \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n                }\n            ]\n  \
+          \      }\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"/api/nutanix/v3/blueprints/{uuid}/simple_launch\", payload,\
+          \ headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/blueprints/{uuid}/simple_launch\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          spec\": {\"app_description\": \"string\", \"app_name\": \"string\", \"app_profile_reference\": {\"kind\": \"app_profile\"\
+          , \"name\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}, \"runtime_editables\": {\"action_list\"\
+          : [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"app_profile\": {\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"credential_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"\
+          b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"deployment_list\": [{\"description\": \"string\", \"name\": \"string\"\
+          , \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"package_list\": [{\"description\"\
+          : \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}],\
+          \ \"restore_config_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\":\
+          \ \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"service_list\": [{\"description\": \"string\", \"name\": \"string\"\
+          , \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"snapshot_config_list\": [{\"description\"\
+          : \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}],\
+          \ \"substrate_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"task_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"variable_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }]}}}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n\
+          \    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/blueprints/{uuid}/simple_launch\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"spec\\\": {\\\"app_description\\\": \\\
+          \"string\\\", \\\"app_name\\\": \\\"string\\\", \\\"app_profile_reference\\\": {\\\"kind\\\": \\\"app_profile\\\"\
+          , \\\"name\\\": \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}, \\\"runtime_editables\\\
+          \": {\\\"action_list\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\": \\\"\
+          string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"app_profile\\\": {\\\"description\\\
+          \": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\": \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \"}, \\\"credential_list\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\"\
+          : \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"deployment_list\\\": [{\\\"\
+          description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\": \\\"string\\\", \\\"uuid\\\": \\\"\
+          b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"package_list\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\
+          \": \\\"string\\\", \\\"type\\\": \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}],\
+          \ \\\"restore_config_list\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\"\
+          : \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"service_list\\\": [{\\\"description\\\
+          \": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\": \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \"}], \\\"snapshot_config_list\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\
+          \": \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"substrate_list\\\": [{\\\"\
+          description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\": \\\"string\\\", \\\"uuid\\\": \\\"\
+          b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}], \\\"task_list\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\
+          \": \\\"string\\\", \\\"type\\\": \\\"string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}],\
+          \ \\\"variable_list\\\": [{\\\"description\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"type\\\": \\\"\
+          string\\\", \\\"uuid\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}]}}}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/blueprints/{uuid}/simple_launch';\nconst options = {\n\
+          \  method: 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"spec\": {\"app_description\": \"string\", \"app_name\": \"string\", \"app_profile_reference\"\
+          : {\"kind\": \"app_profile\", \"name\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}, \"runtime_editables\"\
+          : {\"action_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"app_profile\": {\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"credential_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"\
+          b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"deployment_list\": [{\"description\": \"string\", \"name\": \"string\"\
+          , \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"package_list\": [{\"description\"\
+          : \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}],\
+          \ \"restore_config_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\":\
+          \ \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"service_list\": [{\"description\": \"string\", \"name\": \"string\"\
+          , \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}], \"snapshot_config_list\": [{\"description\"\
+          : \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}],\
+          \ \"substrate_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"task_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }], \"variable_list\": [{\"description\": \"string\", \"name\": \"string\", \"type\": \"string\", \"uuid\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }]}}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    app_profile_reference_for_simple_launch:
+      description: The reference to a app_profile
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - app_profile
+          type: string
+          description: The kind name
+        name:
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a app_profile
+    blueprint_runtime_editable:
+      description: Spec for runtime editable.
+      type: object
+      properties:
+        description:
+          type: string
+          description: description of the object
+        value:
+          additionalProperties: true
+          type: object
+          description: 'dictionary of runtime editable fields under this
+
+            object with their values
+
+            '
+        name:
+          type: string
+          description: name of the object
+        context:
+          readOnly: true
+          type: string
+          description: 'the context the object is part of, for example if it''s a runtime variable on an app profile, then
+            the context is app_profile.app_profile_name.variable
+
+            '
+        type:
+          type: string
+          description: type of the object
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: uuid of the object
+          format: UUID
+      title: Spec for runtime editable.
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    blueprint_launch2_spec:
+      description: Spec for Blueprint launch.
+      type: object
+      properties:
+        app_profile_reference:
+          $ref: '#/components/schemas/app_profile_reference_for_simple_launch'
+        app_description:
+          type: string
+          description: description for blueprint launch
+          maxLength: 5000
+        app_name:
+          type: string
+          description: Application name by which the application need to be created.
+        runtime_editables:
+          $ref: '#/components/schemas/blueprint_editables'
+      title: Spec for Blueprint launch.
+    blueprint_launch2_input:
+      description: Launch Blueprint request.
+      required:
+      - spec
+      type: object
+      properties:
+        spec:
+          $ref: '#/components/schemas/blueprint_launch2_spec'
+      title: Launch Blueprint request.
+    blueprint_editables:
+      description: Response containing the runtime variables on the blueprint
+      type: object
+      properties:
+        action_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        service_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        credential_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        substrate_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        package_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        snapshot_config_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        app_profile:
+          $ref: '#/components/schemas/blueprint_runtime_editable'
+        task_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        restore_config_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        variable_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+        deployment_list:
+          items:
+            $ref: '#/components/schemas/blueprint_runtime_editable'
+          type: array
+      title: Runtime editables on the blueprint
+    blueprint_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - blueprint
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    blueprint_launch2_response:
+      description: Response containing the application uuid and create action and runlog uuid
+      required:
+      - status
+      - spec
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/blueprint_launch2_response_status'
+        spec:
+          $ref: '#/components/schemas/blueprint_launch2_spec'
+      title: Response containing the application uuid and create action runlog uuid
+    blueprint_launch2_response_status:
+      description: Status of the Blueprint launch.
+      type: object
+      properties:
+        request_id:
+          type: string
+          description: Request id to track the launch process
+      title: Status of the Blueprint launch.

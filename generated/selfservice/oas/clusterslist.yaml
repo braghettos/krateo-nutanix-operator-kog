@@ -1,0 +1,1368 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /nutanix/v1/clusters/list:
+    post:
+      description: List all clusters according to the filter.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cluster_list_metadata'
+        required: true
+      tags:
+      - nutanix/clusters
+      x-private: true
+      x-doc-hide: true
+      summary: Get a list of Nutanix clusters.
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: ntnx_meta_api
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/cluster_list_intent_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/clusters/list \\\n  \
+          \  --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"filter\": \"string\",\n    \"kind\": \"cluster\",\n\
+          \    \"length\": 1,\n    \"offset\": 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\",\n    \"kind\": \"cluster\",\n    \"length\": 1,\n    \"offset\": 0,\n    \"sort_attribute\": \"string\"\
+          ,\n    \"sort_order\": \"string\"\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/clusters/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\",\n    \"kind\": \"cluster\",\n    \"length\": 1,\n    \"offset\"\
+          : 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/nutanix/v3/nutanix/v1/clusters/list\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/clusters/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          filter\": \"string\", \"kind\": \"cluster\", \"length\": 1, \"offset\": 0, \"sort_attribute\": \"string\", \"sort_order\"\
+          : \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"\
+          application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/clusters/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\", \\\"kind\\\
+          \": \\\"cluster\\\", \\\"length\\\": 1, \\\"offset\\\": 0, \\\"sort_attribute\\\": \\\"string\\\", \\\"sort_order\\\
+          \": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/clusters/list';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"filter\": \"string\", \"kind\": \"cluster\", \"length\": 1, \"offset\": 0,\
+          \ \"sort_attribute\": \"string\", \"sort_order\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url,\
+          \ options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    ssl_key_type:
+      x-ntnx-enum:
+      - RSA_2048
+      - ECDSA_256
+      - ECDSA_384
+      - ECDSA_521
+      - JKS
+      - PKCS12
+      - RSA_PUBLIC
+      - KRB_KEYTAB
+      - NONE
+      type: string
+      description: 'SSL key type. Key types with RSA_2048, ECDSA_256, ECDSA_384 and ECDSA_521
+
+        are supported for key generation and importing.
+
+        '
+      title: SSL key type
+    credentials:
+      description: Credentials to login server
+      required:
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      title: Credentials to login server
+    cluster_network:
+      description: Cluster network.
+      type: object
+      properties:
+        masquerading_ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The cluster NAT''d or proxy IP which maps to the cluster local IP.
+
+            '
+        masquerading_port:
+          type: integer
+          description: 'Port used together with masquerading_ip to connect to the cluster.
+
+            '
+          format: int32
+        external_ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: The local IP of cluster visible externally.
+        http_proxy_list:
+          items:
+            $ref: '#/components/schemas/cluster_network_entity'
+          type: array
+          description: List of proxies to connect to the service centers.
+        smtp_server:
+          $ref: '#/components/schemas/smtp_server'
+        ntp_server_ip_list:
+          items:
+            type: string
+          type: array
+          description: The list of IP addresses or FQDNs of the NTP servers.
+        external_subnet:
+          type: string
+          description: 'External subnet for cross server communication. The format is
+
+            IP/netmask.
+
+            '
+        nfs_subnet_whitelist:
+          items:
+            type: string
+          type: array
+          description: 'Comma separated list of subnets (of the form ''a.b.c.d/l.m.n.o'') that
+
+            are allowed to send NFS requests to this container. If not specified,
+
+            the global NFS whitelist will be looked up for access permission.
+
+            The internal subnet is always automatically considered part of the
+
+            whitelist, even if the field below does not explicitly specify it.
+
+            Similarly, all the hypervisor IPs are considered part of the
+
+            whitelist. Finally, to permit debugging, all of the SVMs local IPs
+
+            are considered to be implicitly part of the whitelist.
+
+            '
+        external_data_services_ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The cluster IP address that provides external entities access to
+
+            various cluster data services.
+
+            '
+        domain_server:
+          $ref: '#/components/schemas/cluster_domain_server'
+        fully_qualified_domain_name:
+          type: string
+          description: fully qualified domain name of the cluster visible externally.
+        name_server_ip_list:
+          items:
+            pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+            type: string
+          type: array
+          description: The list of IP addresses of the name servers.
+        http_proxy_whitelist:
+          items:
+            $ref: '#/components/schemas/http_proxy_whitelist'
+          type: array
+          description: HTTP proxy whitelist.
+        internal_subnet:
+          type: string
+          description: 'The internal subnet is local to every server - its not visible
+
+            outside.iSCSI requests generated internally within the appliance
+
+            (by user VMs or VMFS) are sent to the internal subnet. The format is
+
+            IP/netmask.
+
+            '
+        default_vswitch_config:
+          $ref: '#/components/schemas/vswitch_config'
+      title: Cluster Network Configuration
+    cluster_list_metadata_output:
+      description: 'All api calls that return a list will have this metadata block
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - cluster
+          type: string
+          description: The kind name
+        total_matches:
+          type: integer
+          description: Total matches found
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter used for the results
+        length:
+          type: integer
+          description: The number of records retrieved relative to the offset
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          type: integer
+          description: Offset from the start of the entity list
+      title: Metadata for cluster list output
+    cluster_software:
+      description: Cluster software.
+      required:
+      - software_type
+      - version
+      properties:
+        status:
+          x-ntnx-enum:
+          - INSTALLED
+          - UPGRADING
+          - DOWNLOADED
+          type: string
+          description: Current software status.
+        version:
+          type: string
+        software_type:
+          $ref: '#/components/schemas/software_type'
+      title: Cluster software
+    cluster_service_list:
+      items:
+        x-ntnx-enum:
+        - AOS
+        - PRISM_CENTRAL
+        - CLOUD_DATA_GATEWAY
+        - AFS
+        - WITNESS
+        - XI_PORTAL
+        - ONE_NODE
+        - TWO_NODE
+        type: string
+      type: array
+      description: 'Array of enabled cluster services. For example, a cluster can function
+
+        as both AOS and cloud data gateway.
+
+        - ''AOS'': Regular Prism Element
+
+        - ''PRISM_CENTRAL'': Prism Central
+
+        - ''CLOUD_DATA_GATEWAY'': Cloud backup and DR gateway
+
+        - ''AFS'': Cluster for file server
+
+        - ''WITNESS'' : Witness cluster
+
+        - ''XI_PORTAL'': Xi cluster
+
+        - ''ONE_NODE_CLUSTER'': Single node backup cluster
+
+        - ''TWO_NODE_CLUSTER'': Two node cluster
+
+        '
+      title: List of Cluster Services
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    citrix_connector_config_details:
+      description: Citrix Connector details.
+      type: object
+      properties:
+        citrix_vm_reference_list:
+          items:
+            $ref: '#/components/schemas/vm_reference'
+          type: array
+          description: Reference to the list of vm ids registered with citrix cloud.
+        client_secret:
+          type: string
+          description: The client secret for the Citrix Cloud.
+        customer_id:
+          type: string
+          description: The customer id registered with Citrix Cloud.
+        client_id:
+          type: string
+          description: The client id for the Citrix Cloud.
+        resource_location:
+          $ref: '#/components/schemas/citrix_resource_location'
+      title: Citrix Connector details.
+    ca_cert:
+      description: CA certificate info.
+      required:
+      - ca_name
+      - certificate
+      type: object
+      properties:
+        ca_name:
+          type: string
+          description: Name of the certificate authority.
+        certificate:
+          type: string
+          description: Certificate content.
+          format: byte
+      title: CA certificate info
+    citrix_resource_location_spec:
+      description: Resource Location on Citrix Cloud.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The resource location id.
+          maxLength: 200
+        name:
+          type: string
+          description: The resource location name.
+          maxLength: 200
+      title: Citrix Resource Location.
+    build_info:
+      description: Cluster build details.
+      required:
+      - build_type
+      - version
+      - commit_id
+      - short_commit_id
+      type: object
+      properties:
+        commit_id:
+          type: string
+          description: Last Git commit id which the build is based on.
+        full_version:
+          type: string
+          description: Full version name.
+        commit_date:
+          type: string
+          description: Date/time of the last commit.
+          format: date-time
+        is_long_term_support:
+          type: boolean
+          description: 'Flag to indicate if the AOS release is qualified as long term support.
+
+            '
+        version:
+          type: string
+          description: Numeric version. e.g. "5.5"
+        short_commit_id:
+          type: string
+          description: First 6 characters of the last Git commit id.
+        build_type:
+          type: string
+          description: Build type, one of {dbg, opt, release}.
+      title: Cluster build details
+    cluster_metadata:
+      description: The cluster kind metadata
+      required:
+      - kind
+      type: object
+      properties:
+        last_update_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when cluster was last updated
+
+            '
+          format: date-time
+        use_categories_mapping:
+          type: boolean
+          description: 'Client need to specify this field as true if user want to use the
+
+            newer way of assigning the categories. Without this things should work
+
+            as it was earlier.
+
+            '
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - cluster
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: cluster uuid
+          format: UUID
+        project_reference:
+          $ref: '#/components/schemas/project_reference'
+        creation_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when cluster was created
+
+            '
+          format: date-time
+        spec_version:
+          type: integer
+          description: Version number of the latest spec.
+        spec_hash:
+          type: string
+          description: 'Hash of the spec. This will be returned from server.
+
+            '
+        categories_mapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+          description: 'Categories for the cluster. This allows setting up multiple
+
+            values from a single key. Categories assigned using the older view will be
+
+            present here. This is the new way of assigning categories.
+
+            '
+        should_force_translate:
+          type: boolean
+          description: 'Applied on Prism Central only. Indicate whether force to translate the spec of the fanout request
+            to fit the target cluster API schema.
+
+            '
+        entity_version:
+          readOnly: true
+          type: string
+          description: 'Logical entity version that allows serializing updates to the entity
+
+            across multiple API namespaces.  For kinds that support
+
+            entity_version, it overrides spec_version described above.
+
+            '
+        owner_reference:
+          $ref: '#/components/schemas/user_reference'
+        categories:
+          additionalProperties:
+            type: string
+          type: object
+          description: 'Categories for the cluster. This allows assigning one value
+
+            of a key to any entity. Changes done in this will be reflected in
+
+            the categories_mapping field.
+
+            '
+        name:
+          readOnly: true
+          type: string
+          description: cluster name
+          maxLength: 80
+      title: cluster metadata
+    cluster_list_intent_response:
+      description: Response object for intentful operation of clusters
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/cluster_intent_resource'
+          type: array
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/cluster_list_metadata_output'
+      title: Entity Intent List Response
+    cluster:
+      description: Cluster Definition.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Cluster Name.
+        resources:
+          type: object
+          description: Cluster resources.
+          properties:
+            config:
+              $ref: '#/components/schemas/cluster_config_spec'
+            network:
+              $ref: '#/components/schemas/cluster_network'
+            runtime_status_list:
+              items:
+                x-ntnx-enum:
+                - UPGRADE_QUEUED
+                - UPGRADE_CANCELLED
+                - UPGRADE_SCHEDULED
+                - SSP_CONFIG_MIGRATED
+                type: string
+              type: array
+              description: Cluster onging operations.
+      title: Cluster Definition
+    cluster_domain_server:
+      description: 'Cluster domain server. Only applied to the cluster with all Hyper-V hosts.
+
+        '
+      required:
+      - name
+      type: object
+      properties:
+        nameserver:
+          type: string
+          description: 'The IP of the nameserver that can resolve the domain name. Must set
+
+            when joining the domain.
+
+            '
+        name:
+          type: string
+          description: 'Joined domain name. In ''put'' request, empty name will unjoin the
+
+            cluster from current domain.
+
+            '
+        domain_credentials:
+          $ref: '#/components/schemas/credentials'
+      title: Domain Server
+    hypervisor_server:
+      description: Hypervisor server information.
+      required:
+      - ip
+      type: object
+      properties:
+        ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+        version:
+          type: string
+        type:
+          x-ntnx-enum:
+          - VMWARE
+          - XEN
+          - AHV
+          - HYPERV
+          type: string
+      title: Hypervisor Server
+    cluster_config_spec:
+      description: Cluster Configuration.
+      type: object
+      properties:
+        gpu_driver_version:
+          type: string
+          description: GPU driver version.
+        client_auth:
+          $ref: '#/components/schemas/client_auth'
+        authorized_public_key_list:
+          items:
+            $ref: '#/components/schemas/public_key'
+          type: array
+          description: List of valid ssh keys for the cluster.
+        software_map:
+          additionalProperties:
+            $ref: '#/components/schemas/cluster_software'
+          type: object
+          description: 'Map of software on the cluster with software type as the
+
+            key.
+
+            '
+        encryption_status:
+          $ref: '#/components/schemas/encryption_status'
+        redundancy_factor:
+          type: integer
+          description: Cluster supported redundancy factor. Default is 2.
+          format: int32
+        certification_signing_info:
+          $ref: '#/components/schemas/certification_signing_info'
+        supported_information_verbosity:
+          x-ntnx-enum:
+          - NOTHING
+          - BASIC
+          - BASIC_PLUS_CORE_DUMP
+          - ALL
+          type: string
+          description: "Verbosity level settings for populating support information.\n- 'Nothing': Send nothing\n- 'Basic':\
+            \ Send basic information - skip core dump and hypervisor\n           stats information\n- 'BasicPlusCoreDump':\
+            \ Send basic and core dump information\n- 'All': Send all information\n"
+        external_configurations:
+          $ref: '#/components/schemas/external_configurations_spec'
+        domain_awareness_level:
+          x-ntnx-enum:
+          - DISK
+          - NODE
+          - BLOCK
+          - RACK
+          type: string
+          description: Domain awareness supported on cluster.
+        enabled_feature_list:
+          items:
+            x-ntnx-enum:
+            - LOCK_DOWN_ENABLED
+            - PASSWORD_REMOTE_LOGIN_ENABLED
+            - SHADOW_CLONES_ENABLED
+            - COMMON_CRITERIA_MODE_ENABLED
+            - SSP_CONFIGURED
+            - ACS_ENABLED
+            - NETWORK_FLOW_STATS_COLLECTOR_ENABLED
+            type: string
+          type: array
+          description: Array of enabled features.
+        timezone:
+          type: string
+          description: Zone name used in value of TZ environment variable.
+        enable_efficient_metric_sync:
+          type: boolean
+          description: 'Indicates if downsampling of metrics syncing between PE
+
+            and PC is enabled or not.
+
+            '
+        operation_mode:
+          $ref: '#/components/schemas/cluster_operation_mode'
+      title: Cluster Configuration
+    nutanix_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - nutanix
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    external_configurations:
+      description: External configurations for the connectors.
+      type: object
+      properties:
+        citrix_connector_config:
+          $ref: '#/components/schemas/citrix_connector_config_details'
+      title: External Connector Configurations.
+    cluster_intent_resource:
+      description: Response object for intentful operations on a cluster
+      required:
+      - metadata
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/cluster_def_status'
+        spec:
+          $ref: '#/components/schemas/cluster'
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/cluster_metadata'
+      title: cluster Intent Response
+    sort_order:
+      x-ntnx-enum:
+      - ASCENDING
+      - DESCENDING
+      description: The sort order in which results are returned
+      title: Sort order
+    cluster_config:
+      description: Cluster Configuration.
+      type: object
+      properties:
+        gpu_driver_version:
+          type: string
+          description: GPU driver version.
+        client_auth:
+          $ref: '#/components/schemas/client_auth'
+        authorized_public_key_list:
+          items:
+            $ref: '#/components/schemas/public_key'
+          type: array
+          description: List of valid ssh keys for the cluster.
+        software_map:
+          additionalProperties:
+            $ref: '#/components/schemas/cluster_software'
+          type: object
+          description: 'Map of software on the cluster with software type as the
+
+            key.
+
+            '
+        encryption_status:
+          $ref: '#/components/schemas/encryption_status'
+        ssl_key:
+          $ref: '#/components/schemas/ssl_key'
+        service_list:
+          $ref: '#/components/schemas/cluster_service_list'
+        supported_information_verbosity:
+          x-ntnx-enum:
+          - NOTHING
+          - BASIC
+          - BASIC_PLUS_CORE_DUMP
+          - ALL
+          type: string
+          description: "Verbosity level settings for populating support information.\n- 'Nothing': Send nothing\n- 'Basic':\
+            \ Send basic information - skip core dump and hypervisor\n           stats information\n- 'BasicPlusCoreDump':\
+            \ Send basic and core dump information\n- 'All': Send all information\n"
+        certification_signing_info:
+          $ref: '#/components/schemas/certification_signing_info'
+        redundancy_factor:
+          type: integer
+          description: Cluster supported redundancy factor.
+          format: int32
+        external_configurations:
+          $ref: '#/components/schemas/external_configurations'
+        operation_mode:
+          $ref: '#/components/schemas/cluster_operation_mode'
+        ca_certificate_list:
+          items:
+            $ref: '#/components/schemas/ca_cert'
+          readOnly: true
+          type: array
+          description: List of cluster trusted CA certificates.
+        domain_awareness_level:
+          x-ntnx-enum:
+          - DISK
+          - NODE
+          - BLOCK
+          - RACK
+          type: string
+          description: Domain awareness supported on cluster.
+        enabled_feature_list:
+          items:
+            x-ntnx-enum:
+            - LOCK_DOWN_ENABLED
+            - PASSWORD_REMOTE_LOGIN_ENABLED
+            - SHADOW_CLONES_ENABLED
+            - COMMON_CRITERIA_MODE_ENABLED
+            - SSP_CONFIGURED
+            - ACS_ENABLED
+            - NETWORK_FLOW_STATS_COLLECTOR_ENABLED
+            type: string
+          type: array
+          description: Array of enabled features.
+        is_available:
+          readOnly: true
+          type: boolean
+          description: Indicates if cluster is available to contact.
+        build:
+          $ref: '#/components/schemas/build_info'
+        timezone:
+          type: string
+          description: Zone name used in value of TZ environment variable.
+        enable_efficient_metric_sync:
+          type: boolean
+          description: 'Indicates if downsampling of metrics syncing between PE
+
+            and PC is enabled or not.
+
+            '
+        cluster_arch:
+          readOnly: true
+          type: string
+          x-ntnx-enum:
+          - X86_64
+          - PPC64LE
+          description: Cluster architecture.
+        management_server_list:
+          items:
+            $ref: '#/components/schemas/cluster_management_server'
+          readOnly: true
+          type: array
+          description: List of cluster management servers.
+      title: Cluster Configuration
+    user_reference:
+      description: The reference to a user
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - user
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a user
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    external_configurations_spec:
+      description: External configurations for the connectors.
+      type: object
+      properties:
+        citrix_connector_config:
+          $ref: '#/components/schemas/citrix_connector_config_details_spec'
+      title: External Connector Configurations.
+    vm_reference:
+      description: The reference to a vm
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - vm
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a vm
+    client_auth:
+      description: Client authentication config.
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          x-ntnx-enum:
+          - ENABLED
+          - DISABLED
+          type: string
+          description: Status of client authentication.
+        ca_chain:
+          readOnly: true
+          type: string
+          description: Content of CA chain certificate.
+          format: byte
+        name:
+          readOnly: true
+          type: string
+          description: Name of CA chain file.
+          maxLength: 64
+      title: Client authentication config
+    citrix_resource_location:
+      description: Resource Location on Citrix Cloud.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The resource location id.
+        name:
+          type: string
+          description: The resource location name.
+      title: Citrix Resource Location.
+    ssl_key:
+      description: SSL certificate.
+      required:
+      - key_type
+      type: object
+      properties:
+        key_type:
+          $ref: '#/components/schemas/ssl_key_type'
+        key_name:
+          type: string
+        signing_info:
+          $ref: '#/components/schemas/certification_signing_info'
+        expire_datetime:
+          type: string
+          description: UTC date and time in RFC-3339 format when the key expires
+          format: date-time
+      title: SSL certificate
+    address:
+      properties:
+        ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: IPV4 address.
+        fqdn:
+          type: string
+          description: Fully qualified domain name.
+        is_backup:
+          type: boolean
+          description: Whether this address is a backup or not.
+        port:
+          type: integer
+          description: Port Number
+          format: int32
+        ipv6:
+          pattern: (([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))
+          type: string
+          description: IPV6 address.
+      x-ntnx-one-of:
+      - required:
+        - ip
+      - required:
+        - ipv6
+      - required:
+        - fqdn
+      type: object
+      description: Host address.
+      title: Host address.
+    http_proxy_whitelist:
+      description: HTTP Proxy Whitelist.
+      required:
+      - target
+      - target_type
+      type: object
+      properties:
+        target:
+          type: string
+        target_type:
+          x-ntnx-enum:
+          - IPV4_ADDRESS
+          - IPV4_NETWORK_MASK
+          - DOMAIN_NAME_SUFFIX
+          - HOST_NAME
+          type: string
+      title: HTTP Proxy Whitelist
+    citrix_connector_config_details_spec:
+      description: Citrix Connector details.
+      type: object
+      properties:
+        citrix_vm_reference_list:
+          items:
+            $ref: '#/components/schemas/vm_reference'
+          type: array
+          description: Reference to the list of vm ids registered with citrix cloud.
+        client_secret:
+          type: string
+          description: The client secret for the Citrix Cloud.
+        customer_id:
+          type: string
+          description: The customer id registered with Citrix Cloud.
+          maxLength: 200
+        client_id:
+          type: string
+          description: The client id for the Citrix Cloud.
+          maxLength: 200
+        resource_location:
+          $ref: '#/components/schemas/citrix_resource_location_spec'
+      title: Citrix Connector details.
+    software_type:
+      x-ntnx-enum:
+      - NOS
+      - NCC
+      - PRISM_CENTRAL
+      type: string
+      description: Software type
+      title: Software type
+    encryption_status:
+      x-ntnx-enum:
+      - NOT_SUPPORTED
+      - DISABLED
+      - ENABLED
+      type: string
+      description: Cluster encryption status.
+      title: Cluster encryption status
+    cluster_def_status:
+      description: 'Cluster status definition.  A Nutanix cluster is comprised of three or
+
+        more Nutanix nodes. Each node in the cluster contains memory, CPU, RAM,
+
+        and storage (SSD/HDD). Each node in the cluster runs standard hypervisor
+
+        such as VMware vSphere, Microsoft Hyper-V, or AHV. A Controller VM (CVM)
+
+        runs on each node in the cluster. The CVM enables each node to share
+
+        local storage from all nodes in the cluster.
+
+        '
+      required:
+      - resources
+      type: object
+      properties:
+        state:
+          readOnly: true
+          type: string
+          description: The state of the cluster entity.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          type: array
+        name:
+          type: string
+          description: Cluster Name.
+        resources:
+          required:
+          - config
+          - network
+          type: object
+          description: Cluster resources.
+          properties:
+            nodes:
+              $ref: '#/components/schemas/cluster_nodes'
+            config:
+              $ref: '#/components/schemas/cluster_config'
+            network:
+              $ref: '#/components/schemas/cluster_network'
+            runtime_status_list:
+              items:
+                x-ntnx-enum:
+                - UPGRADE_QUEUED
+                - UPGRADE_CANCELLED
+                - UPGRADE_IN_PROGRESS
+                - UPGRADE_SCHEDULED
+                - HAVE_SELF_ENCRYPTING_DRIVE
+                - SSP_CONFIG_OWNER
+                type: string
+              type: array
+              description: Cluster current attributes and onging operations.
+      title: Cluster Status
+    cluster_list_metadata:
+      description: 'All api calls that return a list will have this metadata block as input
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - cluster
+          type: string
+          description: The kind name
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter in FIQL syntax used for the results.
+        length:
+          minimum: 1
+          type: integer
+          description: The number of records to retrieve relative to the offset
+          format: int32
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          minimum: 0
+          type: integer
+          description: Offset from the start of the entity list
+          format: int32
+      title: Metadata for cluster list
+    smtp_server:
+      description: SMTP Server.
+      required:
+      - email_address
+      - server
+      type: object
+      properties:
+        type:
+          x-ntnx-enum:
+          - PLAIN
+          - STARTTLS
+          - SSL
+          type: string
+        email_address:
+          type: string
+        server:
+          $ref: '#/components/schemas/cluster_network_entity'
+      title: SMTP server
+    certification_signing_info:
+      description: 'Customer information used in Certificate Signing Request for
+
+        creating digital certificates.
+
+        '
+      type: object
+      properties:
+        city:
+          type: string
+          description: The Town or City where customer's business is located.
+        common_name_suffix:
+          type: string
+          description: 'Common name is by default <node_uuid>.nutanix.com, but if a customer
+
+            wants something instead of nutanix.com they can specify it here.
+
+            '
+        state:
+          type: string
+          description: 'The Province, Region, County or State where customer business is
+
+            is located.
+
+            '
+        country_code:
+          type: string
+          description: 'Two-letter ISO code for Country where customer''s organization is
+
+            located.
+
+            '
+        common_name:
+          type: string
+          description: Common name of the organization or host server
+        organization:
+          type: string
+          description: Name of the customer business.
+        email_address:
+          type: string
+          description: Email address of the certificate administrator.
+      title: Customer information in Certificate Signing Request
+    cluster_network_entity:
+      description: Cluster network entity.
+      required:
+      - address
+      type: object
+      properties:
+        credentials:
+          $ref: '#/components/schemas/credentials'
+        proxy_type_list:
+          items:
+            x-ntnx-enum:
+            - HTTP
+            - HTTPS
+            - SOCKS
+            type: string
+          type: array
+        address:
+          $ref: '#/components/schemas/address'
+      title: Cluster Network Entity
+    public_key:
+      description: Public Key
+      required:
+      - name
+      - key
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        key:
+          type: string
+      title: Public Key
+    cluster_management_server:
+      description: Cluster Management server information.
+      required:
+      - ip
+      - type
+      type: object
+      properties:
+        ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+        drs_enabled:
+          type: boolean
+          description: Denotes if DRS is enabled or not.
+        status_list:
+          items:
+            x-ntnx-enum:
+            - REGISTERED
+            - IN_USE
+            type: string
+          type: array
+          description: "Array of management server status: - 'REGISTERED': Indicates whether the server is registered with\n\
+            \                Nutanix or not.\n- 'IN_USE': Indicates whether any host is managed by this server or\n      \
+            \      not.\n"
+        type:
+          x-ntnx-enum:
+          - VCENTER
+          type: string
+      title: Cluster Management Server
+    cluster_operation_mode:
+      x-ntnx-enum:
+      - NORMAL
+      - READ_ONLY
+      - STAND_ALONE
+      - SWITCH_TO_TWO_NODE
+      - OVERRIDE
+      type: string
+      description: "Cluster operation mode. - 'NORMAL': Cluster is operating normally. - 'READ_ONLY': Cluster is operating\
+        \ in read only mode. - 'STAND_ALONE': Only one node is operational in the cluster. This is\n                 valid\
+        \ only for single node or two node clusters.\n- 'SWITCH_TO_TWO_NODE': Cluster is moving from single node to two node\n\
+        \                        cluster.\n- 'OVERRIDE': Valid only for single node cluster. If the user wants to\n      \
+        \        run vms on a single node cluster in read only mode, he\n              can set the cluster peration mode to\
+        \ override. Writes\n              will be allowed in override mode.\n"
+      title: Cluster operation mode
+    project_reference:
+      description: The reference to a project
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - project
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a project
+    cluster_nodes:
+      description: Node info for this cluster.
+      type: object
+      properties:
+        hypervisor_server_list:
+          items:
+            $ref: '#/components/schemas/hypervisor_server'
+          readOnly: true
+          type: array
+      title: Cluster Nodes
+    vswitch_config:
+      description: VSwitch configuration.
+      required:
+      - nic_teaming_policy
+      - uplink_grouping
+      type: object
+      properties:
+        nic_teaming_policy:
+          x-ntnx-enum:
+          - ACTIVE_BACKUP
+          - BALANCE_SLB
+          - BALANCE_TCP
+          type: string
+          description: NIC teaming policy.
+        uplink_grouping:
+          x-ntnx-enum:
+          - NO_UPLINKS
+          - ALL
+          - ALL_1G
+          - ALL_10G
+          - ALL_25G
+          - ALL_40G
+          - ALL_100G
+          type: string
+          description: Determines how the ethernet uplinks are selected for this vswitch.
+      title: VSwitch configuration

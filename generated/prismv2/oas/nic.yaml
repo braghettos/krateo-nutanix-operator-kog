@@ -1,0 +1,484 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /vms/{uuid}/nics:
+    post:
+      summary: Add a NIC to a Virtual Machine.
+      description: Add a NIC to a Virtual Machine.  A VM NIC must be associated with a virtual network. It is not possible
+        to change this association. To connect a VM to a different virtual network, it is necessary to create a new NIC. If
+        the virtual network is managed (see POST /networks/), the NIC must be assigned an IPv4 address at creation time. If
+        the network has no DHCP pool, the user must specify the IPv4 address manually. If the VM is running, the NIC is hot-added
+        to the VM. The logical timestamp can optionally be provided for consistency. If a logical timestamp is specified,
+        then this operation will be rejected if the logical timestamp specified is not the value of the Virtual Machine logical
+        timestamp. The logical timestamp can be obtained from the Virtual Machine object. This is also an asynchronous operation
+        that results in the creation of a task object. The UUID of this task object is returned as the response of this operation.
+        This task can be monitored by using the /tasks/poll API.
+      tags:
+      - /vms
+      operationId: post/vms/{uuid}/nics/createNic
+      parameters:
+      - name: uuid
+        in: path
+        description: UUID of the Virtual Machine
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.acropolis.VMNicCreateDTO'
+        description: NIC Config Info
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"spec_list\": [\n        {\n            \"adapter_type\": \"E1000\",\n            \"ip_address\": \"string\"\
+          ,\n            \"ip_addresses\": [\n                \"string\"\n            ],\n            \"is_connected\": true,\n\
+          \            \"mac_address\": \"string\",\n            \"model\": \"string\",\n            \"network_uuid\": \"\
+          string\",\n            \"nic_uuid\": \"string\",\n            \"port_id\": \"string\",\n            \"request_ip\"\
+          : true,\n            \"requested_ip_address\": \"string\",\n            \"vlan_mode\": \"Access\"\n        }\n \
+          \   ],\n    \"uuid\": \"string\",\n    \"vm_logical_timestamp\": 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"spec_list\": [\n        {\n            \"adapter_type\": \"E1000\"\
+          ,\n            \"ip_address\": \"string\",\n            \"ip_addresses\": [\n                \"string\"\n      \
+          \      ],\n            \"is_connected\": true,\n            \"mac_address\": \"string\",\n            \"model\"\
+          : \"string\",\n            \"network_uuid\": \"string\",\n            \"nic_uuid\": \"string\",\n            \"\
+          port_id\": \"string\",\n            \"request_ip\": true,\n            \"requested_ip_address\": \"string\",\n \
+          \           \"vlan_mode\": \"Access\"\n        }\n    ],\n    \"uuid\": \"string\",\n    \"vm_logical_timestamp\"\
+          : 0\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"spec_list\"\
+          : [\n        {\n            \"adapter_type\": \"E1000\",\n            \"ip_address\": \"string\",\n            \"\
+          ip_addresses\": [\n                \"string\"\n            ],\n            \"is_connected\": true,\n           \
+          \ \"mac_address\": \"string\",\n            \"model\": \"string\",\n            \"network_uuid\": \"string\",\n\
+          \            \"nic_uuid\": \"string\",\n            \"port_id\": \"string\",\n            \"request_ip\": true,\n\
+          \            \"requested_ip_address\": \"string\",\n            \"vlan_mode\": \"Access\"\n        }\n    ],\n \
+          \   \"uuid\": \"string\",\n    \"vm_logical_timestamp\": 0\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          spec_list\": [{\"adapter_type\": \"E1000\", \"ip_address\": \"string\", \"ip_addresses\": [\"string\"], \"is_connected\"\
+          : true, \"mac_address\": \"string\", \"model\": \"string\", \"network_uuid\": \"string\", \"nic_uuid\": \"string\"\
+          , \"port_id\": \"string\", \"request_ip\": true, \"requested_ip_address\": \"string\", \"vlan_mode\": \"Access\"\
+          }], \"uuid\": \"string\", \"vm_logical_timestamp\": 0}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"spec_list\\\": [{\\\"adapter_type\\\": \\\"E1000\\\", \\\"ip_address\\\": \\\"string\\\", \\\"ip_addresses\\\
+          \": [\\\"string\\\"], \\\"is_connected\\\": true, \\\"mac_address\\\": \\\"string\\\", \\\"model\\\": \\\"string\\\
+          \", \\\"network_uuid\\\": \\\"string\\\", \\\"nic_uuid\\\": \\\"string\\\", \\\"port_id\\\": \\\"string\\\", \\\"\
+          request_ip\\\": true, \\\"requested_ip_address\\\": \\\"string\\\", \\\"vlan_mode\\\": \\\"Access\\\"}], \\\"uuid\\\
+          \": \\\"string\\\", \\\"vm_logical_timestamp\\\": 0}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics';\nconst options = {\n\
+          \  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"\
+          spec_list\": [{\"adapter_type\": \"E1000\", \"ip_address\": \"string\", \"ip_addresses\": [\"string\"], \"is_connected\"\
+          : true, \"mac_address\": \"string\", \"model\": \"string\", \"network_uuid\": \"string\", \"nic_uuid\": \"string\"\
+          , \"port_id\": \"string\", \"request_ip\": true, \"requested_ip_address\": \"string\", \"vlan_mode\": \"Access\"\
+          }], \"uuid\": \"string\", \"vm_logical_timestamp\": 0}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      summary: Get list of NICs in a Virtual Machine.
+      description: Get list of NICs in a Virtual Machine. Address assignments are not included by default as fetching these
+        is an expensive operation. Address assignments can be included by setting include_address_assignments to true.
+      tags:
+      - /vms
+      operationId: get/vms/{uuid}/nics/getNics
+      parameters:
+      - name: uuid
+        in: path
+        description: UUID of the Virtual Machine
+        required: true
+        schema:
+          type: string
+      - name: include_address_assignments
+        in: query
+        description: Include address assignments
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.acropolis.VMNicSpecDTO_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+  /vms/{uuid}/nics/{nic_id}:
+    put:
+      summary: Update a NIC for a Virtual Machine.
+      description: Update a NIC for a Virtual Machine.  A VM NIC must be associated with a MAC address. It is not possible
+        to change this association as the MAC address acts as the NIC s identifier. If the virtual network is managed (see
+        POST /networks/), the IPv4 address of the NIC can be updated. If the VM is running, the NIC is hot-added to the VM.
+        The logical timestamp can optionally be provided for consistency. If a logical timestamp is specified, then this operation
+        will be rejected if the logical timestamp specified is not the value of the Virtual Machine logical timestamp. The
+        logical timestamp can be obtained from the Virtual Machine object. This is also an asynchronous operation that results
+        in the creation of a task object. The UUID of this task object is returned as the response of this operation. This
+        task can be monitored by using the /tasks/poll API.
+      tags:
+      - /vms
+      operationId: put/vms/{uuid}/nics/{nic_id}/updateNic
+      parameters:
+      - name: uuid
+        in: path
+        description: UUID of the Virtual Machine
+        required: true
+        schema:
+          type: string
+      - name: nic_id
+        in: path
+        description: Virtual Machine NIC identifier (MAC address)
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update.dto.acropolis.VMNicUpdateDTO'
+        description: NIC Config Update Info
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics/{nic_id}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"nic_id\": \"string\",\n    \"nic_spec\": {\n        \"adapter_type\": \"E1000\",\n        \"ip_address\"\
+          : \"string\",\n        \"ip_addresses\": [\n            \"string\"\n        ],\n        \"is_connected\": true,\n\
+          \        \"mac_address\": \"string\",\n        \"model\": \"string\",\n        \"network_uuid\": \"string\",\n \
+          \       \"nic_uuid\": \"string\",\n        \"port_id\": \"string\",\n        \"request_ip\": true,\n        \"requested_ip_address\"\
+          : \"string\",\n        \"vlan_mode\": \"Access\"\n    },\n    \"uuid\": \"string\",\n    \"vm_logical_timestamp\"\
+          : 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"nic_id\": \"string\",\n    \"nic_spec\": {\n        \"adapter_type\"\
+          : \"E1000\",\n        \"ip_address\": \"string\",\n        \"ip_addresses\": [\n            \"string\"\n       \
+          \ ],\n        \"is_connected\": true,\n        \"mac_address\": \"string\",\n        \"model\": \"string\",\n  \
+          \      \"network_uuid\": \"string\",\n        \"nic_uuid\": \"string\",\n        \"port_id\": \"string\",\n    \
+          \    \"request_ip\": true,\n        \"requested_ip_address\": \"string\",\n        \"vlan_mode\": \"Access\"\n \
+          \   },\n    \"uuid\": \"string\",\n    \"vm_logical_timestamp\": 0\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics/{nic_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"nic_id\": \"\
+          string\",\n    \"nic_spec\": {\n        \"adapter_type\": \"E1000\",\n        \"ip_address\": \"string\",\n    \
+          \    \"ip_addresses\": [\n            \"string\"\n        ],\n        \"is_connected\": true,\n        \"mac_address\"\
+          : \"string\",\n        \"model\": \"string\",\n        \"network_uuid\": \"string\",\n        \"nic_uuid\": \"string\"\
+          ,\n        \"port_id\": \"string\",\n        \"request_ip\": true,\n        \"requested_ip_address\": \"string\"\
+          ,\n        \"vlan_mode\": \"Access\"\n    },\n    \"uuid\": \"string\",\n    \"vm_logical_timestamp\": 0\n}\"\"\"\
+          \n\nconn.request(\"PUT\",\"/PrismGateway/services/rest/v2.0/vms/{uuid}/nics/{nic_id}\", payload, headers)\n\nres\
+          \ = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics/{nic_id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          nic_id\": \"string\", \"nic_spec\": {\"adapter_type\": \"E1000\", \"ip_address\": \"string\", \"ip_addresses\":\
+          \ [\"string\"], \"is_connected\": true, \"mac_address\": \"string\", \"model\": \"string\", \"network_uuid\": \"\
+          string\", \"nic_uuid\": \"string\", \"port_id\": \"string\", \"request_ip\": true, \"requested_ip_address\": \"\
+          string\", \"vlan_mode\": \"Access\"}, \"uuid\": \"string\", \"vm_logical_timestamp\": 0}`)\n\treq, err := http.NewRequest(\"\
+          PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics/{nic_id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"nic_id\\\": \\\"string\\\", \\\"nic_spec\\\": {\\\"adapter_type\\\": \\\"E1000\\\", \\\"ip_address\\\": \\\"\
+          string\\\", \\\"ip_addresses\\\": [\\\"string\\\"], \\\"is_connected\\\": true, \\\"mac_address\\\": \\\"string\\\
+          \", \\\"model\\\": \\\"string\\\", \\\"network_uuid\\\": \\\"string\\\", \\\"nic_uuid\\\": \\\"string\\\", \\\"\
+          port_id\\\": \\\"string\\\", \\\"request_ip\\\": true, \\\"requested_ip_address\\\": \\\"string\\\", \\\"vlan_mode\\\
+          \": \\\"Access\\\"}, \\\"uuid\\\": \\\"string\\\", \\\"vm_logical_timestamp\\\": 0}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/vms/{uuid}/nics/{nic_id}';\nconst options\
+          \ = {\n  method: 'PUT',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"nic_id\": \"string\", \"nic_spec\": {\"adapter_type\": \"E1000\", \"ip_address\": \"string\", \"ip_addresses\"\
+          : [\"string\"], \"is_connected\": true, \"mac_address\": \"string\", \"model\": \"string\", \"network_uuid\": \"\
+          string\", \"nic_uuid\": \"string\", \"port_id\": \"string\", \"request_ip\": true, \"requested_ip_address\": \"\
+          string\", \"vlan_mode\": \"Access\"}, \"uuid\": \"string\", \"vm_logical_timestamp\": 0}`\n};\n\ntry {\n  const\
+          \ response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error)\
+          \ {\n  console.error(error);\n}"
+components:
+  schemas:
+    update.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    create.dto.acropolis.VMNicSpecDTO:
+      type: object
+      properties:
+        adapter_type:
+          enum:
+          - E1000
+          - E1000e
+          - PCNet32
+          - Vmxnet
+          - Vmxnet2
+          - Vmxnet3
+          - Unsupported
+          type: string
+        ip_address:
+          type: string
+        ip_addresses:
+          items:
+            type: string
+          type: array
+        is_connected:
+          type: boolean
+        mac_address:
+          type: string
+        model:
+          type: string
+        network_uuid:
+          type: string
+        nic_uuid:
+          type: string
+        port_id:
+          type: string
+        request_ip:
+          type: boolean
+        requested_ip_address:
+          type: string
+        vlan_mode:
+          enum:
+          - Access
+          - Trunked
+          - Untagged
+          type: string
+    update.dto.acropolis.VMNicUpdateDTO:
+      type: object
+      properties:
+        nic_id:
+          type: string
+        nic_spec:
+          $ref: '#/components/schemas/update.dto.acropolis.VMNicSpecDTO'
+        uuid:
+          type: string
+        vm_logical_timestamp:
+          format: int64
+          type: integer
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.base.EntityCollection_get.dto.acropolis.VMNicSpecDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.acropolis.VMNicSpecDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    create.dto.acropolis.VMNicCreateDTO:
+      type: object
+      properties:
+        spec_list:
+          items:
+            $ref: '#/components/schemas/create.dto.acropolis.VMNicSpecDTO'
+          type: array
+        uuid:
+          type: string
+        vm_logical_timestamp:
+          format: int64
+          type: integer
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    get.dto.acropolis.VMNicSpecDTO:
+      type: object
+      properties:
+        adapter_type:
+          enum:
+          - E1000
+          - E1000e
+          - PCNet32
+          - Vmxnet
+          - Vmxnet2
+          - Vmxnet3
+          - Unsupported
+          type: string
+        ip_address:
+          type: string
+        ip_addresses:
+          items:
+            type: string
+          type: array
+        is_connected:
+          type: boolean
+        mac_address:
+          type: string
+        model:
+          type: string
+        network_uuid:
+          type: string
+        nic_uuid:
+          type: string
+        port_id:
+          type: string
+        request_ip:
+          type: boolean
+        requested_ip_address:
+          type: string
+        vlan_mode:
+          enum:
+          - Access
+          - Trunked
+          - Untagged
+          type: string
+    create.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    update.dto.acropolis.VMNicSpecDTO:
+      type: object
+      properties:
+        adapter_type:
+          enum:
+          - E1000
+          - E1000e
+          - PCNet32
+          - Vmxnet
+          - Vmxnet2
+          - Vmxnet3
+          - Unsupported
+          type: string
+        ip_address:
+          type: string
+        ip_addresses:
+          items:
+            type: string
+          type: array
+        is_connected:
+          type: boolean
+        mac_address:
+          type: string
+        model:
+          type: string
+        network_uuid:
+          type: string
+        nic_uuid:
+          type: string
+        port_id:
+          type: string
+        request_ip:
+          type: boolean
+        requested_ip_address:
+          type: string
+        vlan_mode:
+          enum:
+          - Access
+          - Trunked
+          - Untagged
+          type: string

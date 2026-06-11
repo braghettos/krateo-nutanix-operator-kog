@@ -1,0 +1,338 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /tags:
+    get:
+      operationId: getTags
+      parameters:
+      - description: The time zone (e.g. 'America/New_York', 'UTC') to convert the timestamps in the response to the client's
+          local time zone.
+        in: header
+        name: client_tz
+        schema:
+          type: string
+      - in: query
+        name: entityType
+        schema:
+          enum:
+          - DATABASE
+          - TIME_MACHINE
+          - CLONE
+          - DATABASE_SERVER
+          type: string
+      - in: query
+        name: id
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: name
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EraTagDTO'
+                type: array
+          description: Operation completed.
+      summary: Get the a list of Tags in NDB
+      tags:
+      - Tags
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/tags \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/tags"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/tags\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tags\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/tags\")\n\
+          \  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tags';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization': 'Basic\
+          \ <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      operationId: createTag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagModel'
+        description: Payload required to create a Tag.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EraTagDTO'
+          description: Operation completed.
+      summary: Create a Tag
+      tags:
+      - Tags
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/tags \\\n    --header 'Accept: application/json' \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"description\": \"string\",\n    \"entityType\": \"DATABASE\",\n    \"name\": \"string\",\n    \"required\"\
+          : false,\n    \"status\": \"ENABLED\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"description\"\
+          : \"string\",\n    \"entityType\": \"DATABASE\",\n    \"name\": \"string\",\n    \"required\": false,\n    \"status\"\
+          : \"ENABLED\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/tags"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"description\": \"string\",\n    \"entityType\": \"DATABASE\",\n    \"name\": \"string\",\n \
+          \   \"required\": false,\n    \"status\": \"ENABLED\"\n}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/tags\", payload,\
+          \ headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tags\"\n\t\n\tpayload :=  strings.NewReader(`{\"description\": \"string\", \"entityType\": \"\
+          DATABASE\", \"name\": \"string\", \"required\": false, \"status\": \"ENABLED\"}`)\n\treq, err := http.NewRequest(\"\
+          POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/tags\")\n\
+          \  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n\
+          \  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"description\\\": \\\"string\\\", \\\"entityType\\\
+          \": \\\"DATABASE\\\", \\\"name\\\": \\\"string\\\", \\\"required\\\": false, \\\"status\\\": \\\"ENABLED\\\"}\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tags';\nconst options = {\n  method: 'POST',\n  headers: {'Accept': 'application/json',\
+          \ 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:  `{\"description\"\
+          : \"string\", \"entityType\": \"DATABASE\", \"name\": \"string\", \"required\": false, \"status\": \"ENABLED\"}`\n\
+          };\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+  /tags/{id}:
+    delete:
+      operationId: deleteTag
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses: {}
+      summary: Delete a Tag
+      tags:
+      - Tags
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/tags/{id} \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/tags/{id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/tags/{id}\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tags/{id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif err != nil {\n\t\
+          \tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"\
+          Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/tags/{id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tags/{id}';\nconst options = {\n  method: 'DELETE',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      operationId: updateTag
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTagModel'
+        description: Payload required to update a Tag.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EraTagDTO'
+          description: Operation completed.
+      summary: Update a Tag
+      tags:
+      - Tags
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/tags/{id} \\\n    --header 'Accept: application/json' \\\n\
+          \    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n \
+          \   --data '{\n    \"description\": \"string\",\n    \"name\": \"string\",\n    \"owner\": \"string\",\n    \"required\"\
+          : false,\n    \"status\": \"ENABLED\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"description\"\
+          : \"string\",\n    \"name\": \"string\",\n    \"owner\": \"string\",\n    \"required\": false,\n    \"status\":\
+          \ \"ENABLED\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/tags/{id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"description\": \"string\",\n    \"name\": \"string\",\n    \"owner\": \"string\",\n    \"required\"\
+          : false,\n    \"status\": \"ENABLED\"\n}\"\"\"\n\nconn.request(\"PUT\",\"/era/v0.9/tags/{id}\", payload, headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tags/{id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"description\": \"string\", \"name\": \"\
+          string\", \"owner\": \"string\", \"required\": false, \"status\": \"ENABLED\"}`)\n\treq, err := http.NewRequest(\"\
+          PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/tags/{id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"description\\\": \\\"string\\\", \\\"\
+          name\\\": \\\"string\\\", \\\"owner\\\": \\\"string\\\", \\\"required\\\": false, \\\"status\\\": \\\"ENABLED\\\"\
+          }\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tags/{id}';\nconst options = {\n  method: 'PUT',\n  headers: {'Accept': 'application/json',\
+          \ 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:  `{\"description\"\
+          : \"string\", \"name\": \"string\", \"owner\": \"string\", \"required\": false, \"status\": \"ENABLED\"}`\n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    UpdateTagModel:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        owner:
+          type: string
+        required:
+          type: boolean
+        status:
+          enum:
+          - ENABLED
+          - DEPRECATED
+          type: string
+      required:
+      - name
+      - owner
+      type: object
+    EraTagDTO:
+      properties:
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        entityType:
+          enum:
+          - DATABASE
+          - TIME_MACHINE
+          - DATABASE_SERVER
+          - CLONE
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        owner:
+          type: string
+        required:
+          type: boolean
+        status:
+          enum:
+          - ENABLED
+          - DEPRECATED
+          type: string
+        values:
+          format: int32
+          type: integer
+      type: object
+    TagModel:
+      properties:
+        description:
+          type: string
+        entityType:
+          enum:
+          - DATABASE
+          - TIME_MACHINE
+          - CLONE
+          - DATABASE_SERVER
+          type: string
+        name:
+          type: string
+        required:
+          type: boolean
+        status:
+          enum:
+          - ENABLED
+          - DEPRECATED
+          type: string
+      required:
+      - entityType
+      - name
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

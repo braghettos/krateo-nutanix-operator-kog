@@ -1,0 +1,789 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /images:
+    post:
+      summary: Create a Disk Image.
+      description: Create a Image with specified configuration. There are two modes of creation, one mode you either provide
+        some source (URL, vmdisk, or uploaded file) or you just create the metadata for the image. If a UUID is specified
+        for the Image, this operation will be idempotent. This is an asynchronous operation that results in the creation of
+        a task object. The UUID of this task object is returned as the response of this operation. This task can be monitored
+        by using the /tasks/poll API.
+      tags:
+      - /images
+      operationId: post/images/createImage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.acropolis.ImageSpecDTO'
+        description: Image Creation Specs
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images \\\n   \
+          \ --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n    \"\
+          annotation\": \"string\",\n    \"image_import_spec\": {\n        \"checksum\": \"string\",\n        \"checksum_type\"\
+          : \"SHA_256\",\n        \"container_id\": 0,\n        \"container_name\": \"string\",\n        \"container_uuid\"\
+          : \"string\",\n        \"storage_container_id\": 0,\n        \"storage_container_name\": \"string\",\n        \"\
+          storage_container_uuid\": \"string\",\n        \"url\": \"string\"\n    },\n    \"image_type\": \"DISK_IMAGE\",\n\
+          \    \"logical_timestamp\": 0,\n    \"name\": \"string\",\n    \"uuid\": \"string\",\n    \"vm_disk_clone\": {\n\
+          \        \"container_uuid\": \"string\",\n        \"image_path\": \"string\",\n        \"minimum_size\": 0,\n  \
+          \      \"minimum_size_mb\": 0,\n        \"ndfs_filepath\": \"string\",\n        \"snapshot_group_id\": \"string\"\
+          ,\n        \"vm_disk_uuid\": \"string\",\n        \"vmdisk_uuid\": \"string\"\n    },\n    \"vm_disk_clone_spec\"\
+          : {\n        \"disk_address\": {\n            \"device_bus\": \"SCSI\",\n            \"device_index\": 0,\n    \
+          \        \"device_uuid\": \"string\",\n            \"disk_label\": \"string\",\n            \"is_cdrom\": true,\n\
+          \            \"ndfs_filepath\": \"string\",\n            \"vmdisk_uuid\": \"string\",\n            \"volume_group_uuid\"\
+          : \"string\"\n        },\n        \"minimum_size\": 0,\n        \"snapshot_group_uuid\": \"string\",\n        \"\
+          storage_container_uuid\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"annotation\": \"string\",\n    \"image_import_spec\": {\n    \
+          \    \"checksum\": \"string\",\n        \"checksum_type\": \"SHA_256\",\n        \"container_id\": 0,\n        \"\
+          container_name\": \"string\",\n        \"container_uuid\": \"string\",\n        \"storage_container_id\": 0,\n \
+          \       \"storage_container_name\": \"string\",\n        \"storage_container_uuid\": \"string\",\n        \"url\"\
+          : \"string\"\n    },\n    \"image_type\": \"DISK_IMAGE\",\n    \"logical_timestamp\": 0,\n    \"name\": \"string\"\
+          ,\n    \"uuid\": \"string\",\n    \"vm_disk_clone\": {\n        \"container_uuid\": \"string\",\n        \"image_path\"\
+          : \"string\",\n        \"minimum_size\": 0,\n        \"minimum_size_mb\": 0,\n        \"ndfs_filepath\": \"string\"\
+          ,\n        \"snapshot_group_id\": \"string\",\n        \"vm_disk_uuid\": \"string\",\n        \"vmdisk_uuid\": \"\
+          string\"\n    },\n    \"vm_disk_clone_spec\": {\n        \"disk_address\": {\n            \"device_bus\": \"SCSI\"\
+          ,\n            \"device_index\": 0,\n            \"device_uuid\": \"string\",\n            \"disk_label\": \"string\"\
+          ,\n            \"is_cdrom\": true,\n            \"ndfs_filepath\": \"string\",\n            \"vmdisk_uuid\": \"\
+          string\",\n            \"volume_group_uuid\": \"string\"\n        },\n        \"minimum_size\": 0,\n        \"snapshot_group_uuid\"\
+          : \"string\",\n        \"storage_container_uuid\": \"string\"\n    }\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"annotation\"\
+          : \"string\",\n    \"image_import_spec\": {\n        \"checksum\": \"string\",\n        \"checksum_type\": \"SHA_256\"\
+          ,\n        \"container_id\": 0,\n        \"container_name\": \"string\",\n        \"container_uuid\": \"string\"\
+          ,\n        \"storage_container_id\": 0,\n        \"storage_container_name\": \"string\",\n        \"storage_container_uuid\"\
+          : \"string\",\n        \"url\": \"string\"\n    },\n    \"image_type\": \"DISK_IMAGE\",\n    \"logical_timestamp\"\
+          : 0,\n    \"name\": \"string\",\n    \"uuid\": \"string\",\n    \"vm_disk_clone\": {\n        \"container_uuid\"\
+          : \"string\",\n        \"image_path\": \"string\",\n        \"minimum_size\": 0,\n        \"minimum_size_mb\": 0,\n\
+          \        \"ndfs_filepath\": \"string\",\n        \"snapshot_group_id\": \"string\",\n        \"vm_disk_uuid\": \"\
+          string\",\n        \"vmdisk_uuid\": \"string\"\n    },\n    \"vm_disk_clone_spec\": {\n        \"disk_address\"\
+          : {\n            \"device_bus\": \"SCSI\",\n            \"device_index\": 0,\n            \"device_uuid\": \"string\"\
+          ,\n            \"disk_label\": \"string\",\n            \"is_cdrom\": true,\n            \"ndfs_filepath\": \"string\"\
+          ,\n            \"vmdisk_uuid\": \"string\",\n            \"volume_group_uuid\": \"string\"\n        },\n       \
+          \ \"minimum_size\": 0,\n        \"snapshot_group_uuid\": \"string\",\n        \"storage_container_uuid\": \"string\"\
+          \n    }\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/images\", payload, headers)\n\nres\
+          \ = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          annotation\": \"string\", \"image_import_spec\": {\"checksum\": \"string\", \"checksum_type\": \"SHA_256\", \"container_id\"\
+          : 0, \"container_name\": \"string\", \"container_uuid\": \"string\", \"storage_container_id\": 0, \"storage_container_name\"\
+          : \"string\", \"storage_container_uuid\": \"string\", \"url\": \"string\"}, \"image_type\": \"DISK_IMAGE\", \"logical_timestamp\"\
+          : 0, \"name\": \"string\", \"uuid\": \"string\", \"vm_disk_clone\": {\"container_uuid\": \"string\", \"image_path\"\
+          : \"string\", \"minimum_size\": 0, \"minimum_size_mb\": 0, \"ndfs_filepath\": \"string\", \"snapshot_group_id\"\
+          : \"string\", \"vm_disk_uuid\": \"string\", \"vmdisk_uuid\": \"string\"}, \"vm_disk_clone_spec\": {\"disk_address\"\
+          : {\"device_bus\": \"SCSI\", \"device_index\": 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\"\
+          : true, \"ndfs_filepath\": \"string\", \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"minimum_size\"\
+          : 0, \"snapshot_group_uuid\": \"string\", \"storage_container_uuid\": \"string\"}}`)\n\treq, err := http.NewRequest(\"\
+          POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"annotation\\\": \\\"string\\\", \\\"image_import_spec\\\": {\\\"checksum\\\": \\\"string\\\", \\\"checksum_type\\\
+          \": \\\"SHA_256\\\", \\\"container_id\\\": 0, \\\"container_name\\\": \\\"string\\\", \\\"container_uuid\\\": \\\
+          \"string\\\", \\\"storage_container_id\\\": 0, \\\"storage_container_name\\\": \\\"string\\\", \\\"storage_container_uuid\\\
+          \": \\\"string\\\", \\\"url\\\": \\\"string\\\"}, \\\"image_type\\\": \\\"DISK_IMAGE\\\", \\\"logical_timestamp\\\
+          \": 0, \\\"name\\\": \\\"string\\\", \\\"uuid\\\": \\\"string\\\", \\\"vm_disk_clone\\\": {\\\"container_uuid\\\"\
+          : \\\"string\\\", \\\"image_path\\\": \\\"string\\\", \\\"minimum_size\\\": 0, \\\"minimum_size_mb\\\": 0, \\\"\
+          ndfs_filepath\\\": \\\"string\\\", \\\"snapshot_group_id\\\": \\\"string\\\", \\\"vm_disk_uuid\\\": \\\"string\\\
+          \", \\\"vmdisk_uuid\\\": \\\"string\\\"}, \\\"vm_disk_clone_spec\\\": {\\\"disk_address\\\": {\\\"device_bus\\\"\
+          : \\\"SCSI\\\", \\\"device_index\\\": 0, \\\"device_uuid\\\": \\\"string\\\", \\\"disk_label\\\": \\\"string\\\"\
+          , \\\"is_cdrom\\\": true, \\\"ndfs_filepath\\\": \\\"string\\\", \\\"vmdisk_uuid\\\": \\\"string\\\", \\\"volume_group_uuid\\\
+          \": \\\"string\\\"}, \\\"minimum_size\\\": 0, \\\"snapshot_group_uuid\\\": \\\"string\\\", \\\"storage_container_uuid\\\
+          \": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"annotation\"\
+          : \"string\", \"image_import_spec\": {\"checksum\": \"string\", \"checksum_type\": \"SHA_256\", \"container_id\"\
+          : 0, \"container_name\": \"string\", \"container_uuid\": \"string\", \"storage_container_id\": 0, \"storage_container_name\"\
+          : \"string\", \"storage_container_uuid\": \"string\", \"url\": \"string\"}, \"image_type\": \"DISK_IMAGE\", \"logical_timestamp\"\
+          : 0, \"name\": \"string\", \"uuid\": \"string\", \"vm_disk_clone\": {\"container_uuid\": \"string\", \"image_path\"\
+          : \"string\", \"minimum_size\": 0, \"minimum_size_mb\": 0, \"ndfs_filepath\": \"string\", \"snapshot_group_id\"\
+          : \"string\", \"vm_disk_uuid\": \"string\", \"vmdisk_uuid\": \"string\"}, \"vm_disk_clone_spec\": {\"disk_address\"\
+          : {\"device_bus\": \"SCSI\", \"device_index\": 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\"\
+          : true, \"ndfs_filepath\": \"string\", \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"minimum_size\"\
+          : 0, \"snapshot_group_uuid\": \"string\", \"storage_container_uuid\": \"string\"}}`\n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+    get:
+      summary: Get the list of Disk Images.
+      description: Get the list of Images
+      tags:
+      - /images
+      operationId: get/images/getImages
+      parameters:
+      - name: include_vm_disk_sizes
+        in: query
+        description: Include VmDisk sizes
+        required: false
+        schema:
+          type: boolean
+      - name: include_vm_disk_paths
+        in: query
+        description: Include VmDisk paths
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.acropolis.ImageInfoDTO_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/images\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images\"\n\t \n\treq, err := http.NewRequest(\"GET\"\
+          , url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+  /images/{uuid}:
+    get:
+      summary: Get details of a specific Image based on the given Id.
+      description: Get details of a specific Disk Image based on the given Id.
+      tags:
+      - /images
+      operationId: get/images/{uuid}/getImage
+      parameters:
+      - name: uuid
+        in: path
+        description: Id of the Image
+        required: true
+        schema:
+          type: string
+      - name: include_vm_disk_sizes
+        in: query
+        description: Include VmDisk size
+        required: false
+        schema:
+          type: boolean
+      - name: include_vm_disk_paths
+        in: query
+        description: Include VmDisk path
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.acropolis.ImageInfoDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid} \\\
+          \n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/images/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+    delete:
+      summary: Delete a Disk Image.
+      description: Delete a Disk Image. This is an idempotent operation. The logical timestamp can optionally be provided
+        for consistency. If a logical timestamp is specified, then this operation will be rejected if the logical timestamp
+        specified is not the value of the Image logical timestamp. The logical timestamp can be obtained from the Image Info
+        object. This is also an asynchronous operation that results in the creation of a task object. The UUID of this task
+        object is returned as the response of this operation. This task can be monitored by using the /tasks/poll API.
+      tags:
+      - /images
+      operationId: delete/images/{uuid}/deleteImage
+      parameters:
+      - name: uuid
+        in: path
+        description: Id of the Image
+        required: true
+        schema:
+          type: string
+      - name: logical_timestamp
+        in: query
+        description: Logical timestamp for synchronized delete
+        required: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/PrismGateway/services/rest/v2.0/images/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}';\nconst options = {\n\
+          \  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry\
+          \ {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    put:
+      summary: Update a Disk Image.
+      description: Update a Disk Image. Fields that are not set or are not specified are ignored. If an Image is already in
+        ACTIVE state then its source can be updated. But you can still update the image name, image type and image annotation.If
+        a logical timestamp is specified, then this operation will be rejected if the logical timestamp specified is not the
+        value of the Image logical timestamp. The logical timestamp can be obtained from the Image object.
+      tags:
+      - /images
+      operationId: put/images/{uuid}/updateImage
+      parameters:
+      - name: uuid
+        in: path
+        description: Id of the Disk Image
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update.dto.acropolis.ImageSpecDTO'
+        description: Disk Image Update Info
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid} \\\
+          \n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"annotation\": \"string\",\n    \"image_import_spec\": {\n        \"checksum\": \"string\",\n        \"checksum_type\"\
+          : \"SHA_256\",\n        \"container_id\": 0,\n        \"container_name\": \"string\",\n        \"container_uuid\"\
+          : \"string\",\n        \"storage_container_id\": 0,\n        \"storage_container_name\": \"string\",\n        \"\
+          storage_container_uuid\": \"string\",\n        \"url\": \"string\"\n    },\n    \"image_type\": \"DISK_IMAGE\",\n\
+          \    \"logical_timestamp\": 0,\n    \"name\": \"string\",\n    \"uuid\": \"string\",\n    \"vm_disk_clone\": {\n\
+          \        \"container_uuid\": \"string\",\n        \"image_path\": \"string\",\n        \"minimum_size\": 0,\n  \
+          \      \"minimum_size_mb\": 0,\n        \"ndfs_filepath\": \"string\",\n        \"snapshot_group_id\": \"string\"\
+          ,\n        \"vm_disk_uuid\": \"string\",\n        \"vmdisk_uuid\": \"string\"\n    },\n    \"vm_disk_clone_spec\"\
+          : {\n        \"disk_address\": {\n            \"device_bus\": \"SCSI\",\n            \"device_index\": 0,\n    \
+          \        \"device_uuid\": \"string\",\n            \"disk_label\": \"string\",\n            \"is_cdrom\": true,\n\
+          \            \"ndfs_filepath\": \"string\",\n            \"vmdisk_uuid\": \"string\",\n            \"volume_group_uuid\"\
+          : \"string\"\n        },\n        \"minimum_size\": 0,\n        \"snapshot_group_uuid\": \"string\",\n        \"\
+          storage_container_uuid\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"annotation\": \"string\",\n    \"image_import_spec\": {\n    \
+          \    \"checksum\": \"string\",\n        \"checksum_type\": \"SHA_256\",\n        \"container_id\": 0,\n        \"\
+          container_name\": \"string\",\n        \"container_uuid\": \"string\",\n        \"storage_container_id\": 0,\n \
+          \       \"storage_container_name\": \"string\",\n        \"storage_container_uuid\": \"string\",\n        \"url\"\
+          : \"string\"\n    },\n    \"image_type\": \"DISK_IMAGE\",\n    \"logical_timestamp\": 0,\n    \"name\": \"string\"\
+          ,\n    \"uuid\": \"string\",\n    \"vm_disk_clone\": {\n        \"container_uuid\": \"string\",\n        \"image_path\"\
+          : \"string\",\n        \"minimum_size\": 0,\n        \"minimum_size_mb\": 0,\n        \"ndfs_filepath\": \"string\"\
+          ,\n        \"snapshot_group_id\": \"string\",\n        \"vm_disk_uuid\": \"string\",\n        \"vmdisk_uuid\": \"\
+          string\"\n    },\n    \"vm_disk_clone_spec\": {\n        \"disk_address\": {\n            \"device_bus\": \"SCSI\"\
+          ,\n            \"device_index\": 0,\n            \"device_uuid\": \"string\",\n            \"disk_label\": \"string\"\
+          ,\n            \"is_cdrom\": true,\n            \"ndfs_filepath\": \"string\",\n            \"vmdisk_uuid\": \"\
+          string\",\n            \"volume_group_uuid\": \"string\"\n        },\n        \"minimum_size\": 0,\n        \"snapshot_group_uuid\"\
+          : \"string\",\n        \"storage_container_uuid\": \"string\"\n    }\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"annotation\"\
+          : \"string\",\n    \"image_import_spec\": {\n        \"checksum\": \"string\",\n        \"checksum_type\": \"SHA_256\"\
+          ,\n        \"container_id\": 0,\n        \"container_name\": \"string\",\n        \"container_uuid\": \"string\"\
+          ,\n        \"storage_container_id\": 0,\n        \"storage_container_name\": \"string\",\n        \"storage_container_uuid\"\
+          : \"string\",\n        \"url\": \"string\"\n    },\n    \"image_type\": \"DISK_IMAGE\",\n    \"logical_timestamp\"\
+          : 0,\n    \"name\": \"string\",\n    \"uuid\": \"string\",\n    \"vm_disk_clone\": {\n        \"container_uuid\"\
+          : \"string\",\n        \"image_path\": \"string\",\n        \"minimum_size\": 0,\n        \"minimum_size_mb\": 0,\n\
+          \        \"ndfs_filepath\": \"string\",\n        \"snapshot_group_id\": \"string\",\n        \"vm_disk_uuid\": \"\
+          string\",\n        \"vmdisk_uuid\": \"string\"\n    },\n    \"vm_disk_clone_spec\": {\n        \"disk_address\"\
+          : {\n            \"device_bus\": \"SCSI\",\n            \"device_index\": 0,\n            \"device_uuid\": \"string\"\
+          ,\n            \"disk_label\": \"string\",\n            \"is_cdrom\": true,\n            \"ndfs_filepath\": \"string\"\
+          ,\n            \"vmdisk_uuid\": \"string\",\n            \"volume_group_uuid\": \"string\"\n        },\n       \
+          \ \"minimum_size\": 0,\n        \"snapshot_group_uuid\": \"string\",\n        \"storage_container_uuid\": \"string\"\
+          \n    }\n}\"\"\"\n\nconn.request(\"PUT\",\"/PrismGateway/services/rest/v2.0/images/{uuid}\", payload, headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          annotation\": \"string\", \"image_import_spec\": {\"checksum\": \"string\", \"checksum_type\": \"SHA_256\", \"container_id\"\
+          : 0, \"container_name\": \"string\", \"container_uuid\": \"string\", \"storage_container_id\": 0, \"storage_container_name\"\
+          : \"string\", \"storage_container_uuid\": \"string\", \"url\": \"string\"}, \"image_type\": \"DISK_IMAGE\", \"logical_timestamp\"\
+          : 0, \"name\": \"string\", \"uuid\": \"string\", \"vm_disk_clone\": {\"container_uuid\": \"string\", \"image_path\"\
+          : \"string\", \"minimum_size\": 0, \"minimum_size_mb\": 0, \"ndfs_filepath\": \"string\", \"snapshot_group_id\"\
+          : \"string\", \"vm_disk_uuid\": \"string\", \"vmdisk_uuid\": \"string\"}, \"vm_disk_clone_spec\": {\"disk_address\"\
+          : {\"device_bus\": \"SCSI\", \"device_index\": 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\"\
+          : true, \"ndfs_filepath\": \"string\", \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"minimum_size\"\
+          : 0, \"snapshot_group_uuid\": \"string\", \"storage_container_uuid\": \"string\"}}`)\n\treq, err := http.NewRequest(\"\
+          PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"annotation\\\": \\\"string\\\", \\\"image_import_spec\\\": {\\\"checksum\\\": \\\"string\\\", \\\"checksum_type\\\
+          \": \\\"SHA_256\\\", \\\"container_id\\\": 0, \\\"container_name\\\": \\\"string\\\", \\\"container_uuid\\\": \\\
+          \"string\\\", \\\"storage_container_id\\\": 0, \\\"storage_container_name\\\": \\\"string\\\", \\\"storage_container_uuid\\\
+          \": \\\"string\\\", \\\"url\\\": \\\"string\\\"}, \\\"image_type\\\": \\\"DISK_IMAGE\\\", \\\"logical_timestamp\\\
+          \": 0, \\\"name\\\": \\\"string\\\", \\\"uuid\\\": \\\"string\\\", \\\"vm_disk_clone\\\": {\\\"container_uuid\\\"\
+          : \\\"string\\\", \\\"image_path\\\": \\\"string\\\", \\\"minimum_size\\\": 0, \\\"minimum_size_mb\\\": 0, \\\"\
+          ndfs_filepath\\\": \\\"string\\\", \\\"snapshot_group_id\\\": \\\"string\\\", \\\"vm_disk_uuid\\\": \\\"string\\\
+          \", \\\"vmdisk_uuid\\\": \\\"string\\\"}, \\\"vm_disk_clone_spec\\\": {\\\"disk_address\\\": {\\\"device_bus\\\"\
+          : \\\"SCSI\\\", \\\"device_index\\\": 0, \\\"device_uuid\\\": \\\"string\\\", \\\"disk_label\\\": \\\"string\\\"\
+          , \\\"is_cdrom\\\": true, \\\"ndfs_filepath\\\": \\\"string\\\", \\\"vmdisk_uuid\\\": \\\"string\\\", \\\"volume_group_uuid\\\
+          \": \\\"string\\\"}, \\\"minimum_size\\\": 0, \\\"snapshot_group_uuid\\\": \\\"string\\\", \\\"storage_container_uuid\\\
+          \": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/images/{uuid}';\nconst options = {\n\
+          \  method: 'PUT',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"\
+          annotation\": \"string\", \"image_import_spec\": {\"checksum\": \"string\", \"checksum_type\": \"SHA_256\", \"container_id\"\
+          : 0, \"container_name\": \"string\", \"container_uuid\": \"string\", \"storage_container_id\": 0, \"storage_container_name\"\
+          : \"string\", \"storage_container_uuid\": \"string\", \"url\": \"string\"}, \"image_type\": \"DISK_IMAGE\", \"logical_timestamp\"\
+          : 0, \"name\": \"string\", \"uuid\": \"string\", \"vm_disk_clone\": {\"container_uuid\": \"string\", \"image_path\"\
+          : \"string\", \"minimum_size\": 0, \"minimum_size_mb\": 0, \"ndfs_filepath\": \"string\", \"snapshot_group_id\"\
+          : \"string\", \"vm_disk_uuid\": \"string\", \"vmdisk_uuid\": \"string\"}, \"vm_disk_clone_spec\": {\"disk_address\"\
+          : {\"device_bus\": \"SCSI\", \"device_index\": 0, \"device_uuid\": \"string\", \"disk_label\": \"string\", \"is_cdrom\"\
+          : true, \"ndfs_filepath\": \"string\", \"vmdisk_uuid\": \"string\", \"volume_group_uuid\": \"string\"}, \"minimum_size\"\
+          : 0, \"snapshot_group_uuid\": \"string\", \"storage_container_uuid\": \"string\"}}`\n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+components:
+  schemas:
+    create.dto.acropolis.VMDiskSpecCloneDTO:
+      type: object
+      properties:
+        container_uuid:
+          type: string
+        image_path:
+          type: string
+        minimum_size:
+          format: int64
+          type: integer
+        minimum_size_mb:
+          format: int64
+          type: integer
+        ndfs_filepath:
+          type: string
+        snapshot_group_id:
+          type: string
+        vm_disk_uuid:
+          type: string
+        vmdisk_uuid:
+          type: string
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    update.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    get.base.EntityCollection_get.dto.acropolis.ImageInfoDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.acropolis.ImageInfoDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    create.dto.acropolis.ImageSpecDTO:
+      type: object
+      properties:
+        annotation:
+          type: string
+        image_import_spec:
+          $ref: '#/components/schemas/create.dto.acropolis.ImageImportSpecDTO'
+        image_type:
+          enum:
+          - DISK_IMAGE
+          - ISO_IMAGE
+          type: string
+        logical_timestamp:
+          format: int64
+          type: integer
+        name:
+          type: string
+        uuid:
+          type: string
+        vm_disk_clone:
+          $ref: '#/components/schemas/create.dto.acropolis.VMDiskSpecCloneDTO'
+        vm_disk_clone_spec:
+          $ref: '#/components/schemas/create.dto.uhura.VmDiskCloneDTO'
+    get.dto.acropolis.ImageInfoDTO:
+      type: object
+      properties:
+        annotation:
+          type: string
+        checksum:
+          type: string
+        checksum_type:
+          enum:
+          - SHA_256
+          - SHA_1
+          type: string
+        container_id:
+          format: int64
+          type: integer
+        container_uuid:
+          type: string
+        created_time_in_usecs:
+          format: int64
+          type: integer
+        deleted:
+          type: boolean
+        image_state:
+          enum:
+          - ACTIVE
+          - INACTIVE
+          type: string
+        image_type:
+          enum:
+          - DISK_IMAGE
+          - ISO_IMAGE
+          type: string
+        logical_timestamp:
+          format: int64
+          type: integer
+        name:
+          type: string
+        storage_container_id:
+          format: int64
+          type: integer
+        storage_container_uuid:
+          type: string
+        updated_time_in_usecs:
+          format: int64
+          type: integer
+        uuid:
+          type: string
+        vm_disk_id:
+          type: string
+        vm_disk_path:
+          type: string
+        vm_disk_size:
+          format: int64
+          type: integer
+    update.dto.acropolis.ImageSpecDTO:
+      type: object
+      properties:
+        annotation:
+          type: string
+        image_import_spec:
+          $ref: '#/components/schemas/update.dto.acropolis.ImageImportSpecDTO'
+        image_type:
+          enum:
+          - DISK_IMAGE
+          - ISO_IMAGE
+          type: string
+        logical_timestamp:
+          format: int64
+          type: integer
+        name:
+          type: string
+        uuid:
+          type: string
+        vm_disk_clone:
+          $ref: '#/components/schemas/update.dto.acropolis.VMDiskSpecCloneDTO'
+        vm_disk_clone_spec:
+          $ref: '#/components/schemas/update.dto.uhura.VmDiskCloneDTO'
+    update.dto.acropolis.ImageImportSpecDTO:
+      type: object
+      properties:
+        checksum:
+          type: string
+        checksum_type:
+          enum:
+          - SHA_256
+          - SHA_1
+          type: string
+        container_id:
+          format: int64
+          type: integer
+        container_name:
+          type: string
+        container_uuid:
+          type: string
+        storage_container_id:
+          format: int64
+          type: integer
+        storage_container_name:
+          type: string
+        storage_container_uuid:
+          type: string
+        url:
+          type: string
+    update.dto.uhura.VmDiskCloneDTO:
+      type: object
+      properties:
+        disk_address:
+          $ref: '#/components/schemas/update.dto.acropolis.VMDiskAddressDTO'
+        minimum_size:
+          format: int64
+          type: integer
+        snapshot_group_uuid:
+          type: string
+        storage_container_uuid:
+          type: string
+    create.dto.acropolis.ImageImportSpecDTO:
+      type: object
+      properties:
+        checksum:
+          type: string
+        checksum_type:
+          enum:
+          - SHA_256
+          - SHA_1
+          type: string
+        container_id:
+          format: int64
+          type: integer
+        container_name:
+          type: string
+        container_uuid:
+          type: string
+        storage_container_id:
+          format: int64
+          type: integer
+        storage_container_name:
+          type: string
+        storage_container_uuid:
+          type: string
+        url:
+          type: string
+    update.dto.acropolis.VMDiskSpecCloneDTO:
+      type: object
+      properties:
+        container_uuid:
+          type: string
+        image_path:
+          type: string
+        minimum_size:
+          format: int64
+          type: integer
+        minimum_size_mb:
+          format: int64
+          type: integer
+        ndfs_filepath:
+          type: string
+        snapshot_group_id:
+          type: string
+        vm_disk_uuid:
+          type: string
+        vmdisk_uuid:
+          type: string
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    create.dto.acropolis.VMDiskAddressDTO:
+      type: object
+      properties:
+        device_bus:
+          enum:
+          - SCSI
+          - IDE
+          - PCI
+          - SATA
+          - SPAPR
+          - NVME
+          type: string
+        device_index:
+          format: int32
+          type: integer
+        device_uuid:
+          type: string
+        disk_label:
+          type: string
+        is_cdrom:
+          type: boolean
+        ndfs_filepath:
+          type: string
+        vmdisk_uuid:
+          type: string
+        volume_group_uuid:
+          type: string
+    update.dto.acropolis.VMDiskAddressDTO:
+      type: object
+      properties:
+        device_bus:
+          enum:
+          - SCSI
+          - IDE
+          - PCI
+          - SATA
+          - SPAPR
+          - NVME
+          type: string
+        device_index:
+          format: int32
+          type: integer
+        device_uuid:
+          type: string
+        disk_label:
+          type: string
+        is_cdrom:
+          type: boolean
+        ndfs_filepath:
+          type: string
+        vmdisk_uuid:
+          type: string
+        volume_group_uuid:
+          type: string
+    delete.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    create.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    create.dto.uhura.VmDiskCloneDTO:
+      type: object
+      properties:
+        disk_address:
+          $ref: '#/components/schemas/create.dto.acropolis.VMDiskAddressDTO'
+        minimum_size:
+          format: int64
+          type: integer
+        snapshot_group_uuid:
+          type: string
+        storage_container_uuid:
+          type: string

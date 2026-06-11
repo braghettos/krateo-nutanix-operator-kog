@@ -1,0 +1,582 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /snmp/traps:
+    patch:
+      summary: Modify SNMP Trap.
+      description: Modify the specified SNMP Trap.
+      tags:
+      - /snmp
+      operationId: patch/snmp/traps/patchSnmpTrap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/patch.dto.RequestDTO_patch.dto.appliance.configuration.SnmpTrapDTO_'
+        description: An SNMP Trap instance
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patch.dto.appliance.configuration.SnmpTrapDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PATCH \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n \
+          \   \"cluster_uuid\": \"string\",\n    \"generic_dto\": {\n        \"community_string\": \"string\",\n        \"\
+          engine_id\": \"string\",\n        \"inform\": true,\n        \"log\": {\n            \"root_logger_name\": \"string\"\
+          \n        },\n        \"port\": 0,\n        \"receiver_name\": \"string\",\n        \"transport_protocol\": \"TCP\"\
+          ,\n        \"trap_address\": \"string\",\n        \"trap_username\": \"string\",\n        \"version\": \"SNMPv2C\"\
+          \n    },\n    \"operation\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PATCH \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"cluster_uuid\": \"string\",\n    \"generic_dto\": {\n        \"\
+          community_string\": \"string\",\n        \"engine_id\": \"string\",\n        \"inform\": true,\n        \"log\"\
+          : {\n            \"root_logger_name\": \"string\"\n        },\n        \"port\": 0,\n        \"receiver_name\":\
+          \ \"string\",\n        \"transport_protocol\": \"TCP\",\n        \"trap_address\": \"string\",\n        \"trap_username\"\
+          : \"string\",\n        \"version\": \"SNMPv2C\"\n    },\n    \"operation\": \"string\"\n}' \\\n    --output-document\
+          \ \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"cluster_uuid\"\
+          : \"string\",\n    \"generic_dto\": {\n        \"community_string\": \"string\",\n        \"engine_id\": \"string\"\
+          ,\n        \"inform\": true,\n        \"log\": {\n            \"root_logger_name\": \"string\"\n        },\n   \
+          \     \"port\": 0,\n        \"receiver_name\": \"string\",\n        \"transport_protocol\": \"TCP\",\n        \"\
+          trap_address\": \"string\",\n        \"trap_username\": \"string\",\n        \"version\": \"SNMPv2C\"\n    },\n\
+          \    \"operation\": \"string\"\n}\"\"\"\n\nconn.request(\"PATCH\",\"/PrismGateway/services/rest/v2.0/snmp/traps\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          cluster_uuid\": \"string\", \"generic_dto\": {\"community_string\": \"string\", \"engine_id\": \"string\", \"inform\"\
+          : true, \"log\": {\"root_logger_name\": \"string\"}, \"port\": 0, \"receiver_name\": \"string\", \"transport_protocol\"\
+          : \"TCP\", \"trap_address\": \"string\", \"trap_username\": \"string\", \"version\": \"SNMPv2C\"}, \"operation\"\
+          : \"string\"}`)\n\treq, err := http.NewRequest(\"PATCH\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PATCH\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"cluster_uuid\\\": \\\"string\\\", \\\"generic_dto\\\": {\\\"community_string\\\": \\\"string\\\", \\\"engine_id\\\
+          \": \\\"string\\\", \\\"inform\\\": true, \\\"log\\\": {\\\"root_logger_name\\\": \\\"string\\\"}, \\\"port\\\"\
+          : 0, \\\"receiver_name\\\": \\\"string\\\", \\\"transport_protocol\\\": \\\"TCP\\\", \\\"trap_address\\\": \\\"\
+          string\\\", \\\"trap_username\\\": \\\"string\\\", \\\"version\\\": \\\"SNMPv2C\\\"}, \\\"operation\\\": \\\"string\\\
+          \"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps';\nconst options = {\n  method:\
+          \ 'PATCH',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"cluster_uuid\"\
+          : \"string\", \"generic_dto\": {\"community_string\": \"string\", \"engine_id\": \"string\", \"inform\": true, \"\
+          log\": {\"root_logger_name\": \"string\"}, \"port\": 0, \"receiver_name\": \"string\", \"transport_protocol\": \"\
+          TCP\", \"trap_address\": \"string\", \"trap_username\": \"string\", \"version\": \"SNMPv2C\"}, \"operation\": \"\
+          string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      summary: Add SNMP Trap.
+      description: Add SNMP Trap to the cluster.
+      tags:
+      - /snmp
+      operationId: post/snmp/traps/addSnmpTrap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.appliance.configuration.SnmpTrapDTO'
+        description: An SNMP Trap instance
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.appliance.configuration.SnmpTrapDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n \
+          \   \"community_string\": \"string\",\n    \"engine_id\": \"string\",\n    \"inform\": true,\n    \"log\": {\n \
+          \       \"root_logger_name\": \"string\"\n    },\n    \"port\": 0,\n    \"receiver_name\": \"string\",\n    \"transport_protocol\"\
+          : \"TCP\",\n    \"trap_address\": \"string\",\n    \"trap_username\": \"string\",\n    \"version\": \"SNMPv2C\"\n\
+          }'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"community_string\": \"string\",\n    \"engine_id\": \"string\"\
+          ,\n    \"inform\": true,\n    \"log\": {\n        \"root_logger_name\": \"string\"\n    },\n    \"port\": 0,\n \
+          \   \"receiver_name\": \"string\",\n    \"transport_protocol\": \"TCP\",\n    \"trap_address\": \"string\",\n  \
+          \  \"trap_username\": \"string\",\n    \"version\": \"SNMPv2C\"\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"community_string\"\
+          : \"string\",\n    \"engine_id\": \"string\",\n    \"inform\": true,\n    \"log\": {\n        \"root_logger_name\"\
+          : \"string\"\n    },\n    \"port\": 0,\n    \"receiver_name\": \"string\",\n    \"transport_protocol\": \"TCP\"\
+          ,\n    \"trap_address\": \"string\",\n    \"trap_username\": \"string\",\n    \"version\": \"SNMPv2C\"\n}\"\"\"\n\
+          \nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/snmp/traps\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          community_string\": \"string\", \"engine_id\": \"string\", \"inform\": true, \"log\": {\"root_logger_name\": \"\
+          string\"}, \"port\": 0, \"receiver_name\": \"string\", \"transport_protocol\": \"TCP\", \"trap_address\": \"string\"\
+          , \"trap_username\": \"string\", \"version\": \"SNMPv2C\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"community_string\\\": \\\"string\\\", \\\"engine_id\\\": \\\"string\\\", \\\"inform\\\": true, \\\"log\\\"\
+          : {\\\"root_logger_name\\\": \\\"string\\\"}, \\\"port\\\": 0, \\\"receiver_name\\\": \\\"string\\\", \\\"transport_protocol\\\
+          \": \\\"TCP\\\", \\\"trap_address\\\": \\\"string\\\", \\\"trap_username\\\": \\\"string\\\", \\\"version\\\": \\\
+          \"SNMPv2C\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"community_string\"\
+          : \"string\", \"engine_id\": \"string\", \"inform\": true, \"log\": {\"root_logger_name\": \"string\"}, \"port\"\
+          : 0, \"receiver_name\": \"string\", \"transport_protocol\": \"TCP\", \"trap_address\": \"string\", \"trap_username\"\
+          : \"string\", \"version\": \"SNMPv2C\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      summary: Get the list of SNMP Traps.
+      description: Get the list of SNMP Traps configured in the cluster.
+      tags:
+      - /snmp
+      operationId: get/snmp/traps/getSnmpTraps
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.appliance.configuration.SnmpTrapDTO_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/snmp/traps\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+    put:
+      summary: Edit SNMP Trap.
+      description: Edit the specified SNMP Trap.
+      tags:
+      - /snmp
+      operationId: put/snmp/traps/editSnmpTrap
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update.dto.appliance.configuration.SnmpTrapDTO'
+        description: An SNMP Trap instance
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update.dto.appliance.configuration.SnmpTrapDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n \
+          \   \"community_string\": \"string\",\n    \"engine_id\": \"string\",\n    \"inform\": true,\n    \"log\": {\n \
+          \       \"root_logger_name\": \"string\"\n    },\n    \"port\": 0,\n    \"receiver_name\": \"string\",\n    \"transport_protocol\"\
+          : \"TCP\",\n    \"trap_address\": \"string\",\n    \"trap_username\": \"string\",\n    \"version\": \"SNMPv2C\"\n\
+          }'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"community_string\": \"string\",\n    \"engine_id\": \"string\"\
+          ,\n    \"inform\": true,\n    \"log\": {\n        \"root_logger_name\": \"string\"\n    },\n    \"port\": 0,\n \
+          \   \"receiver_name\": \"string\",\n    \"transport_protocol\": \"TCP\",\n    \"trap_address\": \"string\",\n  \
+          \  \"trap_username\": \"string\",\n    \"version\": \"SNMPv2C\"\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"community_string\"\
+          : \"string\",\n    \"engine_id\": \"string\",\n    \"inform\": true,\n    \"log\": {\n        \"root_logger_name\"\
+          : \"string\"\n    },\n    \"port\": 0,\n    \"receiver_name\": \"string\",\n    \"transport_protocol\": \"TCP\"\
+          ,\n    \"trap_address\": \"string\",\n    \"trap_username\": \"string\",\n    \"version\": \"SNMPv2C\"\n}\"\"\"\n\
+          \nconn.request(\"PUT\",\"/PrismGateway/services/rest/v2.0/snmp/traps\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          community_string\": \"string\", \"engine_id\": \"string\", \"inform\": true, \"log\": {\"root_logger_name\": \"\
+          string\"}, \"port\": 0, \"receiver_name\": \"string\", \"transport_protocol\": \"TCP\", \"trap_address\": \"string\"\
+          , \"trap_username\": \"string\", \"version\": \"SNMPv2C\"}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"community_string\\\": \\\"string\\\", \\\"engine_id\\\": \\\"string\\\", \\\"inform\\\": true, \\\"log\\\"\
+          : {\\\"root_logger_name\\\": \\\"string\\\"}, \\\"port\\\": 0, \\\"receiver_name\\\": \\\"string\\\", \\\"transport_protocol\\\
+          \": \\\"TCP\\\", \\\"trap_address\\\": \\\"string\\\", \\\"trap_username\\\": \\\"string\\\", \\\"version\\\": \\\
+          \"SNMPv2C\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps';\nconst options = {\n  method:\
+          \ 'PUT',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"community_string\"\
+          : \"string\", \"engine_id\": \"string\", \"inform\": true, \"log\": {\"root_logger_name\": \"string\"}, \"port\"\
+          : 0, \"receiver_name\": \"string\", \"transport_protocol\": \"TCP\", \"trap_address\": \"string\", \"trap_username\"\
+          : \"string\", \"version\": \"SNMPv2C\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /snmp/traps/{trap_address}:
+    get:
+      summary: Get SNMP Trap.
+      description: Get SNMP Trap with the specified address.
+      tags:
+      - /snmp
+      operationId: get/snmp/traps/{trap_address}/getSnmpTrap
+      parameters:
+      - name: trap_address
+        in: path
+        description: Address of the SNMP Trap
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.appliance.configuration.SnmpTrapDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    delete:
+      summary: Delete SNMP Trap.
+      description: Delete SNMP Trap with the specified address
+      tags:
+      - /snmp
+      operationId: delete/snmp/traps/{trap_address}/deleteSnmpTrap
+      parameters:
+      - name: trap_address
+        in: path
+        description: Address of the SNMP Trap
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete.dto.PrimitiveDTO_java.lang.Boolean_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snmp/traps/{trap_address}';\nconst options\
+          \ = {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\
+          \ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    create.dto.appliance.configuration.SnmpTrapDTO:
+      type: object
+      properties:
+        community_string:
+          type: string
+        engine_id:
+          type: string
+        inform:
+          type: boolean
+        log:
+          $ref: '#/components/schemas/org.slf4j.Logger'
+        port:
+          format: int32
+          maximum: 65536
+          minimum: 0
+          type: integer
+        receiver_name:
+          type: string
+        transport_protocol:
+          enum:
+          - TCP
+          - TCP_6
+          - UDP
+          - UDP_6
+          type: string
+        trap_address:
+          type: string
+        trap_username:
+          type: string
+        version:
+          enum:
+          - SNMPv2C
+          - SNMPv3
+          type: string
+    get.dto.appliance.configuration.SnmpTrapDTO:
+      type: object
+      properties:
+        community_string:
+          type: string
+        engine_id:
+          type: string
+        inform:
+          type: boolean
+        log:
+          $ref: '#/components/schemas/org.slf4j.Logger'
+        port:
+          format: int32
+          maximum: 65536
+          minimum: 0
+          type: integer
+        receiver_name:
+          type: string
+        transport_protocol:
+          enum:
+          - TCP
+          - TCP_6
+          - UDP
+          - UDP_6
+          type: string
+        trap_address:
+          type: string
+        trap_username:
+          type: string
+        version:
+          enum:
+          - SNMPv2C
+          - SNMPv3
+          type: string
+    patch.dto.appliance.configuration.SnmpTrapDTO:
+      type: object
+      properties:
+        community_string:
+          type: string
+        engine_id:
+          type: string
+        inform:
+          type: boolean
+        log:
+          $ref: '#/components/schemas/org.slf4j.Logger'
+        port:
+          format: int32
+          maximum: 65536
+          minimum: 0
+          type: integer
+        receiver_name:
+          type: string
+        transport_protocol:
+          enum:
+          - TCP
+          - TCP_6
+          - UDP
+          - UDP_6
+          type: string
+        trap_address:
+          type: string
+        trap_username:
+          type: string
+        version:
+          enum:
+          - SNMPv2C
+          - SNMPv3
+          type: string
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    delete.dto.PrimitiveDTO_java.lang.Boolean_:
+      type: object
+      properties:
+        value:
+          type: boolean
+    org.slf4j.Logger:
+      type: object
+      properties:
+        root_logger_name:
+          type: string
+    patch.dto.RequestDTO_patch.dto.appliance.configuration.SnmpTrapDTO_:
+      type: object
+      properties:
+        cluster_uuid:
+          type: string
+        generic_dto:
+          $ref: '#/components/schemas/patch.dto.appliance.configuration.SnmpTrapDTO'
+        operation:
+          type: string
+    get.base.EntityCollection_get.dto.appliance.configuration.SnmpTrapDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.appliance.configuration.SnmpTrapDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    update.dto.appliance.configuration.SnmpTrapDTO:
+      type: object
+      properties:
+        community_string:
+          type: string
+        engine_id:
+          type: string
+        inform:
+          type: boolean
+        log:
+          $ref: '#/components/schemas/org.slf4j.Logger'
+        port:
+          format: int32
+          maximum: 65536
+          minimum: 0
+          type: integer
+        receiver_name:
+          type: string
+        transport_protocol:
+          enum:
+          - TCP
+          - TCP_6
+          - UDP
+          - UDP_6
+          type: string
+        trap_address:
+          type: string
+        trap_username:
+          type: string
+        version:
+          enum:
+          - SNMPv2C
+          - SNMPv3
+          type: string

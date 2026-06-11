@@ -1,0 +1,786 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /operations:
+    get:
+      operationId: getAllOperations
+      parameters:
+      - description: The time zone (e.g. 'America/New_York', 'UTC') to convert the timestamps in the response to the client's
+          local time zone.
+        in: header
+        name: client_tz
+        schema:
+          type: string
+      - description: The number of days to look back at operations.
+        in: query
+        name: days
+        schema:
+          type: string
+      - description: Includes system-triggered operations in the response.
+        in: query
+        name: sysOps
+        schema:
+          type: boolean
+      - description: Includes scheduled operations in the response.
+        in: query
+        name: scheduledOps
+        schema:
+          type: boolean
+      - description: Includes internal operations in the response such as scheduled Log Catchup, etc.
+        in: query
+        name: internalOps
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/OperationDefinition'
+                type: array
+          description: Operation completed.
+      summary: Get a list of NDB operations
+      tags:
+      - Operations
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/operations \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/operations"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/operations\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/operations\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic\
+          \ <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/operations\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/operations';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /operations/{operation_id}:
+    get:
+      operationId: getOperationDefinition
+      parameters:
+      - description: ID of the Operation to fetch.
+        in: path
+        name: operation_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Indicates whether the Operation definition is being fetched for display purposes.
+        in: query
+        name: display
+        schema:
+          type: boolean
+      - description: The identifier used to convert timestamps in the response to the specified time zone.
+        in: query
+        name: time-zone
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationDefinition'
+          description: Operation completed.
+      summary: Get Operation definition
+      tags:
+      - Operations
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/operations/{operation_id} \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/operations/{operation_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/operations/{operation_id}\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/operations/{operation_id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err\
+          \ != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/operations/{operation_id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/operations/{operation_id}';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    EraParentOperationDTO:
+      properties:
+        id:
+          format: uuid
+          type: string
+        operation:
+          $ref: '#/components/schemas/OperationDefinition'
+        stepIndex:
+          format: int32
+          type: integer
+      type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    EraLCMConfigInfoEraEntityExpiryPolicy:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/EraEntityExpiryPolicy'
+        postDeleteCommand:
+          $ref: '#/components/schemas/EraPostDeleteCommand'
+        preDeleteCommand:
+          $ref: '#/components/schemas/EraPreDeleteCommand'
+        refreshDetails:
+          $ref: '#/components/schemas/EraEntityRefreshPolicy'
+      type: object
+    PropertyValue:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        value:
+          type: string
+      type: object
+    OperationDefinition:
+      properties:
+        childOperations:
+          items:
+            $ref: '#/components/schemas/OperationDefinition'
+          type: array
+        completed:
+          type: boolean
+        dateSubmitted:
+          type: string
+        dbserverId:
+          format: uuid
+          type: string
+        deferredBy:
+          items:
+            type: string
+          type: array
+        endTime:
+          type: string
+        entityId:
+          format: uuid
+          type: string
+        entityName:
+          type: string
+        entityType:
+          type: string
+        id:
+          format: uuid
+          type: string
+        instanceId:
+          format: uuid
+          type: string
+        isInternal:
+          type: boolean
+        message:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/EraOperationMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        parentId:
+          format: uuid
+          type: string
+        parentStep:
+          format: int32
+          type: integer
+        percentageComplete:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/PropertyValue'
+          type: array
+        scheduleTime:
+          type: string
+        setStartTime:
+          type: boolean
+        startTime:
+          type: string
+        status:
+          type: string
+        stepGenEnabled:
+          type: boolean
+        steps:
+          items:
+            $ref: '#/components/schemas/OperationInstance'
+          type: array
+        systemTask:
+          type: string
+        systemTriggered:
+          type: boolean
+        timeZone:
+          type: string
+        timeout:
+          format: int64
+          type: integer
+        type:
+          type: string
+        uniqueName:
+          type: string
+        userRequestedAction:
+          type: string
+        userRequestedActionTime:
+          type: string
+        userVisible:
+          type: boolean
+        work:
+          $ref: '#/components/schemas/TaskInfoDTO'
+      type: object
+    EraLCMConfigInfoEraDbServerExpiryPolicy:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/EraDbServerExpiryPolicy'
+        postDeleteCommand:
+          $ref: '#/components/schemas/EraPostDeleteCommand'
+        preDeleteCommand:
+          $ref: '#/components/schemas/EraPreDeleteCommand'
+        refreshDetails:
+          $ref: '#/components/schemas/EraEntityRefreshPolicy'
+      type: object
+    TaskInfoDTO:
+      properties:
+        actionArguments:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        actionHeader:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        applicationId:
+          format: uuid
+          type: string
+        applicationType:
+          type: string
+        clientId:
+          format: uuid
+          type: string
+        deferredBy:
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          format: uuid
+          type: string
+        entityName:
+          type: string
+        entityType:
+          type: string
+        expiryDate:
+          type: string
+        hostId:
+          format: uuid
+          type: string
+        id:
+          format: uuid
+          type: string
+        isEraCreated:
+          type: boolean
+        isInternal:
+          type: boolean
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigDTO'
+        message:
+          type: string
+        name:
+          type: string
+        operationDefinition:
+          $ref: '#/components/schemas/OperationDefinition'
+        operationId:
+          format: uuid
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        parentId:
+          format: uuid
+          type: string
+        parentOpStep:
+          format: int32
+          type: integer
+        parentOperation:
+          $ref: '#/components/schemas/EraParentOperationDTO'
+        parentStepIndex:
+          format: int32
+          type: integer
+        parentWorkId:
+          format: uuid
+          type: string
+        payload:
+          properties: {}
+          type: object
+        priority:
+          format: int32
+          type: integer
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        scheduleInfo:
+          $ref: '#/components/schemas/ScheduleInfo'
+        scheduleTime:
+          type: string
+        skipDriverArgumentValidations:
+          type: boolean
+        status:
+          type: string
+        statusName:
+          type: string
+        stepGenEnabled:
+          type: boolean
+        submissionDate:
+          type: string
+        submittedForOwnerId:
+          format: uuid
+          type: string
+        systemCreated:
+          type: boolean
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeZone:
+          type: string
+        type:
+          type: string
+        userDTO:
+          $ref: '#/components/schemas/ERAUser'
+        verboseLevel:
+          format: int32
+          type: integer
+      type: object
+    EraOperationMetadata:
+      properties:
+        associatedEntities:
+          items:
+            $ref: '#/components/schemas/EraEntityShortInfo'
+          type: array
+        controlMessage:
+          type: string
+        executionContext:
+          $ref: '#/components/schemas/ExecutionContext'
+        linkedOperations:
+          items:
+            $ref: '#/components/schemas/LinkedOperation'
+          type: array
+        linkedOperationsDescription:
+          type: string
+        oldStatus:
+          type: string
+        retriedOperations:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        retryImmediateParentId:
+          type: string
+        retryParentId:
+          type: string
+        scheduleTime:
+          type: string
+        scheduledBy:
+          type: string
+        scheduledOn:
+          type: string
+        switchedDbservers:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        userRequestedAction:
+          type: string
+        userRequestedActionTimestamp:
+          type: string
+      type: object
+    ERAUserProperties:
+      properties:
+        notificationProps:
+          $ref: '#/components/schemas/ERAUserNotificationProperties'
+        uiTheme:
+          type: string
+        uiTimeZone:
+          type: string
+        uiTimeout:
+          format: float
+          type: number
+      type: object
+    EraEntityExpiryPolicy:
+      properties:
+        effectiveTimestamp:
+          type: string
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+        expiryTimestamp:
+          type: string
+        remindBeforeInDays:
+          format: int32
+          type: integer
+        userCreated:
+          type: boolean
+      type: object
+    EraTagValueDTO:
+      properties:
+        entityId:
+          type: string
+        entityType:
+          enum:
+          - DATABASE
+          - TIME_MACHINE
+          - DATABASE_SERVER
+          - CLONE
+          type: string
+        tagId:
+          type: string
+        tagName:
+          type: string
+        value:
+          type: string
+      type: object
+    EraLCMConfigDTO:
+      properties:
+        databaseLCMConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDatabaseExpiryPolicy'
+        dbServerLCMConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraDbServerExpiryPolicy'
+        snapshotLCMConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraEntityExpiryPolicy'
+      type: object
+    EraDbServerExpiryPolicy:
+      properties:
+        deleteVM:
+          type: boolean
+        effectiveTimestamp:
+          type: string
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+        expiryTimestamp:
+          type: string
+        remindBeforeInDays:
+          format: int32
+          type: integer
+        userCreated:
+          type: boolean
+      type: object
+    EraEntityShortInfo:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    LinkedOperation:
+      properties:
+        displayMessage:
+          type: string
+        label:
+          type: string
+        operationId:
+          format: uuid
+          type: string
+        primary:
+          type: boolean
+      type: object
+    EraLCMConfigInfoEraDatabaseExpiryPolicy:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/EraDatabaseExpiryPolicy'
+        postDeleteCommand:
+          $ref: '#/components/schemas/EraPostDeleteCommand'
+        preDeleteCommand:
+          $ref: '#/components/schemas/EraPreDeleteCommand'
+        refreshDetails:
+          $ref: '#/components/schemas/EraEntityRefreshPolicy'
+      type: object
+    EraEntityRefreshPolicy:
+      properties:
+        lastRefreshDate:
+          type: string
+        nextRefreshDate:
+          type: string
+        refreshDateTimezone:
+          type: string
+        refreshInDays:
+          format: int32
+          type: integer
+        refreshInHours:
+          format: int32
+          type: integer
+        refreshInMonths:
+          format: int32
+          type: integer
+        refreshTime:
+          type: string
+      type: object
+    EraPreDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    OperationInstance:
+      properties:
+        childSteps:
+          items:
+            $ref: '#/components/schemas/OperationInstance'
+          type: array
+        definitionId:
+          type: string
+        endTime:
+          type: string
+        fileId:
+          type: string
+        id:
+          format: uuid
+          type: string
+        instanceId:
+          type: string
+        level:
+          type: string
+        message:
+          type: string
+        name:
+          type: string
+        parentId:
+          type: string
+        percentageComplete:
+          type: string
+        sequenceNumber:
+          format: int32
+          type: integer
+        setStartTimeValue:
+          type: boolean
+        startTime:
+          type: string
+        status:
+          type: string
+        stepGenEnabled:
+          type: boolean
+        uniqueName:
+          type: string
+        weightage:
+          format: int32
+          type: integer
+      type: object
+    ERAUserNotificationProperties:
+      properties:
+        notifyAlerts:
+          type: boolean
+        notifyOnOpComplete:
+          type: boolean
+        notifyOnOpFailure:
+          type: boolean
+      type: object
+    ERAUser:
+      properties:
+        customerId:
+          type: string
+        directoryId:
+          type: string
+        email:
+          type: string
+        encrypted:
+          type: boolean
+        eulaAccepted:
+          type: boolean
+        groups:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        internalUser:
+          type: boolean
+        isExternalAuth:
+          type: boolean
+        password:
+          type: string
+        passwordExpired:
+          type: boolean
+        passwordHint:
+          type: string
+        privilegeEndpoints:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        properties: {}
+        resetProfile:
+          type: boolean
+        roles:
+          items:
+            type: string
+          type: array
+        rolesGroupMapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+            uniqueItems: true
+          type: object
+        state:
+          type: string
+        unresetProfile:
+          type: boolean
+        username:
+          type: string
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    ScheduleInfo:
+      properties:
+        scheduleTime:
+          type: string
+        timeZone:
+          type: string
+      type: object
+    EraPostDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+    EraDatabaseExpiryPolicy:
+      properties:
+        deleteDatabase:
+          type: boolean
+        deleteTimeMachine:
+          type: boolean
+        deleteVM:
+          type: boolean
+        effectiveTimestamp:
+          type: string
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+        expiryTimestamp:
+          type: string
+        remindBeforeInDays:
+          format: int32
+          type: integer
+        userCreated:
+          type: boolean
+      type: object
+    ExecutionContext:
+      properties:
+        affectedDBServers:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        applicationType:
+          type: string
+        extendedAffectedDBServers:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

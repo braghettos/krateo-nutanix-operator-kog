@@ -1,0 +1,210 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: foundation@nutanix.com
+    name: Foundation Developers
+  description: '# Foundation
+
+
+    Foundation is a Nutanix provided tool used for bootstrapping, imaging, and deployment of Nutanix clusters. The imaging
+    process will install the desired version of the AOS software and the hypervisor of your choice. One of the ways to use
+    Foundation services is to make use of the APIs provided by Foundation.
+
+
+    Foundation provides seven categories of APIs, namely, General APIs, File Management APIs, Networking APIs, Imaging and
+    Cluster Creation APIs, UCS Managed Mode APIs, Foundation Upgrade APIs and Factory APIs.
+
+
+    However, most of these APIs find their use in internal scenarios. Some APIs that find most relevance in the customer scenario
+    are image_nodes, pre_check, reboot_to_phoenix, reboot_from_phoenix, progress, phoenix_network_status, abort_session, get_progress_sessions
+    among others.
+
+
+
+    - Foundation Version: 5.10
+
+
+
+    ## Terminology
+
+
+    Some of the acronyms frequently used in the API descriptions are listed below:
+
+
+    - **FVM** - Foundation Virtual Machine, A VM that has Foundation service running on it.
+
+    - **BMC** - Baseboard management controller.
+
+    - **IPMI** - Intelligent Platform Management Interface.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+
+    '
+  license:
+    name: 'Copyright Nutanix Inc. All rights reserved
+
+      '
+  title: Foundation REST API
+  version: '5.10'
+servers:
+- url: /foundation
+security: []
+paths:
+  /boot_phoenix:
+    post:
+      description: Boots node(s) in phoenix asynchronously.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/boot_phoenix'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/http_code_200_with_session_id'
+      summary: Boot node(s) into phoenix
+      tags:
+      - General APIs
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/foundation/boot_phoenix \\\n    --data '{\n   \
+          \ \"ipmi_password\": \"string\",\n    \"ipmi_user\": \"string\",\n    \"nodes\": [\n        {\n            \"bond_lacp_rate\"\
+          : \"string\",\n            \"bond_mode\": \"string\",\n            \"bond_uplinks\": [\n                \"string\"\
+          \n            ],\n            \"device_hint\": \"string\",\n            \"install_discovery_os\": true,\n      \
+          \      \"ipmi_ip\": \"192.168.0.1\",\n            \"phoenix_ip\": \"192.168.0.1\"\n        }\n    ],\n    \"phoenix_gateway\"\
+          : \"192.168.0.1\",\n    \"phoenix_netmask\": \"192.168.0.1\",\n    \"ucsm_ip\": \"192.168.0.1\",\n    \"ucsm_managed_mode\"\
+          : true,\n    \"ucsm_password\": \"string\",\n    \"ucsm_user\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --body-data '{\n    \"ipmi_password\": \"string\",\n    \"ipmi_user\"\
+          : \"string\",\n    \"nodes\": [\n        {\n            \"bond_lacp_rate\": \"string\",\n            \"bond_mode\"\
+          : \"string\",\n            \"bond_uplinks\": [\n                \"string\"\n            ],\n            \"device_hint\"\
+          : \"string\",\n            \"install_discovery_os\": true,\n            \"ipmi_ip\": \"192.168.0.1\",\n        \
+          \    \"phoenix_ip\": \"192.168.0.1\"\n        }\n    ],\n    \"phoenix_gateway\": \"192.168.0.1\",\n    \"phoenix_netmask\"\
+          : \"192.168.0.1\",\n    \"ucsm_ip\": \"192.168.0.1\",\n    \"ucsm_managed_mode\": true,\n    \"ucsm_password\":\
+          \ \"string\",\n    \"ucsm_user\": \"string\"\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/foundation/boot_phoenix"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {}\n\npayload\
+          \ =  \"\"\"{\n    \"ipmi_password\": \"string\",\n    \"ipmi_user\": \"string\",\n    \"nodes\": [\n        {\n\
+          \            \"bond_lacp_rate\": \"string\",\n            \"bond_mode\": \"string\",\n            \"bond_uplinks\"\
+          : [\n                \"string\"\n            ],\n            \"device_hint\": \"string\",\n            \"install_discovery_os\"\
+          : true,\n            \"ipmi_ip\": \"192.168.0.1\",\n            \"phoenix_ip\": \"192.168.0.1\"\n        }\n   \
+          \ ],\n    \"phoenix_gateway\": \"192.168.0.1\",\n    \"phoenix_netmask\": \"192.168.0.1\",\n    \"ucsm_ip\": \"\
+          192.168.0.1\",\n    \"ucsm_managed_mode\": true,\n    \"ucsm_password\": \"string\",\n    \"ucsm_user\": \"string\"\
+          \n}\"\"\"\n\nconn.request(\"POST\",\"/foundation/boot_phoenix\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/foundation/boot_phoenix\"\n\t\n\tpayload :=  strings.NewReader(`{\"ipmi_password\"\
+          : \"string\", \"ipmi_user\": \"string\", \"nodes\": [{\"bond_lacp_rate\": \"string\", \"bond_mode\": \"string\"\
+          , \"bond_uplinks\": [\"string\"], \"device_hint\": \"string\", \"install_discovery_os\": true, \"ipmi_ip\": \"192.168.0.1\"\
+          , \"phoenix_ip\": \"192.168.0.1\"}], \"phoenix_gateway\": \"192.168.0.1\", \"phoenix_netmask\": \"192.168.0.1\"\
+          , \"ucsm_ip\": \"192.168.0.1\", \"ucsm_managed_mode\": true, \"ucsm_password\": \"string\", \"ucsm_user\": \"string\"\
+          }`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/foundation/boot_phoenix\"\
+          )\n  .setBody(\"{\\\"ipmi_password\\\": \\\"string\\\", \\\"ipmi_user\\\": \\\"string\\\", \\\"nodes\\\": [{\\\"\
+          bond_lacp_rate\\\": \\\"string\\\", \\\"bond_mode\\\": \\\"string\\\", \\\"bond_uplinks\\\": [\\\"string\\\"], \\\
+          \"device_hint\\\": \\\"string\\\", \\\"install_discovery_os\\\": true, \\\"ipmi_ip\\\": \\\"192.168.0.1\\\", \\\"\
+          phoenix_ip\\\": \\\"192.168.0.1\\\"}], \\\"phoenix_gateway\\\": \\\"192.168.0.1\\\", \\\"phoenix_netmask\\\": \\\
+          \"192.168.0.1\\\", \\\"ucsm_ip\\\": \\\"192.168.0.1\\\", \\\"ucsm_managed_mode\\\": true, \\\"ucsm_password\\\"\
+          : \\\"string\\\", \\\"ucsm_user\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/foundation/boot_phoenix';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {},\n  body:  `{\"ipmi_password\": \"string\", \"ipmi_user\": \"string\", \"nodes\": [{\"bond_lacp_rate\": \"\
+          string\", \"bond_mode\": \"string\", \"bond_uplinks\": [\"string\"], \"device_hint\": \"string\", \"install_discovery_os\"\
+          : true, \"ipmi_ip\": \"192.168.0.1\", \"phoenix_ip\": \"192.168.0.1\"}], \"phoenix_gateway\": \"192.168.0.1\", \"\
+          phoenix_netmask\": \"192.168.0.1\", \"ucsm_ip\": \"192.168.0.1\", \"ucsm_managed_mode\": true, \"ucsm_password\"\
+          : \"string\", \"ucsm_user\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    http_code_200_with_session_id:
+      properties:
+        session_id:
+          description: Imaging session ID.
+          type: string
+      type: object
+    boot_phoenix:
+      description: Boot phoenix parameters.
+      properties:
+        ipmi_password:
+          description: IPMI password.
+          type: string
+        ipmi_user:
+          description: IPMI user.
+          type: string
+        nodes:
+          description: Node details.
+          items:
+            $ref: '#/components/schemas/node_dict_for_boot_phoenix'
+          type: array
+        phoenix_gateway:
+          description: Phoenix gateway.
+          format: ipv4
+          type: string
+        phoenix_netmask:
+          description: Phoenix netmask.
+          format: ipv4
+          type: string
+        ucsm_ip:
+          description: UCSM IP address.
+          format: ipv4
+          type: string
+        ucsm_managed_mode:
+          description: UCSM managed mode.
+          type: boolean
+        ucsm_password:
+          description: UCSM password.
+          type: string
+        ucsm_user:
+          description: UCSM username.
+          type: string
+      required:
+      - nodes
+      type: object
+    node_dict_for_boot_phoenix:
+      description: Boot phoenix node parameters.
+      properties:
+        bond_lacp_rate:
+          description: slow or fast if lacp if being used at the switch
+          type: string
+        bond_mode:
+          description: dynamic if using LACP, static for LAG
+          type: string
+        bond_uplinks:
+          description: MAC Addresses of NICs in a team/bond
+          items:
+            description: Mac Address of NIC in a team/bond
+            type: string
+          type: array
+        device_hint:
+          description: use "vm_installer" to enable CVM imaging from standalone.
+          type: string
+        install_discovery_os:
+          description: Installs DiscoveryOS if true.
+          type: boolean
+        ipmi_ip:
+          description: IPMI IP Address.
+          format: ipv4
+          type: string
+        phoenix_ip:
+          description: IP to boot phoenix with.
+          format: ipv4
+          type: string
+      required:
+      - ipmi_ip
+      type: object

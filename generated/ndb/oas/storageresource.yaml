@@ -1,0 +1,564 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /storage-resources:
+    get:
+      operationId: getAllStorageResources
+      parameters:
+      - description: Includes additional details of the Storage Resources, for example,. capacity, storage usage, and more.
+        in: query
+        name: include-details
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ERAStorageResource'
+                type: array
+          description: Operation completed.
+      summary: Get a list of Storage Resources registered with NDB
+      tags:
+      - Storage Resources
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/storage-resources \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/storage-resources"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/storage-resources\", headers=headers)\n\nres\
+          \ = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/storage-resources\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/storage-resources\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/storage-resources';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      description: Registers a Nutanix Object Store with NDB.
+      operationId: addStorageResource
+      parameters:
+      - description: Skips Domain version check (this is not recommended as NDB may not be compatible with the Domain version).
+        in: query
+        name: skip-version-check
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ERAStorageResourceDTO'
+        description: Payload required to register an object store. If the createKeys parameter is true, the accessKey and
+          secretKey parameters will be ignored. If createKeys is not provided, it will default to false.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAStorageResource'
+          description: Operation completed.
+      summary: Register a Nutanix Object Store with NDB
+      tags:
+      - Storage Resources
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/storage-resources \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\
+          \n    --data '{\n    \"accessKey\": \"string\",\n    \"createKeys\": false,\n    \"description\": \"string\",\n\
+          \    \"domainId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"fqdn\": \"string\",\n    \"name\": \"string\"\
+          ,\n    \"secretKey\": \"string\",\n    \"type\": \"NUTANIX_OBJECT_STORE\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"accessKey\"\
+          : \"string\",\n    \"createKeys\": false,\n    \"description\": \"string\",\n    \"domainId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n    \"fqdn\": \"string\",\n    \"name\": \"string\",\n    \"secretKey\": \"string\",\n    \"type\": \"NUTANIX_OBJECT_STORE\"\
+          \n}' \\\n    --output-document \\\n    - :///era/v0.9/storage-resources"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"accessKey\": \"string\",\n    \"createKeys\": false,\n    \"description\": \"string\",\n   \
+          \ \"domainId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"fqdn\": \"string\",\n    \"name\": \"string\",\n\
+          \    \"secretKey\": \"string\",\n    \"type\": \"NUTANIX_OBJECT_STORE\"\n}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/storage-resources\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/storage-resources\"\n\t\n\tpayload :=  strings.NewReader(`{\"accessKey\": \"string\", \"createKeys\"\
+          : false, \"description\": \"string\", \"domainId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"fqdn\": \"string\"\
+          , \"name\": \"string\", \"secretKey\": \"string\", \"type\": \"NUTANIX_OBJECT_STORE\"}`)\n\treq, err := http.NewRequest(\"\
+          POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/storage-resources\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"accessKey\\\": \\\"string\\\", \\\"createKeys\\\
+          \": false, \\\"description\\\": \\\"string\\\", \\\"domainId\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\",\
+          \ \\\"fqdn\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\", \\\"secretKey\\\": \\\"string\\\", \\\"type\\\": \\\
+          \"NUTANIX_OBJECT_STORE\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/storage-resources';\nconst options = {\n  method: 'POST',\n  headers: {'Accept':\
+          \ 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"accessKey\": \"string\", \"createKeys\": false, \"description\": \"string\", \"domainId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"fqdn\": \"string\", \"name\": \"string\", \"secretKey\": \"string\", \"type\": \"NUTANIX_OBJECT_STORE\"}`\n\
+          };\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+  /storage-resources/{storage-resource-id}:
+    delete:
+      description: Deregisters a Nutanix Object Store from NDB.
+      operationId: deleteStorageResource
+      parameters:
+      - in: path
+        name: storage-resource-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Allow force delete of object store, even if associated log drive is not curated.
+        in: query
+        name: force-delete
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAStatusDTO'
+          description: Operation completed.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request. - This Object Store is currently in use. Disassociate Object Store with all entities before
+            removing it. - Storage resource can only be deleted for type NUTANIX_OBJECT_STORE.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden. - Not owner and the user has no privilege to delete storage resource.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not found. - storage-resource-id not found.
+      summary: Deregister a Nutanix Object Store
+      tags:
+      - Storage Resources
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/storage-resources/{storage-resource-id} \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/storage-resources/{storage-resource-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/storage-resources/{storage-resource-id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/storage-resources/{storage-resource-id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/storage-resources/{storage-resource-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/storage-resources/{storage-resource-id}';\nconst options = {\n  method: 'DELETE',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      operationId: getStorageResource
+      parameters:
+      - description: ID of the Storage Resource.
+        in: path
+        name: storage-resource-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Includes additional details of the Storage Resource such as capacity, storage usage, etc.
+        in: query
+        name: include-details
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAStorageResource'
+          description: Operation completed.
+      summary: Get details of a Storage Resource
+      tags:
+      - Storage Resources
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/storage-resources/{storage-resource-id} \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/storage-resources/{storage-resource-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/storage-resources/{storage-resource-id}\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/storage-resources/{storage-resource-id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/storage-resources/{storage-resource-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/storage-resources/{storage-resource-id}';\nconst options = {\n  method: 'GET',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      description: Updates the Nutanix Object Store.
+      operationId: updateStorageResource
+      parameters:
+      - description: ID of the Storage Resource to update.
+        in: path
+        name: storage-resource-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Skips storage resource credential validation by allowing the FQDN, access key and secret key to be updated
+          without validation.
+        in: query
+        name: skip-credential-validation
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ERAStorageResourceUpdateDTO'
+        description: Payload required to update an object store.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAStorageResource'
+          description: Operation completed.
+      summary: Update a Nutanix Object Store
+      tags:
+      - Storage Resources
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/storage-resources/{storage-resource-id} \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json'\
+          \ \\\n    --data '{\n    \"accessKey\": \"string\",\n    \"description\": \"string\",\n    \"fqdn\": \"string\"\
+          ,\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"name\": \"string\",\n    \"secretKey\": \"string\"\
+          \n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"accessKey\"\
+          : \"string\",\n    \"description\": \"string\",\n    \"fqdn\": \"string\",\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n    \"name\": \"string\",\n    \"secretKey\": \"string\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/storage-resources/{storage-resource-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"accessKey\": \"string\",\n    \"description\": \"string\",\n    \"fqdn\": \"string\",\n    \"\
+          id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"name\": \"string\",\n    \"secretKey\": \"string\"\n}\"\"\
+          \"\n\nconn.request(\"PUT\",\"/era/v0.9/storage-resources/{storage-resource-id}\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/storage-resources/{storage-resource-id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"accessKey\"\
+          : \"string\", \"description\": \"string\", \"fqdn\": \"string\", \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"name\": \"string\", \"secretKey\": \"string\"}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/storage-resources/{storage-resource-id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"accessKey\\\": \\\"string\\\", \\\"description\\\
+          \": \\\"string\\\", \\\"fqdn\\\": \\\"string\\\", \\\"id\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"\
+          name\\\": \\\"string\\\", \\\"secretKey\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/storage-resources/{storage-resource-id}';\nconst options = {\n  method: 'PUT',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"accessKey\": \"string\", \"description\": \"string\", \"fqdn\": \"string\", \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"name\": \"string\", \"secretKey\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    ERAStorageResourceDTO:
+      properties:
+        accessKey:
+          type: string
+        cloudId:
+          format: uuid
+          readOnly: true
+          type: string
+        createKeys:
+          type: boolean
+        description:
+          type: string
+        domainId:
+          format: uuid
+          type: string
+        entityId:
+          format: uuid
+          readOnly: true
+          type: string
+        fqdn:
+          type: string
+        id:
+          format: uuid
+          readOnly: true
+          type: string
+        info:
+          properties:
+            deploymentVersion:
+              type: string
+            dnsDomainName:
+              type: string
+            fqdn:
+              type: string
+            ipAddresses:
+              items:
+                type: string
+              type: array
+            provisioned:
+              type: boolean
+            storageCapacityInBytes:
+              format: int64
+              type: integer
+            storageUsageInBytes:
+              format: int64
+              type: integer
+            username:
+              type: string
+          readOnly: true
+          required:
+          - provisioned
+          - fqdn
+          type: object
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          readOnly: true
+          type: string
+        secretKey:
+          type: string
+        status:
+          enum:
+          - UP
+          - DOWN
+          - DELETED
+          - PROVISIONING
+          readOnly: true
+          type: string
+        type:
+          type: string
+      type: object
+    ERAStorageResource:
+      properties:
+        cloudId:
+          format: uuid
+          readOnly: true
+          type: string
+        description:
+          type: string
+        domainId:
+          format: uuid
+          type: string
+        entityId:
+          format: uuid
+          readOnly: true
+          type: string
+        id:
+          format: uuid
+          readOnly: true
+          type: string
+        info:
+          properties:
+            deploymentVersion:
+              type: string
+            dnsDomainName:
+              type: string
+            fqdn:
+              type: string
+            ipAddresses:
+              items:
+                type: string
+              type: array
+            provisioned:
+              type: boolean
+            storageCapacityInBytes:
+              format: int64
+              type: integer
+            storageUsageInBytes:
+              format: int64
+              type: integer
+            username:
+              type: string
+          readOnly: true
+          required:
+          - provisioned
+          - fqdn
+          type: object
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          readOnly: true
+          type: string
+        status:
+          enum:
+          - UP
+          - DOWN
+          - DELETED
+          - PROVISIONING
+          readOnly: true
+          type: string
+        type:
+          enum:
+          - NUTANIX_OBJECT_STORE
+          - NUTANIX_CLUSTER
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+    ERAStatusDTO:
+      properties:
+        errorCode:
+          format: int32
+          type: integer
+        info:
+          properties: {}
+          type: object
+        message:
+          type: string
+        status:
+          type: string
+      type: object
+    ERAStorageResourceUpdateDTO:
+      properties:
+        accessKey:
+          type: string
+        description:
+          type: string
+        fqdn:
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        secretKey:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

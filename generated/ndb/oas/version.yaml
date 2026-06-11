@@ -1,0 +1,528 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /profiles/{profile_id}/versions:
+    post:
+      description: Creates a Profile version using a source Database Server. This will automatically increment the Profile
+        version in the Profile name.
+      operationId: createProfileVersion
+      parameters:
+      - description: The time zone (e.g. 'America/New_York', 'UTC') to convert the timestamps in the response to the client's
+          local time zone.
+        in: header
+        name: client_tz
+        schema:
+          type: string
+      - description: ID of the profile for which a new version is to be created.
+        in: path
+        name: profile_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileModel'
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation completed.
+      summary: Create a Profile version
+      tags:
+      - Profiles
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/profiles/{profile_id}/versions \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\
+          \n    --data '{\n    \"dbVersion\": \"string\",\n    \"deprecated\": false,\n    \"description\": \"string\",\n\
+          \    \"engineType\": \"oracle_database\",\n    \"name\": \"string\",\n    \"properties\": [\n        {\n       \
+          \     \"name\": \"string\",\n            \"value\": null\n        }\n    ],\n    \"published\": false,\n    \"systemProfile\"\
+          : false,\n    \"type\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"dbVersion\"\
+          : \"string\",\n    \"deprecated\": false,\n    \"description\": \"string\",\n    \"engineType\": \"oracle_database\"\
+          ,\n    \"name\": \"string\",\n    \"properties\": [\n        {\n            \"name\": \"string\",\n            \"\
+          value\": null\n        }\n    ],\n    \"published\": false,\n    \"systemProfile\": false,\n    \"type\": \"string\"\
+          \n}' \\\n    --output-document \\\n    - :///era/v0.9/profiles/{profile_id}/versions"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"dbVersion\": \"string\",\n    \"deprecated\": false,\n    \"description\": \"string\",\n   \
+          \ \"engineType\": \"oracle_database\",\n    \"name\": \"string\",\n    \"properties\": [\n        {\n          \
+          \  \"name\": \"string\",\n            \"value\": null\n        }\n    ],\n    \"published\": false,\n    \"systemProfile\"\
+          : false,\n    \"type\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/profiles/{profile_id}/versions\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/profiles/{profile_id}/versions\"\n\t\n\tpayload :=  strings.NewReader(`{\"dbVersion\": \"string\"\
+          , \"deprecated\": false, \"description\": \"string\", \"engineType\": \"oracle_database\", \"name\": \"string\"\
+          , \"properties\": [{\"name\": \"string\", \"value\": null}], \"published\": false, \"systemProfile\": false, \"\
+          type\": \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n \
+          \       req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/profiles/{profile_id}/versions\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"dbVersion\\\": \\\"string\\\", \\\"deprecated\\\
+          \": false, \\\"description\\\": \\\"string\\\", \\\"engineType\\\": \\\"oracle_database\\\", \\\"name\\\": \\\"\
+          string\\\", \\\"properties\\\": [{\\\"name\\\": \\\"string\\\", \\\"value\\\": null}], \\\"published\\\": false,\
+          \ \\\"systemProfile\\\": false, \\\"type\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/profiles/{profile_id}/versions';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"dbVersion\": \"string\", \"deprecated\": false, \"description\": \"string\", \"engineType\": \"oracle_database\"\
+          , \"name\": \"string\", \"properties\": [{\"name\": \"string\", \"value\": null}], \"published\": false, \"systemProfile\"\
+          : false, \"type\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /profiles/{profile_id}/versions/{version-id}:
+    delete:
+      description: Deletes the Profile Version based on the provided Profile and Version IDs from the Database Servers.
+      operationId: deleteProfileVersion
+      parameters:
+      - in: path
+        name: profile_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: version-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses: {}
+      summary: Delete a Profile version
+      tags:
+      - Profiles
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/profiles/{profile_id}/versions/{version-id} \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/profiles/{profile_id}/versions/{version-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/profiles/{profile_id}/versions/{version-id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/profiles/{profile_id}/versions/{version-id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\"\
+          , url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/profiles/{profile_id}/versions/{version-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/profiles/{profile_id}/versions/{version-id}';\nconst options = {\n  method: 'DELETE',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      description: Get a specific Profile version using the profile and version IDs.
+      operationId: getProfileVersion
+      parameters:
+      - description: The time zone (e.g. 'America/New_York', 'UTC') to convert the timestamps in the response to the client's
+          local time zone.
+        in: header
+        name: client_tz
+        schema:
+          type: string
+      - description: ID of the Profile to fetch.
+        in: path
+        name: profile_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ID of the Profile version to operate on.
+        in: path
+        name: version-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EraProfileVersionDTO'
+          description: Operation completed.
+      summary: Get a Profile Version
+      tags:
+      - Profiles
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/profiles/{profile_id}/versions/{version-id} \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/profiles/{profile_id}/versions/{version-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/profiles/{profile_id}/versions/{version-id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/profiles/{profile_id}/versions/{version-id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/profiles/{profile_id}/versions/{version-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/profiles/{profile_id}/versions/{version-id}';\nconst options = {\n  method: 'GET',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      description: Updates the Profile Version based on the provided Profile and Version IDs.
+      operationId: updateProfileVersion
+      parameters:
+      - in: path
+        name: profile_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: version-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileVersionModel'
+        required: false
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EraProfileVersionDTO'
+          description: Operation completed.
+      summary: Update a Profile Version
+      tags:
+      - Profiles
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/profiles/{profile_id}/versions/{version-id} \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"dbVersion\": \"string\",\n    \"deprecated\": false,\n    \"description\"\
+          : \"string\",\n    \"engineType\": \"oracle_database\",\n    \"name\": \"string\",\n    \"properties\": [\n    \
+          \    {\n            \"name\": \"string\",\n            \"value\": null\n        }\n    ],\n    \"published\": false,\n\
+          \    \"systemProfile\": false,\n    \"type\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"dbVersion\"\
+          : \"string\",\n    \"deprecated\": false,\n    \"description\": \"string\",\n    \"engineType\": \"oracle_database\"\
+          ,\n    \"name\": \"string\",\n    \"properties\": [\n        {\n            \"name\": \"string\",\n            \"\
+          value\": null\n        }\n    ],\n    \"published\": false,\n    \"systemProfile\": false,\n    \"type\": \"string\"\
+          \n}' \\\n    --output-document \\\n    - :///era/v0.9/profiles/{profile_id}/versions/{version-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"dbVersion\": \"string\",\n    \"deprecated\": false,\n    \"description\": \"string\",\n   \
+          \ \"engineType\": \"oracle_database\",\n    \"name\": \"string\",\n    \"properties\": [\n        {\n          \
+          \  \"name\": \"string\",\n            \"value\": null\n        }\n    ],\n    \"published\": false,\n    \"systemProfile\"\
+          : false,\n    \"type\": \"string\"\n}\"\"\"\n\nconn.request(\"PUT\",\"/era/v0.9/profiles/{profile_id}/versions/{version-id}\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/profiles/{profile_id}/versions/{version-id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"dbVersion\"\
+          : \"string\", \"deprecated\": false, \"description\": \"string\", \"engineType\": \"oracle_database\", \"name\"\
+          : \"string\", \"properties\": [{\"name\": \"string\", \"value\": null}], \"published\": false, \"systemProfile\"\
+          : false, \"type\": \"string\"}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\"\
+          )\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/profiles/{profile_id}/versions/{version-id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"dbVersion\\\": \\\"string\\\", \\\"deprecated\\\
+          \": false, \\\"description\\\": \\\"string\\\", \\\"engineType\\\": \\\"oracle_database\\\", \\\"name\\\": \\\"\
+          string\\\", \\\"properties\\\": [{\\\"name\\\": \\\"string\\\", \\\"value\\\": null}], \\\"published\\\": false,\
+          \ \\\"systemProfile\\\": false, \\\"type\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/profiles/{profile_id}/versions/{version-id}';\nconst options = {\n  method: 'PUT',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"dbVersion\": \"string\", \"deprecated\": false, \"description\": \"string\", \"engineType\": \"oracle_database\"\
+          , \"name\": \"string\", \"properties\": [{\"name\": \"string\", \"value\": null}], \"published\": false, \"systemProfile\"\
+          : false, \"type\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    JSONObject:
+      type: object
+    CreateProfileModel:
+      properties:
+        dbVersion:
+          type: string
+        deprecated:
+          type: boolean
+        description:
+          type: string
+        engineType:
+          enum:
+          - oracle_database
+          - postgres_database
+          - sqlserver_database
+          - mariadb_database
+          - mysql_database
+          - mongodb_database
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/Properties'
+          type: array
+        published:
+          description: Indicates whether the Profile is visible for updates.
+          type: boolean
+        systemProfile:
+          type: boolean
+        type:
+          type: string
+      type: object
+    EraProfileVersionDTO:
+      properties:
+        assocDatabases:
+          items:
+            type: string
+          type: array
+        assocDbServers:
+          items:
+            type: string
+          type: array
+        custom1:
+          type: string
+        custom2:
+          type: string
+        custom3:
+          type: string
+        custom4:
+          type: string
+        custom5:
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbVersion:
+          type: string
+        deprecated:
+          type: boolean
+        description:
+          type: string
+        engineType:
+          type: string
+        id:
+          format: uuid
+          type: string
+        json:
+          $ref: '#/components/schemas/JSONObject'
+        name:
+          type: string
+        nxClusterId:
+          format: uuid
+          type: string
+        owner:
+          type: string
+        profileId:
+          format: uuid
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        propertiesMap:
+          additionalProperties:
+            type: string
+          type: object
+        published:
+          type: boolean
+        systemProfile:
+          type: boolean
+        topology:
+          type: string
+        type:
+          type: string
+        version:
+          type: string
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    Properties:
+      properties:
+        name:
+          type: string
+        value:
+          oneOf:
+          - type: string
+          - type: boolean
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+    UpdateProfileVersionModel:
+      properties:
+        dbVersion:
+          type: string
+        deprecated:
+          type: boolean
+        description:
+          type: string
+        engineType:
+          enum:
+          - oracle_database
+          - postgres_database
+          - sqlserver_database
+          - mariadb_database
+          - mysql_database
+          - mongodb_database
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/Properties'
+          type: array
+        published:
+          type: boolean
+        systemProfile:
+          type: boolean
+        type:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

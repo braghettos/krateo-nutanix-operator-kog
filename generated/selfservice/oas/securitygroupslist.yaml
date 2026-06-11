@@ -1,0 +1,242 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /aws/v1/security_groups/list:
+    post:
+      description: 'List all AWS Security Groups. Supported filters are:
+
+        - account_uuid
+
+        - region
+
+        - vpc_id
+
+        - include_classic_sg
+
+        Use account_uuid to list all security groups on the default
+
+        region of a particular AWS account.
+
+        Use account_uuid and region filters together to list all
+
+        security groups in a particular region.
+
+        Use account_uuid, region and vpc_id filters together to list all
+
+        security groups in a particular vpc.
+
+        Set include_classic_sg filter to ''True'' to also show
+
+        EC2 classic security groups in the above three cases.
+
+        '
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/aws_security_group_list_metadata'
+        required: true
+      tags:
+      - aws/security_groups
+      x-private: true
+      x-doc-hide: true
+      summary: List all AWS Security Groups
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: aws_security_group
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/aws_security_group_list_response'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/aws/v1/security_groups/list \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"filter\": \"string\",\n    \"length\": 1,\n    \"offset\"\
+          : 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\",\n    \"length\": 1,\n    \"offset\": 0\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/aws/v1/security_groups/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\",\n    \"length\": 1,\n    \"offset\": 0\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"/api/nutanix/v3/aws/v1/security_groups/list\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\
+          \nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/aws/v1/security_groups/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          filter\": \"string\", \"length\": 1, \"offset\": 0}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/aws/v1/security_groups/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\", \\\"length\\\
+          \": 1, \\\"offset\\\": 0}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/aws/v1/security_groups/list';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"filter\": \"string\", \"length\": 1, \"offset\": 0}`\n};\n\ntry {\n  const\
+          \ response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error)\
+          \ {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    aws_security_group_def_status:
+      description: aws_security_group resources status
+      type: object
+      properties:
+        name:
+          type: string
+          description: aws_security_group name.
+        resources:
+          $ref: '#/components/schemas/aws_security_group_resources_def_status'
+        description:
+          type: string
+          description: A description for aws_security_group.
+      title: aws_security_group resources status
+    aws_security_group_resource:
+      description: aws_security_group entity
+      required:
+      - metadata
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/aws_security_group_def_status'
+        metadata:
+          $ref: '#/components/schemas/aws_security_group_metadata'
+      title: aws_security_group
+    aws_security_group_list_response:
+      description: AWS VPC entity list.
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/aws_security_group_resource'
+          type: array
+        api_version:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/aws_security_group_list_metadata_output'
+      title: aws_security_group entity list
+    aws_security_group_resources_def_status:
+      description: AWS Security Group resources
+      type: object
+      properties:
+        vpc_id:
+          pattern: ^vpc-[a-f0-9]{1,17}$
+          type: string
+          description: The AWS ID of the VPC for the security group.
+        tag_list:
+          $ref: '#/components/schemas/aws_tag_list'
+        id:
+          pattern: ^sg-[a-f0-9]{1,17}$
+          type: string
+          description: The AWS ID of the security group.
+      title: AWS Security Group resources
+    aws_security_group_list_metadata_output:
+      description: 'All api calls that return a list will have this metadata block
+
+        '
+      type: object
+      properties:
+        filter:
+          type: string
+          description: The filter used for the results
+        total_matches:
+          type: integer
+          description: Total matches found
+        kind:
+          x-ntnx-enum:
+          - aws_security_group
+          type: string
+          description: The kind name
+      title: Metadata for aws_security_group list output
+    aws_security_group_list_metadata:
+      description: 'All api calls that return a list will have this metadata block as input
+
+        '
+      type: object
+      properties:
+        filter:
+          type: string
+          description: The filter used for the results
+        length:
+          minimum: 1
+          type: integer
+          description: The number of records to retrieve relative to the offset
+          format: int32
+        offset:
+          minimum: 0
+          type: integer
+          description: Offset from the start of the entity list
+          format: int32
+      title: Metadata for aws_security_group list
+    aws_security_group_metadata:
+      description: The aws_security_group kind metadata
+      required:
+      - kind
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - aws_security_group
+        name:
+          readOnly: true
+          type: string
+          description: aws_security_group name
+      title: aws_security_group metadata
+    aws_tag_list:
+      items:
+        required:
+        - key
+        - value
+        type: object
+        description: Generic key value pair.
+        properties:
+          value:
+            type: string
+            description: Tag value
+          key:
+            type: string
+            description: Tag Key
+      type: array
+      description: The AWS Tags associated with any AWS resource
+      title: AWS Tags

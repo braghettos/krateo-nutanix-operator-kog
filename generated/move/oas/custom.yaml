@@ -1,0 +1,506 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/plans/{id}/workloads/{wid}/custom:
+    get:
+      description: Given a migration plan UUID and a valid workload UUID, this API gets the custom-view details of the workload.
+        <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/plans/867b4a4f-cb8c-4416-8d7e-26e033023aa4/workloads/91cea36d-c857-4092-b232-d46484ee3205/custom
+      operationId: getCustomWorkloadDetail
+      parameters:
+      - description: Migration plan UUID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Workload UUID
+        in: path
+        name: wid
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkloadCustomPropertiesResponse'
+      security:
+      - Bearer: []
+      summary: Get the custom-view details of a workload
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n \nconn.request(\"GET\",\"//move/v2/plans/{id}/workloads/{wid}/custom\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      description: Given a migration plan UUID and a valid workload UUID, this API updates customizable workload properties
+        in target. <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/plans/867b4a4f-cb8c-4416-8d7e-26e033023aa4/workloads/91cea36d-c857-4092-b232-d46484ee3205/custom
+      operationId: putCustomWorkloadDetail
+      parameters:
+      - description: Migration plan UUID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Workload UUID
+        in: path
+        name: wid
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkloadCustomPropertiesRequest'
+        description: Information required to update workload custom properties
+        required: true
+        x-examples:
+        - application/json:
+            APIVersion: 2.2.0
+            CustomProperties:
+              Type: VmCustomPropertiesInfo
+              VmCustomPropertiesInfo:
+                Source:
+                  GenericVmCustomProperties:
+                    Memory: 1073741824
+                    Name: ajc-ce72-dnd
+                    NumCDROMs: 1
+                    NumCoresPerSocket: 1
+                    NumDisks: 1
+                    NumNICs: 1
+                    NumvCPUs: 1
+                    PowerState: PoweredOn
+                  Type: GenericVmCustomProperties
+                Target:
+                  GenericVmCustomProperties:
+                    Memory: 1073741824
+                    Name: ajc-ce72-dnd--2
+                    NumCDROMs: 1
+                    NumCoresPerSocket: 1
+                    NumDisks: 1
+                    NumNICs: 1
+                    NumvCPUs: 1
+                    PowerState: PoweredOn
+                  Type: GenericVmCustomProperties
+                VMCustomizeType: static
+            MetaData:
+              Version: 1.1.0
+        - application/json:
+            APIVersion: 2.2.0
+            CustomProperties:
+              Type: VmCustomPropertiesInfo
+              VmCustomPropertiesInfo:
+                Source:
+                  MimicGenericVmCustomProperties: {}
+                  Type: MimicGenericVmCustomProperties
+                Target:
+                  GenericVmCustomProperties:
+                    Memory: 1073741824
+                    Name: ajc-ce72-dnd--1
+                    NumCDROMs: 1
+                    NumCoresPerSocket: 1
+                    NumDisks: 1
+                    NumNICs: 1
+                    NumvCPUs: 1
+                    PowerState: PoweredOn
+                  Type: GenericVmCustomProperties
+                VMCustomizeType: static
+            MetaData:
+              Version: 1.1.0
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkloadCustomPropertiesResponse'
+      security:
+      - Bearer: []
+      summary: Customize properties of the workload in the target
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"APIVersion\": \"string\",\n    \"CustomProperties\"\
+          : {\n        \"Type\": \"VmCustomPropertiesInfo\",\n        \"VmCustomPropertiesInfo\": {\n            \"Source\"\
+          : {\n                \"GenericVmCustomProperties\": {\n                    \"Memory\": 0,\n                    \"\
+          Name\": \"string\",\n                    \"NumCDROMs\": 0,\n                    \"NumCoresPerSocket\": 0,\n    \
+          \                \"NumDisks\": 0,\n                    \"NumNICs\": 0,\n                    \"NumvCPUs\": 0,\n \
+          \                   \"PowerState\": \"PoweredOn\"\n                },\n                \"MimicGenericVmCustomProperties\"\
+          : {},\n                \"Type\": \"GenericVmCustomProperties\"\n            },\n            \"Target\": {\n    \
+          \            \"GenericVmCustomProperties\": {\n                    \"Memory\": 0,\n                    \"Name\"\
+          : \"string\",\n                    \"NumCDROMs\": 0,\n                    \"NumCoresPerSocket\": 0,\n          \
+          \          \"NumDisks\": 0,\n                    \"NumNICs\": 0,\n                    \"NumvCPUs\": 0,\n       \
+          \             \"PowerState\": \"PoweredOn\"\n                },\n                \"MimicGenericVmCustomProperties\"\
+          : {},\n                \"Type\": \"GenericVmCustomProperties\"\n            },\n            \"VMCustomizeType\"\
+          : \"replicate\"\n        }\n    },\n    \"MetaData\": {\n        \"Version\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"APIVersion\"\
+          : \"string\",\n    \"CustomProperties\": {\n        \"Type\": \"VmCustomPropertiesInfo\",\n        \"VmCustomPropertiesInfo\"\
+          : {\n            \"Source\": {\n                \"GenericVmCustomProperties\": {\n                    \"Memory\"\
+          : 0,\n                    \"Name\": \"string\",\n                    \"NumCDROMs\": 0,\n                    \"NumCoresPerSocket\"\
+          : 0,\n                    \"NumDisks\": 0,\n                    \"NumNICs\": 0,\n                    \"NumvCPUs\"\
+          : 0,\n                    \"PowerState\": \"PoweredOn\"\n                },\n                \"MimicGenericVmCustomProperties\"\
+          : {},\n                \"Type\": \"GenericVmCustomProperties\"\n            },\n            \"Target\": {\n    \
+          \            \"GenericVmCustomProperties\": {\n                    \"Memory\": 0,\n                    \"Name\"\
+          : \"string\",\n                    \"NumCDROMs\": 0,\n                    \"NumCoresPerSocket\": 0,\n          \
+          \          \"NumDisks\": 0,\n                    \"NumNICs\": 0,\n                    \"NumvCPUs\": 0,\n       \
+          \             \"PowerState\": \"PoweredOn\"\n                },\n                \"MimicGenericVmCustomProperties\"\
+          : {},\n                \"Type\": \"GenericVmCustomProperties\"\n            },\n            \"VMCustomizeType\"\
+          : \"replicate\"\n        }\n    },\n    \"MetaData\": {\n        \"Version\": \"string\"\n    }\n}' \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"APIVersion\": \"string\",\n    \"CustomProperties\": {\n        \"Type\": \"VmCustomPropertiesInfo\"\
+          ,\n        \"VmCustomPropertiesInfo\": {\n            \"Source\": {\n                \"GenericVmCustomProperties\"\
+          : {\n                    \"Memory\": 0,\n                    \"Name\": \"string\",\n                    \"NumCDROMs\"\
+          : 0,\n                    \"NumCoresPerSocket\": 0,\n                    \"NumDisks\": 0,\n                    \"\
+          NumNICs\": 0,\n                    \"NumvCPUs\": 0,\n                    \"PowerState\": \"PoweredOn\"\n       \
+          \         },\n                \"MimicGenericVmCustomProperties\": {},\n                \"Type\": \"GenericVmCustomProperties\"\
+          \n            },\n            \"Target\": {\n                \"GenericVmCustomProperties\": {\n                \
+          \    \"Memory\": 0,\n                    \"Name\": \"string\",\n                    \"NumCDROMs\": 0,\n        \
+          \            \"NumCoresPerSocket\": 0,\n                    \"NumDisks\": 0,\n                    \"NumNICs\": 0,\n\
+          \                    \"NumvCPUs\": 0,\n                    \"PowerState\": \"PoweredOn\"\n                },\n \
+          \               \"MimicGenericVmCustomProperties\": {},\n                \"Type\": \"GenericVmCustomProperties\"\
+          \n            },\n            \"VMCustomizeType\": \"replicate\"\n        }\n    },\n    \"MetaData\": {\n     \
+          \   \"Version\": \"string\"\n    }\n}\"\"\"\n\nconn.request(\"PUT\",\"//move/v2/plans/{id}/workloads/{wid}/custom\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          APIVersion\": \"string\", \"CustomProperties\": {\"Type\": \"VmCustomPropertiesInfo\", \"VmCustomPropertiesInfo\"\
+          : {\"Source\": {\"GenericVmCustomProperties\": {\"Memory\": 0, \"Name\": \"string\", \"NumCDROMs\": 0, \"NumCoresPerSocket\"\
+          : 0, \"NumDisks\": 0, \"NumNICs\": 0, \"NumvCPUs\": 0, \"PowerState\": \"PoweredOn\"}, \"MimicGenericVmCustomProperties\"\
+          : {}, \"Type\": \"GenericVmCustomProperties\"}, \"Target\": {\"GenericVmCustomProperties\": {\"Memory\": 0, \"Name\"\
+          : \"string\", \"NumCDROMs\": 0, \"NumCoresPerSocket\": 0, \"NumDisks\": 0, \"NumNICs\": 0, \"NumvCPUs\": 0, \"PowerState\"\
+          : \"PoweredOn\"}, \"MimicGenericVmCustomProperties\": {}, \"Type\": \"GenericVmCustomProperties\"}, \"VMCustomizeType\"\
+          : \"replicate\"}}, \"MetaData\": {\"Version\": \"string\"}}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\")\n   \
+          \     req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"APIVersion\\\": \\\"string\\\", \\\"\
+          CustomProperties\\\": {\\\"Type\\\": \\\"VmCustomPropertiesInfo\\\", \\\"VmCustomPropertiesInfo\\\": {\\\"Source\\\
+          \": {\\\"GenericVmCustomProperties\\\": {\\\"Memory\\\": 0, \\\"Name\\\": \\\"string\\\", \\\"NumCDROMs\\\": 0,\
+          \ \\\"NumCoresPerSocket\\\": 0, \\\"NumDisks\\\": 0, \\\"NumNICs\\\": 0, \\\"NumvCPUs\\\": 0, \\\"PowerState\\\"\
+          : \\\"PoweredOn\\\"}, \\\"MimicGenericVmCustomProperties\\\": {}, \\\"Type\\\": \\\"GenericVmCustomProperties\\\"\
+          }, \\\"Target\\\": {\\\"GenericVmCustomProperties\\\": {\\\"Memory\\\": 0, \\\"Name\\\": \\\"string\\\", \\\"NumCDROMs\\\
+          \": 0, \\\"NumCoresPerSocket\\\": 0, \\\"NumDisks\\\": 0, \\\"NumNICs\\\": 0, \\\"NumvCPUs\\\": 0, \\\"PowerState\\\
+          \": \\\"PoweredOn\\\"}, \\\"MimicGenericVmCustomProperties\\\": {}, \\\"Type\\\": \\\"GenericVmCustomProperties\\\
+          \"}, \\\"VMCustomizeType\\\": \\\"replicate\\\"}}, \\\"MetaData\\\": {\\\"Version\\\": \\\"string\\\"}}\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/custom';\nconst options = {\n  method:\
+          \ 'PUT',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"APIVersion\": \"string\", \"CustomProperties\": {\"Type\": \"VmCustomPropertiesInfo\"\
+          , \"VmCustomPropertiesInfo\": {\"Source\": {\"GenericVmCustomProperties\": {\"Memory\": 0, \"Name\": \"string\"\
+          , \"NumCDROMs\": 0, \"NumCoresPerSocket\": 0, \"NumDisks\": 0, \"NumNICs\": 0, \"NumvCPUs\": 0, \"PowerState\":\
+          \ \"PoweredOn\"}, \"MimicGenericVmCustomProperties\": {}, \"Type\": \"GenericVmCustomProperties\"}, \"Target\":\
+          \ {\"GenericVmCustomProperties\": {\"Memory\": 0, \"Name\": \"string\", \"NumCDROMs\": 0, \"NumCoresPerSocket\"\
+          : 0, \"NumDisks\": 0, \"NumNICs\": 0, \"NumvCPUs\": 0, \"PowerState\": \"PoweredOn\"}, \"MimicGenericVmCustomProperties\"\
+          : {}, \"Type\": \"GenericVmCustomProperties\"}, \"VMCustomizeType\": \"replicate\"}}, \"MetaData\": {\"Version\"\
+          : \"string\"}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    VmCustomPropertiesTypeInfo:
+      description: VM details with type and properties metadata required for custom-view.
+      properties:
+        CustomizableProperties:
+          description: List of properties which can be customized.
+          items:
+            type: string
+          type: array
+        GenericVmCustomProperties:
+          $ref: '#/components/schemas/GenericVmCustomProperties'
+        Type:
+          description: Type of the custom properties used.
+          enum:
+          - GenericVmCustomProperties
+          type: string
+      type: object
+    MetaDataWorkloadCustomProperties:
+      description: Metadata of the customized workload properties.
+      properties:
+        Version:
+          description: Customized workload properties definition version.
+          type: string
+      required:
+      - Version
+      type: object
+    VMCustomizeType:
+      description: Defines the way customizable properties are synchronized on the target side. The default value is "static".
+        When set to the "replicate" value, the customizable properties of the target VM would be the same as those of the
+        source at the time of the cutover. When set to "static", the value remains as set by the user.
+      enum:
+      - replicate
+      - static
+      type: string
+    WorkloadCustomPropertiesRequest:
+      description: Customized workload properties response.
+      properties:
+        APIVersion:
+          description: Move API version.
+          type: string
+        CustomProperties:
+          $ref: '#/components/schemas/WorkloadCustomPropertiesReq'
+        MetaData:
+          $ref: '#/components/schemas/MetaDataWorkloadCustomProperties'
+      required:
+      - CustomProperties
+      - MetaData
+      - APIVersion
+      type: object
+    GenericVmCustomProperties:
+      description: Generic VM properties, usually of on-premise VMs that are needed for custom-view.
+      properties:
+        Memory:
+          description: Memory in bytes for the VM.
+          format: uint64
+          type: integer
+        Name:
+          description: Name of the VM.
+          type: string
+        NumCDROMs:
+          description: Number of CD-ROMs for the VM.
+          format: uint32
+          type: integer
+        NumCoresPerSocket:
+          description: Number of cores per vCPU for the VM.
+          format: uint32
+          type: integer
+        NumDisks:
+          description: Number of disks for the VM.
+          format: uint32
+          type: integer
+        NumNICs:
+          description: Number of NICs for the VM.
+          format: uint32
+          type: integer
+        NumvCPUs:
+          description: vCPUs for the VM.
+          format: uint32
+          type: integer
+        PowerState:
+          description: Power state of the VM.
+          enum:
+          - PoweredOn
+          - PoweredOff
+          type: string
+      required:
+      - Name
+      - PowerState
+      - NumvCPUs
+      - NumCoresPerSocket
+      - Memory
+      - NumDisks
+      - NumCDROMs
+      - NumNICs
+      type: object
+    MimicGenericVmCustomProperties:
+      description: Properties that are used synchronously with GenericVmCustomProperties, denote the same values that are
+        present on the server. This prevents sending all field values if you do not need to change the values.
+      type: object
+    WorkloadCustomProperties:
+      description: Workload properties needed for the custom-view.
+      properties:
+        Type:
+          description: Based on the workload type, the field denotes the appropriate property type.
+          enum:
+          - VmCustomPropertiesInfo
+          type: string
+        VmCustomPropertiesInfo:
+          $ref: '#/components/schemas/VmCustomPropertiesInfo'
+      type: object
+    VmCustomPropertyMapper:
+      description: Custom-view properties of a VM.
+      properties:
+        DisplayName:
+          description: External name for the property.
+          type: string
+        SourceName:
+          description: Name of the property in the source provider.
+          type: string
+        TargetName:
+          description: Name of the property in the target provider.
+          type: string
+      type: object
+    WorkloadCustomPropertiesResponse:
+      description: Customized workload properties response.
+      properties:
+        APIVersion:
+          description: Move API version.
+          type: string
+        CustomProperties:
+          $ref: '#/components/schemas/WorkloadCustomProperties'
+        MetaData:
+          $ref: '#/components/schemas/MetaDataWorkloadCustomProperties'
+      required:
+      - APIVersion
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    VmCustomPropertiesInfo:
+      description: VM properties with detailed information on the custom view.
+      properties:
+        OrderOfProperties:
+          description: List of properties in the preferred order while displaying.
+          items:
+            $ref: '#/components/schemas/VmCustomPropertyMapper'
+          type: array
+        Source:
+          $ref: '#/components/schemas/VmCustomPropertiesTypeInfo'
+        Target:
+          $ref: '#/components/schemas/VmCustomPropertiesTypeInfo'
+        VMCustomizeType:
+          $ref: '#/components/schemas/VMCustomizeType'
+      type: object
+    VmCustomPropertiesInfoReq:
+      description: Used in the update request of VM properties.
+      properties:
+        Source:
+          $ref: '#/components/schemas/VmCustomPropertiesTypeInfoWithMimicReq'
+        Target:
+          $ref: '#/components/schemas/VmCustomPropertiesTypeInfoWithMimicReq'
+        VMCustomizeType:
+          $ref: '#/components/schemas/VMCustomizeType'
+      required:
+      - Source
+      - Target
+      - VMCustomizeType
+      type: object
+    WorkloadCustomPropertiesReq:
+      description: Update request of workload properties.
+      properties:
+        Type:
+          description: Based on the workload type, the field denotes the appropriate property type.
+          enum:
+          - VmCustomPropertiesInfo
+          type: string
+        VmCustomPropertiesInfo:
+          $ref: '#/components/schemas/VmCustomPropertiesInfoReq'
+      required:
+      - Type
+      type: object
+    VmCustomPropertiesTypeInfoWithMimicReq:
+      description: VM details with type and properties metadata required for the update.
+      properties:
+        GenericVmCustomProperties:
+          $ref: '#/components/schemas/GenericVmCustomProperties'
+        MimicGenericVmCustomProperties:
+          $ref: '#/components/schemas/MimicGenericVmCustomProperties'
+        Type:
+          description: Type of the custom properties used.
+          enum:
+          - GenericVmCustomProperties
+          - MimicGenericVmCustomProperties
+          type: string
+      required:
+      - Type
+      type: object

@@ -1,0 +1,215 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /ops-managers/associated-org-details:
+    get:
+      description: Retrieve all the associated organizations and group names for all the Ops Manager. | Note - This data is
+        cached, and may be up to 5 minutes stale. If newly added groups and organizations are not reported, please retry after
+        5 minutes
+      operationId: getOmAssociatedOrgsDetails
+      parameters:
+      - description: The maximum numbers of Ops manager(s) to return.
+        in: query
+        name: limit
+        schema:
+          type: integer
+      - description: The number of Ops manager(s) skipped before selecting the next set of Ops manager(s).
+        in: query
+        name: offset
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/EraPaginationResponse'
+                - properties:
+                    entities:
+                      items:
+                        $ref: '#/components/schemas/OpsManagerWithAssociatedOrgDetail'
+                      type: array
+                  type: object
+          description: Returns all the Ops Manager along with associated organization and group names.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Retrieve all the associated organizations and group names for all the Ops Manager.
+      tags:
+      - Ops Manager
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/ops-managers/associated-org-details \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/ops-managers/associated-org-details"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/ops-managers/associated-org-details\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/ops-managers/associated-org-details\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/ops-managers/associated-org-details\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/ops-managers/associated-org-details';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    OpsManagerWithAssociatedOrgDetail:
+      allOf:
+      - $ref: '#/components/schemas/OpsManager'
+      - properties:
+          associatedOrgDetails:
+            $ref: '#/components/schemas/AssociatedOrgDetail'
+        type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    OpsManager:
+      properties:
+        associatedDbCount:
+          description: Number of associated databases
+          format: int32
+          type: integer
+        dateCreated:
+          description: Time at which ops-manager is created
+          format: date-time
+          type: string
+        dateModified:
+          description: Time at which ops-manager is last modified
+          format: date-time
+          type: string
+        description:
+          description: An optional field to describe the ops-manager registered
+          type: string
+        host:
+          description: IP address or hostname of the ops-manager server
+          type: string
+        id:
+          description: Unique identifier for the ops-manager
+          format: uuid
+          type: string
+        name:
+          description: The name of the ops-manager
+          type: string
+        ownerId:
+          description: ID of NDB user who owns it
+          format: uuid
+          type: string
+        port:
+          description: Port at which ops-manager server is listening
+          format: int32
+          type: integer
+        secure:
+          description: True if https, otherwise false
+          type: boolean
+        status:
+          description: The current status of the ops-manager
+          enum:
+          - up
+          - down
+          - initializing
+          - updating
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+    EraPaginationResponse:
+      properties:
+        count:
+          format: int32
+          type: integer
+        entities:
+          items:
+            type: object
+          type: array
+      type: object
+    AssociatedOrgDetail:
+      properties:
+        groupNames:
+          items:
+            type: string
+          type: array
+        orgNames:
+          items:
+            type: string
+          type: array
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey
