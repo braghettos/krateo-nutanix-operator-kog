@@ -1,0 +1,264 @@
+openapi: 3.0.0
+info:
+  title: Nutanix Cloud Clusters API Reference
+  description: "# NC2 Introduction \n\nNutanix Cloud Clusters (NC2) delivers the promise of a hybrid multicloud platform designed\
+    \ to run applications in private or multiple public clouds. NC2 operates as an extension of on-prem data centers and provides\
+    \ a hybrid cloud architecture that spans private and public clouds, operated as a single cloud.\n\n![nc2-architecture.png](./images/nc2-architecture.png)\n\
+    \n\n\nThis document covers the NC2 version 2 (v2) APIs. These APIs allow you to create and manage Azure and AWS clusters\
+    \ on the cloud. The v2 APIs are compliant with the Open API Specification (OAS3) 3.0 standards.  \n\nThe NC2 version1\
+    \ (v1) APIs were mainly used for internal purposes and are not generally available. Nutanix recommends all its customers\
+    \ using v1 APIs to manually migrate to the latest v2 GA APIs. \n\nFor more information on NC2, see Nutanix user guide\
+    \ for [AWS](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:Nutanix-Clusters-AWS), and\
+    \ [Azure](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:Nutanix-Cloud-Clusters-Azure).\n\
+    \n# Leveraging NC2 V2 APIs to Create a 3-Node AWS Cluster\nThis topic serves as a roadmap, guiding users through the process\
+    \ of leveraging these APIs to create a 3-node AWS cluster efficiently. \n\n## Prerequisites\nBefore you begin, ensure\
+    \ that Python 3.x is installed on your system. If not, you may need to install Python 3.x before proceeding further with\
+    \ utilizing the NC2 V2 APIs.\n\n\n\\# *Check python version* \n\n`python3 --version` \n\n## Installation \nInstall the\
+    \ necessary Python packages using a package manager called pip.   \n \n`pip3 install requests pyjwt pytz`\n\n1. requests:\
+    \ This package is commonly used for making HTTP requests in Python.\n2. pyjwt: PyJWT is a Python library that provides\
+    \ functionality for encoding and decoding JSON Web Tokens (JWTs). \n3. pytz: Pytz is a Python library that provides functionality\
+    \ for working with time zones.\n\n## Variable Configuration\nDefine variables necessary for specifying authentication\
+    \ credentials and other parameters essential for interacting with the NC2 V2 APIs effectively, such as\n`API_KEY` and\
+    \ `KEY_ID`.\n\nTo create a MyNutanix API Key (refer to the [NC2 Azure user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:nc2-cloud-clusters-api-key-management-t.html)\
+    \ and [NC2 AWS user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:nc2-cloud-clusters-api-key-management-t.html)).\n\
+    \n\n```py\n# Constants and Configurations\n\nAPI_KEY = 'YOUR_API_KEY'                                       \nKEY_ID =\
+    \ 'YOUR_KEY_ID'\nISSUER = 'RANDOM_UUID'                                          # A unique issuer uuid\n\nNC2_BASE_URL\
+    \ = 'https://cloud.nutanix.com/api/v2'\nCREATE_CLUSTER_URL = '/clusters/aws'\nHIBERNATE_CLUSTER_URL = '/clusters/{cluster_id}/hibernate'\n\
+    RESUME_CLUSTER_URL = '/clusters/{cluster_id}/resume'\nTERMINATE_CLUSTER_URL = '/clusters/{cluster_id}/terminate'\n\nGET_TASK_URL\
+    \ = '/tasks/{task_id}'\nMAX_TIMEOUT = 7200                                              # Maximum timeout of 2 hours (in\
+    \ seconds)\nPOLLING_INTERVAL = 60                                           # Initial polling interval (in seconds)\n\
+    MYNUTANIX_API_KEYS_URL = 'https://apikeys.nutanix.com'          # MyNutanix API Keys URL\n```\n\n## Log Configuration\n\
+    By configuring logs, you can ensure that relevant information and errors are captured systematically, enabling you to\
+    \ monitor the execution of their scripts effectively and troubleshoot any issues that may arise.\n\n```py\n# Configure\
+    \ Logs\nimport logging\n\nlogging.basicConfig(\n    level=logging.DEBUG, # set log level to debug\n    format='%(asctime)s\
+    \ - %(levelname)s - %(message)s',\n    # filename='api_interaction.log'                               # Alternatively,\
+    \ write logs to the file if filename param is passed\n)\n```\n\n## Authentication\nAuthentication involves two key steps:\n\
+    -  Create a MyNutanix API Key (refer to the [NC2 Azure user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:nc2-cloud-clusters-api-key-management-t.html)\
+    \ and [NC2 AWS user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:nc2-cloud-clusters-api-key-management-t.html)).\n\
+    - Create a JWT token using the provided API Key and Key ID.\n\n```py\nimport jwt\nimport datetime\nimport time\nimport\
+    \ hmac\nimport hashlib\nimport base64\nimport pytz\nimport uuid\n\n\n# Create a JWT token\ndef create_jwt():\n    \"\"\
+    \"\n    Create a JWT token using the provided API key and key ID.\n\n    Returns:\n        The JWT token and it's expiry\
+    \ if successful, None otherwise.\n    \"\"\"\n    \n    try:\n        curr_time = datetime.datetime.utcnow()\n       \
+    \ payload = {\n            \"aud\": MYNUTANIX_API_KEYS_URL,\n            \"iat\": curr_time,\n            \"exp\": curr_time\
+    \ + datetime.timedelta(seconds=300),     # Nutanix recommends a 5 minute expiry\n            \"iss\": ISSUER,\n      \
+    \      \"metadata\": {\n                \"reason\": \"NC2 AWS Cluster Quick Starter\"\n            },\n            \"\
+    context\": {}\n        }\n        body = \"{}\".format(KEY_ID)\n        signature = base64.b64encode(\n            hmac.new(bytes(API_KEY\
+    \ , 'latin-1'),\n            bytes(body , 'latin-1'),\n            digestmod=hashlib.sha512).digest()\n        )\n   \
+    \     token = jwt.encode(\n            payload,\n            signature,\n            algorithm='HS512',\n            headers={\"\
+    kid\": KEY_ID}\n        )\n        logging.debug(\"Token: {}\" .format(token))\n\n        return token, payload[\"exp\"\
+    ]\n\n    except Exception as e:\n        logging.error(f\"JWT generation failed: {str(e)}\")\n        return None, None\n\
+    \    \ncreate_jwt()\n```\nWe will utilize the curl command to execute an API call, fetching the organizations by employing\
+    \ the JWT token that has been recently generated.\n\n\n\\# *List organizations*\n\n`curl --location 'https://cloud.nutanix.com/api/v2/organizations'\
+    \ --header 'Authorization: Bearer {{token}}'`\n\nWe now proceed with another API call to retrieve the list of cloud accounts\
+    \ within an organization. You can choose any organization from the available options if you have access to multiple organizations.\
+    \ Please note that if five minutes have passed since the creation of the JWT token, you will need to generate a new one.\n\
+    \n\n\\# *List cloud accounts under an organization*\n\n`curl --location 'https://cloud.nutanix.com/api/v2/organizations/{{organization_id}}/cloud-accounts'\
+    \ --header 'Authorization: Bearer {{token}}'`\n\n\n`ORGANIZATION_ID = \"YOUR_ORGANIZATION_ID\"                       \
+    \ # Fetched using the List Organizations API`\n\n`CLOUD_ACCOUNT_ID = \"YOUR_CLOUD_ACCOUNT_ID\"                      #\
+    \ Fetched using the List Cloud Account API`\n\n## Usage\nIn this usage example, we demonstrate the creation of a 3-node\
+    \ AWS cluster within a freshly created Virtual Private Cloud (VPC). The API call will return a task when initiating the\
+    \ cluster creation process. It's important to note that long-running NC2 V2 API operations, including cluster creation,\
+    \ termination, hibernation, and resumption, will similarly return a task. To monitor the progress and status of these\
+    \ tasks, users can periodically poll the task endpoint using a GET request.\n\n```py\nimport requests\nimport json\n\n\
+    def create_cluster(jwt):\n    \"\"\"\n    Create an AWS cluster using the provided JWT token.\n\n    Args:\n        jwt\
+    \ (pair(jwt_token, jwt_expiry)): The JWT token and it's expiry time.\n\n    Returns:\n        The task object for cluster\
+    \ creation if successful, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers with JWT token for authentication\n\
+    \        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer {jwt_token}',\n            'Content-Type':\
+    \ 'application/json',\n            'Accept': 'application/json',\n        }\n\n        logging.debug(headers)\n      \
+    \  \n        # Below is payload for creating an aws cluster (adjust as needed)\n        # More information on the api\
+    \ specification for create aws cluster can be found here,\n        # https://www.nutanix.dev/api_references/nc2/#/6lo1uf2bcd4bv-create-aws-cluster\n\
+    \        payload = {\n            \"data\": {\n                \"use_case\": \"general\",\n                \"organization_id\"\
+    : ORGANIZATION_ID,\n                \"name\": \"nc2-v2-apis-quick-starter\",\n                \"cloud_account_id\": CLOUD_ACCOUNT_ID,\n\
+    \                \"region\": \"eu-central-1\",                             # eu-central-1 represents Frankfurt region.\
+    \ Given region mentioned for reference. \n                \"host_access_ssh_key\": \"SSH_KEY_NAME\",                #\
+    \ Can be generated on AWS -'KEY PAIRS' or UI.\n                \"license\": \"aos\",\n                \"aos_version\"\
+    : \"6.7\",\n                \"software_tier\": \"pro\",                               \n                \"capacity\":\
+    \ [\n                    {\n                        \"host_type\": \"z1d.metal\",                     # Only for reference.\
+    \ For allowed values check API documentation.\n                        \"number_of_hosts\": 3\n                    }\n\
+    \                ],\n                \"redundancy\": {\n                    \"factor\": 2                            \
+    \            \n                },\n                \"network\": {\n                    \"mode\": \"new\",            \
+    \                         \n                    \"availability_zone\": \"eu-central-1a\",               \n           \
+    \         \"vpc_cidr\": \"192.10.0.0/16\",                        \n                    \"management_services_access_policy\"\
+    : {\n                        \"mode\": \"restricted\",\n                        \"ip_addresses\": [\n                \
+    \            \"192.10.0.0/16\"\n                        ]\n                    },\n                    \"prism_element_access_policy\"\
+    : {\n                        \"mode\": \"restricted\",   \n                        \"ip_addresses\": [\n             \
+    \               \"192.10.0.0/16\"\n                        ]\n                    }\n                }\n            }\n\
+    \        }\n\n        # Send a POST request to create the cluster\n        response = requests.post(NC2_BASE_URL + CREATE_CLUSTER_URL,\
+    \ json=payload, headers=headers)\n\n        if response.status_code == 202:\n            return response.json()\n    \
+    \    else:\n            raise Exception(f\"Cluster creation failed with status code {response.status_code}, error {response.text}\"\
+    )\n\n    except Exception as e:\n        raise Exception(f\"Error creating cluster: {str(e)}\")\n\n```\nWe will monitor\
+    \ a task by polling it every 60 seconds to check its status. We will keep polling until the task reaches a terminal status\
+    \ or until the maximum timeout of 7200 seconds (2 hours) is reached. Additionally, we'll ensure token validity by checking\
+    \ for expiry and generating a new token if needed.\n\n\n```py\n# Function to poll the status of a task with maximum timeout\n\
+    \nterminal_status_list = [\n    \"done\",\n    \"failed\",\n    \"cancelled\"\n]\n\ndef poll_task_status(jwt, task_id):\n\
+    \n    start_time = time.time()\n    \n    while True:\n\n        # Check if the JWT token is expired and create a new\
+    \ one if needed\n        jwt_token, jwt_expiry = jwt\n        if jwt_token is not None and datetime.datetime.now() >=\
+    \ jwt_expiry:\n            jwt_token, jwt_expiry = create_jwt()\n            \n        headers = {\n            'Authorization':\
+    \ f'Bearer {jwt_token}'\n        }\n\n        task_status_url = NC2_BASE_URL + GET_TASK_URL.format(task_id=task_id)\n\
+    \        response = requests.get(task_status_url, headers=headers)\n        if response.status_code == 200:\n        \
+    \    task_status = response.json()['data']['status']\n            logging.info(f\"Task status: {task_status}\")\n    \
+    \        if task_status in terminal_status_list:\n                logging.debug(f\"Task done!\")\n                return\
+    \ task_status\n        else:\n            logging.error(f\"Error polling task status with status code: {response.status_code}\"\
+    )\n\n        elapsed_time = time.time() - start_time\n        if elapsed_time < MAX_TIMEOUT:\n            sleep_time =\
+    \ min(POLLING_INTERVAL, MAX_TIMEOUT - elapsed_time)\n            time.sleep(sleep_time)\n            logging.debug(f\"\
+    Sleeping for {sleep_time} ..\")\n        else:\n            raise(\"Polling reached maximum timeout.\")\n```\nWe will\
+    \ combine these steps to create a 3-node AWS cluster in a new VPC and monitor the task status by polling. Upon completion\
+    \ of the task, we will print the cluster UUID.\n\n```py\n# First we create a JWT token\njwt = create_jwt()\n\nlogging.debug(jwt)\n\
+    \n# Let's create a cluster create task\ntask = create_cluster(jwt)\nif task != None :\n    task_id = task['data']['id']\n\
+    \n    # Poll the status of the task\n    if task_id is not None:\n        logging.info(f\"Task ID: {task_id}\")\n    \
+    \    task_status = poll_task_status(jwt, task_id)\n\n    # Check if the task was successful\n    if task_status == \"\
+    success\":\n        logging.info(\"Cluster creation successful!\")\n        logging.info(\"Cluster ID: {}\".format(task.get('cluster_id')))\n\
+    \    else:\n        logging.error(\"Cluster creation failed!\")\nelse:\n    logging.error(\"Cluster creation task could\
+    \ not be created!\")\n```\nBelow are sample functions for hibernating, resuming, and terminating a cluster. Similar to\
+    \ the create cluster API call, these functions also return a task. We can employ the same mechanism used for polling the\
+    \ status to monitor these tasks.\n\n```py\ndef hibernate_cluster(cluster_id, jwt):\n    \"\"\"\n    Hibernate a cluster.\n\
+    \n    Args:\n        cluster_id (str): The UUID of the cluster to hibernate.\n\n    Returns:\n        str: The task ID\
+    \ for hibernating a cluster if request is accepted, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers\
+    \ with JWT token for authentication\n        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer\
+    \ {jwt_token}',\n            'Content-Type': 'application/json',\n        }\n\n        # Send a POST request to hibernate\
+    \ the cluster\n        hibernate_payload = {}\n        response = requests.post(\n            NC2_BASE_URL + HIBERNATE_CLUSTER_URL.format(cluster_id\
+    \ = cluster_id), \n            json=hibernate_payload, \n            headers=headers\n        )\n\n        logging.debug(f\"\
+    Response: {response.json()}\")\n        if response.status_code >= 200 and response.status_code <= 299:\n            #\
+    \ Extract the task ID from the response\n            task_id = response.json()['data']['id']\n            return task_id\n\
+    \n        else:\n            logging.error(f\"Cluster hibernating failed with status code {response.status_code}\")\n\
+    \            return None\n\n    except Exception as e:\n        logging.error(f\"Error hibernating cluster: {str(e)}\"\
+    )\n        return None\n\n```\n\n```py\ndef resume_cluster(cluster_id, jwt):\n    \"\"\"\n    Resume a cluster.\n\n  \
+    \  Args:\n        cluster_id (str): The UUID of the cluster to resume.\n\n    Returns:\n        str: The task ID for resuming\
+    \ a cluster if request is accepted, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers with JWT token for\
+    \ authentication\n        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer {jwt_token}',\n\
+    \            'Content-Type': 'application/json',\n        }\n\n        # Send a POST request to resume the cluster\n \
+    \       resume_payload = {}\n        response = requests.post(\n            NC2_BASE_URL + RESUME_CLUSTER_URL.format(cluster_id\
+    \ = cluster_id), \n            json=resume_payload, \n            headers=headers\n        )\n\n        logging.debug(f\"\
+    Response: {response.json()}\")\n        if response.status_code >= 200 and response.status_code <= 299:\n            #\
+    \ Extract the task ID from the response\n            task_id = response.json()['data']['id']\n            return task_id\n\
+    \n        else:\n            print(f\"Cluster resume failed with status code {response.status_code}\")\n            return\
+    \ None\n\n    except Exception as e:\n        print(f\"Error resuming cluster: {str(e)}\")\n        return None\n```\n\
+    \n```py\ndef terminate_cluster(cluster_id, jwt):\n    \"\"\"\n    Terminate a cluster.\n\n    Args:\n        cluster_id\
+    \ (str): The UUID of the cluster to terminate.\n\n    Returns:\n        str: The task ID for terminating a cluster if\
+    \ request is accepted, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers with JWT token for authentication\n\
+    \        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer {jwt_token}',\n            'Content-Type':\
+    \ 'application/json',\n        }\n\n        # Send a POST request to resume the cluster\n        terminate_payload = {}\n\
+    \        response = requests.post(\n            NC2_BASE_URL + TERMINATE_CLUSTER_URL.format(cluster_id = cluster_id),\
+    \ \n            json=terminate_payload, \n            headers=headers\n        )\n\n        logging.debug(f\"Response:\
+    \ {response.json()}\")\n        if response.status_code >= 200 and response.status_code <= 299:\n            # Extract\
+    \ the task ID from the response\n            task_id = response.json()['data']['id']\n            return task_id\n\n \
+    \       else:\n            print(f\"Cluster terminate failed with status code {response.status_code}\")\n            return\
+    \ None\n\n    except Exception as e:\n        print(f\"Error terminating cluster: {str(e)}\")\n        return None\n```\n\
+    \n**Note**: After completing this example, it is recommended to delete the created cluster to prevent any additional costs.\
+    \ Additionally, if the API key was generated solely for this walkthrough, consider deleting it as well.\n# Authentication\n\
+    \nNC2 uses JSON Web Token (JWT) based bearer authentication. The JWT can be generated using MyNutanix API keys.\n\nFor\
+    \ detailed information on how to generate API keys and JWT tokens, refer to the [NC2 Azure user guide](https://stage-portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:nc2-cloud-clusters-api-key-management-t.html)\
+    \ and [NC2 AWS user guide](https://stage-portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:nc2-cloud-clusters-api-key-management-t.html).\n\
+    \n# Best Practice \n\nIt is advisable to keep your JWT short lived, Nutanix recommends a maximum of 5 minutes as the JWT\
+    \ token lifespan.\n\n# Error Codes\nList of HTTP status codes returned by the NC2 APIs\n\n|Error codes |\tMessages |\n\
+    | :-----------: | -----: |\n|200\t  |Successful|\n|201\t  |Created |\n|202    |Accepted|\n|400    |Bad Request|\n|401\
+    \    |Unauthorized|\n|403    |Forbidden|\n|404    |Not Found|\n|406    |Not Acceptable|\n|500\t  |Internal Server Error|\n"
+  version: v2
+servers:
+- url: https://cloud.nutanix.com/api/v2
+  variables: {}
+security:
+- bearerAuth: []
+paths:
+  /cloud-accounts/{cloud_account_id}/regions/{region_id}/vpcs:
+    get:
+      callbacks: {}
+      description: The request retrieves the list of VPCs associated with a cloud account, including any applied filters.
+      operationId: CPanelWeb.Api.VpcController.index
+      parameters:
+      - description: The ID of the cloud account.
+        in: path
+        name: cloud_account_id
+        required: true
+        schema:
+          type: Elixir.CPanelWeb.Api.Params.Base64ID
+      - description: The region of VPCs.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: A list of VPCs for a given cloud account.
+                properties:
+                  data:
+                    items:
+                      $ref: '#/components/schemas/Cloud Account VPC'
+                    type: array
+                title: The list of VPC Cloud accounts.
+                type: object
+          description: The list of VPC Cloud accounts.
+      summary: List VPCs for a cloud account
+      tags:
+      - vpcs
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://cloud.nutanix.com/api/v2/cloud-accounts/{cloud_account_id}/regions/{region_id}/vpcs\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n      \\\n    --output-document \\\n    - https://cloud.nutanix.com/api/v2/cloud-accounts/{cloud_account_id}/regions/{region_id}/vpcs"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"cloud.nutanix.com\")\n\nheaders = {}\n \nconn.request(\"\
+          GET\",\"/api/v2/cloud-accounts/{cloud_account_id}/regions/{region_id}/vpcs\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://cloud.nutanix.com/api/v2/cloud-accounts/{cloud_account_id}/regions/{region_id}/vpcs\"\n\t \n\treq,\
+          \ err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err !=\
+          \ nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://cloud.nutanix.com/api/v2/cloud-accounts/{cloud_account_id}/regions/{region_id}/vpcs\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://cloud.nutanix.com/api/v2/cloud-accounts/{cloud_account_id}/regions/{region_id}/vpcs';\n\
+          const options = {\n  method: 'GET',\n  headers: {} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    Cloud Account VPC:
+      description: A cloud account VPC.
+      properties:
+        cidr:
+          $ref: '#/components/schemas/CIDR'
+        id:
+          type: string
+        name:
+          description: The name of the VPC.
+          type: string
+        subnets:
+          items:
+            properties:
+              availability_zone:
+                description: The availability of the subnet.
+                type: string
+              cidr:
+                $ref: '#/components/schemas/CIDR'
+              id:
+                type: string
+              name:
+                description: The name of the subnet.
+                type: string
+            type: object
+          type: array
+      required:
+      - id
+      - region
+      title: Cloud Account VPC
+      type: object
+    CIDR:
+      description: Classless Inter-Domain Routing.
+      format: cidr
+      title: CIDR
+      type: string
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

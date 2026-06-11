@@ -1,0 +1,845 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /nutanix/v1/hosts/list:
+    post:
+      description: List all hosts according to the filter.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/host_list_metadata'
+        required: true
+      tags:
+      - nutanix/hosts
+      x-private: true
+      x-doc-hide: true
+      summary: Get a list of Nutanix hosts.
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: ntnx_meta_api
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/host_list_intent_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/hosts/list \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"filter\": \"string\",\n    \"kind\": \"host\",\n    \"length\": 1,\n\
+          \    \"offset\": 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\",\n    \"kind\": \"host\",\n    \"length\": 1,\n    \"offset\": 0,\n    \"sort_attribute\": \"string\"\
+          ,\n    \"sort_order\": \"string\"\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/hosts/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\",\n    \"kind\": \"host\",\n    \"length\": 1,\n    \"offset\"\
+          : 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/nutanix/v3/nutanix/v1/hosts/list\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/hosts/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          filter\": \"string\", \"kind\": \"host\", \"length\": 1, \"offset\": 0, \"sort_attribute\": \"string\", \"sort_order\"\
+          : \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"\
+          application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/hosts/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\", \\\"kind\\\
+          \": \\\"host\\\", \\\"length\\\": 1, \\\"offset\\\": 0, \\\"sort_attribute\\\": \\\"string\\\", \\\"sort_order\\\
+          \": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/nutanix/v1/hosts/list';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"filter\": \"string\", \"kind\": \"host\", \"length\": 1, \"offset\": 0, \"\
+          sort_attribute\": \"string\", \"sort_order\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    windows_domain:
+      description: Hyper-V node domain.
+      required:
+      - domain_credential
+      type: object
+      properties:
+        name:
+          type: string
+          description: 'The name of the node to be renamed to during domain-join. If not given,a new name will be automatically
+            assigned.
+
+            '
+        domain_name:
+          type: string
+          description: Full name of domain.
+        domain_credential:
+          $ref: '#/components/schemas/credentials'
+        organization_unit_path:
+          type: string
+          description: Path to organization unit in the domain.
+        name_prefix:
+          type: string
+          description: The name prefix in the domain in case of CPS deployment.
+        name_server_ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: 'The ip of name server that can resolve the domain name. Required during joining domain.
+
+            '
+      title: Hyper-v Domain
+    block:
+      description: Host block config info.
+      type: object
+      properties:
+        block_serial_number:
+          type: string
+          description: Rackable unit serial number.
+        block_model:
+          type: string
+          description: Rackable unit model name.
+      title: Host block information
+    host_metadata:
+      description: The host kind metadata
+      required:
+      - kind
+      type: object
+      properties:
+        last_update_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when host was last updated
+
+            '
+          format: date-time
+        use_categories_mapping:
+          type: boolean
+          description: 'Client need to specify this field as true if user want to use the
+
+            newer way of assigning the categories. Without this things should work
+
+            as it was earlier.
+
+            '
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - host
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: host uuid
+          format: UUID
+        project_reference:
+          $ref: '#/components/schemas/project_reference'
+        creation_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when host was created
+
+            '
+          format: date-time
+        spec_version:
+          type: integer
+          description: Version number of the latest spec.
+        spec_hash:
+          type: string
+          description: 'Hash of the spec. This will be returned from server.
+
+            '
+        categories_mapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+          description: 'Categories for the host. This allows setting up multiple
+
+            values from a single key. Categories assigned using the older view will be
+
+            present here. This is the new way of assigning categories.
+
+            '
+        should_force_translate:
+          type: boolean
+          description: 'Applied on Prism Central only. Indicate whether force to translate the spec of the fanout request
+            to fit the target cluster API schema.
+
+            '
+        entity_version:
+          readOnly: true
+          type: string
+          description: 'Logical entity version that allows serializing updates to the entity
+
+            across multiple API namespaces.  For kinds that support
+
+            entity_version, it overrides spec_version described above.
+
+            '
+        owner_reference:
+          $ref: '#/components/schemas/user_reference'
+        categories:
+          additionalProperties:
+            type: string
+          type: object
+          description: 'Categories for the host. This allows assigning one value
+
+            of a key to any entity. Changes done in this will be reflected in
+
+            the categories_mapping field.
+
+            '
+        name:
+          readOnly: true
+          type: string
+          description: host name
+          maxLength: 80
+      title: host metadata
+    credentials:
+      description: Credentials to login server
+      required:
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      title: Credentials to login server
+    host_intent_resource:
+      description: Response object for intentful operations on a host
+      required:
+      - metadata
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/host_def_status'
+        spec:
+          $ref: '#/components/schemas/host'
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/host_metadata'
+      title: host Intent Response
+    host_def_status:
+      description: Host Status definition.
+      required:
+      - resources
+      type: object
+      properties:
+        state:
+          type: string
+          description: The state of the entity
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          type: array
+        name:
+          type: string
+          description: Host Name.
+        resources:
+          description: Host resources.
+          type: object
+          properties:
+            gpu_driver_version:
+              type: string
+              description: Host GPU driver version.
+            failover_cluster:
+              $ref: '#/components/schemas/failover_cluster'
+            controller_vm:
+              $ref: '#/components/schemas/controller_vm'
+            ipmi:
+              $ref: '#/components/schemas/ipmi'
+            rackable_unit_reference:
+              $ref: '#/components/schemas/rackable_unit_reference'
+            host_type:
+              x-ntnx-enum:
+              - HYPER_CONVERGED
+              - COMPUTE_ONLY
+              type: string
+              description: Host type.
+            cpu_model:
+              type: string
+              description: Host CPU model.
+            host_nics_id_list:
+              items:
+                type: string
+              type: array
+              description: Host NICs.
+            num_cpu_sockets:
+              type: integer
+              description: Number of CPU sockets.
+              format: int64
+            windows_domain:
+              $ref: '#/components/schemas/windows_domain'
+            gpu_list:
+              items:
+                $ref: '#/components/schemas/host_gpu'
+              type: array
+              description: List of GPUs on the host.
+            num_cpu_cores:
+              type: integer
+              description: Number of CPU cores on Host.
+              format: int64
+            monitoring_state:
+              x-ntnx-enum:
+              - MONITORED
+              - NOT_MONITORED
+              type: string
+              description: Host monitoring status.
+            cpu_capacity_hz:
+              type: integer
+              description: Host CPU capacity.
+              format: int64
+            serial_number:
+              type: string
+              description: Node serial number.
+            memory_capacity_mib:
+              type: integer
+              description: Host memory capacity in MiB.
+              format: int64
+            hypervisor:
+              $ref: '#/components/schemas/hypervisor'
+            block:
+              $ref: '#/components/schemas/block'
+            host_disks_reference_list:
+              items:
+                $ref: '#/components/schemas/disk_reference'
+              type: array
+          title: Host Resources
+        cluster_reference:
+          $ref: '#/components/schemas/reference'
+      title: Host Status
+    host_list_metadata_output:
+      description: 'All api calls that return a list will have this metadata block
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - host
+          type: string
+          description: The kind name
+        total_matches:
+          type: integer
+          description: Total matches found
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter used for the results
+        length:
+          type: integer
+          description: The number of records retrieved relative to the offset
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          type: integer
+          description: Offset from the start of the entity list
+      title: Metadata for host list output
+    host:
+      description: Host Definition.
+      required:
+      - resources
+      type: object
+      properties:
+        name:
+          type: string
+          description: Host Name.
+          maxLength: 64
+        resources:
+          type: object
+          description: Host resources.
+          properties:
+            windows_domain:
+              $ref: '#/components/schemas/windows_domain'
+            controller_vm:
+              $ref: '#/components/schemas/controller_vm'
+            failover_cluster:
+              $ref: '#/components/schemas/failover_cluster'
+      title: Host Input definition
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    host_list_metadata:
+      description: 'All api calls that return a list will have this metadata block as input
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - host
+          type: string
+          description: The kind name
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter in FIQL syntax used for the results.
+        length:
+          minimum: 1
+          type: integer
+          description: The number of records to retrieve relative to the offset
+          format: int32
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          minimum: 0
+          type: integer
+          description: Offset from the start of the entity list
+          format: int32
+      title: Metadata for host list
+    failover_cluster:
+      description: Hyper-V failover cluster.
+      required:
+      - domain_credential
+      properties:
+        ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: IP address of the failover cluster.
+        name:
+          type: string
+          description: Name of the failover cluster.
+        domain_credential:
+          $ref: '#/components/schemas/credentials'
+      title: Hyper-v failover cluster
+    oplog_usage:
+      description: oplog disk usage.
+      type: object
+      properties:
+        oplog_disk_pct:
+          type: number
+          description: Oplog disk size used in percentage.
+          format: float
+        oplog_disk_size:
+          type: integer
+          description: Size of oplog disk in bytes.
+          format: int64
+      title: Host oplog disk usage stats
+    nutanix_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - nutanix
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    host_gpu:
+      description: Host GPU.
+      type: object
+      properties:
+        status:
+          x-ntnx-enum:
+          - UNUSED
+          - USED_FOR_PASSTHROUGH
+          - USED_FOR_VIRTUAL
+          type: string
+          description: Current status of the physical GPU.
+        assignable:
+          type: boolean
+          description: Whether this vGPU instance can be allocated to a VM.
+        vendor:
+          x-ntnx-enum:
+          - NVIDIA
+          - INTEL
+          - AMD
+          type: string
+          description: The vendor of the GPU.
+        name:
+          type: string
+          description: Name of the host GPU.
+        index:
+          type: integer
+          description: The index of the vGPU within physical GPU resource.
+          format: int32
+        license_list:
+          items:
+            type: string
+          type: array
+          description: List of license types associated with this GPU.
+        numa_node:
+          type: integer
+          description: NUMA node this GPU belongs to.
+          format: int32
+        max_resolution:
+          type: string
+          description: Maximum resolution per display head.
+        num_vgpus_allocated:
+          type: integer
+          description: 'The number of vGPU instances allocated for this physical GPU resource.
+
+            '
+          format: int32
+        consumer_reference:
+          $ref: '#/components/schemas/reference'
+        pci_address:
+          type: string
+          description: GPU {segment:bus:device:function} (sbdf) address.
+        fraction:
+          type: integer
+          description: Fraction of the physical GPU.
+          format: int32
+        mode:
+          x-ntnx-enum:
+          - PASSTHROUGH_GRAPHICS
+          - PASSTHROUGH_COMPUTE
+          - VIRTUAL
+          type: string
+          description: The type of this GPU.
+        num_virtual_display_heads:
+          type: integer
+          description: Number of supported virtual display heads.
+          format: int32
+        guest_driver_version:
+          type: string
+          description: Last determined guest driver version.
+        frame_buffer_size_mib:
+          type: integer
+          description: GPU frame buffer size in MiB.
+          format: int64
+        device_id:
+          type: integer
+          description: The device ID of the GPU.
+          format: int32
+        max_instances_per_vm:
+          type: integer
+          description: Maximum number of vGPUs of a GPU type assignable to a VM.
+          format: int64
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the GPU.
+          format: UUID
+      title: Host GPU
+    hypervisor:
+      description: Host Hypervisor information.
+      required:
+      - ip
+      type: object
+      properties:
+        num_vms:
+          type: integer
+          description: Num of VMs running on this Host.
+          format: int64
+        ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: Hypervisor IP.
+        hypervisor_full_name:
+          type: string
+          description: Full name of hypervisor running on Host.
+      title: Hypervisor Info
+    sort_order:
+      x-ntnx-enum:
+      - ASCENDING
+      - DESCENDING
+      description: The sort order in which results are returned
+      title: Sort order
+    user_reference:
+      description: The reference to a user
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - user
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a user
+    controller_vm:
+      description: Host controller vm information.
+      required:
+      - ip
+      type: object
+      properties:
+        ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          readOnly: true
+          type: string
+          description: Controller VM IP address.
+        nat_ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: Controller VM NAT IP address.
+        oplog_usage:
+          $ref: '#/components/schemas/oplog_usage'
+        nat_port:
+          type: integer
+          description: Controller VM NAT port.
+          format: int32
+      title: Host Controller VM Info
+    disk_reference:
+      description: The reference to a disk
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - disk
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a disk
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    ipmi:
+      description: Host IPMI info.
+      required:
+      - ip
+      type: object
+      properties:
+        ip:
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+          type: string
+          description: IPMI IP address.
+      title: Host IPMI info
+    reference:
+      description: 'Reference to a kind. Either one of (kind, uuid) or url needs to be specified.
+
+        '
+      type: object
+      properties:
+        url:
+          pattern: ^((http[s]?):\/)?\/?([^:\/\s]+)((\/\w+)*(:[0-9]+)*?\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$
+          type: string
+          description: 'GET query on the URL will provide information on the source.
+
+            '
+        kind:
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+        name:
+          readOnly: true
+          type: string
+      title: Reference
+    rackable_unit_reference:
+      description: The reference to a rackable_unit
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - rackable_unit
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a rackable_unit
+    host_list_intent_response:
+      description: Response object for intentful operation of hosts
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/host_intent_resource'
+          type: array
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/host_list_metadata_output'
+      title: Entity Intent List Response
+    project_reference:
+      description: The reference to a project
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - project
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a project

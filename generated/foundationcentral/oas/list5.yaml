@@ -1,0 +1,272 @@
+openapi: 3.0.0
+info:
+  title: Foundation Central Service
+  description: '# Introduction
+
+
+    **Foundation Central** creates clusters from factory-imaged nodes and reimages existing nodes that are already registered
+    with Foundation Central, remotely from Prism Central. This provides benefits such as creating clusters on remote sites
+    (for example, ROBO), without arranging for a deployment personnel visit.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+    '
+  contact:
+    name: Foundation Central Developers
+    email: foundation@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: '1.0'
+servers:
+- url: /api/fc/v1
+security:
+- BasicAuth: []
+- CookieAuth: []
+paths:
+  /pc/clusters/list:
+    post:
+      description: Get the details of all the Prism Element clusters associated with Prism Central. This API will return clusters
+        details from Prism Central, where Foundation Central is part of.
+      tags:
+      - pc_clusters
+      summary: Get the details of all the Prism Element clusters.
+      operationId: ListPCClusters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pc_clusters_list_input'
+        required: true
+      responses:
+        '200':
+          description: Details of all the Prism Element clusters registered with Prism Central.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/pc_clusters_list_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/api/fc/v1/pc/clusters/list \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --data '{\n    \"length\": 0,\n    \"offset\": 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --body-data\
+          \ '{\n    \"length\": 0,\n    \"offset\": 0\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/pc/clusters/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"length\": 0,\n    \"offset\": 0\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"/api/fc/v1/pc/clusters/list\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"\
+          utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/pc/clusters/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"length\": 0,\
+          \ \"offset\": 0}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/api/fc/v1/pc/clusters/list\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .setBody(\"{\\\"length\\\": 0, \\\"offset\\\"\
+          : 0}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/pc/clusters/list';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"length\": 0, \"offset\": 0}`\n};\n\ntry\
+          \ {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      name: X-API-Key
+      in: header
+    APIKeyKubAuth:
+      type: apiKey
+      name: X-API-Key-Kub
+      in: header
+    BasicAuth:
+      type: http
+      scheme: basic
+    CookieAuth:
+      type: apiKey
+      name: Cookie
+      in: header
+    OpenIDAuth:
+      type: apiKey
+      name: code
+      in: query
+  schemas:
+    pc_clusters_list_response:
+      description: Response parameters for the list of clusters.
+      type: object
+      properties:
+        metadata:
+          $ref: '#/components/schemas/list_metadata_output'
+        pc_clusters:
+          type: array
+          items:
+            $ref: '#/components/schemas/pc_cluster_details'
+    common_network_settings:
+      description: Common network settings across the nodes in the cluster.
+      type: object
+      properties:
+        cvm_dns_servers:
+          description: List of DNS servers for the CVMs in the cluster.
+          type: array
+          items:
+            type: string
+            format: ipv4
+        cvm_ntp_servers:
+          description: List of NTP servers for the CVMs in the cluster.
+          type: array
+          items:
+            type: string
+        hypervisor_dns_servers:
+          description: List of DNS servers for the hypervisors in the cluster.
+          type: array
+          items:
+            type: string
+            format: ipv4
+        hypervisor_ntp_servers:
+          description: List of NTP servers for the hypervisors in the cluster.
+          type: array
+          items:
+            type: string
+    error_response:
+      type: object
+      properties:
+        code:
+          description: HTTP response code from the API.
+          type: integer
+          format: int32
+        message_list:
+          description: Error message in detail.
+          type: array
+          items:
+            type: string
+    list_metadata_output:
+      description: List metadata output for all the list APIs.
+      type: object
+      required:
+      - length
+      properties:
+        length:
+          description: The number of records retrieved.
+          type: integer
+        offset:
+          description: Offset from the start of the object list.
+          type: integer
+        total_matches:
+          description: Total matches found.
+          type: integer
+    pc_clusters_list_input:
+      description: Input needed for listing all the Prism Element clusters registered with Prism Central.
+      type: object
+      properties:
+        length:
+          description: The number of records to retrieve.
+          type: integer
+        offset:
+          description: Offset from the start of the object list. If omitted, the default value is 0.
+          type: integer
+          minimum: 0
+    pc_cluster_details:
+      description: Details of the Prism Element cluster registered with Prism Central.
+      type: object
+      required:
+      - cluster_uuid
+      - aos_version
+      - common_network_settings
+      - cluster_external_ip
+      - redundancy_factor
+      - timezone
+      - node_count
+      - current_time
+      - nodes_list
+      properties:
+        aos_version:
+          description: AOS version currently installed on the cluster.
+          type: string
+        cluster_external_ip:
+          description: External management IP of the cluster.
+          type: string
+          format: ipv4
+        cluster_name:
+          description: Name of the cluster.
+          type: string
+        cluster_uuid:
+          description: UUID of the cluster.
+          type: string
+          format: uuid
+        common_network_settings:
+          $ref: '#/components/schemas/common_network_settings'
+        current_time:
+          description: Current time of Foundation Central.
+          type: string
+          format: date-time
+        node_count:
+          description: Number of nodes in the cluster.
+          type: integer
+        nodes_list:
+          description: List of details of the nodes in the deployment.
+          type: array
+          items:
+            $ref: '#/components/schemas/pc_cluster_node_details'
+        redundancy_factor:
+          description: Redundancy factor of the cluster.
+          type: integer
+        timezone:
+          description: Timezone of the cluster.
+          type: string
+    pc_cluster_node_details:
+      description: Details of the nodes in a cluster.
+      type: object
+      properties:
+        block_serial:
+          description: Block serial of the node.
+          type: string
+        cvm_gateway:
+          description: Gateway of the CVM.
+          type: string
+          format: ipv4
+        cvm_ip:
+          description: CVM IP address of the node.
+          type: string
+          format: ipv4
+        cvm_netmask:
+          description: Netmask of the CVM.
+          type: string
+        hypervisor_gateway:
+          description: Gateway of the hypervisor.
+          type: string
+          format: ipv4
+        hypervisor_hostname:
+          description: Host name of the node.
+          type: string
+        hypervisor_ip:
+          description: Hypervisor IP address of the node.
+          type: string
+          format: ipv4
+        hypervisor_netmask:
+          description: Netmask of the hypervisor.
+          type: string
+        hypervisor_type:
+          description: Type of hypervisor currently installed on the node.
+          type: string
+        hypervisor_version:
+          description: Version of the hypervisor currently installed on the node.
+          type: string
+        model:
+          description: Model name of the node.
+          type: string
+        node_serial:
+          description: Node serial of the node.
+          type: string
+        node_uuid:
+          description: UUID of the node.
+          type: string
+          format: uuid

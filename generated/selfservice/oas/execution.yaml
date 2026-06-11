@@ -1,0 +1,651 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /policies/{uuid}/executions/{exec_uuid}:
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/approval_request_intent_response'
+        '404':
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/policy_status'
+      parameters:
+      - $ref: '#/components/parameters/uuid'
+      tags:
+      - policies
+      x-private: true
+      x-doc-hide: true
+      summary: Get Policy's execution
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: policy
+      description: Retrieves the specified policy's execution
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/policies/{uuid}/executions/{exec_uuid}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n  \
+          \   "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n      \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/policies/{uuid}/executions/{exec_uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/api/nutanix/v3/policies/{uuid}/executions/{exec_uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/policies/{uuid}/executions/{exec_uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://pc-host-ip:9440/api/nutanix/v3/policies/{uuid}/executions/{exec_uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/policies/{uuid}/executions/{exec_uuid}';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  parameters:
+    uuid:
+      description: The UUID of the entity.
+      required: true
+      in: path
+      name: uuid
+      schema:
+        type: string
+        format: UUID
+        pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    user_reference:
+      description: The reference to a user
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - user
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a user
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    policy_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - policy
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    policy_reference:
+      description: The reference to a policy
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - policy
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a policy
+    project_reference:
+      description: The reference to a project
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - project
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a project
+    condition_object:
+      description: Actions of the Policy are executed only if this condition is satisfied
+      required:
+      - attribute_name
+      - criteria_list
+      type: object
+      properties:
+        criteria_list:
+          items:
+            required:
+            - lhs
+            - operator
+            - rhs
+            - is_primary
+            type: object
+            properties:
+              operator:
+                type: string
+              is_primary:
+                type: boolean
+              rhs:
+                type: string
+              lhs:
+                type: string
+          type: array
+        attribute_name:
+          type: string
+        name:
+          type: string
+      title: Condition of the policy
+    approval_request_resources_def_status:
+      description: Approval Request resources
+      required:
+      - approval_set_list
+      - state
+      type: object
+      properties:
+        condition_list:
+          items:
+            $ref: '#/components/schemas/condition_object'
+          type: array
+          description: List of criteria
+        policy_reference:
+          $ref: '#/components/schemas/policy_reference'
+        approval_set_list:
+          items:
+            $ref: '#/components/schemas/approval_set_object'
+          type: array
+          description: Approval sets for this approval_request
+        entity_reference:
+          $ref: '#/components/schemas/entity_reference'
+        state:
+          enum:
+          - APPROVED
+          - REJECTED
+          type: string
+          description: 'State of approval request.
+
+            '
+        owner_reference:
+          $ref: '#/components/schemas/user_reference'
+        expiry_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when approval request was created
+
+            '
+          format: date-time
+      title: Approval Request resources
+    approval_element_object:
+      description: Approval element can be either user, group or external user
+      required:
+      - name
+      - type
+      - state
+      type: object
+      properties:
+        comment:
+          type: string
+        state:
+          enum:
+          - APPROVED
+          - REJECTED
+          type: string
+          description: 'State of approval element.
+
+            '
+        type:
+          enum:
+          - USER
+          - GROUP
+          - EXTERNAL
+          type: string
+          description: 'Type of approval element.
+
+            '
+        approver_name:
+          type: string
+      title: Approval elements of the approval set
+    approval_set_object:
+      description: Approval will be taken from users in approval set
+      required:
+      - name
+      - type
+      - state
+      - approval_element_list
+      type: object
+      properties:
+        state:
+          enum:
+          - APPROVED
+          - REJECTED
+          type: string
+          description: 'State of approval set.
+
+            '
+        type:
+          enum:
+          - ALL
+          - ANY
+          type: string
+          description: 'State of approval request.
+
+            '
+        name:
+          type: string
+        approval_element_list:
+          items:
+            $ref: '#/components/schemas/approval_element_object'
+          type: array
+          description: Approval elements for this approval_set
+      title: Approval Sets of approval_request
+    entity_reference:
+      description: Reference to an entity.
+      type: object
+      properties:
+        kind:
+          type: string
+          description: Kind of the reference.
+        type:
+          x-ntnx-enum:
+          - CATEGORIES_MATCH_ALL
+          - CATEGORIES_MATCH_ANY
+          type: string
+          description: The type of filter being used.
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the entity.
+          format: UUID
+        categories:
+          additionalProperties:
+            type: string
+          type: object
+          description: Categories for the entity.
+        name:
+          type: string
+          description: Name of the entity.
+          maxLength: 64
+      title: Entity Reference.
+    approval_request_def_status:
+      description: An intentful representation of a approval_request status
+      required:
+      - name
+      - resources
+      type: object
+      properties:
+        name:
+          type: string
+          description: approval_request Name.
+        state:
+          type: string
+          description: The state of the approval_request.
+        availability_zone_reference:
+          $ref: '#/components/schemas/availability_zone_reference'
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          type: array
+          description: Any error messages for the approval_request, if in an error state.
+        cluster_reference:
+          $ref: '#/components/schemas/cluster_reference'
+        resources:
+          $ref: '#/components/schemas/approval_request_resources_def_status'
+        description:
+          type: string
+          description: A description for approval_request.
+      title: approval_request Intent Status with placement specified
+    availability_zone_reference:
+      description: The reference to a availability_zone
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - availability_zone
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a availability_zone
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    cluster_reference:
+      description: The reference to a cluster
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - cluster
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a cluster
+    approval_request_intent_response:
+      description: Response object for intentful operations on a approval_request
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/approval_request_def_status'
+        spec:
+          $ref: '#/components/schemas/approval_request'
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/approval_request_metadata'
+      title: approval_request Intent Response
+    approval_request:
+      description: An intentful representation of a approval_request spec
+      required:
+      - name
+      - resources
+      type: object
+      properties:
+        name:
+          type: string
+          description: approval_request Name.
+          maxLength: 80
+        availability_zone_reference:
+          $ref: '#/components/schemas/availability_zone_reference'
+        description:
+          type: string
+          description: A description for approval_request.
+          maxLength: 1000
+        resources:
+          $ref: '#/components/schemas/approval_request_resources'
+        cluster_reference:
+          $ref: '#/components/schemas/cluster_reference'
+      title: approval_request Intent Spec with placement specified
+    approval_request_metadata:
+      description: The approval_request kind metadata
+      required:
+      - kind
+      type: object
+      properties:
+        last_update_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when approval_request was last updated
+
+            '
+          format: date-time
+        use_categories_mapping:
+          type: boolean
+          description: 'Client need to specify this field as true if user want to use the
+
+            newer way of assigning the categories. Without this things should work
+
+            as it was earlier.
+
+            '
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - approval_request
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: approval_request uuid
+          format: UUID
+        project_reference:
+          $ref: '#/components/schemas/project_reference'
+        creation_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when approval_request was created
+
+            '
+          format: date-time
+        spec_version:
+          type: integer
+          description: Version number of the latest spec.
+        spec_hash:
+          type: string
+          description: 'Hash of the spec. This will be returned from server.
+
+            '
+        categories_mapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+          description: 'Categories for the approval_request. This allows setting up multiple
+
+            values from a single key. Categories assigned using the older view will be
+
+            present here. This is the new way of assigning categories.
+
+            '
+        should_force_translate:
+          type: boolean
+          description: 'Applied on Prism Central only. Indicate whether force to translate the spec of the fanout request
+            to fit the target cluster API schema.
+
+            '
+        entity_version:
+          readOnly: true
+          type: string
+          description: 'Logical entity version that allows serializing updates to the entity
+
+            across multiple API namespaces.  For kinds that support
+
+            entity_version, it overrides spec_version described above.
+
+            '
+        owner_reference:
+          $ref: '#/components/schemas/user_reference'
+        categories:
+          additionalProperties:
+            type: string
+          type: object
+          description: 'Categories for the approval_request. This allows assigning one value
+
+            of a key to any entity. Changes done in this will be reflected in
+
+            the categories_mapping field.
+
+            '
+        name:
+          readOnly: true
+          type: string
+          description: approval_request name
+          maxLength: 80
+      title: approval_request metadata
+    approval_request_resources:
+      type: object
+      description: Approval Request resources
+      title: Approval Request resources

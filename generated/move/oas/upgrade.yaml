@@ -1,0 +1,349 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/upgrade:
+    get:
+      description: Checks the status of the ongoing upgrade of the Move application and returns following information about
+        the upgrade:<br/> <ul><li>Online/offline</li> <li>Current version</li> <li>Latest version</li> <li>Percentage progress</li>
+        <li>Tasks completed</li></ul> <b>Sample API Syntax:</b> https://move.address/move/v2/upgrade
+      operationId: getUpgradeStatus
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XtractUpgradeStatusResponse'
+      security:
+      - Bearer: []
+      summary: Get status of an ongoing Move application upgrade
+      tags:
+      - Upgrade
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev//move/v2/upgrade \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/upgrade"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n \nconn.request(\"GET\",\"//move/v2/upgrade\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\
+          \nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/upgrade\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err\
+          \ != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\"\
+          , \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\")\n        req.Header.Add(\"\
+          Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev//move/v2/upgrade\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/upgrade';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    post:
+      description: Initiates the Move application upgrade and returns upgrade information:</br> <ul><li>Online/offline</li>
+        <li>Current version</li> <li>Latest version</li> <li>Percentage progress</li> <li>Tasks completed</li></ul> <b>Sample
+        API Syntax:</b> https://move.address/move/v2/upgrade
+      operationId: initUpgrade
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/XtractInitUpgradeInfoEntity'
+        description: Information required to trigger a Move application upgrade.
+        required: true
+        x-examples:
+          application/json:
+            XtractInitUpgradeInfo:
+              LatestVersion": 3.7.0
+              OfflineUpgrade": false
+              Version": 3.5.2
+      responses:
+        '202':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XtractUpgradeStatusResponse'
+      security:
+      - Bearer: []
+      summary: Initiate Move application upgrade
+      tags:
+      - Upgrade
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/upgrade \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json'\
+          \ \\\n    --data '{\n    \"APIVersion\": \"string\",\n    \"Spec\": {\n        \"LatestVersion\": \"string\",\n\
+          \        \"OfflineUpgrade\": true,\n        \"UploadedFilesInfo\": {\n            \"BundleFileInfo\": {\n      \
+          \          \"Path\": \"string\"\n            },\n            \"MetaFileInfo\": {\n                \"Path\": \"string\"\
+          \n            }\n        },\n        \"Version\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"APIVersion\"\
+          : \"string\",\n    \"Spec\": {\n        \"LatestVersion\": \"string\",\n        \"OfflineUpgrade\": true,\n    \
+          \    \"UploadedFilesInfo\": {\n            \"BundleFileInfo\": {\n                \"Path\": \"string\"\n       \
+          \     },\n            \"MetaFileInfo\": {\n                \"Path\": \"string\"\n            }\n        },\n   \
+          \     \"Version\": \"string\"\n    }\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/upgrade"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"APIVersion\": \"string\",\n    \"Spec\": {\n        \"LatestVersion\": \"string\"\
+          ,\n        \"OfflineUpgrade\": true,\n        \"UploadedFilesInfo\": {\n            \"BundleFileInfo\": {\n    \
+          \            \"Path\": \"string\"\n            },\n            \"MetaFileInfo\": {\n                \"Path\": \"\
+          string\"\n            }\n        },\n        \"Version\": \"string\"\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"\
+          //move/v2/upgrade\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"\
+          ))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/upgrade\"\n\t\n\tpayload :=  strings.NewReader(`{\"APIVersion\": \"string\"\
+          , \"Spec\": {\"LatestVersion\": \"string\", \"OfflineUpgrade\": true, \"UploadedFilesInfo\": {\"BundleFileInfo\"\
+          : {\"Path\": \"string\"}, \"MetaFileInfo\": {\"Path\": \"string\"}}, \"Version\": \"string\"}}`)\n\treq, err :=\
+          \ http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\"\
+          , \"Bearer <your_access_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/upgrade\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"APIVersion\\\": \\\"string\\\", \\\"\
+          Spec\\\": {\\\"LatestVersion\\\": \\\"string\\\", \\\"OfflineUpgrade\\\": true, \\\"UploadedFilesInfo\\\": {\\\"\
+          BundleFileInfo\\\": {\\\"Path\\\": \\\"string\\\"}, \\\"MetaFileInfo\\\": {\\\"Path\\\": \\\"string\\\"}}, \\\"\
+          Version\\\": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n \
+          \ .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/upgrade';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"APIVersion\": \"string\", \"Spec\": {\"LatestVersion\": \"string\", \"OfflineUpgrade\": true, \"UploadedFilesInfo\"\
+          : {\"BundleFileInfo\": {\"Path\": \"string\"}, \"MetaFileInfo\": {\"Path\": \"string\"}}, \"Version\": \"string\"\
+          }}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    Task:
+      description: Move application upgrade task information.
+      properties:
+        Description:
+          description: Move application upgrade task description.
+          type: string
+        Name:
+          description: Name of Move application upgrade task.
+          type: string
+        Status:
+          description: Move application upgrade task status.
+          type: string
+      type: object
+    Tasks:
+      description: Move application upgrade task information.
+      items:
+        $ref: '#/components/schemas/Task'
+      type: array
+    XtractUpgradeSplMessages:
+      description: Move application upgrade messages.
+      items:
+        $ref: '#/components/schemas/SplMessage'
+      type: array
+    SplMessage:
+      description: Move application message.
+      properties:
+        Message:
+          description: Contents of the message.
+          type: string
+        Title:
+          description: Title of the message.
+          type: string
+        Type:
+          description: Type of the message.
+          enum:
+          - INFO
+          - WARN
+          - ERROR
+          type: string
+      type: object
+    MetaData:
+      description: Metadata information
+      properties:
+        Count:
+          type: integer
+        CreationTime:
+          description: Token creation time.
+          type: string
+        Kind:
+          type: string
+        LastUpdateTime:
+          description: Last updated time.
+          type: string
+        Name:
+          description: User name
+          type: string
+        SpecVersion:
+          description: Specification version
+          type: string
+        UUID:
+          description: UUID
+          format: uuid
+          type: string
+      type: object
+    BundleFileInfo:
+      properties:
+        Path:
+          type: string
+      type: object
+    MetaFileInfo:
+      properties:
+        Path:
+          type: string
+      type: object
+    XtractInitUpgradeInfoEntity:
+      description: Move application upgrade information.
+      properties:
+        APIVersion:
+          description: Move API Version.
+          type: string
+        Spec:
+          $ref: '#/components/schemas/XtractInitUpgradeInfo'
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    XtractUpgradeStatusResponse:
+      description: Move application upgrade status.
+      properties:
+        APIVersion:
+          description: Move API version.
+          type: string
+        MetaData:
+          $ref: '#/components/schemas/MetaData'
+        Spec:
+          $ref: '#/components/schemas/XtractInitUpgradeInfoEntity'
+        Status:
+          $ref: '#/components/schemas/XtractUpgradeStatus'
+      type: object
+    XtractInitUpgradeInfo:
+      description: Move application upgrade information.
+      properties:
+        LatestVersion:
+          description: Latest available Move application version.
+          type: string
+        OfflineUpgrade:
+          description: Offline Upgrade Option availability to upgrade to latest available Move application version.
+          type: boolean
+        UploadedFilesInfo:
+          $ref: '#/components/schemas/UploadedFilesInfo'
+        Version:
+          description: Current Move application version.
+          type: string
+      type: object
+    XtractUpgradeStatus:
+      description: Move application upgrade information.
+      properties:
+        Message:
+          description: Move application upgrade status message.
+          type: string
+        Percentage:
+          description: Move application upgrade Percentage.
+          type: integer
+        SplMessages:
+          $ref: '#/components/schemas/XtractUpgradeSplMessages'
+        Status:
+          description: Move application upgrade status.
+          type: string
+        TasksInfo:
+          description: Move application upgrade task Information.
+          properties:
+            CompletedTasks:
+              description: Number of completed Move application upgrade tasks.
+              type: integer
+            CurrentTaskName:
+              description: Name of current Move application upgrade task.
+              type: string
+            Tasks:
+              $ref: '#/components/schemas/Tasks'
+            TotalTasks:
+              description: Number of total Move application upgrade tasks.
+              type: integer
+          type: object
+      type: object
+    UploadedFilesInfo:
+      properties:
+        BundleFileInfo:
+          $ref: '#/components/schemas/BundleFileInfo'
+        MetaFileInfo:
+          $ref: '#/components/schemas/MetaFileInfo'
+      type: object

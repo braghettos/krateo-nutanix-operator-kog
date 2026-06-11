@@ -1,0 +1,293 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /tasks/{uuid}:
+    get:
+      summary: Get details of the specified task.
+      description: Get details of the specified task.
+      tags:
+      - /tasks
+      operationId: get/tasks/{uuid}/getTask
+      parameters:
+      - name: uuid
+        in: path
+        description: UUID of the task
+        required: true
+        schema:
+          type: string
+      - name: include_subtasks_info
+        in: query
+        description: Whether to include a detailed information of the immediate subtasks. Default value is false.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.ergon.TaskDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/tasks/{uuid} \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/tasks/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/tasks/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/tasks/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/tasks/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/tasks/{uuid}';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.dto.ergon.TaskDTO:
+      type: object
+      properties:
+        cluster_uuid:
+          type: string
+        complete_time_usecs:
+          format: int64
+          type: integer
+        create_time_usecs:
+          format: int64
+          type: integer
+        display_name:
+          type: string
+        entity_list:
+          items:
+            $ref: '#/components/schemas/get.dto.ergon.EntityIdDTO'
+          type: array
+        last_updated_time_usecs:
+          format: int64
+          type: integer
+        message:
+          type: string
+        meta_request:
+          $ref: '#/components/schemas/get.dto.acropolis.tasks.MetaRequestDTO'
+        meta_response:
+          $ref: '#/components/schemas/get.dto.ergon.MetaResponseDTO'
+        operation_type:
+          type: string
+        parent_task_uuid:
+          type: string
+        percentage_complete:
+          format: int32
+          type: integer
+        progress_status:
+          enum:
+          - QUEUED
+          - RUNNING
+          - SUCCEEDED
+          - ABORTED
+          - SUSPENDED
+          - FAILED
+          - NONE
+          type: string
+        start_time_usecs:
+          format: int64
+          type: integer
+        subtask_info_list:
+          items:
+            $ref: '#/components/schemas/circular.reference.handler'
+          type: array
+        subtask_uuid_list:
+          items:
+            type: string
+          type: array
+        uuid:
+          type: string
+    get.dto.acropolis.tasks.MetaRequestDTO:
+      type: object
+      properties:
+        method_name:
+          type: string
+    get.dto.ergon.MetaResponseDTO:
+      type: object
+      properties:
+        error_code:
+          format: int32
+          type: integer
+        error_detail:
+          type: string
+    circular.reference.handler:
+      type: string
+    get.dto.ergon.EntityIdDTO:
+      type: object
+      properties:
+        entity_id:
+          type: string
+        entity_name:
+          type: string
+        entity_type:
+          enum:
+          - NODE
+          - VM
+          - SNAPSHOT
+          - DISK
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - PACKAGE
+          - REMOTE_SITE
+          - VOLUME_GROUP
+          - IMAGE
+          - CLUSTER
+          - TAG
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - FILE_SERVER
+          - FILE_SERVER_SHARE
+          - VIRTUAL_NETWORK
+          - VM_GROUP
+          - LCM_ENTITY
+          - MANAGEMENT_SERVER_INFO
+          - REMOTE_CONNECTION
+          - AFFINITY_INFO
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - SUPPORT_CASE_UPLOAD
+          - CLOUD_TRUST
+          - IDENTITY_PROVIDER
+          - DUMMY_API
+          - ABAC_ENTITY_PERMISSION
+          - ABAC_ENTITY_ROLE
+          - ABAC_ROLE
+          - ABAC_CATEGORY
+          - ABAC_USER_CAPABILITY
+          - ABAC_ENTITY_CAPABILITY
+          - PROJECT
+          - TEMPLATE
+          - WEBHOOK
+          - CONTAINER
+          - CONTAINER_CLUSTER
+          - DOCKER_REGISTRY
+          - NETWORK_FUNCTION_CHAIN
+          - EXTENSION
+          - RECOVERY_PLAN
+          - CATALOG_ITEM
+          - PROTECTION_RULE
+          - AVAILABILITY_ZONE
+          - RECOVERY_PLAN_JOB
+          - ALTAS_VIRTUAL_NETWORK
+          - FILE
+          - ACCESS_REQUEST
+          - JUMPBOX
+          - SSH_USER
+          - APP_BLUEPRINT
+          - MARKETPLACE_ITEM
+          - STREAMING_POLICY
+          - DIRECTORY_SERVICE
+          - SUBNET
+          - AFFINITY_RULE
+          - AGS_MANAGED_MACHINE
+          - DIRECT_CONNECT
+          - DIRECT_CONNECT_SP
+          - DIRECT_CONNECT_VIF
+          - PORT
+          - DATACENTER
+          - CELL
+          - RACK
+          - NETWORK_DEVICE
+          - UNDERLAY_SUBNET
+          - FLOATING_IP
+          - NETWORK_SECURITY_RULE
+          - DIRECT_CONNECT_PORT
+          - CIDR
+          - BLACKOUT
+          - ACCESS_CONTROL_POLICY
+          - APP
+          - MICROSEG
+          - ALERT
+          - SECRET
+          - FILE_SERVER_SHARE_SNAPSHOT
+          - IAM_TENANT
+          - IAM_SERVICE_ACCOUNT
+          - IAM_SERVICE_PROVIDER
+          - IAM_IDENTITY_PROVIDER
+          - RECOVERY_POINT
+          - VPN_GATEWAY
+          - VPN_CONNECTION
+          - LAYER2_STRETCH
+          - ENTITY_SYNC_RULE
+          - CLUSTER_VSWITCH
+          - RACKABLE_UNIT
+          - IAM_SERVICE_ACCOUNT_GROUP
+          - QOS_POLICY
+          - NGT_POLICY
+          - ACTION_RULE
+          - ACTION_TYPE
+          - ACTION_TRIGGER_TYPE
+          - ACTION_INSTANCE
+          - ACTION_RULE_RESULT
+          - ROUTING_POLICY
+          - ID_CATEGORIZATION_MAPPING
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - OVA
+          - CATALOG_PLACEMENT_POLICY
+          - EXTERNAL_REPOSITORY
+          - CLOUD_TENANT
+          - DEDICATED_DOMAIN
+          - VPC
+          - ROUTING_POLICY_COLLECTION
+          - NETWORK_CONTROLLER
+          - ATLAS_CLOUD_CONFIG
+          - ATLAS_FLOW_GATEWAY
+          - PORT_SET
+          - SECURITY_GROUP
+          - VIRTUAL_DISK
+          - VIRTUAL_SWITCH
+          - METRICS_DATA_PROVIDER
+          - EXTERNAL_ENTITY_CONFIG
+          - XFIT_POLICY
+          - ISCSI_CLIENT
+          - IPFIX_EXPORTER
+          - ROLE
+          - PERMISSION
+          - FILE_SERVER_PROTECTION_POLICY
+          - STORAGE_POLICY
+          - NUTANIX_VCENTER_VM
+          - DATASOURCE
+          - EXTERNAL_ENTITY_SHAREABLE_CONFIG
+          - VM_HOST_AFFINITY_POLICY
+          - VM_RECOVERY_POINT
+          - VOLUME_GROUP_RECOVERY_POINT
+          type: string

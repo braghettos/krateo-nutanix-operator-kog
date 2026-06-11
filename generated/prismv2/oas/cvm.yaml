@@ -1,0 +1,182 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /cloud/{cloud_type}/cvms:
+    get:
+      summary: Get a list of CVMs.
+      description: Get a list of CVMs that installed.
+      tags:
+      - /cloud
+      operationId: get/cloud/{cloud_type}/cvms/getCvms
+      parameters:
+      - name: cloud_type
+        in: path
+        description: Cloud type
+        required: true
+        schema:
+          type: string
+      - name: region
+        in: query
+        description: Region
+        required: true
+        schema:
+          type: string
+      - name: credential_name
+        in: query
+        description: Name of the credential
+        required: false
+        schema:
+          type: string
+      - name: count
+        in: query
+        description: Maximum number of cloud cvms to retrieve
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filter_criteria
+        in: query
+        description: Filter criteria
+        required: false
+        schema:
+          type: string
+      - name: sort_criteria
+        in: query
+        description: Sort criteria
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.dr.CloudCvmDTO_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cloud/{cloud_type}/cvms\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cloud/{cloud_type}/cvms"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/cloud/{cloud_type}/cvms\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cloud/{cloud_type}/cvms\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cloud/{cloud_type}/cvms\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cloud/{cloud_type}/cvms';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    get.base.EntityCollection_get.dto.dr.CloudCvmDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.dr.CloudCvmDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.dto.dr.CloudCvmDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        private_ip:
+          type: string
+        public_ip:
+          type: string
+        region:
+          type: string
+        state:
+          enum:
+          - STARTING
+          - STARTED
+          - RUNNING
+          - STOPPING
+          - STOPPED
+          - TERMINATED
+          type: string
+        subnet_id:
+          type: string
+        type:
+          type: string

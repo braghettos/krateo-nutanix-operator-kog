@@ -1,0 +1,316 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-alpha.1/registries:
+    get:
+      tags:
+      - NKE_API_Reference_Registry
+      summary: "List the private registry configurations\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/registries"
+      operationId: ListPrivateRegistry
+      responses:
+        '200':
+          description: List of private registries.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_registry_list'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/registries \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/registries"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-alpha.1/registries\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/registries\"\n\t \n\treq, err := http.NewRequest(\"GET\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-alpha.1/registries\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/registries';\nconst options = {\n  method: 'GET',\n\
+          \  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response =\
+          \ await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n \
+          \ console.error(error);\n}"
+    post:
+      tags:
+      - NKE_API_Reference_Registry
+      summary: "Create the private registry entry in NKE with the provided configuration\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/registries"
+      operationId: PostPrivateRegistry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1.1.0_registry_config'
+        required: true
+      responses:
+        '202':
+          description: Private registry creation in NKE is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_registry'
+        '412':
+          description: Private registry creation pre-checks failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/registries \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n    \"cert\": \"string\"\
+          ,\n    \"name\": \"prod-user-registry\",\n    \"port\": 0,\n    \"url\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"cert\": \"string\",\n    \"name\": \"prod-user-registry\",\n \
+          \   \"port\": 0,\n    \"url\": \"string\"\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/registries"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"cert\": \"string\"\
+          ,\n    \"name\": \"prod-user-registry\",\n    \"port\": 0,\n    \"url\": \"string\"\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"/karbon/v1-alpha.1/registries\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"\
+          utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/registries\"\n\t\n\tpayload :=  strings.NewReader(`{\"cert\": \"\
+          string\", \"name\": \"prod-user-registry\", \"port\": 0, \"url\": \"string\"}`)\n\treq, err := http.NewRequest(\"\
+          POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1-alpha.1/registries\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"cert\\\": \\\"string\\\", \\\"name\\\": \\\"prod-user-registry\\\", \\\"port\\\": 0, \\\"url\\\": \\\"string\\\
+          \"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/registries';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"cert\": \"string\"\
+          , \"name\": \"prod-user-registry\", \"port\": 0, \"url\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url,\
+          \ options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+  /karbon/v1-alpha.1/registries/{name}:
+    get:
+      tags:
+      - NKE_API_Reference_Registry
+      summary: "Get the private registry configuration of the specified name\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/registries/test-reg"
+      operationId: GetPrivateRegistry
+      parameters:
+      - description: The name of the private registry.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Get the private registry is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_registry'
+        '404':
+          description: The name of the private registry is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name} \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-alpha.1/registries/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}\"\n\t \n\treq, err := http.NewRequest(\"GET\"\
+          , url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+    delete:
+      tags:
+      - NKE_API_Reference_Registry
+      summary: "Delete the private registry configuration\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/registries/test-reg"
+      operationId: DeletePrivateRegistry
+      parameters:
+      - description: The name of the private registry.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delete the private registry configuration is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_registry_delete_response'
+        '404':
+          description: The name of the private registry is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '412':
+          description: Private registry deletion pre-checks failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name} \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/karbon/v1-alpha.1/registries/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\"\
+          , url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/registries/{name}';\nconst options = {\n  method:\
+          \ 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const\
+          \ response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error)\
+          \ {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_registry:
+      type: object
+      required:
+      - uuid
+      - name
+      - endpoint
+      properties:
+        endpoint:
+          description: 'Endpoint of the private registry in format, <url:port>. (For example: prod-user-registry:5000).'
+          type: string
+        name:
+          description: The name of the private registry.
+          type: string
+        uuid:
+          description: The UUID of the private registry.
+          type: string
+    v1.1.0_registry_config:
+      type: object
+      required:
+      - name
+      - url
+      properties:
+        cert:
+          description: Certificate of the private registry in the format of base64-encoded byte array.
+          type: string
+          format: byte
+        name:
+          description: The name of the private registry configuration.
+          type: string
+          maxLength: 40
+          minLength: 1
+          pattern: '[a-z0-9]([-a-z0-9]*[a-z0-9])?'
+        port:
+          description: Port of the private registry.
+          type: integer
+        url:
+          description: URL of the private registry.
+          type: string
+          minLength: 1
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_registry_list:
+      type: array
+      items:
+        $ref: '#/components/schemas/v1.1.0_registry'
+    v1.1.0_registry_delete_response:
+      type: object
+      required:
+      - registry_name
+      properties:
+        registry_name:
+          description: The name of the private registry.
+          type: string

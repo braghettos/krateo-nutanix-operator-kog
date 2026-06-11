@@ -1,0 +1,231 @@
+openapi: 3.0.0
+info:
+  title: Foundation Central Service
+  description: '# Introduction
+
+
+    **Foundation Central** creates clusters from factory-imaged nodes and reimages existing nodes that are already registered
+    with Foundation Central, remotely from Prism Central. This provides benefits such as creating clusters on remote sites
+    (for example, ROBO), without arranging for a deployment personnel visit.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+    '
+  contact:
+    name: Foundation Central Developers
+    email: foundation@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: '1.0'
+servers:
+- url: /api/fc/v1
+security:
+- BasicAuth: []
+- CookieAuth: []
+paths:
+  /hardware_managers/{hardware_manager_uuid}/resources:
+    post:
+      description: Fetches resources of a hardware manager needed for deployment.
+      tags:
+      - hardware_managers
+      summary: Get resources of hardware manager needed for deployment.
+      operationId: FetchHardwareManagerResources
+      parameters:
+      - description: UUID of the hardware manager.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/resources_input'
+        required: true
+      responses:
+        '200':
+          description: Returns the hardware manager resources.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/resources_output'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/resources\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --data '{\n    \"hardware_manager_data\": {\n\
+          \        \"intersight_data\": {\n            \"organization\": \"string\"\n        }\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --body-data\
+          \ '{\n    \"hardware_manager_data\": {\n        \"intersight_data\": {\n            \"organization\": \"string\"\
+          \n        }\n    }\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/resources"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"hardware_manager_data\": {\n        \"intersight_data\"\
+          : {\n            \"organization\": \"string\"\n        }\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}/resources\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/resources\"\n\t\n\tpayload :=\
+          \  strings.NewReader(`{\"hardware_manager_data\": {\"intersight_data\": {\"organization\": \"string\"}}}`)\n\treq,\
+          \ err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/resources\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .setBody(\"{\\\"hardware_manager_data\\\": {\\\
+          \"intersight_data\\\": {\\\"organization\\\": \\\"string\\\"}}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/resources';\nconst\
+          \ options = {\n  method: 'POST',\n  headers: {'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"hardware_manager_data\"\
+          : {\"intersight_data\": {\"organization\": \"string\"}}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      name: X-API-Key
+      in: header
+    APIKeyKubAuth:
+      type: apiKey
+      name: X-API-Key-Kub
+      in: header
+    BasicAuth:
+      type: http
+      scheme: basic
+    CookieAuth:
+      type: apiKey
+      name: Cookie
+      in: header
+    OpenIDAuth:
+      type: apiKey
+      name: code
+      in: query
+  schemas:
+    intersight_resources:
+      description: Intersight resources.
+      type: object
+      required:
+      - ip_pools
+      - mac_pools
+      - uuid_pools
+      properties:
+        ip_pools:
+          description: IP pools available in the Intersight.
+          type: array
+          items:
+            $ref: '#/components/schemas/ip_pool'
+        mac_pools:
+          description: MAC pools available in the Intersight.
+          type: array
+          items:
+            $ref: '#/components/schemas/mac_pool'
+        uuid_pools:
+          description: UUID pools available in the Intersight.
+          type: array
+          items:
+            $ref: '#/components/schemas/uuid_pool'
+    resources_input:
+      description: Input parameters for fetching resources of a hardware manager.
+      type: object
+      properties:
+        hardware_manager_data:
+          $ref: '#/components/schemas/resources_input_data'
+    intersight_resources_input_data:
+      description: Input required for fetching Intersight resources. This input is mandatory for Intersight.
+      type: object
+      required:
+      - organization
+      properties:
+        organization:
+          description: Name of the organization in Intersight.
+          type: string
+    error_response:
+      type: object
+      properties:
+        code:
+          description: HTTP response code from the API.
+          type: integer
+          format: int32
+        message_list:
+          description: Error message in detail.
+          type: array
+          items:
+            type: string
+    uuid_pool:
+      description: UUID pool available in the Intersight.
+      type: object
+      required:
+      - name
+      - available_count
+      properties:
+        available_count:
+          description: Number of available UUID items in the UUID pool.
+          type: integer
+          minimum: 0
+        name:
+          description: Name of the UUID pool, which is a collection of UUID items that can be allocated to server profiles.
+          type: string
+    resources_output:
+      description: Response with resources details fetched from the hardware manager.
+      type: object
+      required:
+      - hardware_manager_data
+      properties:
+        hardware_manager_data:
+          $ref: '#/components/schemas/resources_output_data'
+    resources_input_data:
+      description: Input parameters for fetching resources of the hardware manager.
+      type: object
+      properties:
+        intersight_data:
+          $ref: '#/components/schemas/intersight_resources_input_data'
+    ip_pool:
+      description: IP pool available in Intersight.
+      type: object
+      required:
+      - name
+      - ipv4_available_count
+      - ipv6_available_count
+      properties:
+        ipv4_available_count:
+          description: Number of available IPv4 addresses in the IP pool.
+          type: integer
+          minimum: 0
+        ipv6_available_count:
+          description: Number of available IPv6 addresses in the IP pool.
+          type: integer
+          minimum: 0
+        name:
+          description: Name of the IP pool, which is a collection of IPv4 and/or IPv6 addresses that can be allocated to server
+            profiles.
+          type: string
+    resources_output_data:
+      description: Resources fetched from the hardware manager.
+      type: object
+      properties:
+        intersight_data:
+          $ref: '#/components/schemas/intersight_resources'
+    mac_pool:
+      description: MAC pool available in Intersight.
+      type: object
+      required:
+      - name
+      - available_count
+      properties:
+        available_count:
+          description: Number of available MAC addresses in the MAC pool.
+          type: integer
+          minimum: 0
+        name:
+          description: Name of the MAC pool which is a collection of MAC addresses that can be allocated to VNICs of a server
+            profile.
+          type: string

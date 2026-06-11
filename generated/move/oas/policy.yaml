@@ -1,0 +1,544 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/plans/bwcap/policies:
+    post:
+      description: Create a new bandwidth capacity policy
+      operationId: createBwCapPolicy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BandwidthCapPolicyDef'
+        description: The bandwidth capacity policy details
+        required: true
+        x-examples:
+          application/json:
+            IsActive: true
+            MatchExpression: SourceHostname=="10.46.17.154"
+            Name: Foo
+            Schedules:
+            - BwcapMbps: 200
+              CronExpr: 22 17 * * TUE,FRI,SAT
+            WindowSchedules:
+            - BwcapMbps: 100
+              DaysOfTheWeek:
+              - MON
+              - TUE
+              - WED
+              - THU
+              - FRI
+              EndTimeHours: 17
+              EndTimeMins: 22
+              StartTimeHours: 9
+              StartTimeMins: 0
+      responses:
+        '201':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BandwidthCapPolicy'
+      security:
+      - Bearer: []
+      summary: Create a new bandwidth capacity policy
+      tags:
+      - Bandwidth Throttling Policies
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/plans/bwcap/policies \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"IsActive\": true,\n    \"MatchExpression\": \"string\",\n    \"Name\"\
+          : \"string\",\n    \"Schedules\": [\n        {\n            \"BwcapMbps\": 0,\n            \"CronExpr\": \"string\"\
+          \n        }\n    ],\n    \"WindowSchedules\": [\n        {\n            \"BwcapMbps\": 0,\n            \"DaysOfTheWeek\"\
+          : [\n                \"string\"\n            ],\n            \"EndTimeHours\": 0,\n            \"EndTimeMins\":\
+          \ 0,\n            \"StartTimeHours\": 0,\n            \"StartTimeMins\": 0\n        }\n    ]\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"IsActive\"\
+          : true,\n    \"MatchExpression\": \"string\",\n    \"Name\": \"string\",\n    \"Schedules\": [\n        {\n    \
+          \        \"BwcapMbps\": 0,\n            \"CronExpr\": \"string\"\n        }\n    ],\n    \"WindowSchedules\": [\n\
+          \        {\n            \"BwcapMbps\": 0,\n            \"DaysOfTheWeek\": [\n                \"string\"\n      \
+          \      ],\n            \"EndTimeHours\": 0,\n            \"EndTimeMins\": 0,\n            \"StartTimeHours\": 0,\n\
+          \            \"StartTimeMins\": 0\n        }\n    ]\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/plans/bwcap/policies"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"IsActive\": true,\n    \"MatchExpression\": \"string\",\n    \"Name\": \"string\"\
+          ,\n    \"Schedules\": [\n        {\n            \"BwcapMbps\": 0,\n            \"CronExpr\": \"string\"\n      \
+          \  }\n    ],\n    \"WindowSchedules\": [\n        {\n            \"BwcapMbps\": 0,\n            \"DaysOfTheWeek\"\
+          : [\n                \"string\"\n            ],\n            \"EndTimeHours\": 0,\n            \"EndTimeMins\":\
+          \ 0,\n            \"StartTimeHours\": 0,\n            \"StartTimeMins\": 0\n        }\n    ]\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"//move/v2/plans/bwcap/policies\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\n\
+          print(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/bwcap/policies\"\n\t\n\tpayload :=  strings.NewReader(`{\"IsActive\"\
+          : true, \"MatchExpression\": \"string\", \"Name\": \"string\", \"Schedules\": [{\"BwcapMbps\": 0, \"CronExpr\":\
+          \ \"string\"}], \"WindowSchedules\": [{\"BwcapMbps\": 0, \"DaysOfTheWeek\": [\"string\"], \"EndTimeHours\": 0, \"\
+          EndTimeMins\": 0, \"StartTimeHours\": 0, \"StartTimeMins\": 0}]}`)\n\treq, err := http.NewRequest(\"POST\", url,\
+          \ payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\")\n   \
+          \     req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/plans/bwcap/policies\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"IsActive\\\": true, \\\"MatchExpression\\\
+          \": \\\"string\\\", \\\"Name\\\": \\\"string\\\", \\\"Schedules\\\": [{\\\"BwcapMbps\\\": 0, \\\"CronExpr\\\": \\\
+          \"string\\\"}], \\\"WindowSchedules\\\": [{\\\"BwcapMbps\\\": 0, \\\"DaysOfTheWeek\\\": [\\\"string\\\"], \\\"EndTimeHours\\\
+          \": 0, \\\"EndTimeMins\\\": 0, \\\"StartTimeHours\\\": 0, \\\"StartTimeMins\\\": 0}]}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/bwcap/policies';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"IsActive\": true, \"MatchExpression\": \"string\", \"Name\": \"string\", \"Schedules\": [{\"BwcapMbps\"\
+          : 0, \"CronExpr\": \"string\"}], \"WindowSchedules\": [{\"BwcapMbps\": 0, \"DaysOfTheWeek\": [\"string\"], \"EndTimeHours\"\
+          : 0, \"EndTimeMins\": 0, \"StartTimeHours\": 0, \"StartTimeMins\": 0}]}`\n};\n\ntry {\n  const response = await\
+          \ fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+  /move/v2/plans/bwcap/policies/{policyuuid}:
+    delete:
+      description: Delete a specific bandwidth capacity policy
+      operationId: deleteBwCapPolicy
+      parameters:
+      - description: The UUID of the policy
+        in: path
+        name: policyuuid
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Operation completed.
+      security:
+      - Bearer: []
+      summary: Delete a specific bandwidth capacity policy
+      tags:
+      - Bandwidth Throttling Policies
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid} \\\
+          \n    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n \nconn.request(\"DELETE\",\"//move/v2/plans/bwcap/policies/{policyuuid}\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}';\nconst options = {\n  method:\
+          \ 'DELETE',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      description: Get details of a specific bandwidth capacity policy
+      operationId: getBwCapPolicy
+      parameters:
+      - description: The UUID of the policy
+        in: path
+        name: policyuuid
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Operation completed.
+          x-examples:
+            application/json:
+              BandwidthCapPolicyDef:
+                IsActive: true
+                MatchExpression: SourceHostname=="10.46.17.154"
+                Name: Foo
+                Schedules:
+                - BwcapMbps: 200
+                  CronExpr: 22 17 * * TUE,FRI,SAT
+                WindowSchedules:
+                - BwcapMbps: 100
+                  DaysOfTheWeek:
+                  - MON
+                  - TUE
+                  - WED
+                  - THU
+                  - FRI
+                  EndTimeHours: 17
+                  EndTimeMins: 22
+                  StartTimeHours: 9
+                  StartTimeMins: 0
+              CreatedAt: '2021-10-15T00:27:17.741Z'
+              UUID: 16b10589-988c-46e2-aafa-57e0a85c1e5d
+              UpdatedAt: '2021-10-15T00:27:17.741Z'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BandwidthCapPolicy'
+      security:
+      - Bearer: []
+      summary: Get details of a specific bandwidth capacity policy
+      tags:
+      - Bandwidth Throttling Policies
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid} \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n \nconn.request(\"GET\",\"//move/v2/plans/bwcap/policies/{policyuuid}\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      description: Update a specific bandwidth capacity policy
+      operationId: updateBwCapPolicy
+      parameters:
+      - description: The UUID of the policy
+        in: path
+        name: policyuuid
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BandwidthCapPolicyDef'
+        description: The bandwidth capacity policy details
+        required: true
+        x-examples:
+          application/json:
+            IsActive: true
+            MatchExpression: SourceHostname=="10.46.17.154"
+            Name: Foo-1
+            Schedules:
+            - BwcapMbps: 200
+              CronExpr: 22 17 * * TUE,FRI,SAT
+            WindowSchedules:
+            - BwcapMbps: 100
+              DaysOfTheWeek:
+              - MON
+              - TUE
+              - WED
+              - THU
+              - FRI
+              EndTimeHours: 17
+              EndTimeMins: 22
+              StartTimeHours: 9
+              StartTimeMins: 0
+      responses:
+        '200':
+          description: Operation completed.
+          x-examples:
+            application/json:
+              BandwidthCapPolicyDef:
+                IsActive: true
+                MatchExpression: SourceHostname=="10.46.17.154"
+                Name: Foo-1
+                Schedules:
+                - BwcapMbps: 200
+                  CronExpr: 22 17 * * TUE,FRI,SAT
+                WindowSchedules:
+                - BwcapMbps: 100
+                  DaysOfTheWeek:
+                  - MON
+                  - TUE
+                  - WED
+                  - THU
+                  - FRI
+                  EndTimeHours: 17
+                  EndTimeMins: 22
+                  StartTimeHours: 9
+                  StartTimeMins: 0
+              CreatedAt: '2021-10-15T00:27:17.741Z'
+              UUID: 16b10589-988c-46e2-aafa-57e0a85c1e5d
+              UpdatedAt: '2021-10-15T00:28:47.121Z'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BandwidthCapPolicy'
+      security:
+      - Bearer: []
+      summary: Update a specific bandwidth capacity policy
+      tags:
+      - Bandwidth Throttling Policies
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid} \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"IsActive\": true,\n    \"MatchExpression\": \"string\"\
+          ,\n    \"Name\": \"string\",\n    \"Schedules\": [\n        {\n            \"BwcapMbps\": 0,\n            \"CronExpr\"\
+          : \"string\"\n        }\n    ],\n    \"WindowSchedules\": [\n        {\n            \"BwcapMbps\": 0,\n        \
+          \    \"DaysOfTheWeek\": [\n                \"string\"\n            ],\n            \"EndTimeHours\": 0,\n      \
+          \      \"EndTimeMins\": 0,\n            \"StartTimeHours\": 0,\n            \"StartTimeMins\": 0\n        }\n  \
+          \  ]\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"IsActive\"\
+          : true,\n    \"MatchExpression\": \"string\",\n    \"Name\": \"string\",\n    \"Schedules\": [\n        {\n    \
+          \        \"BwcapMbps\": 0,\n            \"CronExpr\": \"string\"\n        }\n    ],\n    \"WindowSchedules\": [\n\
+          \        {\n            \"BwcapMbps\": 0,\n            \"DaysOfTheWeek\": [\n                \"string\"\n      \
+          \      ],\n            \"EndTimeHours\": 0,\n            \"EndTimeMins\": 0,\n            \"StartTimeHours\": 0,\n\
+          \            \"StartTimeMins\": 0\n        }\n    ]\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"IsActive\": true,\n    \"MatchExpression\": \"string\",\n    \"Name\": \"string\"\
+          ,\n    \"Schedules\": [\n        {\n            \"BwcapMbps\": 0,\n            \"CronExpr\": \"string\"\n      \
+          \  }\n    ],\n    \"WindowSchedules\": [\n        {\n            \"BwcapMbps\": 0,\n            \"DaysOfTheWeek\"\
+          : [\n                \"string\"\n            ],\n            \"EndTimeHours\": 0,\n            \"EndTimeMins\":\
+          \ 0,\n            \"StartTimeHours\": 0,\n            \"StartTimeMins\": 0\n        }\n    ]\n}\"\"\"\n\nconn.request(\"\
+          PUT\",\"//move/v2/plans/bwcap/policies/{policyuuid}\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\
+          \nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          IsActive\": true, \"MatchExpression\": \"string\", \"Name\": \"string\", \"Schedules\": [{\"BwcapMbps\": 0, \"CronExpr\"\
+          : \"string\"}], \"WindowSchedules\": [{\"BwcapMbps\": 0, \"DaysOfTheWeek\": [\"string\"], \"EndTimeHours\": 0, \"\
+          EndTimeMins\": 0, \"StartTimeHours\": 0, \"StartTimeMins\": 0}]}`)\n\treq, err := http.NewRequest(\"PUT\", url,\
+          \ payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\")\n   \
+          \     req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"IsActive\\\": true, \\\"MatchExpression\\\
+          \": \\\"string\\\", \\\"Name\\\": \\\"string\\\", \\\"Schedules\\\": [{\\\"BwcapMbps\\\": 0, \\\"CronExpr\\\": \\\
+          \"string\\\"}], \\\"WindowSchedules\\\": [{\\\"BwcapMbps\\\": 0, \\\"DaysOfTheWeek\\\": [\\\"string\\\"], \\\"EndTimeHours\\\
+          \": 0, \\\"EndTimeMins\\\": 0, \\\"StartTimeHours\\\": 0, \\\"StartTimeMins\\\": 0}]}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/bwcap/policies/{policyuuid}';\nconst options = {\n  method:\
+          \ 'PUT',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"IsActive\": true, \"MatchExpression\": \"string\", \"Name\": \"string\", \"\
+          Schedules\": [{\"BwcapMbps\": 0, \"CronExpr\": \"string\"}], \"WindowSchedules\": [{\"BwcapMbps\": 0, \"DaysOfTheWeek\"\
+          : [\"string\"], \"EndTimeHours\": 0, \"EndTimeMins\": 0, \"StartTimeHours\": 0, \"StartTimeMins\": 0}]}`\n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    BandwidthCapSchedule:
+      description: The bandwidth capacity schedule
+      properties:
+        BwcapMbps:
+          format: uint64
+          type: integer
+        CronExpr:
+          description: The schedule expression in the standard cron format.
+          type: string
+      required:
+      - CronExpr
+      - BwcapMbps
+      type: object
+    BandwidthCapPolicyDef:
+      description: The bandwidth capacity policy details.
+      properties:
+        IsActive:
+          description: Indicates if the policy is active or not.
+          type: boolean
+        MatchExpression:
+          description: The expression used to determine if the policy applies to a particular VM.
+          type: string
+        Name:
+          description: Name of the policy.
+          type: string
+        Schedules:
+          description: The list of cron schedules
+          items:
+            $ref: '#/components/schemas/BandwidthCapSchedule'
+          type: array
+        WindowSchedules:
+          description: The list of cron schedules with start and end time details.
+          items:
+            $ref: '#/components/schemas/BandwidthCapWindowSchedule'
+          type: array
+      required:
+      - Name
+      - MatchExpression
+      - Schedules
+      - WindowSchedules
+      type: object
+    BandwidthCapPolicy:
+      description: The bandwidth capacity policy object.
+      properties:
+        BandwidthCapPolicyDef:
+          $ref: '#/components/schemas/BandwidthCapPolicyDef'
+        CreatedAt:
+          format: date-time
+          type: string
+        UUID:
+          description: The bandwidth capacity policy UUID.
+          format: uuid4
+          type: string
+        UpdatedAt:
+          format: date-time
+          type: string
+      required:
+      - BandwidthCapPolicyDef
+      - UUID
+      - CreatedAt
+      - UpdatedAt
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    BandwidthCapWindowSchedule:
+      description: The bandwidth capacity schedule for a weekly time window.
+      properties:
+        BwcapMbps:
+          format: uint64
+          type: integer
+        DaysOfTheWeek:
+          items:
+            description: The days of the week to which the schedule applies. If start/end times are all 0's, then this is
+              an all-day schedule for the specified days.
+            enum:
+            - SUN
+            - MON
+            - TUE
+            - WED
+            - THU
+            - FRI
+            - SAT
+            type: string
+          minItems: 1
+          type: array
+          uniqueItems: true
+        EndTimeHours:
+          description: End time in hours for the time window in 24-hour format.
+          format: uint64
+          maximum: 23
+          minimum: 0
+          type: integer
+        EndTimeMins:
+          description: End time in minutes for the time window schedule.
+          format: uint64
+          maximum: 59
+          minimum: 0
+          type: integer
+        StartTimeHours:
+          description: Start time in hours for the time window in 24-hour format.
+          format: uint64
+          maximum: 23
+          minimum: 0
+          type: integer
+        StartTimeMins:
+          description: Start time in minutes for the time window schedule.
+          format: uint64
+          maximum: 59
+          minimum: 0
+          type: integer
+      required:
+      - StartTimeHours
+      - StartTimeMins
+      - EndTimeHours
+      - EndTimeMins
+      - DaysOfTheWeek
+      - BwcapMbps
+      type: object

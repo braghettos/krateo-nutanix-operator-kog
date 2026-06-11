@@ -1,0 +1,182 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /databases/ui/ops-managers-mapping:
+    get:
+      description: 'Returns a paginated list of mappings between databases and their associated Ops Managers,
+
+        along with Time Machine enabled status information.
+
+        '
+      operationId: getTmDbOmMappingForUi
+      parameters:
+      - description: The maximum number of records to return.
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+      - description: The number of records to skip before selecting the next set.
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TmDbOmMappingResponse'
+          description: Returns the paginated list of database-Ops Manager mappings.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error.
+      summary: Get the mapping of databases to Ops Managers and Time Machine info
+      tags:
+      - Databases
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/databases/ui/ops-managers-mapping \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/databases/ui/ops-managers-mapping"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/databases/ui/ops-managers-mapping\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/databases/ui/ops-managers-mapping\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/databases/ui/ops-managers-mapping\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/databases/ui/ops-managers-mapping';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    TmDbOmMapping:
+      description: Mapping between a database, Ops Manager, and Time Machine information.
+      properties:
+        dbId:
+          description: UUID of the database.
+          format: uuid
+          type: string
+        opsMgrId:
+          description: UUID of the associated Ops Manager.
+          format: uuid
+          type: string
+        tmInfo:
+          $ref: '#/components/schemas/TmEnabledInfo'
+      type: object
+    TimeMachineStatus:
+      description: The status of the Time Machine
+      enum:
+      - READY
+      - PAUSED
+      - FROZEN
+      - DISABLED
+      - NOT_YET_ACTIVATED
+      - DELETED
+      type: string
+    TmEnabledInfo:
+      description: Time Machine enabled status information.
+      properties:
+        id:
+          description: UUID of the Time Machine
+          format: uuid
+          type: string
+        status:
+          $ref: '#/components/schemas/TimeMachineStatus'
+      type: object
+    TmDbOmMappingResponse:
+      description: Paginated response containing database to Ops Manager mappings.
+      properties:
+        count:
+          description: Total number of records in the response.
+          type: integer
+        entities:
+          items:
+            $ref: '#/components/schemas/TmDbOmMapping'
+          type: array
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

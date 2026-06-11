@@ -1,0 +1,866 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /tms/{timemachine_id}/capability:
+    get:
+      description: "This API indicates the time ranges during which the Time Machine can restore the Database. \nNOTE - This\
+        \ API is not supported for MongoDB Sharded Clusters. Use the 'tms/{tm_id}/timeline' instead\n"
+      operationId: getTimeMachineCapability
+      parameters:
+      - in: path
+        name: timemachine_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: 'This field specifies the time zone in which the response containing the Time machine capability will
+          be returned . The default value is UTC.
+
+          '
+        in: query
+        name: time-zone
+        schema:
+          type: string
+      - description: 'The type of capability to be returned. The default value is ''detailed''.
+
+          The possible values are:
+
+          - detailed: Returns the detailed capability of the Time Machine along with information of respective staging snapshots.
+
+          - real: Returns the summary of the capability of the Time Machine.
+
+          - summary: Returns the summary of the capability of the Time Machine.
+
+          '
+        in: query
+        name: type
+        schema:
+          type: string
+      - description: 'If set to true, The API will return the active DB logs for the time machine collected by NDB. The default
+          value is true.
+
+          '
+        in: query
+        name: load-db-logs
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return the active snapshots for the time machine taken by NDB . The default
+          value is true.
+
+          '
+        in: query
+        name: load-snapshots
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return the active sanitized snapshots for the time machine taken by NDB
+          . The default value is false.
+
+          '
+        in: query
+        name: load-sanitised-snapshots
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return any logs collected by NDB which are not part of the Time Machine
+          capability . The default value is false.
+
+          '
+        in: query
+        name: load-unknown-timestamp-logs
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return any snapshots which are not yet replicated by NDB to the target
+          cluster as part of the Time Machine capability . The default value is false.
+
+          '
+        in: query
+        name: load-not-yet-replicated-snapshots
+        schema:
+          type: boolean
+      - description: 'The list of Nutanix cluster IDs for which the Time Machine capability needs to be fetched. If not provided
+          , the capability will only be fetched for the primary cluster.
+
+          '
+        in: query
+        name: nx-cluster-ids
+        schema:
+          type: string
+      - description: 'The Nutanix cluster ID for which the Time Machine capability needs to be fetched. If not provided ,
+          the capability will only be fetched for the primary cluster.
+
+          '
+        in: query
+        name: nx-cluster-id
+        schema:
+          format: uuid
+          type: string
+      - description: 'If set to true , the API will return the capability of the Time Machine only for the primary clusters
+          . The default value is false.
+
+          '
+        in: query
+        name: primary-clusters
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return the capability of the Time Machine only for the source clusters
+          i.e where the database nodes are physically located . The default value is false.
+
+          '
+        in: query
+        name: source-clusters
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return the capability of the Time Machine only for the non source clusters
+          i.e where the database nodes are not physically located . The default value is false.
+
+          '
+        in: query
+        name: non-source-clusters
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return the capability of the Time Machine only for all the clusters. The
+          default value is false.
+
+          '
+        in: query
+        name: all-clusters
+        schema:
+          type: boolean
+      - description: 'If set to true , the API will return the capability of the Time Machine only for all the clusters. The
+          default value is false.
+
+          '
+        in: query
+        name: combined-capability
+        schema:
+          type: boolean
+      - description: 'If set to true, the API will return the `tmHealthInfo` field along with the Capability. This field offers
+          a detailed account of all gaps in your recoverability timeline, including the reasons for these gaps.
+
+          '
+        in: query
+        name: load-health
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/EraTimeMachineCapability'
+                - $ref: '#/components/schemas/EraTimeMachineMultiClusterCapability'
+                - $ref: '#/components/schemas/EraTimeMachineCombinedCapability'
+          description: Operation completed.
+      summary: Get capability of the given Time Machine
+      tags:
+      - Time Machines
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/tms/{timemachine_id}/capability \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/tms/{timemachine_id}/capability"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/tms/{timemachine_id}/capability\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tms/{timemachine_id}/capability\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/tms/{timemachine_id}/capability\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tms/{timemachine_id}/capability';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    PairStringString:
+      properties:
+        first:
+          type: string
+        second:
+          type: string
+      type: object
+    EraLCMConfigInfoEraEntityExpiryPolicy:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/EraEntityExpiryPolicy'
+        postDeleteCommand:
+          $ref: '#/components/schemas/EraPostDeleteCommand'
+        preDeleteCommand:
+          $ref: '#/components/schemas/EraPreDeleteCommand'
+        refreshDetails:
+          $ref: '#/components/schemas/EraEntityRefreshPolicy'
+      type: object
+    EraSnapshotLogListDTO:
+      properties:
+        continuousRegion:
+          $ref: '#/components/schemas/EraContinuousRegion'
+        from:
+          type: string
+        mode:
+          type: string
+        snapshots:
+          items:
+            $ref: '#/components/schemas/ERASnapshotDTO'
+          type: array
+        timeUnit:
+          type: string
+        timeUnitNumber:
+          type: string
+        to:
+          type: string
+      type: object
+    ERASnapshotInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    DeregisterInfo:
+      properties:
+        message:
+          type: string
+        operations:
+          items:
+            type: string
+          type: array
+      type: object
+    ERADbLogInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    PITRGapHealthInfo:
+      description: If PITR recoverability has any gaps, this field returns details of when the gaps occurred, and why.
+      properties:
+        databaseIds:
+          description: 'The list of Databases that have gaps in recoverability during this period.
+
+            If the Time Machine manages a group of Databases, this can be used to identify which Databases have gaps
+
+            when the combined capability is requested.
+
+            '
+          items:
+            type: string
+          type: array
+        fromUTC:
+          description: Start of the gap in recoverability, in UTC.
+          type: string
+        reasons:
+          description: Reasons for the gap in recoverability, in UTC.
+          items:
+            properties:
+              cause:
+                description: Reason for the gap in recoverability.
+                type: string
+              opId:
+                description: If the gap is caused by an Operation, this field returns the Operation UUID.
+                nullable: true
+                type: string
+            type: object
+          type: array
+        toUTC:
+          description: End of the gap in recoverability, in UTC.
+          type: string
+      type: object
+    EraEntityExpiryPolicy:
+      properties:
+        effectiveTimestamp:
+          type: string
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+        expiryTimestamp:
+          type: string
+        remindBeforeInDays:
+          format: int32
+          type: integer
+        userCreated:
+          type: boolean
+      type: object
+    EraTimeMachineCombinedCapability:
+      description: Returns combined recoverability Capability (across all DBs in the Group) for Group Time Machines.
+      properties:
+        capabilityResetTime:
+          description: The last time the Capability was reset, along with the position of the last deletion of the new Database
+            home due to a failure.
+          type: string
+        databaseCapabilities:
+          additionalProperties:
+            $ref: '#/components/schemas/EraTimeMachineCapability'
+            description: This is a <Database Id, Capability> Map.
+          type: object
+        databaseIds:
+          description: The list of Databases whose Capabilities are being returned.
+          items:
+            format: uuid
+            type: string
+          type: array
+        databaseLogTimeInfo:
+          additionalProperties:
+            $ref: '#/components/schemas/MultiClusterLogTimeInfo'
+            description: This represents the Database ID and Log Catchup Time information map.
+          type: object
+        databaseTimelineInfo:
+          description: Database Group timeline information
+          items:
+            $ref: '#/components/schemas/ERADatabaseGroupTimelineInfo'
+          type: array
+        healWithResetCapability:
+          description: Set to true if a heal Snapshot is in progress.
+          type: boolean
+        logCatchupStartTime:
+          description: 'Indicates the last successful backup operation timestamp.
+
+            This is the log copy time if the type is REAL and the log catchup time if the type is Actual.
+
+            '
+          type: string
+        lowestLogCatchupStartTime:
+          description: The start time for log recoverability.
+          type: string
+        nonSourceNxClusterIds:
+          description: The list of clusters that do not host a Database.
+          items:
+            format: uuid
+            type: string
+          type: array
+        nxClusterLogCatchupStartTimes:
+          additionalProperties:
+            description: A map of Nutanix Cluster ID (on which the backup is stored) against the start time of the recovery
+              region.
+            type: string
+          type: object
+        outputTimeZone:
+          description: All date time objects in the response are in this time zone.
+          type: string
+        primaryNxClusterIds:
+          description: The list of clusters that hold the Database Primary.
+          items:
+            format: uuid
+            type: string
+          type: array
+        sourceNxClusterIds:
+          description: The list of clusters that host a Database.
+          items:
+            format: uuid
+            type: string
+          type: array
+        timeMachineId:
+          description: ID of the Time Machine.
+          format: uuid
+          type: string
+        type:
+          description: "The type of capability - Real or Actual\nReal ==> logCatchupStartTime = Time at which log copy operation\
+            \ was successful\n          (and thus logs have been persisted in the backup)\nActual ==> logCatchupStartTime\
+            \ = Time at which log catchup operation was successful \n          (does not guarantee recoverability).\n"
+          type: string
+      type: object
+    EraTagValueDTO:
+      properties:
+        entityId:
+          type: string
+        entityType:
+          enum:
+          - DATABASE
+          - TIME_MACHINE
+          - DATABASE_SERVER
+          - CLONE
+          type: string
+        tagId:
+          type: string
+        tagName:
+          type: string
+        value:
+          type: string
+      type: object
+    EraEntityRefreshPolicy:
+      properties:
+        lastRefreshDate:
+          type: string
+        nextRefreshDate:
+          type: string
+        refreshDateTimezone:
+          type: string
+        refreshInDays:
+          format: int32
+          type: integer
+        refreshInHours:
+          format: int32
+          type: integer
+        refreshInMonths:
+          format: int32
+          type: integer
+        refreshTime:
+          type: string
+      type: object
+    ERASnapshotMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        fromTimeStamp:
+          type: string
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+        toTimeStamp:
+          type: string
+      type: object
+    InnerDatabaseInfo:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      type: object
+    EraTimeMachineMultiClusterCapability:
+      description: Recovery Capability, when multi-cluster backups are enabled.
+      properties:
+        capabilityResetTime:
+          description: The last time the Capability was reset, along with the position of the last deletion of the new Database
+            home due to a failure.
+          type: string
+        clusterCapabilities:
+          additionalProperties:
+            $ref: '#/components/schemas/EraTimeMachineCapability'
+            description: This is a <Nutanix Cluster Id, Capability> Map.
+          type: object
+        databaseLogTimeInfo:
+          additionalProperties:
+            $ref: '#/components/schemas/MultiClusterLogTimeInfo'
+            description: This is a <Database Id, Log Catchup Time Info> Map.
+          type: object
+        datbaseIds:
+          description: The list of Databases whose Capabilities are being returned.
+          items:
+            format: uuid
+            type: string
+          type: array
+        healWithResetCapability:
+          description: Set to true if a heal Snapshot is in progress.
+          type: boolean
+        logCatchupStartTime:
+          description: 'The last successful backup operation timestamp.
+
+            This is the log copy time if the type is REAL and the log catchup time if the type is Actual.
+
+            '
+          type: string
+        lowestLogCatchupStartTime:
+          description: The start time for log recoverability.
+          type: string
+        nxClusterLogCatchupStartTimes:
+          additionalProperties:
+            type: string
+          description: A map of Nutanix Cluster ID (on which backup is stored) against the start time of the recovery region.
+          type: object
+        outputTimeZone:
+          description: All date time objects in the response are in this time zone.
+          type: string
+        primaryNxClusterIds:
+          description: The list of clusters that hold the Database Primary.
+          items:
+            format: uuid
+            type: string
+          type: array
+        sourceNxClusterIds:
+          description: The list of clusters that host a Database.
+          items:
+            format: uuid
+            type: string
+          type: array
+        timeMachineId:
+          description: ID of Time Machine.
+          format: uuid
+          type: string
+        type:
+          description: "The type of capability - Real or Actual\nReal ==> logCatchupStartTime = Time at which log copy operation\
+            \ was successful\n          (and thus logs have been persisted in the backup)\nActual ==> logCatchupStartTime\
+            \ = Time at which log catchup operation was successful \n          (does not guarantee recoverability).\n"
+          type: string
+      type: object
+    snapshotType:
+      description: he type of the snapshot (used to determine retention policies)
+      enum:
+      - CONTINUOUS
+      - NONE
+      - CONTINUOUS_EXTRA
+      - TRANSIENT
+      - CONTINUOUS_RETRY
+      - DISCRETE
+      - MANUAL
+      - HOURLY
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
+      type: string
+    EraPreDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    EraDbLogDTO:
+      properties:
+        databaseNodeId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        eraLogDriveId:
+          format: uuid
+          type: string
+        fromTime:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADbLogInfo'
+        logCopyOperationId:
+          format: uuid
+          type: string
+        message:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/ERADbLogMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        size:
+          format: int64
+          type: integer
+        status:
+          type: string
+        toTime:
+          type: string
+        unprocessed:
+          type: boolean
+      type: object
+    ERADatabaseGroupTimelineInfo:
+      description: Database Group Timeline Info.
+      properties:
+        addedDatabases:
+          items:
+            $ref: '#/components/schemas/InnerDatabaseInfo'
+          type: array
+        removedDatabases:
+          items:
+            $ref: '#/components/schemas/InnerDatabaseInfo'
+          type: array
+        time:
+          type: string
+        timeDt:
+          type: string
+      type: object
+    ERASnapshotDTO:
+      properties:
+        appInfoVersion:
+          type: string
+        applicableTypeFrequencies:
+          items:
+            $ref: '#/components/schemas/snapshotType'
+          type: array
+        applicableTypes:
+          items:
+            type: string
+          type: array
+        databaseNodeId:
+          format: uuid
+          type: string
+        databaseSnapshot:
+          type: boolean
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverId:
+          format: uuid
+          type: string
+        dbserverIp:
+          format: ipv4
+          type: string
+        dbserverName:
+          type: string
+        description:
+          type: string
+        fromTimeStamp:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERASnapshotInfo'
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraEntityExpiryPolicy'
+        metadata:
+          $ref: '#/components/schemas/ERASnapshotMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        processed:
+          type: boolean
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        protectionDomainId:
+          format: uuid
+          type: string
+        queryCount:
+          type: integer
+        snapshotId:
+          format: uuid
+          type: string
+        snapshotSize:
+          type: string
+        snapshotTimeStamp:
+          type: string
+        snapshotUuid:
+          format: uuid
+          type: string
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachineId:
+          format: uuid
+          type: string
+        timeZone:
+          type: string
+        toTimeStamp:
+          type: string
+        type:
+          type: string
+        typeFrequency:
+          $ref: '#/components/schemas/snapshotType'
+      type: object
+    EraDbLog:
+      properties:
+        databaseNodeId:
+          format: uuid
+          type: string
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        eraLogDriveId:
+          format: uuid
+          type: string
+        fromTime:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERADbLogInfo'
+        metadata:
+          $ref: '#/components/schemas/ERADbLogMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        size:
+          format: int64
+          type: integer
+        status:
+          type: string
+        toTime:
+          type: string
+      type: object
+    MultiClusterLogTimeInfo:
+      description: Log Catchup Time Info for a Database; used when returning Database specific information for Group Time
+        Machines.
+      properties:
+        lowestLogCatchupStartTime:
+          description: The start time for PITR recoverability for this Database.
+          type: string
+        nxClusterLogCatchupStartTimes:
+          additionalProperties:
+            type: string
+          description: A map of Nutanix Cluster ID (on which backup is stored) against the end time of the PITR recovery region.
+          type: object
+      type: object
+    EraContinuousRegion:
+      properties:
+        dbLogs:
+          items:
+            $ref: '#/components/schemas/EraDbLogDTO'
+          type: array
+        fromTime:
+          type: string
+        lastEntry:
+          $ref: '#/components/schemas/EraDbLogDTO'
+        processedRanges:
+          items:
+            $ref: '#/components/schemas/PairStringString'
+          type: array
+        snapshots:
+          items:
+            $ref: '#/components/schemas/ERASnapshotDTO'
+          type: array
+        toTime:
+          type: string
+        unprocessedRanges:
+          items:
+            $ref: '#/components/schemas/PairStringString'
+          type: array
+        valid:
+          type: boolean
+      type: object
+    EraPostDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    ERADbLogMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    TimeMachineHealthHistory:
+      description: Details of the health history of a Time Machine.
+      properties:
+        critical:
+          $ref: '#/components/schemas/PITRGapHealthInfo'
+        delayedSnaps:
+          description: Recoverability gaps caused by delayed snapshots.
+          items:
+            $ref: '#/components/schemas/PITRGapHealthInfo'
+          type: array
+        failedSnapshotOps:
+          description: List of failed Snapshot operations.
+          items:
+            properties:
+              opId:
+                description: The UUID of the failed Snapshot Operation, if available.
+                nullable: true
+                type: string
+              reason:
+                description: Reason for the failure.
+                type: string
+              tsUTC:
+                description: The timestamp of the failed Snapshot Operation, in UTC.
+                type: string
+            type: object
+          type: array
+        paused:
+          description: Recoverability gaps caused by the Time Machine being paused.
+          items:
+            $ref: '#/components/schemas/PITRGapHealthInfo'
+          type: array
+        warning:
+          description: Recoverability gaps caused by backup failures in the past.
+          items:
+            $ref: '#/components/schemas/PITRGapHealthInfo'
+          type: array
+      type: object
+    EraTimeMachineCapability:
+      description: Recovery Capability on a single storage destination.
+      properties:
+        capability:
+          items:
+            $ref: '#/components/schemas/EraSnapshotLogListDTO'
+          type: array
+        capabilityResetTime:
+          type: string
+        healWithResetCapability:
+          type: boolean
+        lastContinuousSnapshot:
+          $ref: '#/components/schemas/ERASnapshotDTO'
+        lastContinuousSnapshotTime:
+          type: string
+        lastDbLog:
+          $ref: '#/components/schemas/EraDbLog'
+        logCatchupStartTime:
+          type: string
+        outputTimeZone:
+          type: string
+        overallContinuousRangeEndTime:
+          type: string
+        timeMachineId:
+          format: uuid
+          type: string
+        tmHealthInfo:
+          $ref: '#/components/schemas/TimeMachineHealthHistory'
+        type:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

@@ -1,0 +1,611 @@
+openapi: 3.0.0
+info:
+  title: Foundation Central Service
+  description: '# Introduction
+
+
+    **Foundation Central** creates clusters from factory-imaged nodes and reimages existing nodes that are already registered
+    with Foundation Central, remotely from Prism Central. This provides benefits such as creating clusters on remote sites
+    (for example, ROBO), without arranging for a deployment personnel visit.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+    '
+  contact:
+    name: Foundation Central Developers
+    email: foundation@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: '1.0'
+servers:
+- url: /api/fc/v1
+security:
+- BasicAuth: []
+- CookieAuth: []
+paths:
+  /imaged_clusters/list:
+    post:
+      description: Lists all the clusters created using Foundation Central.
+      tags:
+      - imaged_clusters
+      summary: Get details of all the clusters
+      operationId: ListImagedClusters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/imaged_clusters_list_input'
+        required: true
+      responses:
+        '200':
+          description: Details of all the clusters created using Foundation Central.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/imaged_clusters_list_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/api/fc/v1/imaged_clusters/list \\\n    --header\
+          \ 'Authorization: Basic <basic_auth_token>' \\\n    --data '{\n    \"filters\": {\n        \"archived\": true\n\
+          \    },\n    \"length\": 0,\n    \"offset\": 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --body-data\
+          \ '{\n    \"filters\": {\n        \"archived\": true\n    },\n    \"length\": 0,\n    \"offset\": 0\n}' \\\n   \
+          \ --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/imaged_clusters/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"filters\": {\n        \"archived\": true\n    },\n\
+          \    \"length\": 0,\n    \"offset\": 0\n}\"\"\"\n\nconn.request(\"POST\",\"/api/fc/v1/imaged_clusters/list\", payload,\
+          \ headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/imaged_clusters/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"filters\"\
+          : {\"archived\": true}, \"length\": 0, \"offset\": 0}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/api/fc/v1/imaged_clusters/list\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .setBody(\"{\\\"filters\\\": {\\\"archived\\\
+          \": true}, \\\"length\\\": 0, \\\"offset\\\": 0}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/imaged_clusters/list';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"filters\": {\"archived\": true}, \"length\"\
+          : 0, \"offset\": 0}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      name: X-API-Key
+      in: header
+    APIKeyKubAuth:
+      type: apiKey
+      name: X-API-Key-Kub
+      in: header
+    BasicAuth:
+      type: http
+      scheme: basic
+    CookieAuth:
+      type: apiKey
+      name: Cookie
+      in: header
+    OpenIDAuth:
+      type: apiKey
+      name: code
+      in: query
+  schemas:
+    imaged_cluster_details:
+      description: Details of the cluster created using Foundation Central.
+      type: object
+      required:
+      - imaged_cluster_uuid
+      - cluster_size
+      - imaged_node_uuid_list
+      - common_network_settings
+      - cluster_name
+      - cluster_external_ip
+      - redundancy_factor
+      - storage_node_count
+      - foundation_init_config
+      - foundation_init_node_uuid
+      - cluster_status
+      - created_timestamp
+      - updated_timestamp
+      - destroyed
+      - workflow_type
+      - archived
+      - current_time
+      - skip_cluster_creation
+      - hardware_manager_type
+      - hardware_manager_uuid
+      properties:
+        aos_metadata_url:
+          description: URL to download the AOS metadata JSON. Returned only when imaging is performed.
+          type: string
+        archived:
+          description: True if the cluster creation request is archived. Otherwise, False.
+          type: boolean
+        cluster_external_ip:
+          description: External management IP of the cluster.
+          type: string
+          format: ipv4
+        cluster_metadata:
+          $ref: '#/components/schemas/cluster_metadata'
+        cluster_name:
+          description: Name of the cluster.
+          type: string
+        cluster_size:
+          description: Number of nodes in the cluster.
+          type: integer
+        cluster_status:
+          $ref: '#/components/schemas/cluster_creation_status'
+        common_network_settings:
+          $ref: '#/components/schemas/common_network_settings'
+        created_timestamp:
+          description: Time when the cluster creation request was received in Foundation Central.
+          type: string
+          format: date-time
+        current_time:
+          description: Current time of Foundation Central.
+          type: string
+          format: date-time
+        destroyed:
+          description: True if the cluster is destroyed. Otherwise, False.
+          type: boolean
+        discovered_node_details:
+          description: Details of the node discovered at the time of submitting the deployment request.
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        fc_metadata:
+          $ref: '#/components/schemas/fc_metadata'
+        foundation_init_config:
+          description: JSON configuration used by foundation to create the cluster.
+          type: object
+          additionalProperties: true
+        foundation_init_node_uuid:
+          description: UUID of the first node coordinating the cluster creation.
+          type: string
+          format: uuid
+        hardware_manager_type:
+          $ref: '#/components/schemas/hardware_manager_type'
+        hardware_manager_uuid:
+          description: UUID of the hardware manager if the nodes in the deployment are managed by a hardware manager.
+          type: string
+          format: uuid
+        imaged_cluster_uuid:
+          description: UUID of the cluster.
+          type: string
+          format: uuid
+        imaged_node_uuid_list:
+          description: List of UUIDs of the imaged nodes.
+          type: array
+          items:
+            type: string
+            format: uuid
+        nodes_list:
+          description: List of details of the nodes in the deployment.
+          type: array
+          items:
+            $ref: '#/components/schemas/node_details_output'
+        redundancy_factor:
+          description: Redundancy factor of the cluster.
+          type: integer
+        server_configuration_data:
+          $ref: '#/components/schemas/server_configuration_data'
+        skip_cluster_creation:
+          description: True if the cluster creation must be skipped. Otherwise, False.
+          type: boolean
+        storage_node_count:
+          description: Number of storage-only nodes in the cluster. AHV ISO for the storage node will be taken from the AOS
+            package.
+          type: integer
+        target_cluster:
+          $ref: '#/components/schemas/target_cluster_details'
+        updated_timestamp:
+          description: Time when the cluster creation request's status was updated in Foundation Central.
+          type: string
+          format: date-time
+        workflow_type:
+          description: If the imaging and cluster creation are coordinated by Foundation, the value is FOUNDATION_WF. If the
+            nodes are in phoenix, the value is PHOENIX_WF.
+          type: string
+    error_response:
+      type: object
+      properties:
+        code:
+          description: HTTP response code from the API.
+          type: integer
+          format: int32
+        message_list:
+          description: Error message in detail.
+          type: array
+          items:
+            type: string
+    intersight_deployment_data:
+      description: Deployment data which is specific to Intersight.
+      type: object
+      required:
+      - organization
+      properties:
+        organization:
+          description: Common organization to which all the nodes in the deployment belong to.
+          type: string
+          minLength: 1
+    imaged_clusters_list_response:
+      description: Response parameters for the list of clusters.
+      type: object
+      properties:
+        imaged_clusters:
+          type: array
+          items:
+            $ref: '#/components/schemas/imaged_cluster_details'
+        metadata:
+          $ref: '#/components/schemas/list_metadata_output'
+    server_configuration_data:
+      description: Server configuration details per deployment. In the case of node preparation for cluster expansion, this
+        is not a mandatory input for deployment.
+      type: object
+      properties:
+        intersight_data:
+          $ref: '#/components/schemas/intersight_deployment_data'
+        skip_cleanup:
+          description: True to skip server configuration cleanup, i.e., to skip unassociation and deletion of server profiles/policies
+            in case of Intersight, if deployment fails. False otherwise. This input is ignored if imaging is successful on
+            all nodes and if deployment fails during cluster creation or the post-cluster creation phase, as cleanup is always
+            skipped in those cases.
+          type: boolean
+    management_mode_intersight:
+      description: Management mode of the node in Intersight.
+      type: string
+      enum:
+      - ISM
+      - IMM
+    intersight_imc_settings:
+      description: IMC settings for IMM servers. Atleast one of inband or out-of-band settings have to be provided.
+      type: object
+      minProperties: 1
+      properties:
+        inband_settings:
+          description: Inband network settings.
+          type: object
+          required:
+          - vlan
+          - ip_pool_name
+          - ipv4
+          - ipv6
+          properties:
+            ip_pool_name:
+              description: Name of the IP pool which is a collection of IPv4 and/or IPv6 addresses that can be allocated to
+                server profiles.
+              type: string
+              minLength: 1
+            ipv4:
+              description: This flag enables the use of IPv4 address for end-point access.
+              type: boolean
+            ipv4_available_count:
+              description: Number of available IPv4 addresses. This is used only in case of node preparation for cluster expansion.
+              type: integer
+              minimum: 0
+            ipv6:
+              description: This flag enables the use of IPv6 address for end-point access.
+              type: boolean
+            ipv6_available_count:
+              description: Number of available IPv6 addresses. This is used only in case of node preparation for cluster expansion.
+              type: integer
+              minimum: 0
+            vlan:
+              description: VLAN to be used for node access over Inband network.
+              type: integer
+              maximum: 4093
+              minimum: 4
+        out_of_band_settings:
+          description: Out-of-band network settings.
+          type: object
+          required:
+          - ip_pool_name
+          properties:
+            ip_pool_name:
+              description: Name of the IP pool which is a collection of IP addresses that can be allocated to server profiles.
+                Only IPv4 configuration will be supported for Out-Of-Band configuration.
+              type: string
+              minLength: 1
+            ipv4_available_count:
+              description: Number of available IPv4 addresses. This is used only in case of node preparation for cluster expansion.
+              type: integer
+              minimum: 0
+    target_cluster_details:
+      description: Details of the PE cluster to which the nodes will be added. This cluster must be registered with the Prism
+        Central where Foundation Central is running.
+      type: object
+      required:
+      - cluster_uuid
+      properties:
+        cluster_name:
+          description: Name of the cluster. This is a read-only attribute used by the client.
+          type: string
+          readOnly: true
+        cluster_uuid:
+          description: UUID of the cluster.
+          type: string
+    cluster_metadata:
+      description: Cluster metadata to be updated on Foundation Central.
+      type: object
+      required:
+      - cluster_uuid
+      properties:
+        cluster_uuid:
+          description: UUID of the cluster which is generated by genesis during cluster creation.
+          type: string
+          format: uuid
+    imaged_clusters_list_input:
+      description: Input needed for listing all the cluster entities.
+      type: object
+      properties:
+        filters:
+          $ref: '#/components/schemas/imaged_clusters_list_filter_fields'
+        length:
+          description: The number of records to retrieve.
+          type: integer
+        offset:
+          description: Offset from the start of the object list. If omitted, the default value is 0.
+          type: integer
+          minimum: 0
+    imaged_clusters_list_filter_fields:
+      description: Supported fields for filtering the cluster entities.
+      type: object
+      properties:
+        archived:
+          description: If true, only the archived cluster entities are filtered. If false, only the cluster entities that
+            are not archived are filtered.
+          type: boolean
+          nullable: true
+    server_configuration_per_node:
+      description: Server configuration details per node.
+      type: object
+      properties:
+        intersight_data:
+          $ref: '#/components/schemas/intersight_node_data'
+        skip_firmware_upgrade:
+          description: True to skip firmware upgrade; otherwise, false.
+          type: boolean
+    cluster_progress_status:
+      description: Denotes the progress status of the cluster creation.
+      type: object
+      properties:
+        category:
+          description: List of error categories.
+          type: array
+          items:
+            description: Error category.
+            type: string
+        cluster_name:
+          description: Cluster name.
+          type: string
+        message_list:
+          description: List of messages for the client based on the progress state.
+          type: array
+          items:
+            type: string
+        percent_complete:
+          description: Percentage of completion of the cluster creation process.
+          type: number
+          format: float
+        status:
+          description: Current status of the cluster creation process.
+          type: string
+    cluster_creation_status:
+      description: Details of cluster creation process.
+      type: object
+      required:
+      - current_foundation_ip
+      - foundation_session_id
+      - intent_picked_up
+      - deployment_started
+      - cluster_creation_started
+      - imaging_stopped
+      - aggregate_percent_complete
+      - cluster_progress_details
+      - node_progress_details
+      properties:
+        aggregate_percent_complete:
+          description: Overall progress percentage including imaging and cluster creation.
+          type: number
+          format: float
+        cluster_creation_started:
+          description: Denotes whether the cluster creation has started in the phoenix workflow. For Foundation workflows,
+            this field is the same as intent_picked_up.
+          type: boolean
+        cluster_progress_details:
+          $ref: '#/components/schemas/cluster_progress_status'
+        current_foundation_ip:
+          description: Current IP address of the coordinating foundation node.
+          type: string
+          format: ipv4
+        deployment_started:
+          description: Denotes whether the deployment has started. For regular nodes, it is the same as intent_picked_up.
+          type: boolean
+        foundation_session_id:
+          description: Foundation session ID for the cluster creation.
+          type: string
+        imaging_stopped:
+          description: Describes whether Foundation imaging and cluster creation has stopped. True indicates that the process
+            has stopped and false indicates that the process is still in-progress.
+          type: boolean
+        intent_picked_up:
+          description: Denotes whether the remote node has picked up the cluster creation intent.
+          type: boolean
+        node_progress_details:
+          description: List of details about the progress of each node.
+          type: array
+          items:
+            $ref: '#/components/schemas/node_progress_status_output'
+        warning_list:
+          description: List of warnings for the client.
+          type: array
+          items:
+            type: string
+    intersight_node_data:
+      description: Node deployment data which is specific to Intersight.
+      type: object
+      properties:
+        imc_settings:
+          $ref: '#/components/schemas/intersight_imc_settings'
+        management_mode:
+          $ref: '#/components/schemas/management_mode_intersight'
+        uuid_pool_name:
+          description: Name of the UUID pool which is a collection of UUID items that can be allocated to server profiles.
+            This is only required for IMM servers.
+          type: string
+        vic_fec_mode:
+          description: FEC Mode for VIC Adapter. This is only required for ISM servers.
+          type: string
+          enum:
+          - cl91
+          - cl74
+          - 'Off'
+        vnic_settings:
+          description: vNIC settings for IMM servers.
+          type: object
+          required:
+          - mac_pool_name
+          properties:
+            mac_pool_name:
+              description: Name of the MAC pool, which is a collection of MAC addresses that can be allocated to VNICs of
+                a server profile.
+              type: string
+              minLength: 1
+            vlans:
+              description: Allowed VLAN IDs of the virtual interface. A list of comma separated VLAN IDs and/or VLAN ID ranges.
+              type: string
+    common_network_settings:
+      description: Common network settings across the nodes in the cluster.
+      type: object
+      properties:
+        cvm_dns_servers:
+          description: List of DNS servers for the CVMs in the cluster.
+          type: array
+          items:
+            type: string
+            format: ipv4
+        cvm_ntp_servers:
+          description: List of NTP servers for the CVMs in the cluster.
+          type: array
+          items:
+            type: string
+        hypervisor_dns_servers:
+          description: List of DNS servers for the hypervisors in the cluster.
+          type: array
+          items:
+            type: string
+            format: ipv4
+        hypervisor_ntp_servers:
+          description: List of NTP servers for the hypervisors in the cluster.
+          type: array
+          items:
+            type: string
+    list_metadata_output:
+      description: List metadata output for all the list APIs.
+      type: object
+      required:
+      - length
+      properties:
+        length:
+          description: The number of records retrieved.
+          type: integer
+        offset:
+          description: Offset from the start of the object list.
+          type: integer
+        total_matches:
+          description: Total matches found.
+          type: integer
+    hardware_manager_type:
+      description: Type of the hardware manager.
+      type: string
+      enum:
+      - INTERSIGHT
+      - NOT_APPLICABLE
+    fc_metadata:
+      description: Foundation Central metadata required for the deployment.
+      type: object
+      required:
+      - api_key_uuid
+      properties:
+        api_key_uuid:
+          description: UUID of the Foundation Central API key that will be pushed to the nodes for the deployment. This is
+            only required for the nodes managed by a hardware manager.
+          type: string
+          minLength: 1
+    node_details_output:
+      description: Details of the node in the deployment.
+      type: object
+      properties:
+        node_uuid:
+          description: UUID of the node.
+          type: string
+          format: uuid
+        server_configuration_data:
+          $ref: '#/components/schemas/server_configuration_per_node'
+    node_progress_status_output:
+      description: Denotes the progress status of node imaging.
+      type: object
+      required:
+      - imaged_node_uuid
+      - status
+      - percent_complete
+      - imaging_stopped
+      - intent_picked_up
+      properties:
+        category:
+          description: List of error categories.
+          type: array
+          items:
+            description: Error category.
+            type: string
+        imaged_node_uuid:
+          description: UUID of the node.
+          type: string
+          format: uuid
+        imaging_stopped:
+          description: Describes whether imaging has stopped. True indicates that the process has stopped. False indicates
+            that the process is still in-progress. This field will only be used by phoenix nodes to update Foundation Central.
+          type: boolean
+        intent_picked_up:
+          description: Denotes whether the remote nodes have picked up the cluster creation intent.
+          type: boolean
+        message_list:
+          description: List of messages for the client based on the process state.
+          type: array
+          items:
+            type: string
+        node_imaging_percent_complete:
+          description: Percentage of completion of the node imaging process.
+          type: number
+          format: float
+          nullable: true
+        node_preparation_percent_complete:
+          description: Percentage of completion of the node preparation process.
+          type: number
+          format: float
+          nullable: true
+        percent_complete:
+          description: Overall progress percentage of the node imaging process including node preparation.
+          type: number
+          format: float
+        status:
+          description: Current status of the node imaging process.
+          type: string
+        warning_list:
+          description: List of warnings for the client.
+          type: array
+          items:
+            type: string

@@ -1,0 +1,796 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /tunnels/list:
+    post:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tunnel_list_intent_response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tunnel_list_metadata'
+        required: true
+      tags:
+      - tunnels
+      x-private: false
+      x-doc-hide: false
+      summary: List Tunnels
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: tunnel
+      description: 'Retrieves a list of all tunnels. Supported filters are:
+
+        - name
+
+        '
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/tunnels/list \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json'\
+          \ \\\n    --data '{\n    \"filter\": \"string\",\n    \"kind\": \"tunnel\",\n    \"length\": 1,\n    \"offset\"\
+          : 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"filter\"\
+          : \"string\",\n    \"kind\": \"tunnel\",\n    \"length\": 1,\n    \"offset\": 0,\n    \"sort_attribute\": \"string\"\
+          ,\n    \"sort_order\": \"string\"\n}' \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/tunnels/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"filter\": \"string\",\n    \"kind\": \"tunnel\",\n    \"length\": 1,\n    \"offset\"\
+          : 0,\n    \"sort_attribute\": \"string\",\n    \"sort_order\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/nutanix/v3/tunnels/list\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/tunnels/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"filter\":\
+          \ \"string\", \"kind\": \"tunnel\", \"length\": 1, \"offset\": 0, \"sort_attribute\": \"string\", \"sort_order\"\
+          : \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"\
+          application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://pc-host-ip:9440/api/nutanix/v3/tunnels/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"filter\\\": \\\"string\\\", \\\"kind\\\
+          \": \\\"tunnel\\\", \\\"length\\\": 1, \\\"offset\\\": 0, \\\"sort_attribute\\\": \\\"string\\\", \\\"sort_order\\\
+          \": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/tunnels/list';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"filter\": \"string\", \"kind\": \"tunnel\", \"length\": 1, \"offset\": 0, \"sort_attribute\": \"string\"\
+          , \"sort_order\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    tunnel_list_intent_response:
+      description: Response object for intentful operation of tunnels
+      required:
+      - api_version
+      - metadata
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/tunnel_intent_resource'
+          type: array
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/tunnel_list_metadata_output'
+      title: Entity Intent List Response
+    tunnel_metadata:
+      description: The tunnel kind metadata
+      required:
+      - kind
+      type: object
+      properties:
+        last_update_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when tunnel was last updated
+
+            '
+          format: date-time
+        use_categories_mapping:
+          type: boolean
+          description: 'Client need to specify this field as true if user want to use the
+
+            newer way of assigning the categories. Without this things should work
+
+            as it was earlier.
+
+            '
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - tunnel
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: tunnel uuid
+          format: UUID
+        project_reference:
+          $ref: '#/components/schemas/project_reference'
+        creation_time:
+          readOnly: true
+          type: string
+          description: 'UTC date and time in RFC-3339 format when tunnel was created
+
+            '
+          format: date-time
+        spec_version:
+          type: integer
+          description: Version number of the latest spec.
+        spec_hash:
+          type: string
+          description: 'Hash of the spec. This will be returned from server.
+
+            '
+        categories_mapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+          description: 'Categories for the tunnel. This allows setting up multiple
+
+            values from a single key. Categories assigned using the older view will be
+
+            present here. This is the new way of assigning categories.
+
+            '
+        should_force_translate:
+          type: boolean
+          description: 'Applied on Prism Central only. Indicate whether force to translate the spec of the fanout request
+            to fit the target cluster API schema.
+
+            '
+        entity_version:
+          readOnly: true
+          type: string
+          description: 'Logical entity version that allows serializing updates to the entity
+
+            across multiple API namespaces.  For kinds that support
+
+            entity_version, it overrides spec_version described above.
+
+            '
+        owner_reference:
+          $ref: '#/components/schemas/user_reference'
+        categories:
+          additionalProperties:
+            type: string
+          type: object
+          description: 'Categories for the tunnel. This allows assigning one value
+
+            of a key to any entity. Changes done in this will be reflected in
+
+            the categories_mapping field.
+
+            '
+        name:
+          readOnly: true
+          type: string
+          description: tunnel name
+          maxLength: 80
+      title: tunnel metadata
+    app_variable_input:
+      description: Variable definition for application.
+      required:
+      - name
+      - uuid
+      type: object
+      properties:
+        val_type:
+          x-ntnx-enum:
+          - STRING
+          - INT
+          - DICT
+          - DATE
+          - TIME
+          - DATE_TIME
+          - MULTILINE_STRING
+          type: string
+          description: ''
+        regex:
+          type: object
+          description: Regex to which variable value should adhere to
+          properties:
+            should_validate:
+              type: boolean
+              description: Whether the variable should be validated against the regex or not
+            value:
+              type: string
+              description: Regular expression
+        is_mandatory:
+          type: boolean
+          description: Whether the variable MUST have a value or not
+        description:
+          type: string
+          description: ''
+          maxLength: 1000
+        data_type:
+          x-ntnx-enum:
+          - BASE
+          - LIST
+          - SINGLE_SELECT_LIST
+          type: string
+          description: ''
+        name:
+          type: string
+          description: ''
+          maxLength: 64
+        library_reference:
+          type: string
+          description: Reference to the library variable (if any) using which this variable is configured
+        value:
+          type: string
+          description: ''
+        label:
+          type: string
+          description: ''
+        attrs:
+          additionalProperties: true
+          type: object
+          description: ''
+        editables:
+          additionalProperties: true
+          type: object
+          description: 'Runtime editable attributes for this entity. The structure for this is a dictionary. The keys in this
+            dictionary should be the name of the attribute on the entity. If the attribute is editable, the value should be
+            true, else false. If the attribute is a nested dictionary, the value can contain a nested dictionary with the
+            same key value structure described above.
+
+            '
+        is_hidden:
+          type: boolean
+          description: Whether the variable should be hidden from launch screen or not
+        type:
+          x-ntnx-enum:
+          - LOCAL
+          - SECRET
+          - EXTERNAL
+          - EXEC_LOCAL
+          - HTTP_LOCAL
+          - EXEC_SECRET
+          - HTTP_SECRET
+          - EXEC_EXTERNAL
+          - HTTP_EXTERNAL
+          type: string
+          description: ''
+        options:
+          type: object
+          description: Choices for the variable value
+          properties:
+            type:
+              x-ntnx-enum:
+              - PREDEFINED
+              - EXEC
+              - HTTP
+              type: string
+              description: Whether the options are predefined or script based or HTTP request based
+            attrs:
+              additionalProperties: true
+              type: object
+              description: EScript/HTTP request info needed for dynamically fetching options
+            choices:
+              items:
+                type: string
+              type: array
+              description: Predefined choices for variable value
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: ''
+          format: UUID
+      title: Variable definition for application.
+    entity_reference:
+      description: Reference to an entity.
+      type: object
+      properties:
+        kind:
+          type: string
+          description: Kind of the reference.
+        type:
+          x-ntnx-enum:
+          - CATEGORIES_MATCH_ALL
+          - CATEGORIES_MATCH_ANY
+          type: string
+          description: The type of filter being used.
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: UUID of the entity.
+          format: UUID
+        categories:
+          additionalProperties:
+            type: string
+          type: object
+          description: Categories for the entity.
+        name:
+          type: string
+          description: Name of the entity.
+          maxLength: 64
+      title: Entity Reference.
+    availability_zone_reference:
+      description: The reference to a availability_zone
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - availability_zone
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a availability_zone
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    tunnel_intent_resource:
+      description: Response object for intentful operations on a tunnel
+      required:
+      - metadata
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/tunnel_def_status'
+        spec:
+          $ref: '#/components/schemas/tunnel'
+        api_version:
+          $ref: '#/components/schemas/api_version'
+        metadata:
+          $ref: '#/components/schemas/tunnel_metadata'
+      title: tunnel Intent Response
+    tunnel:
+      description: An intentful representation of a tunnel spec
+      required:
+      - name
+      - resources
+      type: object
+      properties:
+        name:
+          type: string
+          description: tunnel Name.
+          maxLength: 80
+        availability_zone_reference:
+          $ref: '#/components/schemas/availability_zone_reference'
+        description:
+          type: string
+          description: A description for tunnel.
+          maxLength: 1000
+        resources:
+          $ref: '#/components/schemas/tunnel_resources'
+        cluster_reference:
+          $ref: '#/components/schemas/cluster_reference'
+      title: tunnel Intent Spec with placement specified
+    tunnel_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - tunnel
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    tunnel_resources:
+      description: Tunnel resources definition.
+      type: object
+      properties:
+        credential:
+          $ref: '#/components/schemas/app_credential_input'
+        type:
+          type: string
+          description: ''
+        created_by:
+          type: string
+      title: Tunnel resources
+    cluster_reference:
+      description: The reference to a cluster
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - cluster
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a cluster
+    sort_order:
+      x-ntnx-enum:
+      - ASCENDING
+      - DESCENDING
+      description: The sort order in which results are returned
+      title: Sort order
+    tunnel_list_metadata_output:
+      description: 'All api calls that return a list will have this metadata block
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - tunnel
+          type: string
+          description: The kind name
+        total_matches:
+          type: integer
+          description: Total matches found
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter used for the results
+        length:
+          type: integer
+          description: The number of records retrieved relative to the offset
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          type: integer
+          description: Offset from the start of the entity list
+      title: Metadata for tunnel list output
+    user_reference:
+      description: The reference to a user
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - user
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a user
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    app_credential_reference:
+      description: The reference to a app_credential
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - app_credential
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a app_credential
+    tunnel_list_metadata:
+      description: 'All api calls that return a list will have this metadata block as input
+
+        '
+      type: object
+      properties:
+        kind:
+          x-ntnx-enum:
+          - tunnel
+          type: string
+          description: The kind name
+        sort_attribute:
+          type: string
+          description: The attribute to perform sort on
+        filter:
+          type: string
+          description: The filter in FIQL syntax used for the results.
+        length:
+          minimum: 1
+          type: integer
+          description: The number of records to retrieve relative to the offset
+          format: int32
+        sort_order:
+          $ref: '#/components/schemas/sort_order'
+        offset:
+          minimum: 0
+          type: integer
+          description: Offset from the start of the entity list
+          format: int32
+      title: Metadata for tunnel list
+    tunnel_resources_def_status:
+      description: Tunnel resources definition.
+      type: object
+      properties:
+        credential_reference:
+          $ref: '#/components/schemas/app_credential_reference'
+        type:
+          type: string
+          description: ''
+        created_by:
+          type: string
+      title: Tunnel resources
+    tunnel_def_status:
+      description: An intentful representation of a tunnel status
+      required:
+      - name
+      - resources
+      type: object
+      properties:
+        name:
+          type: string
+          description: tunnel Name.
+        state:
+          type: string
+          description: The state of the tunnel.
+        availability_zone_reference:
+          $ref: '#/components/schemas/availability_zone_reference'
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          type: array
+          description: Any error messages for the tunnel, if in an error state.
+        cluster_reference:
+          $ref: '#/components/schemas/cluster_reference'
+        resources:
+          $ref: '#/components/schemas/tunnel_resources_def_status'
+        description:
+          type: string
+          description: A description for tunnel.
+      title: tunnel Intent Status with placement specified
+    project_reference:
+      description: The reference to a project
+      required:
+      - kind
+      - uuid
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - project
+        name:
+          readOnly: true
+          type: string
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          format: UUID
+      title: Reference to a project
+    app_credential_input:
+      description: Credential for application
+      required:
+      - name
+      - uuid
+      - type
+      - username
+      - secret
+      type: object
+      properties:
+        username:
+          type: string
+          description: ''
+        description:
+          type: string
+          description: ''
+          maxLength: 1000
+        resource_type_reference:
+          $ref: '#/components/schemas/entity_reference'
+        exec_runbook_reference:
+          $ref: '#/components/schemas/entity_reference'
+        name:
+          type: string
+          description: ''
+          maxLength: 64
+        secret:
+          additionalProperties: true
+          type: object
+          description: Credential secret object
+        passphrase:
+          additionalProperties: true
+          type: object
+          description: Credential passphrase object associated with the provided key
+        account_reference:
+          $ref: '#/components/schemas/entity_reference'
+        editables:
+          additionalProperties: true
+          type: object
+          description: 'Runtime editable attributes for this entity. The structure for this is a dictionary. The keys in this
+            dictionary should be the name of the attribute on the entity. If the attribute is editable, the value should be
+            true, else false. If the attribute is a nested dictionary, the value can contain a nested dictionary with the
+            same key value structure described above.
+
+            '
+        cred_class:
+          type: string
+          description: ''
+        type:
+          x-ntnx-enum:
+          - PASSWORD
+          - KEY
+          type: string
+          description: ''
+        variable_list:
+          items:
+            $ref: '#/components/schemas/app_variable_input'
+          type: array
+          description: Variable list of the credential
+        uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: ''
+          format: UUID
+      title: Credential for application

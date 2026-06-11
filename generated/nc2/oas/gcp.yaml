@@ -1,0 +1,690 @@
+openapi: 3.0.0
+info:
+  title: Nutanix Cloud Clusters API Reference
+  description: "# NC2 Introduction \n\nNutanix Cloud Clusters (NC2) delivers the promise of a hybrid multicloud platform designed\
+    \ to run applications in private or multiple public clouds. NC2 operates as an extension of on-prem data centers and provides\
+    \ a hybrid cloud architecture that spans private and public clouds, operated as a single cloud.\n\n![nc2-architecture.png](./images/nc2-architecture.png)\n\
+    \n\n\nThis document covers the NC2 version 2 (v2) APIs. These APIs allow you to create and manage Azure and AWS clusters\
+    \ on the cloud. The v2 APIs are compliant with the Open API Specification (OAS3) 3.0 standards.  \n\nThe NC2 version1\
+    \ (v1) APIs were mainly used for internal purposes and are not generally available. Nutanix recommends all its customers\
+    \ using v1 APIs to manually migrate to the latest v2 GA APIs. \n\nFor more information on NC2, see Nutanix user guide\
+    \ for [AWS](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:Nutanix-Clusters-AWS), and\
+    \ [Azure](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:Nutanix-Cloud-Clusters-Azure).\n\
+    \n# Leveraging NC2 V2 APIs to Create a 3-Node AWS Cluster\nThis topic serves as a roadmap, guiding users through the process\
+    \ of leveraging these APIs to create a 3-node AWS cluster efficiently. \n\n## Prerequisites\nBefore you begin, ensure\
+    \ that Python 3.x is installed on your system. If not, you may need to install Python 3.x before proceeding further with\
+    \ utilizing the NC2 V2 APIs.\n\n\n\\# *Check python version* \n\n`python3 --version` \n\n## Installation \nInstall the\
+    \ necessary Python packages using a package manager called pip.   \n \n`pip3 install requests pyjwt pytz`\n\n1. requests:\
+    \ This package is commonly used for making HTTP requests in Python.\n2. pyjwt: PyJWT is a Python library that provides\
+    \ functionality for encoding and decoding JSON Web Tokens (JWTs). \n3. pytz: Pytz is a Python library that provides functionality\
+    \ for working with time zones.\n\n## Variable Configuration\nDefine variables necessary for specifying authentication\
+    \ credentials and other parameters essential for interacting with the NC2 V2 APIs effectively, such as\n`API_KEY` and\
+    \ `KEY_ID`.\n\nTo create a MyNutanix API Key (refer to the [NC2 Azure user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:nc2-cloud-clusters-api-key-management-t.html)\
+    \ and [NC2 AWS user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:nc2-cloud-clusters-api-key-management-t.html)).\n\
+    \n\n```py\n# Constants and Configurations\n\nAPI_KEY = 'YOUR_API_KEY'                                       \nKEY_ID =\
+    \ 'YOUR_KEY_ID'\nISSUER = 'RANDOM_UUID'                                          # A unique issuer uuid\n\nNC2_BASE_URL\
+    \ = 'https://cloud.nutanix.com/api/v2'\nCREATE_CLUSTER_URL = '/clusters/aws'\nHIBERNATE_CLUSTER_URL = '/clusters/{cluster_id}/hibernate'\n\
+    RESUME_CLUSTER_URL = '/clusters/{cluster_id}/resume'\nTERMINATE_CLUSTER_URL = '/clusters/{cluster_id}/terminate'\n\nGET_TASK_URL\
+    \ = '/tasks/{task_id}'\nMAX_TIMEOUT = 7200                                              # Maximum timeout of 2 hours (in\
+    \ seconds)\nPOLLING_INTERVAL = 60                                           # Initial polling interval (in seconds)\n\
+    MYNUTANIX_API_KEYS_URL = 'https://apikeys.nutanix.com'          # MyNutanix API Keys URL\n```\n\n## Log Configuration\n\
+    By configuring logs, you can ensure that relevant information and errors are captured systematically, enabling you to\
+    \ monitor the execution of their scripts effectively and troubleshoot any issues that may arise.\n\n```py\n# Configure\
+    \ Logs\nimport logging\n\nlogging.basicConfig(\n    level=logging.DEBUG, # set log level to debug\n    format='%(asctime)s\
+    \ - %(levelname)s - %(message)s',\n    # filename='api_interaction.log'                               # Alternatively,\
+    \ write logs to the file if filename param is passed\n)\n```\n\n## Authentication\nAuthentication involves two key steps:\n\
+    -  Create a MyNutanix API Key (refer to the [NC2 Azure user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:nc2-cloud-clusters-api-key-management-t.html)\
+    \ and [NC2 AWS user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:nc2-cloud-clusters-api-key-management-t.html)).\n\
+    - Create a JWT token using the provided API Key and Key ID.\n\n```py\nimport jwt\nimport datetime\nimport time\nimport\
+    \ hmac\nimport hashlib\nimport base64\nimport pytz\nimport uuid\n\n\n# Create a JWT token\ndef create_jwt():\n    \"\"\
+    \"\n    Create a JWT token using the provided API key and key ID.\n\n    Returns:\n        The JWT token and it's expiry\
+    \ if successful, None otherwise.\n    \"\"\"\n    \n    try:\n        curr_time = datetime.datetime.utcnow()\n       \
+    \ payload = {\n            \"aud\": MYNUTANIX_API_KEYS_URL,\n            \"iat\": curr_time,\n            \"exp\": curr_time\
+    \ + datetime.timedelta(seconds=300),     # Nutanix recommends a 5 minute expiry\n            \"iss\": ISSUER,\n      \
+    \      \"metadata\": {\n                \"reason\": \"NC2 AWS Cluster Quick Starter\"\n            },\n            \"\
+    context\": {}\n        }\n        body = \"{}\".format(KEY_ID)\n        signature = base64.b64encode(\n            hmac.new(bytes(API_KEY\
+    \ , 'latin-1'),\n            bytes(body , 'latin-1'),\n            digestmod=hashlib.sha512).digest()\n        )\n   \
+    \     token = jwt.encode(\n            payload,\n            signature,\n            algorithm='HS512',\n            headers={\"\
+    kid\": KEY_ID}\n        )\n        logging.debug(\"Token: {}\" .format(token))\n\n        return token, payload[\"exp\"\
+    ]\n\n    except Exception as e:\n        logging.error(f\"JWT generation failed: {str(e)}\")\n        return None, None\n\
+    \    \ncreate_jwt()\n```\nWe will utilize the curl command to execute an API call, fetching the organizations by employing\
+    \ the JWT token that has been recently generated.\n\n\n\\# *List organizations*\n\n`curl --location 'https://cloud.nutanix.com/api/v2/organizations'\
+    \ --header 'Authorization: Bearer {{token}}'`\n\nWe now proceed with another API call to retrieve the list of cloud accounts\
+    \ within an organization. You can choose any organization from the available options if you have access to multiple organizations.\
+    \ Please note that if five minutes have passed since the creation of the JWT token, you will need to generate a new one.\n\
+    \n\n\\# *List cloud accounts under an organization*\n\n`curl --location 'https://cloud.nutanix.com/api/v2/organizations/{{organization_id}}/cloud-accounts'\
+    \ --header 'Authorization: Bearer {{token}}'`\n\n\n`ORGANIZATION_ID = \"YOUR_ORGANIZATION_ID\"                       \
+    \ # Fetched using the List Organizations API`\n\n`CLOUD_ACCOUNT_ID = \"YOUR_CLOUD_ACCOUNT_ID\"                      #\
+    \ Fetched using the List Cloud Account API`\n\n## Usage\nIn this usage example, we demonstrate the creation of a 3-node\
+    \ AWS cluster within a freshly created Virtual Private Cloud (VPC). The API call will return a task when initiating the\
+    \ cluster creation process. It's important to note that long-running NC2 V2 API operations, including cluster creation,\
+    \ termination, hibernation, and resumption, will similarly return a task. To monitor the progress and status of these\
+    \ tasks, users can periodically poll the task endpoint using a GET request.\n\n```py\nimport requests\nimport json\n\n\
+    def create_cluster(jwt):\n    \"\"\"\n    Create an AWS cluster using the provided JWT token.\n\n    Args:\n        jwt\
+    \ (pair(jwt_token, jwt_expiry)): The JWT token and it's expiry time.\n\n    Returns:\n        The task object for cluster\
+    \ creation if successful, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers with JWT token for authentication\n\
+    \        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer {jwt_token}',\n            'Content-Type':\
+    \ 'application/json',\n            'Accept': 'application/json',\n        }\n\n        logging.debug(headers)\n      \
+    \  \n        # Below is payload for creating an aws cluster (adjust as needed)\n        # More information on the api\
+    \ specification for create aws cluster can be found here,\n        # https://www.nutanix.dev/api_references/nc2/#/6lo1uf2bcd4bv-create-aws-cluster\n\
+    \        payload = {\n            \"data\": {\n                \"use_case\": \"general\",\n                \"organization_id\"\
+    : ORGANIZATION_ID,\n                \"name\": \"nc2-v2-apis-quick-starter\",\n                \"cloud_account_id\": CLOUD_ACCOUNT_ID,\n\
+    \                \"region\": \"eu-central-1\",                             # eu-central-1 represents Frankfurt region.\
+    \ Given region mentioned for reference. \n                \"host_access_ssh_key\": \"SSH_KEY_NAME\",                #\
+    \ Can be generated on AWS -'KEY PAIRS' or UI.\n                \"license\": \"aos\",\n                \"aos_version\"\
+    : \"6.7\",\n                \"software_tier\": \"pro\",                               \n                \"capacity\":\
+    \ [\n                    {\n                        \"host_type\": \"z1d.metal\",                     # Only for reference.\
+    \ For allowed values check API documentation.\n                        \"number_of_hosts\": 3\n                    }\n\
+    \                ],\n                \"redundancy\": {\n                    \"factor\": 2                            \
+    \            \n                },\n                \"network\": {\n                    \"mode\": \"new\",            \
+    \                         \n                    \"availability_zone\": \"eu-central-1a\",               \n           \
+    \         \"vpc_cidr\": \"192.10.0.0/16\",                        \n                    \"management_services_access_policy\"\
+    : {\n                        \"mode\": \"restricted\",\n                        \"ip_addresses\": [\n                \
+    \            \"192.10.0.0/16\"\n                        ]\n                    },\n                    \"prism_element_access_policy\"\
+    : {\n                        \"mode\": \"restricted\",   \n                        \"ip_addresses\": [\n             \
+    \               \"192.10.0.0/16\"\n                        ]\n                    }\n                }\n            }\n\
+    \        }\n\n        # Send a POST request to create the cluster\n        response = requests.post(NC2_BASE_URL + CREATE_CLUSTER_URL,\
+    \ json=payload, headers=headers)\n\n        if response.status_code == 202:\n            return response.json()\n    \
+    \    else:\n            raise Exception(f\"Cluster creation failed with status code {response.status_code}, error {response.text}\"\
+    )\n\n    except Exception as e:\n        raise Exception(f\"Error creating cluster: {str(e)}\")\n\n```\nWe will monitor\
+    \ a task by polling it every 60 seconds to check its status. We will keep polling until the task reaches a terminal status\
+    \ or until the maximum timeout of 7200 seconds (2 hours) is reached. Additionally, we'll ensure token validity by checking\
+    \ for expiry and generating a new token if needed.\n\n\n```py\n# Function to poll the status of a task with maximum timeout\n\
+    \nterminal_status_list = [\n    \"done\",\n    \"failed\",\n    \"cancelled\"\n]\n\ndef poll_task_status(jwt, task_id):\n\
+    \n    start_time = time.time()\n    \n    while True:\n\n        # Check if the JWT token is expired and create a new\
+    \ one if needed\n        jwt_token, jwt_expiry = jwt\n        if jwt_token is not None and datetime.datetime.now() >=\
+    \ jwt_expiry:\n            jwt_token, jwt_expiry = create_jwt()\n            \n        headers = {\n            'Authorization':\
+    \ f'Bearer {jwt_token}'\n        }\n\n        task_status_url = NC2_BASE_URL + GET_TASK_URL.format(task_id=task_id)\n\
+    \        response = requests.get(task_status_url, headers=headers)\n        if response.status_code == 200:\n        \
+    \    task_status = response.json()['data']['status']\n            logging.info(f\"Task status: {task_status}\")\n    \
+    \        if task_status in terminal_status_list:\n                logging.debug(f\"Task done!\")\n                return\
+    \ task_status\n        else:\n            logging.error(f\"Error polling task status with status code: {response.status_code}\"\
+    )\n\n        elapsed_time = time.time() - start_time\n        if elapsed_time < MAX_TIMEOUT:\n            sleep_time =\
+    \ min(POLLING_INTERVAL, MAX_TIMEOUT - elapsed_time)\n            time.sleep(sleep_time)\n            logging.debug(f\"\
+    Sleeping for {sleep_time} ..\")\n        else:\n            raise(\"Polling reached maximum timeout.\")\n```\nWe will\
+    \ combine these steps to create a 3-node AWS cluster in a new VPC and monitor the task status by polling. Upon completion\
+    \ of the task, we will print the cluster UUID.\n\n```py\n# First we create a JWT token\njwt = create_jwt()\n\nlogging.debug(jwt)\n\
+    \n# Let's create a cluster create task\ntask = create_cluster(jwt)\nif task != None :\n    task_id = task['data']['id']\n\
+    \n    # Poll the status of the task\n    if task_id is not None:\n        logging.info(f\"Task ID: {task_id}\")\n    \
+    \    task_status = poll_task_status(jwt, task_id)\n\n    # Check if the task was successful\n    if task_status == \"\
+    success\":\n        logging.info(\"Cluster creation successful!\")\n        logging.info(\"Cluster ID: {}\".format(task.get('cluster_id')))\n\
+    \    else:\n        logging.error(\"Cluster creation failed!\")\nelse:\n    logging.error(\"Cluster creation task could\
+    \ not be created!\")\n```\nBelow are sample functions for hibernating, resuming, and terminating a cluster. Similar to\
+    \ the create cluster API call, these functions also return a task. We can employ the same mechanism used for polling the\
+    \ status to monitor these tasks.\n\n```py\ndef hibernate_cluster(cluster_id, jwt):\n    \"\"\"\n    Hibernate a cluster.\n\
+    \n    Args:\n        cluster_id (str): The UUID of the cluster to hibernate.\n\n    Returns:\n        str: The task ID\
+    \ for hibernating a cluster if request is accepted, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers\
+    \ with JWT token for authentication\n        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer\
+    \ {jwt_token}',\n            'Content-Type': 'application/json',\n        }\n\n        # Send a POST request to hibernate\
+    \ the cluster\n        hibernate_payload = {}\n        response = requests.post(\n            NC2_BASE_URL + HIBERNATE_CLUSTER_URL.format(cluster_id\
+    \ = cluster_id), \n            json=hibernate_payload, \n            headers=headers\n        )\n\n        logging.debug(f\"\
+    Response: {response.json()}\")\n        if response.status_code >= 200 and response.status_code <= 299:\n            #\
+    \ Extract the task ID from the response\n            task_id = response.json()['data']['id']\n            return task_id\n\
+    \n        else:\n            logging.error(f\"Cluster hibernating failed with status code {response.status_code}\")\n\
+    \            return None\n\n    except Exception as e:\n        logging.error(f\"Error hibernating cluster: {str(e)}\"\
+    )\n        return None\n\n```\n\n```py\ndef resume_cluster(cluster_id, jwt):\n    \"\"\"\n    Resume a cluster.\n\n  \
+    \  Args:\n        cluster_id (str): The UUID of the cluster to resume.\n\n    Returns:\n        str: The task ID for resuming\
+    \ a cluster if request is accepted, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers with JWT token for\
+    \ authentication\n        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer {jwt_token}',\n\
+    \            'Content-Type': 'application/json',\n        }\n\n        # Send a POST request to resume the cluster\n \
+    \       resume_payload = {}\n        response = requests.post(\n            NC2_BASE_URL + RESUME_CLUSTER_URL.format(cluster_id\
+    \ = cluster_id), \n            json=resume_payload, \n            headers=headers\n        )\n\n        logging.debug(f\"\
+    Response: {response.json()}\")\n        if response.status_code >= 200 and response.status_code <= 299:\n            #\
+    \ Extract the task ID from the response\n            task_id = response.json()['data']['id']\n            return task_id\n\
+    \n        else:\n            print(f\"Cluster resume failed with status code {response.status_code}\")\n            return\
+    \ None\n\n    except Exception as e:\n        print(f\"Error resuming cluster: {str(e)}\")\n        return None\n```\n\
+    \n```py\ndef terminate_cluster(cluster_id, jwt):\n    \"\"\"\n    Terminate a cluster.\n\n    Args:\n        cluster_id\
+    \ (str): The UUID of the cluster to terminate.\n\n    Returns:\n        str: The task ID for terminating a cluster if\
+    \ request is accepted, None otherwise.\n    \"\"\"\n    try:\n\n        # Define headers with JWT token for authentication\n\
+    \        jwt_token, _ = jwt\n        headers = {\n            'Authorization': f'Bearer {jwt_token}',\n            'Content-Type':\
+    \ 'application/json',\n        }\n\n        # Send a POST request to resume the cluster\n        terminate_payload = {}\n\
+    \        response = requests.post(\n            NC2_BASE_URL + TERMINATE_CLUSTER_URL.format(cluster_id = cluster_id),\
+    \ \n            json=terminate_payload, \n            headers=headers\n        )\n\n        logging.debug(f\"Response:\
+    \ {response.json()}\")\n        if response.status_code >= 200 and response.status_code <= 299:\n            # Extract\
+    \ the task ID from the response\n            task_id = response.json()['data']['id']\n            return task_id\n\n \
+    \       else:\n            print(f\"Cluster terminate failed with status code {response.status_code}\")\n            return\
+    \ None\n\n    except Exception as e:\n        print(f\"Error terminating cluster: {str(e)}\")\n        return None\n```\n\
+    \n**Note**: After completing this example, it is recommended to delete the created cluster to prevent any additional costs.\
+    \ Additionally, if the API key was generated solely for this walkthrough, consider deleting it as well.\n# Authentication\n\
+    \nNC2 uses JSON Web Token (JWT) based bearer authentication. The JWT can be generated using MyNutanix API keys.\n\nFor\
+    \ detailed information on how to generate API keys and JWT tokens, refer to the [NC2 Azure user guide](https://stage-portal.nutanix.com/page/documents/details?targetId=Nutanix-Cloud-Clusters-Azure:nc2-cloud-clusters-api-key-management-t.html)\
+    \ and [NC2 AWS user guide](https://stage-portal.nutanix.com/page/documents/details?targetId=Nutanix-Clusters-AWS:nc2-cloud-clusters-api-key-management-t.html).\n\
+    \n# Best Practice \n\nIt is advisable to keep your JWT short lived, Nutanix recommends a maximum of 5 minutes as the JWT\
+    \ token lifespan.\n\n# Error Codes\nList of HTTP status codes returned by the NC2 APIs\n\n|Error codes |\tMessages |\n\
+    | :-----------: | -----: |\n|200\t  |Successful|\n|201\t  |Created |\n|202    |Accepted|\n|400    |Bad Request|\n|401\
+    \    |Unauthorized|\n|403    |Forbidden|\n|404    |Not Found|\n|406    |Not Acceptable|\n|500\t  |Internal Server Error|\n"
+  version: v2
+servers:
+- url: https://cloud.nutanix.com/api/v2
+  variables: {}
+security:
+- bearerAuth: []
+paths:
+  /clusters/gcp:
+    post:
+      callbacks: {}
+      description: Creates a Google Cloud cluster with the provided configuration.
+      operationId: CPanelWeb.Api.ClusterController.create_gcp
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Google Cloud Cluster'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Task'
+                type: object
+          description: Task
+          headers:
+            location:
+              description: The URI of the newly created task.
+              required: true
+              schema: Elixir.CPanelWeb.Api.Specs.URI
+              style: simple
+      summary: Create Google Cloud cluster
+      tags:
+      - clusters
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://cloud.nutanix.com/api/v2/clusters/gcp \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n    \"advanced_replication\"\
+          : false,\n    \"aos_version\": \"7.3\",\n    \"capacity\": [\n        {\n            \"instance_type\": \"z3-highmem-192-highlssd-metal\"\
+          ,\n            \"nodes_count\": 3\n        }\n    ],\n    \"cloud_account_id\": null,\n    \"cluster_fault_tolerance\"\
+          : {\n        \"factor\": \"1N/1D\"\n    },\n    \"consumption\": {\n        \"max_number_of_concurrent_users\":\
+          \ 2,\n        \"method\": \"user_based\"\n    },\n    \"data_at_rest_encryption\": false,\n    \"files_capacity\"\
+          : 10,\n    \"files_dedicated\": true,\n    \"license\": \"aos\",\n    \"name\": \"my-google-cloud-cluster\",\n \
+          \   \"network\": {\n        \"availability_zone\": \"us-central1-a\",\n        \"dns_servers\": [\n            [\n\
+          \                \"8.8.8.8\",\n                \"8.8.4.4\"\n            ]\n        ],\n        \"fvn_config\": {\n\
+          \            \"nat_ip_ranges\": [\n                {}\n            ],\n            \"no_nat\": {\n             \
+          \   \"cidr\": null,\n                \"name\": \"my-nonat-subnet\"\n            }\n        },\n        \"management_services_access_policy\"\
+          : {\n            \"ip_addresses\": [\n                \"10.0.0.0/16\"\n            ],\n            \"mode\": \"\
+          disabled\"\n        },\n        \"management_subnet\": \"my-management-subnet\",\n        \"mode\": \"existing\"\
+          ,\n        \"prism_element_access_policy\": {\n            \"ip_addresses\": [\n                \"10.0.0.0/16\"\n\
+          \            ],\n            \"mode\": \"disabled\"\n        },\n        \"subnet_cidr\": null,\n        \"vpc\"\
+          : \"my-vpc\"\n    },\n    \"organization_id\": null,\n    \"prism_central\": {\n        \"dns_server_ip_list\":\
+          \ [\n            [\n                \"8.8.8.8\",\n                \"8.8.4.4\"\n            ]\n        ],\n     \
+          \   \"mode\": \"new\",\n        \"ntp_server_ip_list\": [\n            [\n                \"pool.ntp.org\"\n   \
+          \         ]\n        ],\n        \"version\": \"2023.4\",\n        \"vm_size\": \"small\"\n    },\n    \"region\"\
+          : \"us-central1\",\n    \"software_tier\": \"pro\",\n    \"terminate_at\": \"2024-12-31T23:59:59Z\",\n    \"use_case\"\
+          : \"general\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"advanced_replication\": false,\n    \"aos_version\": \"7.3\",\n\
+          \    \"capacity\": [\n        {\n            \"instance_type\": \"z3-highmem-192-highlssd-metal\",\n           \
+          \ \"nodes_count\": 3\n        }\n    ],\n    \"cloud_account_id\": null,\n    \"cluster_fault_tolerance\": {\n \
+          \       \"factor\": \"1N/1D\"\n    },\n    \"consumption\": {\n        \"max_number_of_concurrent_users\": 2,\n\
+          \        \"method\": \"user_based\"\n    },\n    \"data_at_rest_encryption\": false,\n    \"files_capacity\": 10,\n\
+          \    \"files_dedicated\": true,\n    \"license\": \"aos\",\n    \"name\": \"my-google-cloud-cluster\",\n    \"network\"\
+          : {\n        \"availability_zone\": \"us-central1-a\",\n        \"dns_servers\": [\n            [\n            \
+          \    \"8.8.8.8\",\n                \"8.8.4.4\"\n            ]\n        ],\n        \"fvn_config\": {\n         \
+          \   \"nat_ip_ranges\": [\n                {}\n            ],\n            \"no_nat\": {\n                \"cidr\"\
+          : null,\n                \"name\": \"my-nonat-subnet\"\n            }\n        },\n        \"management_services_access_policy\"\
+          : {\n            \"ip_addresses\": [\n                \"10.0.0.0/16\"\n            ],\n            \"mode\": \"\
+          disabled\"\n        },\n        \"management_subnet\": \"my-management-subnet\",\n        \"mode\": \"existing\"\
+          ,\n        \"prism_element_access_policy\": {\n            \"ip_addresses\": [\n                \"10.0.0.0/16\"\n\
+          \            ],\n            \"mode\": \"disabled\"\n        },\n        \"subnet_cidr\": null,\n        \"vpc\"\
+          : \"my-vpc\"\n    },\n    \"organization_id\": null,\n    \"prism_central\": {\n        \"dns_server_ip_list\":\
+          \ [\n            [\n                \"8.8.8.8\",\n                \"8.8.4.4\"\n            ]\n        ],\n     \
+          \   \"mode\": \"new\",\n        \"ntp_server_ip_list\": [\n            [\n                \"pool.ntp.org\"\n   \
+          \         ]\n        ],\n        \"version\": \"2023.4\",\n        \"vm_size\": \"small\"\n    },\n    \"region\"\
+          : \"us-central1\",\n    \"software_tier\": \"pro\",\n    \"terminate_at\": \"2024-12-31T23:59:59Z\",\n    \"use_case\"\
+          : \"general\"\n}' \\\n    --output-document \\\n    - https://cloud.nutanix.com/api/v2/clusters/gcp"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"cloud.nutanix.com\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"advanced_replication\"\
+          : false,\n    \"aos_version\": \"7.3\",\n    \"capacity\": [\n        {\n            \"instance_type\": \"z3-highmem-192-highlssd-metal\"\
+          ,\n            \"nodes_count\": 3\n        }\n    ],\n    \"cloud_account_id\": null,\n    \"cluster_fault_tolerance\"\
+          : {\n        \"factor\": \"1N/1D\"\n    },\n    \"consumption\": {\n        \"max_number_of_concurrent_users\":\
+          \ 2,\n        \"method\": \"user_based\"\n    },\n    \"data_at_rest_encryption\": false,\n    \"files_capacity\"\
+          : 10,\n    \"files_dedicated\": true,\n    \"license\": \"aos\",\n    \"name\": \"my-google-cloud-cluster\",\n \
+          \   \"network\": {\n        \"availability_zone\": \"us-central1-a\",\n        \"dns_servers\": [\n            [\n\
+          \                \"8.8.8.8\",\n                \"8.8.4.4\"\n            ]\n        ],\n        \"fvn_config\": {\n\
+          \            \"nat_ip_ranges\": [\n                {}\n            ],\n            \"no_nat\": {\n             \
+          \   \"cidr\": null,\n                \"name\": \"my-nonat-subnet\"\n            }\n        },\n        \"management_services_access_policy\"\
+          : {\n            \"ip_addresses\": [\n                \"10.0.0.0/16\"\n            ],\n            \"mode\": \"\
+          disabled\"\n        },\n        \"management_subnet\": \"my-management-subnet\",\n        \"mode\": \"existing\"\
+          ,\n        \"prism_element_access_policy\": {\n            \"ip_addresses\": [\n                \"10.0.0.0/16\"\n\
+          \            ],\n            \"mode\": \"disabled\"\n        },\n        \"subnet_cidr\": null,\n        \"vpc\"\
+          : \"my-vpc\"\n    },\n    \"organization_id\": null,\n    \"prism_central\": {\n        \"dns_server_ip_list\":\
+          \ [\n            [\n                \"8.8.8.8\",\n                \"8.8.4.4\"\n            ]\n        ],\n     \
+          \   \"mode\": \"new\",\n        \"ntp_server_ip_list\": [\n            [\n                \"pool.ntp.org\"\n   \
+          \         ]\n        ],\n        \"version\": \"2023.4\",\n        \"vm_size\": \"small\"\n    },\n    \"region\"\
+          : \"us-central1\",\n    \"software_tier\": \"pro\",\n    \"terminate_at\": \"2024-12-31T23:59:59Z\",\n    \"use_case\"\
+          : \"general\"\n}\"\"\"\n\nconn.request(\"POST\",\"/api/v2/clusters/gcp\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://cloud.nutanix.com/api/v2/clusters/gcp\"\n\t\n\tpayload :=  strings.NewReader(`{\"advanced_replication\"\
+          : false, \"aos_version\": \"7.3\", \"capacity\": [{\"instance_type\": \"z3-highmem-192-highlssd-metal\", \"nodes_count\"\
+          : 3}], \"cloud_account_id\": null, \"cluster_fault_tolerance\": {\"factor\": \"1N/1D\"}, \"consumption\": {\"max_number_of_concurrent_users\"\
+          : 2, \"method\": \"user_based\"}, \"data_at_rest_encryption\": false, \"files_capacity\": 10, \"files_dedicated\"\
+          : true, \"license\": \"aos\", \"name\": \"my-google-cloud-cluster\", \"network\": {\"availability_zone\": \"us-central1-a\"\
+          , \"dns_servers\": [[\"8.8.8.8\", \"8.8.4.4\"]], \"fvn_config\": {\"nat_ip_ranges\": [{}], \"no_nat\": {\"cidr\"\
+          : null, \"name\": \"my-nonat-subnet\"}}, \"management_services_access_policy\": {\"ip_addresses\": [\"10.0.0.0/16\"\
+          ], \"mode\": \"disabled\"}, \"management_subnet\": \"my-management-subnet\", \"mode\": \"existing\", \"prism_element_access_policy\"\
+          : {\"ip_addresses\": [\"10.0.0.0/16\"], \"mode\": \"disabled\"}, \"subnet_cidr\": null, \"vpc\": \"my-vpc\"}, \"\
+          organization_id\": null, \"prism_central\": {\"dns_server_ip_list\": [[\"8.8.8.8\", \"8.8.4.4\"]], \"mode\": \"\
+          new\", \"ntp_server_ip_list\": [[\"pool.ntp.org\"]], \"version\": \"2023.4\", \"vm_size\": \"small\"}, \"region\"\
+          : \"us-central1\", \"software_tier\": \"pro\", \"terminate_at\": \"2024-12-31T23:59:59Z\", \"use_case\": \"general\"\
+          }`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"\
+          Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://cloud.nutanix.com/api/v2/clusters/gcp\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"advanced_replication\\\": false, \\\"aos_version\\\": \\\"7.3\\\", \\\"capacity\\\": [{\\\"instance_type\\\"\
+          : \\\"z3-highmem-192-highlssd-metal\\\", \\\"nodes_count\\\": 3}], \\\"cloud_account_id\\\": null, \\\"cluster_fault_tolerance\\\
+          \": {\\\"factor\\\": \\\"1N/1D\\\"}, \\\"consumption\\\": {\\\"max_number_of_concurrent_users\\\": 2, \\\"method\\\
+          \": \\\"user_based\\\"}, \\\"data_at_rest_encryption\\\": false, \\\"files_capacity\\\": 10, \\\"files_dedicated\\\
+          \": true, \\\"license\\\": \\\"aos\\\", \\\"name\\\": \\\"my-google-cloud-cluster\\\", \\\"network\\\": {\\\"availability_zone\\\
+          \": \\\"us-central1-a\\\", \\\"dns_servers\\\": [[\\\"8.8.8.8\\\", \\\"8.8.4.4\\\"]], \\\"fvn_config\\\": {\\\"\
+          nat_ip_ranges\\\": [{}], \\\"no_nat\\\": {\\\"cidr\\\": null, \\\"name\\\": \\\"my-nonat-subnet\\\"}}, \\\"management_services_access_policy\\\
+          \": {\\\"ip_addresses\\\": [\\\"10.0.0.0/16\\\"], \\\"mode\\\": \\\"disabled\\\"}, \\\"management_subnet\\\": \\\
+          \"my-management-subnet\\\", \\\"mode\\\": \\\"existing\\\", \\\"prism_element_access_policy\\\": {\\\"ip_addresses\\\
+          \": [\\\"10.0.0.0/16\\\"], \\\"mode\\\": \\\"disabled\\\"}, \\\"subnet_cidr\\\": null, \\\"vpc\\\": \\\"my-vpc\\\
+          \"}, \\\"organization_id\\\": null, \\\"prism_central\\\": {\\\"dns_server_ip_list\\\": [[\\\"8.8.8.8\\\", \\\"\
+          8.8.4.4\\\"]], \\\"mode\\\": \\\"new\\\", \\\"ntp_server_ip_list\\\": [[\\\"pool.ntp.org\\\"]], \\\"version\\\"\
+          : \\\"2023.4\\\", \\\"vm_size\\\": \\\"small\\\"}, \\\"region\\\": \\\"us-central1\\\", \\\"software_tier\\\": \\\
+          \"pro\\\", \\\"terminate_at\\\": \\\"2024-12-31T23:59:59Z\\\", \\\"use_case\\\": \\\"general\\\"}\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://cloud.nutanix.com/api/v2/clusters/gcp';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"advanced_replication\": false,\
+          \ \"aos_version\": \"7.3\", \"capacity\": [{\"instance_type\": \"z3-highmem-192-highlssd-metal\", \"nodes_count\"\
+          : 3}], \"cloud_account_id\": null, \"cluster_fault_tolerance\": {\"factor\": \"1N/1D\"}, \"consumption\": {\"max_number_of_concurrent_users\"\
+          : 2, \"method\": \"user_based\"}, \"data_at_rest_encryption\": false, \"files_capacity\": 10, \"files_dedicated\"\
+          : true, \"license\": \"aos\", \"name\": \"my-google-cloud-cluster\", \"network\": {\"availability_zone\": \"us-central1-a\"\
+          , \"dns_servers\": [[\"8.8.8.8\", \"8.8.4.4\"]], \"fvn_config\": {\"nat_ip_ranges\": [{}], \"no_nat\": {\"cidr\"\
+          : null, \"name\": \"my-nonat-subnet\"}}, \"management_services_access_policy\": {\"ip_addresses\": [\"10.0.0.0/16\"\
+          ], \"mode\": \"disabled\"}, \"management_subnet\": \"my-management-subnet\", \"mode\": \"existing\", \"prism_element_access_policy\"\
+          : {\"ip_addresses\": [\"10.0.0.0/16\"], \"mode\": \"disabled\"}, \"subnet_cidr\": null, \"vpc\": \"my-vpc\"}, \"\
+          organization_id\": null, \"prism_central\": {\"dns_server_ip_list\": [[\"8.8.8.8\", \"8.8.4.4\"]], \"mode\": \"\
+          new\", \"ntp_server_ip_list\": [[\"pool.ntp.org\"]], \"version\": \"2023.4\", \"vm_size\": \"small\"}, \"region\"\
+          : \"us-central1\", \"software_tier\": \"pro\", \"terminate_at\": \"2024-12-31T23:59:59Z\", \"use_case\": \"general\"\
+          }`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    Task:
+      description: A task
+      properties:
+        cluster_id:
+          description: The ID of the cluster.
+          type: Elixir.CPanelWeb.Api.Specs.UUID
+        created_at:
+          description: The creation date of the task.
+          format: date-time
+          type: string
+        customer_id:
+          description: The ID of the customer.
+          type: Elixir.CPanelWeb.Api.Specs.UUID
+        display_name:
+          description: The display name of the task.
+          type: string
+        duration:
+          description: The duration of the task in seconds.
+          type: integer
+        ended_at:
+          description: The completion date of the task.
+          format: date-time
+          type: string
+        id:
+          description: The ID of the task.
+          type: Elixir.CPanelWeb.Api.Specs.UUID
+        initiated_by:
+          $ref: '#/components/schemas/User Details'
+        initiated_by_id:
+          description: The ID of the user who initiated the task.
+          type: Elixir.CPanelWeb.Api.Specs.UUID
+        kind:
+          description: The kind of the task.
+          type: string
+        organization_id:
+          description: The ID of the organization.
+          type: Elixir.CPanelWeb.Api.Specs.UUID
+        status:
+          description: The status of the task.
+          enum:
+          - not_started
+          - running
+          - succeeding
+          - cancelling
+          - failing
+          - done
+          - failed
+          - cancelled
+          title: Task status
+          type: string
+        status_details:
+          $ref: '#/components/schemas/Task Status Details'
+        updated_at:
+          description: The update date of the task.
+          format: date-time
+          type: string
+      required:
+      - id
+      - created_at
+      - customer_id
+      - display_name
+      - kind
+      - stage
+      - updated_at
+      title: Task
+      type: object
+    Task Status Details:
+      description: Additional details about the status of the task.
+      properties:
+        description:
+          description: A detailed description of the task status.
+          type: string
+      title: Task Status Details
+      type: object
+    Google Cloud Cluster Capacity:
+      description: Capacity configuration for Google Cloud cluster.
+      properties:
+        instance_type:
+          description: The instance type
+          type: string
+        nodes_count:
+          description: The number of nodes
+          type: integer
+      required:
+      - instance_type
+      - nodes_count
+      title: Google Cloud Cluster Capacity
+      type: object
+    Cluster fault tolerance factor:
+      properties:
+        factor:
+          description: Cluster's ability to survive hardware failures - 1D/1N means your data and applications stay safe even
+            if one disk fails OR one node fails.
+          type: string
+      required:
+      - factor
+      title: Cluster fault tolerance factor
+      type: object
+    Files Dedicated:
+      description: Is this a dedicated cluster for Files?
+      title: Files Dedicated
+      type: boolean
+    Cluster consumption:
+      properties:
+        max_number_of_concurrent_users:
+          description: The limit on the maximum number of concurrent users.
+          minimum: 1
+          type: integer
+        method:
+          description: The consumption method for the VDI cluster.
+          enum:
+          - user_based
+          type: string
+      required:
+      - method
+      - max_number_of_concurrent_users
+      title: Cluster consumption
+      type: object
+    Data at Rest Encryption:
+      description: Data at rest encryption enables the encryption of existing data in place, and all new data is written in
+        an encrypted format.
+      title: Data at Rest Encryption
+      type: boolean
+    Google Cloud Cluster:
+      description: A Google Cloud Platform cluster configuration.
+      properties:
+        advanced_replication:
+          $ref: '#/components/schemas/Advanced Replication'
+        aos_version:
+          description: The AOS version of the cluster.
+          type: string
+        capacity:
+          description: The capacity configuration of the cluster.
+          items:
+            $ref: '#/components/schemas/Google Cloud Cluster Capacity'
+          minItems: 1
+          type: array
+        cloud_account_id:
+          description: The ID of the cloud account.
+          type: Elixir.CPanelWeb.Api.Specs.Base64ID
+        cluster_fault_tolerance:
+          $ref: '#/components/schemas/Cluster fault tolerance factor'
+        consumption:
+          $ref: '#/components/schemas/Cluster consumption'
+        data_at_rest_encryption:
+          $ref: '#/components/schemas/Data at Rest Encryption'
+        files_capacity:
+          $ref: '#/components/schemas/Files Capacity'
+        files_dedicated:
+          $ref: '#/components/schemas/Files Dedicated'
+        license:
+          $ref: '#/components/schemas/Cluster License'
+        name:
+          description: The name of the cluster.
+          type: string
+        network:
+          properties:
+            availability_zone:
+              description: The availability zone for the cluster.
+              type: string
+            dns_servers:
+              description: List of DNS server IP addresses for new mode.
+              items:
+                type: string
+              type: array
+            fvn_config:
+              properties:
+                nat_ip_ranges:
+                  items:
+                    properties:
+                      cidr:
+                        allOf:
+                        - $ref: '#/components/schemas/CIDR'
+                        description: The CIDR for NAT IP range for new mode.
+                      name:
+                        description: The name of the NAT IP range.
+                        type: string
+                    type: object
+                  title: NAT IP Ranges Configuration
+                  type: array
+                no_nat:
+                  properties:
+                    cidr:
+                      allOf:
+                      - $ref: '#/components/schemas/CIDR'
+                      description: The CIDR for no NAT subnet for new mode.
+                    name:
+                      description: The subnet name for no NAT for existing mode or CIDR for new mode.
+                      type: string
+                  title: No NAT Configuration
+                  type: object
+              required:
+              - no_nat
+              - nat_ip_ranges
+              title: Flow Virtual Network Configuration
+              type: object
+            management_services_access_policy:
+              properties:
+                ip_addresses:
+                  description: List of allowed IP addresses/CIDRs. Required only if mode is restricted.
+                  items:
+                    $ref: '#/components/schemas/CIDR'
+                  type: array
+                mode:
+                  description: Access policy Mode
+                  enum:
+                  - disabled
+                  - restricted
+                  type: string
+              required:
+              - mode
+              title: Management Services Access Policy
+              type: object
+            management_subnet:
+              description: The management subnet name for existing mode.
+              type: string
+            mode:
+              description: 'Network mode: existing or new.'
+              enum:
+              - existing
+              - new
+              type: string
+            prism_element_access_policy:
+              properties:
+                ip_addresses:
+                  description: List of allowed IP addresses/CIDRs. Required only if mode is restricted.
+                  items:
+                    $ref: '#/components/schemas/CIDR'
+                  type: array
+                mode:
+                  description: Access policy Mode
+                  enum:
+                  - disabled
+                  - restricted
+                  type: string
+              required:
+              - mode
+              title: Prism Element Access Policy
+              type: object
+            subnet_cidr:
+              allOf:
+              - $ref: '#/components/schemas/CIDR'
+              description: The subnet CIDR for new mode.
+            vpc:
+              description: The VPC name for existing mode.
+              type: string
+          required:
+          - mode
+          - management_services_access_policy
+          - prism_element_access_policy
+          title: Google Cloud Network Configuration
+          type: object
+        organization_id:
+          description: The ID of the organization.
+          type: Elixir.CPanelWeb.Api.Specs.UUID
+        prism_central:
+          properties:
+            dns_server_ip_list:
+              description: List of DNS server IP addresses.
+              items:
+                type: string
+              type: array
+            mode:
+              description: Prism Central Deployment Mode
+              enum:
+              - new
+              - existing
+              type: string
+            ntp_server_ip_list:
+              description: List of NTP server IP addresses.
+              items:
+                type: string
+              minItems: 1
+              type: array
+            version:
+              description: Prism Central Version
+              type: string
+            vm_size:
+              description: Virtual machine size for Prism Central.
+              type: string
+          required:
+          - mode
+          title: Prism Central Configuration
+          type: object
+        region:
+          description: The Google Cloud region where the cluster is to be deployed.
+          type: string
+        software_tier:
+          description: The software tier of the cluster.
+          enum:
+          - pro
+          - ultimate
+          type: string
+        terminate_at:
+          description: The termination time of the cluster.
+          format: date-time
+          type: string
+        use_case:
+          $ref: '#/components/schemas/Cluster use-case'
+      required:
+      - organization_id
+      - cloud_account_id
+      - name
+      - use_case
+      - region
+      - license
+      - aos_version
+      - software_tier
+      - capacity
+      - cluster_fault_tolerance
+      - network
+      title: Google Cloud Cluster
+      type: object
+    Files Capacity:
+      description: Files dedicated cluster capacity in TB
+      minimum: 1
+      title: Files Capacity
+      type: integer
+    User Details:
+      description: Details of the user.
+      properties:
+        email:
+          description: The email of the user.
+          format: email
+          type: string
+        first_name:
+          description: The first name of the user.
+          type: string
+        id:
+          description: The ID of the user.
+          format: uuid
+          type: string
+        identity_provider:
+          description: The identity provider of the user.
+          type: string
+        last_name:
+          description: The last name of the user.
+          type: string
+      required:
+      - id
+      - email
+      - identity_provider
+      title: User Details
+      type: object
+    Advanced Replication:
+      description: Advanced Replication allows Metro File Sync Replication and Near-Sync FSVM-level Replication.
+      title: Advanced Replication
+      type: boolean
+    Cluster License:
+      description: Specifies the cluster's license type. 'nci' is always available; 'aos' requires the legacy portfolio feature
+        to be enabled.
+      enum:
+      - aos
+      - nci
+      title: Cluster License
+      type: string
+    Cluster use-case:
+      description: The use-case for the cluster.
+      enum:
+      - general
+      - vdi
+      title: Cluster use-case
+      type: string
+    CIDR:
+      description: Classless Inter-Domain Routing.
+      format: cidr
+      title: CIDR
+      type: string
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http

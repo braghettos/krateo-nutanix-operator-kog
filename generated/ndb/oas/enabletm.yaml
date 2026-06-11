@@ -1,0 +1,507 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /databases/{database-id}/action/enable-tm:
+    post:
+      description: 'Starts an Enable Time Machine operation on a MongoDB Sharded Cluster that already has an Ops Manager associated
+        with it.
+
+        '
+      operationId: pushMongoDbShardedClusterEnableTmWork
+      parameters:
+      - description: The ID of the parent MongoDB Sharded Cluster database on which to enable Time Machine.
+        in: path
+        name: database-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnableTmMongoShardedClusterRequest'
+        description: Payload containing the SLA and schedule configuration for enabling Time Machine.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Enable Time Machine operation submitted successfully.
+        '403':
+          description: Forbidden. Inadequate rights on the database to enable Time Machine.
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unprocessable Entity. Time Machine on this database is already enabled.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal Server Error.
+      summary: Enable Time Machine on a MongoDB Sharded Cluster database.
+      tags:
+      - Databases
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/databases/{database-id}/action/enable-tm \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"backupPolicy\": \"string\",\n    \"nxClusterIdStorageResourceIdMappings\"\
+          : {\n        \"property1\": \"string\",\n        \"property2\": \"string\"\n    },\n    \"nxClusterIds\": [\n  \
+          \      \"string\"\n    ],\n    \"schedule\": {\n        \"continuousSchedule\": {\n            \"enabled\": false,\n\
+          \            \"logBackupInterval\": 0,\n            \"logBackupRepeatIntervalInMinutes\": 0,\n            \"snapshotRepeatIntervalInMinutes\"\
+          : 0,\n            \"snapshotsPerDay\": 0\n        },\n        \"continuousScheduleEnabled\": false,\n        \"\
+          dailySchedule\": {\n            \"enabled\": false\n        },\n        \"dateCreated\": \"string\",\n        \"\
+          dateModified\": \"string\",\n        \"description\": \"string\",\n        \"globalPolicy\": false,\n        \"\
+          id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n        \"monthlySchedule\": {\n            \"dayOfMonth\": 0,\n\
+          \            \"enabled\": false\n        },\n        \"name\": \"string\",\n        \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n        \"quartelySchedule\": {\n            \"dayOfMonth\": 0,\n            \"enabled\": false,\n          \
+          \  \"startMonth\": \"string\",\n            \"startMonthValue\": \"JANUARY\"\n        },\n        \"referenceCount\"\
+          : 0,\n        \"snapshotTimeOfDay\": {\n            \"extra\": false,\n            \"hours\": 0,\n            \"\
+          minutes\": 0,\n            \"repeatIntervalInMinutes\": 0,\n            \"seconds\": 0,\n            \"validScheduleTime\"\
+          : false\n        },\n        \"startTime\": \"string\",\n        \"systemPolicy\": false,\n        \"uniqueName\"\
+          : \"string\",\n        \"weeklySchedule\": {\n            \"dayOfWeek\": \"string\",\n            \"dayOfWeekValue\"\
+          : \"SUNDAY\",\n            \"enabled\": false\n        },\n        \"yearlySchedule\": {\n            \"dayOfMonth\"\
+          : 0,\n            \"enabled\": false,\n            \"month\": \"string\",\n            \"monthValue\": \"JANUARY\"\
+          \n        }\n    },\n    \"scheduleId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"slaId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"backupPolicy\"\
+          : \"string\",\n    \"nxClusterIdStorageResourceIdMappings\": {\n        \"property1\": \"string\",\n        \"property2\"\
+          : \"string\"\n    },\n    \"nxClusterIds\": [\n        \"string\"\n    ],\n    \"schedule\": {\n        \"continuousSchedule\"\
+          : {\n            \"enabled\": false,\n            \"logBackupInterval\": 0,\n            \"logBackupRepeatIntervalInMinutes\"\
+          : 0,\n            \"snapshotRepeatIntervalInMinutes\": 0,\n            \"snapshotsPerDay\": 0\n        },\n    \
+          \    \"continuousScheduleEnabled\": false,\n        \"dailySchedule\": {\n            \"enabled\": false\n     \
+          \   },\n        \"dateCreated\": \"string\",\n        \"dateModified\": \"string\",\n        \"description\": \"\
+          string\",\n        \"globalPolicy\": false,\n        \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n       \
+          \ \"monthlySchedule\": {\n            \"dayOfMonth\": 0,\n            \"enabled\": false\n        },\n        \"\
+          name\": \"string\",\n        \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n        \"quartelySchedule\"\
+          : {\n            \"dayOfMonth\": 0,\n            \"enabled\": false,\n            \"startMonth\": \"string\",\n\
+          \            \"startMonthValue\": \"JANUARY\"\n        },\n        \"referenceCount\": 0,\n        \"snapshotTimeOfDay\"\
+          : {\n            \"extra\": false,\n            \"hours\": 0,\n            \"minutes\": 0,\n            \"repeatIntervalInMinutes\"\
+          : 0,\n            \"seconds\": 0,\n            \"validScheduleTime\": false\n        },\n        \"startTime\":\
+          \ \"string\",\n        \"systemPolicy\": false,\n        \"uniqueName\": \"string\",\n        \"weeklySchedule\"\
+          : {\n            \"dayOfWeek\": \"string\",\n            \"dayOfWeekValue\": \"SUNDAY\",\n            \"enabled\"\
+          : false\n        },\n        \"yearlySchedule\": {\n            \"dayOfMonth\": 0,\n            \"enabled\": false,\n\
+          \            \"month\": \"string\",\n            \"monthValue\": \"JANUARY\"\n        }\n    },\n    \"scheduleId\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"slaId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n}' \\\n  \
+          \  --output-document \\\n    - :///era/v0.9/databases/{database-id}/action/enable-tm"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"backupPolicy\": \"string\",\n    \"nxClusterIdStorageResourceIdMappings\": {\n        \"property1\"\
+          : \"string\",\n        \"property2\": \"string\"\n    },\n    \"nxClusterIds\": [\n        \"string\"\n    ],\n\
+          \    \"schedule\": {\n        \"continuousSchedule\": {\n            \"enabled\": false,\n            \"logBackupInterval\"\
+          : 0,\n            \"logBackupRepeatIntervalInMinutes\": 0,\n            \"snapshotRepeatIntervalInMinutes\": 0,\n\
+          \            \"snapshotsPerDay\": 0\n        },\n        \"continuousScheduleEnabled\": false,\n        \"dailySchedule\"\
+          : {\n            \"enabled\": false\n        },\n        \"dateCreated\": \"string\",\n        \"dateModified\"\
+          : \"string\",\n        \"description\": \"string\",\n        \"globalPolicy\": false,\n        \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n        \"monthlySchedule\": {\n            \"dayOfMonth\": 0,\n            \"enabled\": false\n        },\n\
+          \        \"name\": \"string\",\n        \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n        \"quartelySchedule\"\
+          : {\n            \"dayOfMonth\": 0,\n            \"enabled\": false,\n            \"startMonth\": \"string\",\n\
+          \            \"startMonthValue\": \"JANUARY\"\n        },\n        \"referenceCount\": 0,\n        \"snapshotTimeOfDay\"\
+          : {\n            \"extra\": false,\n            \"hours\": 0,\n            \"minutes\": 0,\n            \"repeatIntervalInMinutes\"\
+          : 0,\n            \"seconds\": 0,\n            \"validScheduleTime\": false\n        },\n        \"startTime\":\
+          \ \"string\",\n        \"systemPolicy\": false,\n        \"uniqueName\": \"string\",\n        \"weeklySchedule\"\
+          : {\n            \"dayOfWeek\": \"string\",\n            \"dayOfWeekValue\": \"SUNDAY\",\n            \"enabled\"\
+          : false\n        },\n        \"yearlySchedule\": {\n            \"dayOfMonth\": 0,\n            \"enabled\": false,\n\
+          \            \"month\": \"string\",\n            \"monthValue\": \"JANUARY\"\n        }\n    },\n    \"scheduleId\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"slaId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n}\"\"\"\n\n\
+          conn.request(\"POST\",\"/era/v0.9/databases/{database-id}/action/enable-tm\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/databases/{database-id}/action/enable-tm\"\n\t\n\tpayload :=  strings.NewReader(`{\"backupPolicy\"\
+          : \"string\", \"nxClusterIdStorageResourceIdMappings\": {\"property1\": \"string\", \"property2\": \"string\"},\
+          \ \"nxClusterIds\": [\"string\"], \"schedule\": {\"continuousSchedule\": {\"enabled\": false, \"logBackupInterval\"\
+          : 0, \"logBackupRepeatIntervalInMinutes\": 0, \"snapshotRepeatIntervalInMinutes\": 0, \"snapshotsPerDay\": 0}, \"\
+          continuousScheduleEnabled\": false, \"dailySchedule\": {\"enabled\": false}, \"dateCreated\": \"string\", \"dateModified\"\
+          : \"string\", \"description\": \"string\", \"globalPolicy\": false, \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"monthlySchedule\": {\"dayOfMonth\": 0, \"enabled\": false}, \"name\": \"string\", \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"quartelySchedule\": {\"dayOfMonth\": 0, \"enabled\": false, \"startMonth\": \"string\", \"startMonthValue\"\
+          : \"JANUARY\"}, \"referenceCount\": 0, \"snapshotTimeOfDay\": {\"extra\": false, \"hours\": 0, \"minutes\": 0, \"\
+          repeatIntervalInMinutes\": 0, \"seconds\": 0, \"validScheduleTime\": false}, \"startTime\": \"string\", \"systemPolicy\"\
+          : false, \"uniqueName\": \"string\", \"weeklySchedule\": {\"dayOfWeek\": \"string\", \"dayOfWeekValue\": \"SUNDAY\"\
+          , \"enabled\": false}, \"yearlySchedule\": {\"dayOfMonth\": 0, \"enabled\": false, \"month\": \"string\", \"monthValue\"\
+          : \"JANUARY\"}}, \"scheduleId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"slaId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n\
+          \    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/databases/{database-id}/action/enable-tm\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"backupPolicy\\\": \\\"string\\\", \\\"\
+          nxClusterIdStorageResourceIdMappings\\\": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"\
+          }, \\\"nxClusterIds\\\": [\\\"string\\\"], \\\"schedule\\\": {\\\"continuousSchedule\\\": {\\\"enabled\\\": false,\
+          \ \\\"logBackupInterval\\\": 0, \\\"logBackupRepeatIntervalInMinutes\\\": 0, \\\"snapshotRepeatIntervalInMinutes\\\
+          \": 0, \\\"snapshotsPerDay\\\": 0}, \\\"continuousScheduleEnabled\\\": false, \\\"dailySchedule\\\": {\\\"enabled\\\
+          \": false}, \\\"dateCreated\\\": \\\"string\\\", \\\"dateModified\\\": \\\"string\\\", \\\"description\\\": \\\"\
+          string\\\", \\\"globalPolicy\\\": false, \\\"id\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"monthlySchedule\\\
+          \": {\\\"dayOfMonth\\\": 0, \\\"enabled\\\": false}, \\\"name\\\": \\\"string\\\", \\\"ownerId\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \", \\\"quartelySchedule\\\": {\\\"dayOfMonth\\\": 0, \\\"enabled\\\": false, \\\"startMonth\\\": \\\"string\\\"\
+          , \\\"startMonthValue\\\": \\\"JANUARY\\\"}, \\\"referenceCount\\\": 0, \\\"snapshotTimeOfDay\\\": {\\\"extra\\\"\
+          : false, \\\"hours\\\": 0, \\\"minutes\\\": 0, \\\"repeatIntervalInMinutes\\\": 0, \\\"seconds\\\": 0, \\\"validScheduleTime\\\
+          \": false}, \\\"startTime\\\": \\\"string\\\", \\\"systemPolicy\\\": false, \\\"uniqueName\\\": \\\"string\\\",\
+          \ \\\"weeklySchedule\\\": {\\\"dayOfWeek\\\": \\\"string\\\", \\\"dayOfWeekValue\\\": \\\"SUNDAY\\\", \\\"enabled\\\
+          \": false}, \\\"yearlySchedule\\\": {\\\"dayOfMonth\\\": 0, \\\"enabled\\\": false, \\\"month\\\": \\\"string\\\"\
+          , \\\"monthValue\\\": \\\"JANUARY\\\"}}, \\\"scheduleId\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"\
+          slaId\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/databases/{database-id}/action/enable-tm';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"backupPolicy\": \"string\", \"nxClusterIdStorageResourceIdMappings\": {\"property1\": \"string\",\
+          \ \"property2\": \"string\"}, \"nxClusterIds\": [\"string\"], \"schedule\": {\"continuousSchedule\": {\"enabled\"\
+          : false, \"logBackupInterval\": 0, \"logBackupRepeatIntervalInMinutes\": 0, \"snapshotRepeatIntervalInMinutes\"\
+          : 0, \"snapshotsPerDay\": 0}, \"continuousScheduleEnabled\": false, \"dailySchedule\": {\"enabled\": false}, \"\
+          dateCreated\": \"string\", \"dateModified\": \"string\", \"description\": \"string\", \"globalPolicy\": false, \"\
+          id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"monthlySchedule\": {\"dayOfMonth\": 0, \"enabled\": false}, \"\
+          name\": \"string\", \"ownerId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"quartelySchedule\": {\"dayOfMonth\"\
+          : 0, \"enabled\": false, \"startMonth\": \"string\", \"startMonthValue\": \"JANUARY\"}, \"referenceCount\": 0, \"\
+          snapshotTimeOfDay\": {\"extra\": false, \"hours\": 0, \"minutes\": 0, \"repeatIntervalInMinutes\": 0, \"seconds\"\
+          : 0, \"validScheduleTime\": false}, \"startTime\": \"string\", \"systemPolicy\": false, \"uniqueName\": \"string\"\
+          , \"weeklySchedule\": {\"dayOfWeek\": \"string\", \"dayOfWeekValue\": \"SUNDAY\", \"enabled\": false}, \"yearlySchedule\"\
+          : {\"dayOfMonth\": 0, \"enabled\": false, \"month\": \"string\", \"monthValue\": \"JANUARY\"}}, \"scheduleId\":\
+          \ \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"slaId\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"}`\n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    EraWeeklySchedule:
+      properties:
+        dayOfWeek:
+          type: string
+        dayOfWeekValue:
+          enum:
+          - SUNDAY
+          - MONDAY
+          - TUESDAY
+          - WEDNESDAY
+          - THURSDAY
+          - FRIDAY
+          - SATURDAY
+          type: string
+        enabled:
+          type: boolean
+      type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    EraMonthlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+      type: object
+    EraQuarterlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+        startMonth:
+          type: string
+        startMonthValue:
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    EraScheduleDTO:
+      description: Defines a backup schedule. Note - All properties are mandatory. If continuous schedule is not needed, you
+        must still specify a valid object, with enabled=false. Omitting the object/property is not permitted.
+      properties:
+        continuousSchedule:
+          $ref: '#/components/schemas/EraContinuousSchedule'
+        continuousScheduleEnabled:
+          type: boolean
+        dailySchedule:
+          $ref: '#/components/schemas/EraDailySchedule'
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        description:
+          type: string
+        globalPolicy:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        monthlySchedule:
+          $ref: '#/components/schemas/EraMonthlySchedule'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        quartelySchedule:
+          $ref: '#/components/schemas/EraQuarterlySchedule'
+        referenceCount:
+          format: int32
+          type: integer
+        snapshotTimeOfDay:
+          $ref: '#/components/schemas/ERAScheduleTime'
+        startTime:
+          type: string
+        systemPolicy:
+          type: boolean
+        uniqueName:
+          type: string
+        weeklySchedule:
+          $ref: '#/components/schemas/EraWeeklySchedule'
+        yearlySchedule:
+          $ref: '#/components/schemas/EraYearlySchedule'
+      type: object
+    EraContinuousSchedule:
+      properties:
+        enabled:
+          type: boolean
+        logBackupInterval:
+          format: int32
+          type: integer
+        logBackupRepeatIntervalInMinutes:
+          format: int32
+          type: integer
+        snapshotRepeatIntervalInMinutes:
+          format: int32
+          type: integer
+        snapshotsPerDay:
+          format: int32
+          type: integer
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    EraYearlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+        month:
+          type: string
+        monthValue:
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+          type: string
+      type: object
+    EnableTmMongoShardedClusterRequest:
+      properties:
+        backupPolicy:
+          description: Backup Policy as json String
+          type: string
+        nxClusterIdStorageResourceIdMappings:
+          additionalProperties:
+            type: string
+          description: Backup Nutanix Cluster ID to Storage Resource ID mapping provided for Point In Time Recovery.
+          type: object
+        nxClusterIds:
+          description: Backup Nutanix Cluster ID provided for Point In Time Recovery.
+          items:
+            type: string
+          type: array
+        schedule:
+          $ref: '#/components/schemas/EraScheduleDTO'
+        scheduleId:
+          description: The Schedule ID to associate with the Time Machine
+          format: uuid
+          type: string
+        slaId:
+          description: The SLA ID to associate with the Time Machine
+          format: uuid
+          type: string
+      required:
+      - slaId
+      type: object
+    EraDailySchedule:
+      properties:
+        enabled:
+          type: boolean
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+    ERAScheduleTime:
+      properties:
+        extra:
+          type: boolean
+        hours:
+          format: int32
+          type: integer
+        minutes:
+          format: int32
+          type: integer
+        repeatIntervalInMinutes:
+          format: int32
+          type: integer
+        seconds:
+          format: int32
+          type: integer
+        validScheduleTime:
+          type: boolean
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

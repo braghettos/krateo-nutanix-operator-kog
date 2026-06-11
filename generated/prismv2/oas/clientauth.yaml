@@ -1,0 +1,365 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /authconfig/client_auth:
+    post:
+      summary: Enable/disable client authentication.
+      description: Enable/disable client authentication on the cluster.
+      tags:
+      - /authconfig
+      operationId: post/authconfig/client_auth/setClientAuthState
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.PrimitiveDTO_java.lang.Boolean_'
+        description: Enable client auth
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.auth.dto.config.CaChainDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"value\": true\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"value\": true\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"value\": true\n\
+          }\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/authconfig/client_auth\", payload, headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          value\": true}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"value\\\": true}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"value\": true}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      summary: Get client authentication status.
+      description: Get the client authentication status configured on the cluster.
+      tags:
+      - /authconfig
+      operationId: get/authconfig/client_auth/getClientAuth
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.auth.dto.config.ClientAuthDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/authconfig/client_auth\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    put:
+      summary: Update client authentication.
+      description: Update client authentication on the cluster.
+      tags:
+      - /authconfig
+      operationId: put/authconfig/client_auth/updateClientAuth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update.auth.dto.config.ClientAuthDTO'
+        description: Client auth updates
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/update.auth.dto.config.ClientAuthDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"auto_login_info\": {\n        \"enabled\": true,\n        \"service_account_dto\": {\n            \"directory_config_name\"\
+          : \"string\",\n            \"password\": \"string\",\n            \"username\": \"string\"\n        }\n    },\n\
+          \    \"ca_chain_info\": {\n        \"ca_chain\": [\n            \"string\"\n        ],\n        \"enable_client_auth\"\
+          : true,\n        \"name\": \"string\"\n    },\n    \"cert_revocation_info\": {\n        \"crl_distribution_points\"\
+          : [\n            \"string\"\n        ],\n        \"global_crl_refresh_interval\": 0,\n        \"ocsp_responder\"\
+          : \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"auto_login_info\": {\n        \"enabled\": true,\n        \"service_account_dto\"\
+          : {\n            \"directory_config_name\": \"string\",\n            \"password\": \"string\",\n            \"username\"\
+          : \"string\"\n        }\n    },\n    \"ca_chain_info\": {\n        \"ca_chain\": [\n            \"string\"\n   \
+          \     ],\n        \"enable_client_auth\": true,\n        \"name\": \"string\"\n    },\n    \"cert_revocation_info\"\
+          : {\n        \"crl_distribution_points\": [\n            \"string\"\n        ],\n        \"global_crl_refresh_interval\"\
+          : 0,\n        \"ocsp_responder\": \"string\"\n    }\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"auto_login_info\"\
+          : {\n        \"enabled\": true,\n        \"service_account_dto\": {\n            \"directory_config_name\": \"string\"\
+          ,\n            \"password\": \"string\",\n            \"username\": \"string\"\n        }\n    },\n    \"ca_chain_info\"\
+          : {\n        \"ca_chain\": [\n            \"string\"\n        ],\n        \"enable_client_auth\": true,\n      \
+          \  \"name\": \"string\"\n    },\n    \"cert_revocation_info\": {\n        \"crl_distribution_points\": [\n     \
+          \       \"string\"\n        ],\n        \"global_crl_refresh_interval\": 0,\n        \"ocsp_responder\": \"string\"\
+          \n    }\n}\"\"\"\n\nconn.request(\"PUT\",\"/PrismGateway/services/rest/v2.0/authconfig/client_auth\", payload, headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          auto_login_info\": {\"enabled\": true, \"service_account_dto\": {\"directory_config_name\": \"string\", \"password\"\
+          : \"string\", \"username\": \"string\"}}, \"ca_chain_info\": {\"ca_chain\": [\"string\"], \"enable_client_auth\"\
+          : true, \"name\": \"string\"}, \"cert_revocation_info\": {\"crl_distribution_points\": [\"string\"], \"global_crl_refresh_interval\"\
+          : 0, \"ocsp_responder\": \"string\"}}`)\n\treq, err := http.NewRequest(\"PUT\", url, payload)\n\tif err != nil {\n\
+          \t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"auto_login_info\\\": {\\\"enabled\\\": true, \\\"service_account_dto\\\": {\\\"directory_config_name\\\": \\\
+          \"string\\\", \\\"password\\\": \\\"string\\\", \\\"username\\\": \\\"string\\\"}}, \\\"ca_chain_info\\\": {\\\"\
+          ca_chain\\\": [\\\"string\\\"], \\\"enable_client_auth\\\": true, \\\"name\\\": \\\"string\\\"}, \\\"cert_revocation_info\\\
+          \": {\\\"crl_distribution_points\\\": [\\\"string\\\"], \\\"global_crl_refresh_interval\\\": 0, \\\"ocsp_responder\\\
+          \": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth';\nconst options\
+          \ = {\n  method: 'PUT',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"auto_login_info\": {\"enabled\": true, \"service_account_dto\": {\"directory_config_name\": \"string\", \"\
+          password\": \"string\", \"username\": \"string\"}}, \"ca_chain_info\": {\"ca_chain\": [\"string\"], \"enable_client_auth\"\
+          : true, \"name\": \"string\"}, \"cert_revocation_info\": {\"crl_distribution_points\": [\"string\"], \"global_crl_refresh_interval\"\
+          : 0, \"ocsp_responder\": \"string\"}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /authconfig/client_auth/{name}:
+    delete:
+      summary: Delete client chain certificate for authentication.
+      description: Delete client chain certificate on the cluster.
+      tags:
+      - /authconfig
+      operationId: delete/authconfig/client_auth/{name}/deleteClientAuthChain
+      parameters:
+      - name: name
+        in: path
+        description: Name of the Certificate
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete.dto.PrimitiveDTO_java.lang.Boolean_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth/{name}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: multipart/form-data' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ multipart/form-data' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"multipart/form-data\"\n}\n \nconn.request(\"DELETE\",\"/PrismGateway/services/rest/v2.0/authconfig/client_auth/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth/{name}\"\n\t \n\treq, err\
+          \ := http.NewRequest(\"DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"multipart/form-data\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"multipart/form-data\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/authconfig/client_auth/{name}';\nconst\
+          \ options = {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'multipart/form-data'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    create.auth.dto.config.CaChainDTO:
+      type: object
+      properties:
+        ca_chain:
+          items:
+            format: byte
+            type: string
+          type: array
+        enable_client_auth:
+          type: boolean
+        name:
+          type: string
+    get.auth.dto.config.CaChainDTO:
+      type: object
+      properties:
+        ca_chain:
+          items:
+            format: byte
+            type: string
+          type: array
+        enable_client_auth:
+          type: boolean
+        name:
+          type: string
+    update.auth.dto.config.AutoLoginInfoDTO:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        service_account_dto:
+          $ref: '#/components/schemas/update.auth.dto.config.ServiceAccountDTO'
+    get.auth.dto.config.ClientAuthDTO:
+      type: object
+      properties:
+        auto_login_info:
+          $ref: '#/components/schemas/get.auth.dto.config.AutoLoginInfoDTO'
+        ca_chain_info:
+          $ref: '#/components/schemas/get.auth.dto.config.CaChainDTO'
+        cert_revocation_info:
+          $ref: '#/components/schemas/get.auth.dto.config.CertRevocationInfoDTO'
+    get.auth.dto.config.CertRevocationInfoDTO:
+      type: object
+      properties:
+        crl_distribution_points:
+          items:
+            type: string
+          type: array
+        global_crl_refresh_interval:
+          format: int64
+          type: integer
+        ocsp_responder:
+          type: string
+    update.auth.dto.config.ClientAuthDTO:
+      type: object
+      properties:
+        auto_login_info:
+          $ref: '#/components/schemas/update.auth.dto.config.AutoLoginInfoDTO'
+        ca_chain_info:
+          $ref: '#/components/schemas/update.auth.dto.config.CaChainDTO'
+        cert_revocation_info:
+          $ref: '#/components/schemas/update.auth.dto.config.CertRevocationInfoDTO'
+    update.auth.dto.config.ServiceAccountDTO:
+      type: object
+      properties:
+        directory_config_name:
+          type: string
+        password:
+          type: string
+        username:
+          type: string
+    update.auth.dto.config.CaChainDTO:
+      type: object
+      properties:
+        ca_chain:
+          items:
+            format: byte
+            type: string
+          type: array
+        enable_client_auth:
+          type: boolean
+        name:
+          type: string
+    get.auth.dto.config.AutoLoginInfoDTO:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        service_account_dto:
+          $ref: '#/components/schemas/get.auth.dto.config.ServiceAccountDTO'
+    delete.dto.PrimitiveDTO_java.lang.Boolean_:
+      type: object
+      properties:
+        value:
+          type: boolean
+    get.auth.dto.config.ServiceAccountDTO:
+      type: object
+      properties:
+        directory_config_name:
+          type: string
+        password:
+          type: string
+        username:
+          type: string
+    create.dto.PrimitiveDTO_java.lang.Boolean_:
+      type: object
+      properties:
+        value:
+          type: boolean
+    update.auth.dto.config.CertRevocationInfoDTO:
+      type: object
+      properties:
+        crl_distribution_points:
+          items:
+            type: string
+          type: array
+        global_crl_refresh_interval:
+          format: int64
+          type: integer
+        ocsp_responder:
+          type: string

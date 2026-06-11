@@ -1,0 +1,350 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /protection_domains/{pd_name}/schedules/{id}/retention_policies:
+    post:
+      summary: Set retention policies of a snapshot schedule of a Protection Domain.
+      description: Set retention policies of specified snapshot schedule from the specified Protection Domain.
+      tags:
+      - /protection_domains
+      operationId: post/protection_domains/{pd_name}/schedules/{id}/retention_policies/setRetentionPolicy
+      parameters:
+      - name: pd_name
+        in: path
+        description: Name of the Protection Domain
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: ID of the snapshot schedule
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.dr.RetentionPolicyDTO'
+        description: The retention policies instance
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.dr.CronScheduleDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"default_local_retention\": 0,\n    \"default_remote_retention\": 0,\n    \"local_max_snapshots\": 0,\n  \
+          \  \"local_retention_period\": 0,\n    \"local_retention_type\": \"NUM_SNAPSHOTS\",\n    \"remote_max_snapshots\"\
+          : {\n        \"property1\": 0,\n        \"property2\": 0\n    },\n    \"remote_retention_period\": {\n        \"\
+          property1\": 0,\n        \"property2\": 0\n    },\n    \"remote_retention_type\": {\n        \"property1\": \"NUM_SNAPSHOTS\"\
+          ,\n        \"property2\": \"NUM_SNAPSHOTS\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"default_local_retention\": 0,\n    \"default_remote_retention\"\
+          : 0,\n    \"local_max_snapshots\": 0,\n    \"local_retention_period\": 0,\n    \"local_retention_type\": \"NUM_SNAPSHOTS\"\
+          ,\n    \"remote_max_snapshots\": {\n        \"property1\": 0,\n        \"property2\": 0\n    },\n    \"remote_retention_period\"\
+          : {\n        \"property1\": 0,\n        \"property2\": 0\n    },\n    \"remote_retention_type\": {\n        \"property1\"\
+          : \"NUM_SNAPSHOTS\",\n        \"property2\": \"NUM_SNAPSHOTS\"\n    }\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"default_local_retention\"\
+          : 0,\n    \"default_remote_retention\": 0,\n    \"local_max_snapshots\": 0,\n    \"local_retention_period\": 0,\n\
+          \    \"local_retention_type\": \"NUM_SNAPSHOTS\",\n    \"remote_max_snapshots\": {\n        \"property1\": 0,\n\
+          \        \"property2\": 0\n    },\n    \"remote_retention_period\": {\n        \"property1\": 0,\n        \"property2\"\
+          : 0\n    },\n    \"remote_retention_type\": {\n        \"property1\": \"NUM_SNAPSHOTS\",\n        \"property2\"\
+          : \"NUM_SNAPSHOTS\"\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\"\
+          \n\t\n\tpayload :=  strings.NewReader(`{\"default_local_retention\": 0, \"default_remote_retention\": 0, \"local_max_snapshots\"\
+          : 0, \"local_retention_period\": 0, \"local_retention_type\": \"NUM_SNAPSHOTS\", \"remote_max_snapshots\": {\"property1\"\
+          : 0, \"property2\": 0}, \"remote_retention_period\": {\"property1\": 0, \"property2\": 0}, \"remote_retention_type\"\
+          : {\"property1\": \"NUM_SNAPSHOTS\", \"property2\": \"NUM_SNAPSHOTS\"}}`)\n\treq, err := http.NewRequest(\"POST\"\
+          , url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n     \
+          \   req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"default_local_retention\\\": 0, \\\"default_remote_retention\\\": 0, \\\"local_max_snapshots\\\": 0, \\\"local_retention_period\\\
+          \": 0, \\\"local_retention_type\\\": \\\"NUM_SNAPSHOTS\\\", \\\"remote_max_snapshots\\\": {\\\"property1\\\": 0,\
+          \ \\\"property2\\\": 0}, \\\"remote_retention_period\\\": {\\\"property1\\\": 0, \\\"property2\\\": 0}, \\\"remote_retention_type\\\
+          \": {\\\"property1\\\": \\\"NUM_SNAPSHOTS\\\", \\\"property2\\\": \\\"NUM_SNAPSHOTS\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies';\n\
+          const options = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"default_local_retention\": 0, \"default_remote_retention\": 0, \"local_max_snapshots\": 0, \"local_retention_period\"\
+          : 0, \"local_retention_type\": \"NUM_SNAPSHOTS\", \"remote_max_snapshots\": {\"property1\": 0, \"property2\": 0},\
+          \ \"remote_retention_period\": {\"property1\": 0, \"property2\": 0}, \"remote_retention_type\": {\"property1\":\
+          \ \"NUM_SNAPSHOTS\", \"property2\": \"NUM_SNAPSHOTS\"}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    delete:
+      summary: Clear retention policies of a snapshot schedule of a Protection Domain.
+      description: Clear retention policies of specified snapshot scheudule from the specified Protection Domain.
+      tags:
+      - /protection_domains
+      operationId: delete/protection_domains/{pd_name}/schedules/{id}/retention_policies/clearRetentionPolicy
+      parameters:
+      - name: pd_name
+        in: path
+        description: Name of the Protection Domain
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: ID of the snapshot schedule
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete.dto.dr.CronScheduleDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\"\
+          \n\t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"\
+          Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/protection_domains/{pd_name}/schedules/{id}/retention_policies';\n\
+          const options = {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    create.dto.dr.CronScheduleDTO:
+      type: object
+      properties:
+        app_consistent:
+          type: boolean
+        duration_in_usecs:
+          format: int64
+          type: integer
+        end_time_in_usecs:
+          format: int64
+          type: integer
+        every_nth:
+          format: int32
+          type: integer
+        id:
+          type: string
+        is_rollup_sched:
+          type: boolean
+        pd_name:
+          type: string
+        retention_policy:
+          $ref: '#/components/schemas/create.dto.dr.RetentionPolicyDTO'
+        rollup_schedule_uuid:
+          type: string
+        start_times_in_usecs:
+          items:
+            format: int64
+            type: integer
+          type: array
+        suspended:
+          type: boolean
+        timezone_offset:
+          format: int32
+          type: integer
+        type:
+          enum:
+          - SECONDLY
+          - MINUTELY
+          - HOURLY
+          - DAILY
+          - WEEKLY
+          - MONTHLY
+          type: string
+        user_start_time_in_usecs:
+          format: int64
+          type: integer
+        values:
+          items:
+            format: int32
+            type: integer
+          type: array
+    delete.dto.dr.CronScheduleDTO:
+      type: object
+      properties:
+        app_consistent:
+          type: boolean
+        duration_in_usecs:
+          format: int64
+          type: integer
+        end_time_in_usecs:
+          format: int64
+          type: integer
+        every_nth:
+          format: int32
+          type: integer
+        id:
+          type: string
+        is_rollup_sched:
+          type: boolean
+        pd_name:
+          type: string
+        retention_policy:
+          $ref: '#/components/schemas/delete.dto.dr.RetentionPolicyDTO'
+        rollup_schedule_uuid:
+          type: string
+        start_times_in_usecs:
+          items:
+            format: int64
+            type: integer
+          type: array
+        suspended:
+          type: boolean
+        timezone_offset:
+          format: int32
+          type: integer
+        type:
+          enum:
+          - SECONDLY
+          - MINUTELY
+          - HOURLY
+          - DAILY
+          - WEEKLY
+          - MONTHLY
+          type: string
+        user_start_time_in_usecs:
+          format: int64
+          type: integer
+        values:
+          items:
+            format: int32
+            type: integer
+          type: array
+    delete.dto.dr.RetentionPolicyDTO:
+      type: object
+      properties:
+        default_local_retention:
+          format: int32
+          type: integer
+        default_remote_retention:
+          format: int32
+          type: integer
+        local_max_snapshots:
+          format: int32
+          type: integer
+        local_retention_period:
+          format: int32
+          type: integer
+        local_retention_type:
+          enum:
+          - NUM_SNAPSHOTS
+          - DAYS
+          - WEEKS
+          - MONTHS
+          type: string
+        remote_max_snapshots:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+        remote_retention_period:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+        remote_retention_type:
+          additionalProperties:
+            enum:
+            - NUM_SNAPSHOTS
+            - DAYS
+            - WEEKS
+            - MONTHS
+            type: string
+          type: object
+    create.dto.dr.RetentionPolicyDTO:
+      type: object
+      properties:
+        default_local_retention:
+          format: int32
+          type: integer
+        default_remote_retention:
+          format: int32
+          type: integer
+        local_max_snapshots:
+          format: int32
+          type: integer
+        local_retention_period:
+          format: int32
+          type: integer
+        local_retention_type:
+          enum:
+          - NUM_SNAPSHOTS
+          - DAYS
+          - WEEKS
+          - MONTHS
+          type: string
+        remote_max_snapshots:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+        remote_retention_period:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+        remote_retention_type:
+          additionalProperties:
+            enum:
+            - NUM_SNAPSHOTS
+            - DAYS
+            - WEEKS
+            - MONTHS
+            type: string
+          type: object

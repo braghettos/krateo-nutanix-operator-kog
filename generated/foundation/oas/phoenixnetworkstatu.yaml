@@ -1,0 +1,131 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: foundation@nutanix.com
+    name: Foundation Developers
+  description: '# Foundation
+
+
+    Foundation is a Nutanix provided tool used for bootstrapping, imaging, and deployment of Nutanix clusters. The imaging
+    process will install the desired version of the AOS software and the hypervisor of your choice. One of the ways to use
+    Foundation services is to make use of the APIs provided by Foundation.
+
+
+    Foundation provides seven categories of APIs, namely, General APIs, File Management APIs, Networking APIs, Imaging and
+    Cluster Creation APIs, UCS Managed Mode APIs, Foundation Upgrade APIs and Factory APIs.
+
+
+    However, most of these APIs find their use in internal scenarios. Some APIs that find most relevance in the customer scenario
+    are image_nodes, pre_check, reboot_to_phoenix, reboot_from_phoenix, progress, phoenix_network_status, abort_session, get_progress_sessions
+    among others.
+
+
+
+    - Foundation Version: 5.10
+
+
+
+    ## Terminology
+
+
+    Some of the acronyms frequently used in the API descriptions are listed below:
+
+
+    - **FVM** - Foundation Virtual Machine, A VM that has Foundation service running on it.
+
+    - **BMC** - Baseboard management controller.
+
+    - **IPMI** - Intelligent Platform Management Interface.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+
+    '
+  license:
+    name: 'Copyright Nutanix Inc. All rights reserved
+
+      '
+  title: Foundation REST API
+  version: '5.10'
+servers:
+- url: /foundation
+security: []
+paths:
+  /phoenix_network_status:
+    get:
+      description: 'Checks whether node is booted into phoenix and has a stable network.
+
+        '
+      parameters:
+      - description: IP address of phoenix node.
+        in: query
+        name: phoenix_ip
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Status of phoenix.
+          content:
+            '*/*':
+              schema:
+                description: Status of phoenix.
+                properties:
+                  stable:
+                    description: True, if phoenix network is stable. False, otherwise.
+                    type: boolean
+                type: object
+        '500':
+          description: Raised in case of any errors.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/http_error_500'
+      summary: Check whether phoenix has a stable network
+      tags:
+      - Networking APIs
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/foundation/phoenix_network_status \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/foundation/phoenix_network_status"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {}\n \nconn.request(\"\
+          GET\",\"/foundation/phoenix_network_status\", headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\n\
+          print(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/foundation/phoenix_network_status\"\n\t \n\treq, err := http.NewRequest(\"GET\",\
+          \ url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/foundation/phoenix_network_status\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/foundation/phoenix_network_status';\nconst options = {\n  method: 'GET',\n\
+          \  headers: {} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    http_error_500:
+      description: HTTP error 500 description.
+      properties:
+        error:
+          properties:
+            details:
+              description: Error details.
+              type: object
+            message:
+              description: Error message.
+              type: string
+            session_id:
+              description: Imaging session ID.
+              type: string
+          type: object
+      type: object

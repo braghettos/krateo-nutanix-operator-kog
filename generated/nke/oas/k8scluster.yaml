@@ -1,0 +1,983 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1/k8s/clusters:
+    post:
+      description: Create a Kubernetes cluster with the provided configuration.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Create a new Kubernetes cluster
+      operationId: CreateK8sCluster
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1.1.0_k8s_cluster_config'
+        required: true
+      responses:
+        '202':
+          description: Kubernetes cluster creation is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_create_response'
+        '400':
+          description: Bad parameters specified in request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Invalid reference supplied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '409':
+          description: The Kubernetes cluster name is not unique.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '412':
+          description: Kubernetes cluster pre-deployment checks failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1/k8s/clusters \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n    \"apiserver_sni\":\
+          \ [\n        \"my.cluster.net\"\n    ],\n    \"categories\": [\n        {\n            \"key\": \"string\",\n  \
+          \          \"value\": \"string\"\n        }\n    ],\n    \"clusterapi_enabled\": true,\n    \"cni_config\": {\n\
+          \        \"calico_config\": {\n            \"ip_pool_configs\": [\n                {\n                    \"cidr\"\
+          : \"172.20.0.0/16\"\n                }\n            ]\n        },\n        \"flannel_config\": {},\n        \"node_cidr_mask_size\"\
+          : 0,\n        \"pod_ipv4_cidr\": \"string\",\n        \"service_ipv4_cidr\": \"string\"\n    },\n    \"disable_http_proxy_import\"\
+          : true,\n    \"disable_monitoring\": true,\n    \"etcd_config\": {\n        \"node_pools\": [\n            {\n \
+          \               \"ahv_config\": {\n                    \"cpu\": 2,\n                    \"disk_mib\": 40960,\n \
+          \                   \"iscsi_network_name\": \"string\",\n                    \"iscsi_network_uuid\": \"string\"\
+          ,\n                    \"memory_mib\": 8192,\n                    \"network_name\": \"string\",\n              \
+          \      \"network_uuid\": \"string\",\n                    \"prism_element_cluster_uuid\": \"string\"\n         \
+          \       },\n                \"gpu_config_list\": [\n                    {\n                        \"count\": 1,\n\
+          \                        \"name\": \"string\"\n                    }\n                ],\n                \"labels\"\
+          : {\n                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n           \
+          \     },\n                \"name\": \"etcd-node-pool\",\n                \"node_os_version\": \"string\",\n    \
+          \            \"num_instances\": 0\n            }\n        ]\n    },\n    \"is_management\": true,\n    \"masters_config\"\
+          : {\n        \"active_passive_config\": {\n            \"external_ipv4_address\": \"string\"\n        },\n     \
+          \   \"external_lb_config\": {\n            \"external_ipv4_address\": \"string\",\n            \"master_nodes_config\"\
+          : [\n                {\n                    \"ipv4_address\": \"string\",\n                    \"node_pool_name\"\
+          : \"string\"\n                }\n            ]\n        },\n        \"node_pools\": [\n            {\n         \
+          \       \"ahv_config\": {\n                    \"cpu\": 2,\n                    \"disk_mib\": 40960,\n         \
+          \           \"iscsi_network_name\": \"string\",\n                    \"iscsi_network_uuid\": \"string\",\n     \
+          \               \"memory_mib\": 8192,\n                    \"network_name\": \"string\",\n                    \"\
+          network_uuid\": \"string\",\n                    \"prism_element_cluster_uuid\": \"string\"\n                },\n\
+          \                \"gpu_config_list\": [\n                    {\n                        \"count\": 1,\n        \
+          \                \"name\": \"string\"\n                    }\n                ],\n                \"labels\": {\n\
+          \                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n               \
+          \ },\n                \"name\": \"etcd-node-pool\",\n                \"node_os_version\": \"string\",\n        \
+          \        \"num_instances\": 0\n            }\n        ],\n        \"single_master_config\": {}\n    },\n    \"metadata\"\
+          : {\n        \"api_version\": \"v1.0.0\"\n    },\n    \"name\": \"prod-cluster\",\n    \"project\": \"string\",\n\
+          \    \"storage_class_config\": {\n        \"default_storage_class\": true,\n        \"name\": \"string\",\n    \
+          \    \"reclaim_policy\": \"string\",\n        \"volumes_config\": {\n            \"data_service_endpoint\": \"10.1.2.3:3260\"\
+          ,\n            \"file_system\": \"ext4\",\n            \"flash_mode\": true,\n            \"password\": \"string\"\
+          ,\n            \"prism_element_cluster_uuid\": \"string\",\n            \"storage_container\": \"string\",\n   \
+          \         \"username\": \"string\"\n        }\n    },\n    \"version\": \"1.16.8-1\",\n    \"workers_config\": {\n\
+          \        \"node_pools\": [\n            {\n                \"ahv_config\": {\n                    \"cpu\": 2,\n\
+          \                    \"disk_mib\": 40960,\n                    \"iscsi_network_name\": \"string\",\n           \
+          \         \"iscsi_network_uuid\": \"string\",\n                    \"memory_mib\": 8192,\n                    \"\
+          network_name\": \"string\",\n                    \"network_uuid\": \"string\",\n                    \"prism_element_cluster_uuid\"\
+          : \"string\"\n                },\n                \"gpu_config_list\": [\n                    {\n              \
+          \          \"count\": 1,\n                        \"name\": \"string\"\n                    }\n                ],\n\
+          \                \"labels\": {\n                    \"property1\": \"string\",\n                    \"property2\"\
+          : \"string\"\n                },\n                \"name\": \"etcd-node-pool\",\n                \"node_os_version\"\
+          : \"string\",\n                \"num_instances\": 0\n            }\n        ]\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"apiserver_sni\": [\n        \"my.cluster.net\"\n    ],\n    \"\
+          categories\": [\n        {\n            \"key\": \"string\",\n            \"value\": \"string\"\n        }\n   \
+          \ ],\n    \"clusterapi_enabled\": true,\n    \"cni_config\": {\n        \"calico_config\": {\n            \"ip_pool_configs\"\
+          : [\n                {\n                    \"cidr\": \"172.20.0.0/16\"\n                }\n            ]\n    \
+          \    },\n        \"flannel_config\": {},\n        \"node_cidr_mask_size\": 0,\n        \"pod_ipv4_cidr\": \"string\"\
+          ,\n        \"service_ipv4_cidr\": \"string\"\n    },\n    \"disable_http_proxy_import\": true,\n    \"disable_monitoring\"\
+          : true,\n    \"etcd_config\": {\n        \"node_pools\": [\n            {\n                \"ahv_config\": {\n \
+          \                   \"cpu\": 2,\n                    \"disk_mib\": 40960,\n                    \"iscsi_network_name\"\
+          : \"string\",\n                    \"iscsi_network_uuid\": \"string\",\n                    \"memory_mib\": 8192,\n\
+          \                    \"network_name\": \"string\",\n                    \"network_uuid\": \"string\",\n        \
+          \            \"prism_element_cluster_uuid\": \"string\"\n                },\n                \"gpu_config_list\"\
+          : [\n                    {\n                        \"count\": 1,\n                        \"name\": \"string\"\n\
+          \                    }\n                ],\n                \"labels\": {\n                    \"property1\": \"\
+          string\",\n                    \"property2\": \"string\"\n                },\n                \"name\": \"etcd-node-pool\"\
+          ,\n                \"node_os_version\": \"string\",\n                \"num_instances\": 0\n            }\n     \
+          \   ]\n    },\n    \"is_management\": true,\n    \"masters_config\": {\n        \"active_passive_config\": {\n \
+          \           \"external_ipv4_address\": \"string\"\n        },\n        \"external_lb_config\": {\n            \"\
+          external_ipv4_address\": \"string\",\n            \"master_nodes_config\": [\n                {\n              \
+          \      \"ipv4_address\": \"string\",\n                    \"node_pool_name\": \"string\"\n                }\n  \
+          \          ]\n        },\n        \"node_pools\": [\n            {\n                \"ahv_config\": {\n        \
+          \            \"cpu\": 2,\n                    \"disk_mib\": 40960,\n                    \"iscsi_network_name\":\
+          \ \"string\",\n                    \"iscsi_network_uuid\": \"string\",\n                    \"memory_mib\": 8192,\n\
+          \                    \"network_name\": \"string\",\n                    \"network_uuid\": \"string\",\n        \
+          \            \"prism_element_cluster_uuid\": \"string\"\n                },\n                \"gpu_config_list\"\
+          : [\n                    {\n                        \"count\": 1,\n                        \"name\": \"string\"\n\
+          \                    }\n                ],\n                \"labels\": {\n                    \"property1\": \"\
+          string\",\n                    \"property2\": \"string\"\n                },\n                \"name\": \"etcd-node-pool\"\
+          ,\n                \"node_os_version\": \"string\",\n                \"num_instances\": 0\n            }\n     \
+          \   ],\n        \"single_master_config\": {}\n    },\n    \"metadata\": {\n        \"api_version\": \"v1.0.0\"\n\
+          \    },\n    \"name\": \"prod-cluster\",\n    \"project\": \"string\",\n    \"storage_class_config\": {\n      \
+          \  \"default_storage_class\": true,\n        \"name\": \"string\",\n        \"reclaim_policy\": \"string\",\n  \
+          \      \"volumes_config\": {\n            \"data_service_endpoint\": \"10.1.2.3:3260\",\n            \"file_system\"\
+          : \"ext4\",\n            \"flash_mode\": true,\n            \"password\": \"string\",\n            \"prism_element_cluster_uuid\"\
+          : \"string\",\n            \"storage_container\": \"string\",\n            \"username\": \"string\"\n        }\n\
+          \    },\n    \"version\": \"1.16.8-1\",\n    \"workers_config\": {\n        \"node_pools\": [\n            {\n \
+          \               \"ahv_config\": {\n                    \"cpu\": 2,\n                    \"disk_mib\": 40960,\n \
+          \                   \"iscsi_network_name\": \"string\",\n                    \"iscsi_network_uuid\": \"string\"\
+          ,\n                    \"memory_mib\": 8192,\n                    \"network_name\": \"string\",\n              \
+          \      \"network_uuid\": \"string\",\n                    \"prism_element_cluster_uuid\": \"string\"\n         \
+          \       },\n                \"gpu_config_list\": [\n                    {\n                        \"count\": 1,\n\
+          \                        \"name\": \"string\"\n                    }\n                ],\n                \"labels\"\
+          : {\n                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n           \
+          \     },\n                \"name\": \"etcd-node-pool\",\n                \"node_os_version\": \"string\",\n    \
+          \            \"num_instances\": 0\n            }\n        ]\n    }\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1/k8s/clusters"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"apiserver_sni\"\
+          : [\n        \"my.cluster.net\"\n    ],\n    \"categories\": [\n        {\n            \"key\": \"string\",\n  \
+          \          \"value\": \"string\"\n        }\n    ],\n    \"clusterapi_enabled\": true,\n    \"cni_config\": {\n\
+          \        \"calico_config\": {\n            \"ip_pool_configs\": [\n                {\n                    \"cidr\"\
+          : \"172.20.0.0/16\"\n                }\n            ]\n        },\n        \"flannel_config\": {},\n        \"node_cidr_mask_size\"\
+          : 0,\n        \"pod_ipv4_cidr\": \"string\",\n        \"service_ipv4_cidr\": \"string\"\n    },\n    \"disable_http_proxy_import\"\
+          : true,\n    \"disable_monitoring\": true,\n    \"etcd_config\": {\n        \"node_pools\": [\n            {\n \
+          \               \"ahv_config\": {\n                    \"cpu\": 2,\n                    \"disk_mib\": 40960,\n \
+          \                   \"iscsi_network_name\": \"string\",\n                    \"iscsi_network_uuid\": \"string\"\
+          ,\n                    \"memory_mib\": 8192,\n                    \"network_name\": \"string\",\n              \
+          \      \"network_uuid\": \"string\",\n                    \"prism_element_cluster_uuid\": \"string\"\n         \
+          \       },\n                \"gpu_config_list\": [\n                    {\n                        \"count\": 1,\n\
+          \                        \"name\": \"string\"\n                    }\n                ],\n                \"labels\"\
+          : {\n                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n           \
+          \     },\n                \"name\": \"etcd-node-pool\",\n                \"node_os_version\": \"string\",\n    \
+          \            \"num_instances\": 0\n            }\n        ]\n    },\n    \"is_management\": true,\n    \"masters_config\"\
+          : {\n        \"active_passive_config\": {\n            \"external_ipv4_address\": \"string\"\n        },\n     \
+          \   \"external_lb_config\": {\n            \"external_ipv4_address\": \"string\",\n            \"master_nodes_config\"\
+          : [\n                {\n                    \"ipv4_address\": \"string\",\n                    \"node_pool_name\"\
+          : \"string\"\n                }\n            ]\n        },\n        \"node_pools\": [\n            {\n         \
+          \       \"ahv_config\": {\n                    \"cpu\": 2,\n                    \"disk_mib\": 40960,\n         \
+          \           \"iscsi_network_name\": \"string\",\n                    \"iscsi_network_uuid\": \"string\",\n     \
+          \               \"memory_mib\": 8192,\n                    \"network_name\": \"string\",\n                    \"\
+          network_uuid\": \"string\",\n                    \"prism_element_cluster_uuid\": \"string\"\n                },\n\
+          \                \"gpu_config_list\": [\n                    {\n                        \"count\": 1,\n        \
+          \                \"name\": \"string\"\n                    }\n                ],\n                \"labels\": {\n\
+          \                    \"property1\": \"string\",\n                    \"property2\": \"string\"\n               \
+          \ },\n                \"name\": \"etcd-node-pool\",\n                \"node_os_version\": \"string\",\n        \
+          \        \"num_instances\": 0\n            }\n        ],\n        \"single_master_config\": {}\n    },\n    \"metadata\"\
+          : {\n        \"api_version\": \"v1.0.0\"\n    },\n    \"name\": \"prod-cluster\",\n    \"project\": \"string\",\n\
+          \    \"storage_class_config\": {\n        \"default_storage_class\": true,\n        \"name\": \"string\",\n    \
+          \    \"reclaim_policy\": \"string\",\n        \"volumes_config\": {\n            \"data_service_endpoint\": \"10.1.2.3:3260\"\
+          ,\n            \"file_system\": \"ext4\",\n            \"flash_mode\": true,\n            \"password\": \"string\"\
+          ,\n            \"prism_element_cluster_uuid\": \"string\",\n            \"storage_container\": \"string\",\n   \
+          \         \"username\": \"string\"\n        }\n    },\n    \"version\": \"1.16.8-1\",\n    \"workers_config\": {\n\
+          \        \"node_pools\": [\n            {\n                \"ahv_config\": {\n                    \"cpu\": 2,\n\
+          \                    \"disk_mib\": 40960,\n                    \"iscsi_network_name\": \"string\",\n           \
+          \         \"iscsi_network_uuid\": \"string\",\n                    \"memory_mib\": 8192,\n                    \"\
+          network_name\": \"string\",\n                    \"network_uuid\": \"string\",\n                    \"prism_element_cluster_uuid\"\
+          : \"string\"\n                },\n                \"gpu_config_list\": [\n                    {\n              \
+          \          \"count\": 1,\n                        \"name\": \"string\"\n                    }\n                ],\n\
+          \                \"labels\": {\n                    \"property1\": \"string\",\n                    \"property2\"\
+          : \"string\"\n                },\n                \"name\": \"etcd-node-pool\",\n                \"node_os_version\"\
+          : \"string\",\n                \"num_instances\": 0\n            }\n        ]\n    }\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"/karbon/v1/k8s/clusters\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"\
+          utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1/k8s/clusters\"\n\t\n\tpayload :=  strings.NewReader(`{\"apiserver_sni\"\
+          : [\"my.cluster.net\"], \"categories\": [{\"key\": \"string\", \"value\": \"string\"}], \"clusterapi_enabled\":\
+          \ true, \"cni_config\": {\"calico_config\": {\"ip_pool_configs\": [{\"cidr\": \"172.20.0.0/16\"}]}, \"flannel_config\"\
+          : {}, \"node_cidr_mask_size\": 0, \"pod_ipv4_cidr\": \"string\", \"service_ipv4_cidr\": \"string\"}, \"disable_http_proxy_import\"\
+          : true, \"disable_monitoring\": true, \"etcd_config\": {\"node_pools\": [{\"ahv_config\": {\"cpu\": 2, \"disk_mib\"\
+          : 40960, \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\": \"string\", \"memory_mib\": 8192, \"network_name\"\
+          : \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\": \"string\"}, \"gpu_config_list\": [{\"\
+          count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\", \"property2\": \"string\"}, \"name\"\
+          : \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\": 0}]}, \"is_management\": true, \"masters_config\"\
+          : {\"active_passive_config\": {\"external_ipv4_address\": \"string\"}, \"external_lb_config\": {\"external_ipv4_address\"\
+          : \"string\", \"master_nodes_config\": [{\"ipv4_address\": \"string\", \"node_pool_name\": \"string\"}]}, \"node_pools\"\
+          : [{\"ahv_config\": {\"cpu\": 2, \"disk_mib\": 40960, \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\"\
+          : \"string\", \"memory_mib\": 8192, \"network_name\": \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\"\
+          : \"string\"}, \"gpu_config_list\": [{\"count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\"\
+          , \"property2\": \"string\"}, \"name\": \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\":\
+          \ 0}], \"single_master_config\": {}}, \"metadata\": {\"api_version\": \"v1.0.0\"}, \"name\": \"prod-cluster\", \"\
+          project\": \"string\", \"storage_class_config\": {\"default_storage_class\": true, \"name\": \"string\", \"reclaim_policy\"\
+          : \"string\", \"volumes_config\": {\"data_service_endpoint\": \"10.1.2.3:3260\", \"file_system\": \"ext4\", \"flash_mode\"\
+          : true, \"password\": \"string\", \"prism_element_cluster_uuid\": \"string\", \"storage_container\": \"string\"\
+          , \"username\": \"string\"}}, \"version\": \"1.16.8-1\", \"workers_config\": {\"node_pools\": [{\"ahv_config\":\
+          \ {\"cpu\": 2, \"disk_mib\": 40960, \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\": \"string\", \"memory_mib\"\
+          : 8192, \"network_name\": \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\": \"string\"},\
+          \ \"gpu_config_list\": [{\"count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\", \"property2\"\
+          : \"string\"}, \"name\": \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\": 0}]}}`)\n\treq,\
+          \ err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1/k8s/clusters\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"apiserver_sni\\\": [\\\"my.cluster.net\\\"], \\\"categories\\\": [{\\\"key\\\": \\\"string\\\", \\\"value\\\
+          \": \\\"string\\\"}], \\\"clusterapi_enabled\\\": true, \\\"cni_config\\\": {\\\"calico_config\\\": {\\\"ip_pool_configs\\\
+          \": [{\\\"cidr\\\": \\\"172.20.0.0/16\\\"}]}, \\\"flannel_config\\\": {}, \\\"node_cidr_mask_size\\\": 0, \\\"pod_ipv4_cidr\\\
+          \": \\\"string\\\", \\\"service_ipv4_cidr\\\": \\\"string\\\"}, \\\"disable_http_proxy_import\\\": true, \\\"disable_monitoring\\\
+          \": true, \\\"etcd_config\\\": {\\\"node_pools\\\": [{\\\"ahv_config\\\": {\\\"cpu\\\": 2, \\\"disk_mib\\\": 40960,\
+          \ \\\"iscsi_network_name\\\": \\\"string\\\", \\\"iscsi_network_uuid\\\": \\\"string\\\", \\\"memory_mib\\\": 8192,\
+          \ \\\"network_name\\\": \\\"string\\\", \\\"network_uuid\\\": \\\"string\\\", \\\"prism_element_cluster_uuid\\\"\
+          : \\\"string\\\"}, \\\"gpu_config_list\\\": [{\\\"count\\\": 1, \\\"name\\\": \\\"string\\\"}], \\\"labels\\\":\
+          \ {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"name\\\": \\\"etcd-node-pool\\\",\
+          \ \\\"node_os_version\\\": \\\"string\\\", \\\"num_instances\\\": 0}]}, \\\"is_management\\\": true, \\\"masters_config\\\
+          \": {\\\"active_passive_config\\\": {\\\"external_ipv4_address\\\": \\\"string\\\"}, \\\"external_lb_config\\\"\
+          : {\\\"external_ipv4_address\\\": \\\"string\\\", \\\"master_nodes_config\\\": [{\\\"ipv4_address\\\": \\\"string\\\
+          \", \\\"node_pool_name\\\": \\\"string\\\"}]}, \\\"node_pools\\\": [{\\\"ahv_config\\\": {\\\"cpu\\\": 2, \\\"disk_mib\\\
+          \": 40960, \\\"iscsi_network_name\\\": \\\"string\\\", \\\"iscsi_network_uuid\\\": \\\"string\\\", \\\"memory_mib\\\
+          \": 8192, \\\"network_name\\\": \\\"string\\\", \\\"network_uuid\\\": \\\"string\\\", \\\"prism_element_cluster_uuid\\\
+          \": \\\"string\\\"}, \\\"gpu_config_list\\\": [{\\\"count\\\": 1, \\\"name\\\": \\\"string\\\"}], \\\"labels\\\"\
+          : {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"name\\\": \\\"etcd-node-pool\\\",\
+          \ \\\"node_os_version\\\": \\\"string\\\", \\\"num_instances\\\": 0}], \\\"single_master_config\\\": {}}, \\\"metadata\\\
+          \": {\\\"api_version\\\": \\\"v1.0.0\\\"}, \\\"name\\\": \\\"prod-cluster\\\", \\\"project\\\": \\\"string\\\",\
+          \ \\\"storage_class_config\\\": {\\\"default_storage_class\\\": true, \\\"name\\\": \\\"string\\\", \\\"reclaim_policy\\\
+          \": \\\"string\\\", \\\"volumes_config\\\": {\\\"data_service_endpoint\\\": \\\"10.1.2.3:3260\\\", \\\"file_system\\\
+          \": \\\"ext4\\\", \\\"flash_mode\\\": true, \\\"password\\\": \\\"string\\\", \\\"prism_element_cluster_uuid\\\"\
+          : \\\"string\\\", \\\"storage_container\\\": \\\"string\\\", \\\"username\\\": \\\"string\\\"}}, \\\"version\\\"\
+          : \\\"1.16.8-1\\\", \\\"workers_config\\\": {\\\"node_pools\\\": [{\\\"ahv_config\\\": {\\\"cpu\\\": 2, \\\"disk_mib\\\
+          \": 40960, \\\"iscsi_network_name\\\": \\\"string\\\", \\\"iscsi_network_uuid\\\": \\\"string\\\", \\\"memory_mib\\\
+          \": 8192, \\\"network_name\\\": \\\"string\\\", \\\"network_uuid\\\": \\\"string\\\", \\\"prism_element_cluster_uuid\\\
+          \": \\\"string\\\"}, \\\"gpu_config_list\\\": [{\\\"count\\\": 1, \\\"name\\\": \\\"string\\\"}], \\\"labels\\\"\
+          : {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}, \\\"name\\\": \\\"etcd-node-pool\\\",\
+          \ \\\"node_os_version\\\": \\\"string\\\", \\\"num_instances\\\": 0}]}}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1/k8s/clusters';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"apiserver_sni\": [\"my.cluster.net\"\
+          ], \"categories\": [{\"key\": \"string\", \"value\": \"string\"}], \"clusterapi_enabled\": true, \"cni_config\"\
+          : {\"calico_config\": {\"ip_pool_configs\": [{\"cidr\": \"172.20.0.0/16\"}]}, \"flannel_config\": {}, \"node_cidr_mask_size\"\
+          : 0, \"pod_ipv4_cidr\": \"string\", \"service_ipv4_cidr\": \"string\"}, \"disable_http_proxy_import\": true, \"\
+          disable_monitoring\": true, \"etcd_config\": {\"node_pools\": [{\"ahv_config\": {\"cpu\": 2, \"disk_mib\": 40960,\
+          \ \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\": \"string\", \"memory_mib\": 8192, \"network_name\"\
+          : \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\": \"string\"}, \"gpu_config_list\": [{\"\
+          count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\", \"property2\": \"string\"}, \"name\"\
+          : \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\": 0}]}, \"is_management\": true, \"masters_config\"\
+          : {\"active_passive_config\": {\"external_ipv4_address\": \"string\"}, \"external_lb_config\": {\"external_ipv4_address\"\
+          : \"string\", \"master_nodes_config\": [{\"ipv4_address\": \"string\", \"node_pool_name\": \"string\"}]}, \"node_pools\"\
+          : [{\"ahv_config\": {\"cpu\": 2, \"disk_mib\": 40960, \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\"\
+          : \"string\", \"memory_mib\": 8192, \"network_name\": \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\"\
+          : \"string\"}, \"gpu_config_list\": [{\"count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\"\
+          , \"property2\": \"string\"}, \"name\": \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\":\
+          \ 0}], \"single_master_config\": {}}, \"metadata\": {\"api_version\": \"v1.0.0\"}, \"name\": \"prod-cluster\", \"\
+          project\": \"string\", \"storage_class_config\": {\"default_storage_class\": true, \"name\": \"string\", \"reclaim_policy\"\
+          : \"string\", \"volumes_config\": {\"data_service_endpoint\": \"10.1.2.3:3260\", \"file_system\": \"ext4\", \"flash_mode\"\
+          : true, \"password\": \"string\", \"prism_element_cluster_uuid\": \"string\", \"storage_container\": \"string\"\
+          , \"username\": \"string\"}}, \"version\": \"1.16.8-1\", \"workers_config\": {\"node_pools\": [{\"ahv_config\":\
+          \ {\"cpu\": 2, \"disk_mib\": 40960, \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\": \"string\", \"memory_mib\"\
+          : 8192, \"network_name\": \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\": \"string\"},\
+          \ \"gpu_config_list\": [{\"count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\", \"property2\"\
+          : \"string\"}, \"name\": \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\": 0}]}}`\n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+  /karbon/v1/k8s/clusters/{name}:
+    get:
+      description: "Get the Kubernetes cluster details, which includes worker, etcd, and master configuration details.\n\n\
+        \ **API format**- https://server.nutanix.com:9440/karbon/v1/k8s/clusters/cluster01."
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Get the Kubernetes cluster details
+      operationId: GetK8sClusterName
+      parameters:
+      - description: The Kubernetes cluster name.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Get request for the Kubernetes cluster is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster'
+        '400':
+          description: Invalid Kubernetes cluster name specified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1/k8s/clusters/{name} \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1/k8s/clusters/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}';\nconst options = {\n  method: 'GET',\n\
+          \  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response =\
+          \ await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n \
+          \ console.error(error);\n}"
+    delete:
+      description: Delete the Kubernetes cluster.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Delete the Kubernetes cluster
+      operationId: DeleteK8sClusterName
+      parameters:
+      - description: The Kubernetes cluster name.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Determines whether NKE allows cluster deletion during cluster deployment.
+        name: skip-prechecks
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '202':
+          description: Delete operation for the Kubernetes cluster is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_delete_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '412':
+          description: The operation failed due to the current state of the Kubernetes cluster.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev/karbon/v1/k8s/clusters/{name} \\\n    --header\
+          \ 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/karbon/v1/k8s/clusters/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url,\
+          \ nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err\
+          \ := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\
+          \t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1/k8s/clusters/{name}';\nconst options = {\n  method: 'DELETE',\n\
+          \  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response =\
+          \ await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n \
+          \ console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_flannel_config:
+      description: Configuration of the Flannel CNI provider.
+      type: object
+    v1.1.0_workers:
+      description: Worker configuration information.
+      type: object
+      properties:
+        node_pools:
+          description: Names of the worker node pools.
+          type: array
+          items:
+            type: string
+    v1.1.0_storage_class_volumes_config:
+      type: object
+      required:
+      - storage_container
+      properties:
+        data_service_endpoint:
+          description: Data service endpoint for iSCSI data traffic.
+          type: string
+        file_system:
+          description: NKE uses either the ext4 or XFS file system on the volume disk.
+          type: string
+          enum:
+          - ext4
+          - xfs
+        flash_mode:
+          type: boolean
+        password:
+          description: Password of the Prism Element user that the API calls use to provision volumes.
+          type: string
+          minLength: 1
+        prism_element_cluster_uuid:
+          description: The UUID of the Prism Element cluster.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        storage_container:
+          description: The name that the storage container uses to provision volumes.
+          type: string
+          minLength: 1
+        username:
+          description: The username of the Prism Element user that the API calls use to provision volumes.
+          type: string
+          minLength: 1
+    v1.1.0_k8s_cluster_delete_response:
+      type: object
+      required:
+      - task_uuid
+      properties:
+        cluster_name:
+          description: The name of the Kubernetes cluster that is deleted.
+          type: string
+        cluster_uuid:
+          description: The UUID of the Kubernetes cluster that is deleted.
+          type: string
+        task_uuid:
+          description: The UUID of the task tracking the Kubernetes cluster deletion.
+          type: string
+    v1.1.0_categories:
+      description: 'Prism categories associated with the NKE cluster. (Note: categories must be pre-created)'
+      type: array
+      items:
+        $ref: '#/components/schemas/v1.1.0_category'
+    v1.1.0_ip_pool:
+      description: List of IP pools configured or managed by Calico.
+      type: object
+      properties:
+        cidr:
+          description: IP range used by this pool.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}(\/([0-9]|[1-2][0-9]|3[0-2]))+$
+    v1.1.0_ip_pool_config:
+      description: List of IP pools to be configured or managed by Calico.
+      type: object
+      required:
+      - cidr
+      properties:
+        cidr:
+          description: IP range to use for this pool. The IP range must be within the pod CIDR ranges.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}(\/([0-9]|[1-2][0-9]|3[0-2]))+$
+    v1.1.0_metadata:
+      type: object
+      required:
+      - api_version
+      properties:
+        api_version:
+          description: NKE API version.
+          type: string
+          pattern: ^v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+    v1.1.0_single_master_config:
+      description: Configuration of a single master node.
+      type: object
+    v1.1.0_masters:
+      description: Configuration of master nodes.
+      type: object
+      required:
+      - deployment_type
+      - node_pools
+      properties:
+        deployment_type:
+          description: Deployment type of the master nodes.
+          type: string
+        node_pools:
+          description: Names of node pools used for master nodes.
+          type: array
+          items:
+            type: string
+    v1.1.0_node_pool_config:
+      type: object
+      required:
+      - name
+      properties:
+        ahv_config:
+          $ref: '#/components/schemas/v1.1.0_ahv_config'
+        gpu_config_list:
+          description: List of GPU configurations that can be assigned to the nodes of the node pool.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_gpu_config'
+        labels:
+          description: Map of user-provided labels for the nodes in the node pool.
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 63
+            pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
+        name:
+          description: Unique name of the node pool.
+          type: string
+          maxLength: 128
+          minLength: 1
+          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+        node_os_version:
+          description: The version of the node OS image.
+          type: string
+        num_instances:
+          description: Number of nodes in the node pool.
+          type: integer
+    v1.1.0_active_passive_config:
+      description: The active passive mode uses the Virtual Router Redundancy Protocol (VRRP) to provide high availability
+        of the master.
+      type: object
+      required:
+      - external_ipv4_address
+      properties:
+        external_ipv4_address:
+          description: External IPV4 address is used to access the master node in multi-master deployments.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$
+    v1.1.0_calico_config:
+      description: Configuration of the Calico CNI provider.
+      type: object
+      properties:
+        ip_pool_configs:
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_ip_pool_config'
+    v1.1.0_cni:
+      description: The CNI information.
+      type: object
+      properties:
+        calico_config:
+          $ref: '#/components/schemas/v1.1.0_calico'
+        cilium_config:
+          $ref: '#/components/schemas/v1.1.0_cilium'
+        flannel_config:
+          $ref: '#/components/schemas/v1.1.0_flannel'
+        node_cidr_mask_size:
+          description: The size of the subnet from the pod_ipv4_cidr assigned to each host. A value of 24 allows up to 255
+            pods per node.
+          type: integer
+        pod_ipv4_cidr:
+          description: CIDR for pods in the cluster.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}(\/([0-9]|[1-2][0-9]|3[0-2]))+$
+        service_ipv4_cidr:
+          description: Classless Inter-Domain Routing (CIDR) for Kubernetes services in the cluster.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}(\/([0-9]|[1-2][0-9]|3[0-2]))+$
+    v1.1.0_k8s_cluster_config:
+      type: object
+      required:
+      - metadata
+      - name
+      - version
+      - masters_config
+      - etcd_config
+      - workers_config
+      - storage_class_config
+      - cni_config
+      properties:
+        apiserver_sni:
+          description: List of hostnames or IP addresses. SNI can be used to provide additional hostnames or IP addresses
+            for the API Server certificate.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_hostnames'
+        categories:
+          $ref: '#/components/schemas/v1.1.0_categories'
+        clusterapi_enabled:
+          description: 'Deploy k8s cluster using cluster api. Default: false'
+          type: boolean
+        cni_config:
+          $ref: '#/components/schemas/v1.1.0_cni_config'
+        disable_http_proxy_import:
+          description: 'Set to ''true'' to disable import of http proxy settings from the platform(PE). Default: ''false''.'
+          type: boolean
+        disable_monitoring:
+          description: 'Set to ''true'' to disable deployment of monitoring stack(prometheus). Default: false.'
+          type: boolean
+        etcd_config:
+          $ref: '#/components/schemas/v1.1.0_etcd_config'
+        is_management:
+          description: 'Determines whether the Kubernetes cluster is management cluster or not. Default: false.'
+          type: boolean
+        masters_config:
+          $ref: '#/components/schemas/v1.1.0_masters_config'
+        metadata:
+          $ref: '#/components/schemas/v1.1.0_metadata'
+        name:
+          description: Unique name of the Kubernetes cluster.
+          type: string
+          maxLength: 40
+          minLength: 1
+          pattern: '[a-z0-9]([-a-z0-9]*[a-z0-9])?'
+        project:
+          description: Project(name or uuid) associated with an NKE cluster
+          type: string
+        storage_class_config:
+          $ref: '#/components/schemas/v1.1.0_storage_class_config'
+        version:
+          description: Kubernetes version of the cluster.
+          type: string
+          pattern: ^v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        workers_config:
+          $ref: '#/components/schemas/v1.1.0_workers_config'
+    v1.1.0_category:
+      type: object
+      required:
+      - key
+      properties:
+        key:
+          description: The key associated with the category.
+          type: string
+        value:
+          description: The value linked to the category key.
+          type: string
+    v1.1.0_workers_config:
+      description: Configuration of the worker nodes.
+      type: object
+      required:
+      - node_pools
+      properties:
+        node_pools:
+          description: Configuration of the node pools that the workers belong to. The worker nodes require a minimum of 8,192
+            MiB memory and 122,880 MiB disk space.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_node_pool_config'
+    v1.1.0_k8s_cluster_create_response:
+      type: object
+      required:
+      - task_uuid
+      - cluster_name
+      - cluster_uuid
+      properties:
+        cluster_name:
+          type: string
+        cluster_uuid:
+          type: string
+        task_uuid:
+          type: string
+    v1.1.0_calico:
+      description: Configuration of the Calico Container Network Interface (CNI) provider.
+      type: object
+      properties:
+        ip_pool_configs:
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_ip_pool'
+    v1.1.0_master_node_config:
+      type: object
+      required:
+      - ipv4_address
+      - node_pool_name
+      properties:
+        ipv4_address:
+          description: The IPV4 address to assign to the master.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$
+        node_pool_name:
+          description: The name of the node pool in which the master IPV4 address will be used.
+          type: string
+          minLength: 1
+    v1.1.0_hostnames:
+      description: Host name or IP address.
+      type: string
+      pattern: ^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$
+    v1.1.0_cni_config:
+      description: Kubernetes cluster networking configuration. The Flannel or the Calico configuration must be provided.
+      type: object
+      properties:
+        calico_config:
+          $ref: '#/components/schemas/v1.1.0_calico_config'
+        flannel_config:
+          $ref: '#/components/schemas/v1.1.0_flannel_config'
+        node_cidr_mask_size:
+          description: The size of the subnet from the pod_ipv4_cidr assigned to each host. A value of 24 would allow up to
+            255 pods per node.
+          type: integer
+        pod_ipv4_cidr:
+          description: CIDR for pods in the cluster.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}(\/([0-9]|[1-2][0-9]|3[0-2]))+$
+        service_ipv4_cidr:
+          description: Classless Inter-Domain Routing (CIDR) for Kubernetes services in the cluster.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}(\/([0-9]|[1-2][0-9]|3[0-2]))+$
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_storage_class_config:
+      type: object
+      required:
+      - name
+      properties:
+        default_storage_class:
+          description: Kubernetes uses the default storage class when the Persistent Volume Claim (PVC) create request does
+            not specify a storage class to use for the new Persistent Volume (PV).
+          type: boolean
+        name:
+          description: The name of the storage class.
+          type: string
+          minLength: 1
+          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+        reclaim_policy:
+          description: Reclaim policy for persistent volumes provisioned using the specified storage class.
+          type: string
+        volumes_config:
+          $ref: '#/components/schemas/v1.1.0_storage_class_volumes_config'
+    v1.1.0_gpu_config:
+      type: object
+      required:
+      - name
+      properties:
+        count:
+          description: Count of assignable GPUs to be added to each node.
+          type: integer
+          minimum: 1
+        name:
+          description: The name of the GPU, such as Quadro RTX 6000/8000, Nvidia A100, Tesla P100.
+          type: string
+    v1.1.0_k8s_cluster:
+      description: Kubernetes cluster details.
+      type: object
+      required:
+      - name
+      - version
+      - kubeapi_server_ipv4_address
+      - master_config
+      - etcd_config
+      properties:
+        categories:
+          $ref: '#/components/schemas/v1.1.0_categories'
+        clusterapi_enabled:
+          description: 'Deploy k8s cluster using cluster api. Default: false'
+          type: boolean
+        cni_config:
+          $ref: '#/components/schemas/v1.1.0_cni'
+        disable_http_proxy_import:
+          description: 'Set to ''true'' to disable import of http proxy settings from the platform(PE). Default: ''false''.'
+          type: boolean
+        disable_monitoring:
+          description: 'Set to ''true'' to disable deployment of monitoring stack(prometheus). Default: false.'
+          type: boolean
+        etcd_config:
+          $ref: '#/components/schemas/v1.1.0_etcd'
+        is_management:
+          description: 'Determines whether the Kubernetes cluster is management cluster or not. Default: false.'
+          type: boolean
+        kubeapi_server_ipv4_address:
+          description: IPV4 address of the API server.
+          type: string
+          pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+        master_config:
+          $ref: '#/components/schemas/v1.1.0_masters'
+        name:
+          description: The Kubernetes cluster name.
+          type: string
+          maxLength: 40
+          minLength: 1
+        project:
+          description: Project(name or uuid) associated with an NKE cluster
+          type: string
+        status:
+          description: Kubernetes cluster status.
+          type: string
+        uuid:
+          description: The UUID of the Kubernetes cluster.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        version:
+          description: Kubernetes version of the cluster.
+          type: string
+          minLength: 3
+          pattern: ^v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        worker_config:
+          $ref: '#/components/schemas/v1.1.0_workers'
+    v1.1.0_flannel:
+      description: Configuration of the Flannel CNI provider.
+      type: object
+    v1.1.0_ahv_config:
+      type: object
+      required:
+      - cpu
+      - memory_mib
+      - disk_mib
+      properties:
+        cpu:
+          description: The number of VCPUs allocated for each VM on the PE cluster.
+          type: integer
+          minimum: 1
+        disk_mib:
+          description: Size of the local storage for each VM on the PE cluster in MiB.
+          type: integer
+          minimum: 40960
+        iscsi_network_name:
+          description: VM network name for isolating iSCSI data traffic.
+          type: string
+          maxLength: 256
+        iscsi_network_uuid:
+          description: VM network UUID for isolating iSCSI data traffic.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        memory_mib:
+          description: Memory allocated for each VM on the PE cluster in MiB.
+          type: integer
+          minimum: 4096
+        network_name:
+          description: The network name for the VMs deployed with this resource configuration.
+          type: string
+          maxLength: 256
+        network_uuid:
+          description: The UUID of the network for the VMs deployed with this resource configuration.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        prism_element_cluster_uuid:
+          description: The UUID of the Prism Element cluster used to deploy VMs for this node pool.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+    v1.1.0_etcd_config:
+      description: Configuration of the etcd cluster.
+      type: object
+      required:
+      - node_pools
+      properties:
+        node_pools:
+          description: Configuration of the node pools that the nodes in the etcd cluster belong to. The etcd nodes require
+            a minimum of 8,192 MiB memory and 409,60 MiB disk space.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_node_pool_config'
+    v1.1.0_masters_config:
+      description: 'Configuration of the master nodes. Provide one of the following configurations: single master, active-passive
+        or the external load-balancer.'
+      type: object
+      required:
+      - node_pools
+      properties:
+        active_passive_config:
+          $ref: '#/components/schemas/v1.1.0_active_passive_config'
+        external_lb_config:
+          $ref: '#/components/schemas/v1.1.0_external_lb_config'
+        node_pools:
+          description: Configuration of the node pools that the master nodes belongs to. The master nodes require a minimum
+            of 4,096 MiB memory and 122,880 MiB disk space.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_node_pool_config'
+        single_master_config:
+          $ref: '#/components/schemas/v1.1.0_single_master_config'
+    v1.1.0_etcd:
+      description: Etcd configuration information.
+      type: object
+      required:
+      - node_pools
+      properties:
+        node_pools:
+          description: The names of node pools used for etcd nodes.
+          type: array
+          items:
+            type: string
+    v1.1.0_external_lb_config:
+      description: The external load balancer configuration in case of a multi-master external load balancer type master deployment.
+      type: object
+      required:
+      - external_ipv4_address
+      - master_nodes_config
+      properties:
+        external_ipv4_address:
+          description: The external load balancer IPV4 address.
+          type: string
+          pattern: ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$
+        master_nodes_config:
+          description: The configuration of the master nodes.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_master_node_config'
+    v1.1.0_cilium:
+      description: Configuration of the Cilium CNI provider.
+      type: object

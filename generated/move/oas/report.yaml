@@ -1,0 +1,830 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/plans/reports:
+    post:
+      description: Lists details of the migration plan selected for generating the report. - The API retrieves the following
+        information for each migration plan. - $ref "#/definitions/PlanReportEntities"
+      operationId: getReports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                properties:
+                  IterationCount:
+                    description: Indicates the number of iterations in a report based on the user input.
+                    type: integer
+                  MigplanUUID:
+                    description: UUID of the migration plan.
+                    type: string
+                  ShareUUIDs:
+                    description: UUID of the shares.
+                    items:
+                      type: string
+                    type: array
+                  ShowAllIterations:
+                    description: Indicates all the iterations.
+                    type: boolean
+                  ShowAllShares:
+                    description: Indicates all the shares.
+                    type: boolean
+                type: object
+              type: array
+        description: Get the migration plan and share details based on the respective UUIDs.
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PlanReportEntities'
+      security:
+      - Bearer: []
+      summary: List details of the migration plan selected for generating the report
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/plans/reports \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/plans/reports"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Bearer <your_access_token>\"\n}\n\npayload =  \"\"\"{}\"\"\"\n\nconn.request(\"POST\",\"//move/v2/plans/reports\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/reports\"\n\t \n\treq, err := http.NewRequest(\"POST\", url, nil)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Bearer <your_access_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/plans/reports\"\
+          )\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/reports';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Authorization': 'Bearer <your_access_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    MigrationPlanProviderInfo:
+      description: Migration plan provider information
+      properties:
+        AWSProviderAttrs:
+          $ref: '#/components/schemas/AWSProviderAttrs'
+        AzureProviderAttrs:
+          $ref: '#/components/schemas/AzureProviderAttrs'
+        Cluster:
+          $ref: '#/components/schemas/MigrationPlanProviderInfo'
+        Name:
+          description: Provider Name.
+          type: string
+        Type:
+          description: Provider type.
+          type: string
+        UUID:
+          description: UUID of the provider.
+          format: uuid
+          type: string
+      type: object
+    SpStateCounts:
+      properties:
+        Completed:
+          description: Count of Security Policies in completed state.
+          format: int64
+          type: integer
+        CompletedWithErrors:
+          description: Count of Security Policies in post migration operations failed state.
+          format: int64
+          type: integer
+        Discarded:
+          description: Count of Security Policies in discarded state.
+          format: int64
+          type: integer
+        Failed:
+          description: Count of Security Policies in failed state.
+          format: int64
+          type: integer
+        Warning:
+          description: Count of Security Policies containing warnings.
+          format: int64
+          type: integer
+      type: object
+    EntityPausedStatus:
+      description: Returns information about paused entities.
+      properties:
+        PausedTime:
+          description: Time of pausing migration (in milliseconds).
+          format: int64
+          type: integer
+        State:
+          description: State of migration before getting paused.
+          format: int64
+          type: integer
+      type: object
+    ScanData:
+      properties:
+        CompletedAt:
+          description: Unix timestamp indicating when the scanning process was completed.
+          format: int64
+          type: integer
+        ScanningError:
+          description: Any error message encountered during the scanning process.
+          type: string
+        ScanningPercentage:
+          description: The percentage of completion for the scanning process.
+          format: int32
+          maximum: 100
+          minimum: 0
+          type: integer
+        ScanningStatus:
+          description: The current status of the scanning process, for example, "StatusInProgress", "StatusCompleted", and
+            so on.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+        StartedAt:
+          description: Unix timestamp indicating when the scanning process started.
+          format: int64
+          type: integer
+        TotalBytes:
+          description: The total size of scanned files in bytes.
+          format: int64
+          type: integer
+        TotalDirs:
+          description: The total number of directories scanned.
+          format: int32
+          type: integer
+        TotalFiles:
+          description: The total number of files scanned.
+          format: int32
+          type: integer
+      type: object
+    IterationStatus:
+      description: Iteration status.
+      properties:
+        BytesPerSec:
+          description: Bytes copied per second.
+          format: uint64
+          type: integer
+        CopiedDataSizeInBytes:
+          description: Size of copied data in bytes.
+          format: uint64
+          type: integer
+        CopiedDirectories:
+          description: Number of directories copied.
+          format: uint64
+          type: integer
+        CopiedFiles:
+          description: Number of files copied.
+          format: uint64
+          type: integer
+        ElapsedTime:
+          $ref: '#/components/schemas/ElapsedTime'
+        EndTime:
+          description: End time of an iteration (in Unix time unit of nanoseconds).
+          format: int64
+          type: integer
+        ErrorMessage:
+          description: Error message.
+          type: string
+        EstimatedTimeToCompleteInSecs:
+          description: Time to complete iteration in seconds.
+          format: int64
+          type: integer
+        FailedDirectories:
+          description: Number of directories that could not be migrated.
+          format: uint64
+          type: integer
+        FailedFiles:
+          description: Number of files that could not be migrated.
+          format: uint64
+          type: integer
+        FilesScannedPerSec:
+          description: Files scanned per second.
+          format: uint64
+          type: integer
+        IterationNumber:
+          description: Iteration number.
+          format: int64
+          type: integer
+        IterationType:
+          description: Defines the type of iteration.
+          format: int
+          type: integer
+        NodeJobStatusInfo:
+          description: Status of jobs for iteration on nodes.
+          items:
+            $ref: '#/components/schemas/NodeJobStatusInfo'
+          type: array
+        ProgressPercentage:
+          description: The completion status of the iterations in percentage.
+          format: float64
+          type: number
+        ScannedFiles:
+          description: Number of files scanned per second.
+          format: uint64
+          type: integer
+        ScanningPercentage:
+          description: The progress of the scanning process in percentage.
+          format: float64
+          type: number
+        SkippedFiles:
+          description: Number of files skipped.
+          format: uint64
+          type: integer
+        SourcePath:
+          description: Source path.
+          type: string
+        StartTime:
+          description: Start time of an iteration (in Unix time unit of nanoseconds).
+          format: int64
+          type: integer
+        State:
+          description: Files state.
+          format: int64
+          type: integer
+        Status:
+          description: Files status.
+          format: int64
+          type: integer
+        StatusMessage:
+          description: Status message of iteration.
+          type: string
+        TargetPath:
+          description: Target path.
+          type: string
+        WarningMessage:
+          description: Warning message.
+          type: string
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    VMStateCounts:
+      properties:
+        Cancelled:
+          description: Number of VMs in canceled state.
+          format: int64
+          type: integer
+        Completed:
+          description: Number of VMs in cutover completed state.
+          format: int64
+          type: integer
+        CompletedWithErrors:
+          description: Number of VMs in post migration operations failed state.
+          format: int64
+          type: integer
+        CutoverInProgress:
+          description: Number of VMs in cutover in progress state.
+          format: int64
+          type: integer
+        DataSeeding:
+          description: Number of VMs in data seeding state.
+          format: int64
+          type: integer
+        Discarded:
+          description: Number of VMs in discarded state.
+          format: int64
+          type: integer
+        Failed:
+          description: Number of VMs in failed state.
+          format: int64
+          type: integer
+        Paused:
+          description: Number of VMs in paused state.
+          format: int64
+          type: integer
+        PostMigration:
+          description: Number of VMs in post migration operations state.
+          format: int64
+          type: integer
+        ReadyToCutover:
+          description: Number of VMs ready for cutover.
+          format: int64
+          type: integer
+        ScheduledCutover:
+          description: Number of VMs scheduled for cutover.
+          format: int64
+          type: integer
+        TestInProgress:
+          description: Number of VMs in test migration state.
+          format: int64
+          type: integer
+        Tested:
+          description: Number of VMs tested.
+          format: int64
+          type: integer
+        Warning:
+          description: Number of VMs containing warnings.
+          format: int64
+          type: integer
+      type: object
+    SubEvents:
+      properties:
+        Description:
+          description: Sub-Event Description.
+          type: string
+        Name:
+          description: Sub-Event Name.
+          type: string
+        State:
+          description: Sub-Event State.
+          format: int64
+          type: integer
+        Status:
+          description: Sub-Event status.
+          format: int64
+          type: integer
+      type: object
+    FilesStateCounts:
+      properties:
+        Cancelled:
+          description: Count of entities in a canceled state.
+          format: int64
+          type: integer
+        Completed:
+          description: Count of entities in cutover completed state.
+          format: int64
+          type: integer
+        CutoverInProgress:
+          description: Count of entities in cutover in progress state.
+          format: int64
+          type: integer
+        DataSeeding:
+          description: Count of entities in data seeding state.
+          format: int64
+          type: integer
+        Discarded:
+          description: Count of entities in the discarded state.
+          format: int64
+          type: integer
+        Failed:
+          description: Count of entities in the failed state.
+          format: int64
+          type: integer
+        PartiallyCompleted:
+          description: Count of entities that are partially completed.
+          format: int64
+          type: integer
+        Paused:
+          description: Count of entities in a paused state.
+          format: int64
+          type: integer
+        ReadyToCutover:
+          description: Count of entities in ready to cutover state.
+          format: int64
+          type: integer
+        Uninitailised:
+          description: Count of entities in an uninitialized state.
+          format: int64
+          type: integer
+        Validated:
+          description: Count of entities that were validated.
+          format: int64
+          type: integer
+        Validating:
+          description: Count of entities that are being validated.
+          format: int64
+          type: integer
+        ValidationFailed:
+          description: Count of entities with validation failed state.
+          format: int64
+          type: integer
+      type: object
+    NodeJobStatusInfo:
+      description: Status of job on nutanix files server nodes.
+      properties:
+        status:
+          description: Nutanix files node job status.
+          type: string
+      type: object
+    AzureProviderAttrs:
+      description: Azure provider attributes.
+      properties:
+        RegionID:
+          description: Azure region ID.
+          type: string
+        ResourceGroup:
+          description: Azure resource group.
+          type: string
+      type: object
+    ValidationWarning:
+      description: Warnings during the migration plan validation.
+      properties:
+        Code:
+          description: Warning code.
+          type: integer
+        Message:
+          description: Warning message.
+          type: string
+        WarningType:
+          description: Warning type.
+          type: string
+      type: object
+    MSchedule:
+      description: Migration schedule.
+      properties:
+        RWEndTimeAtEpochSec:
+          description: Migration plan end time
+          format: int64
+          type: integer
+        RWStartTimeAtEpochSec:
+          description: Migration plan start time
+          format: int64
+          type: integer
+        ScheduleAtEpochSec:
+          description: Migration plan scheduled at time
+          format: int64
+          type: integer
+      type: object
+    PlanReportEntities:
+      description: Migration plan entities.
+      properties:
+        APIVersion:
+          type: string
+        Entities:
+          items:
+            $ref: '#/components/schemas/PlanReportEntity'
+          type: array
+        MetaData:
+          $ref: '#/components/schemas/PlanEntitiesMetaData'
+      type: object
+    FilesStatus:
+      description: Files status.
+      properties:
+        Actions:
+          description: Available actions on files subplan in the current state.
+          items:
+            type: string
+          type: array
+        BaseIterBytesCopiedPerSecond:
+          description: Bytes copied per second.
+          format: uint64
+          type: integer
+        BaseIteration:
+          $ref: '#/components/schemas/IterationStatus'
+        CopiedDataSizeInBytes:
+          description: Size of copied data in bytes.
+          format: uint64
+          type: integer
+        CopiedDirectories:
+          description: Total number of directories copied.
+          format: uint64
+          type: integer
+        CopiedFiles:
+          description: Total number of files copied.
+          format: uint64
+          type: integer
+        ElapsedTime:
+          $ref: '#/components/schemas/ElapsedTime'
+        ErrorMessage:
+          description: Error message.
+          type: string
+        FailedDirectoriesCount:
+          description: Total number of directories that could not be migrated.
+          format: uint64
+          type: integer
+        FailedFilesCount:
+          description: Total number of files that could not be migrated.
+          format: uint64
+          type: integer
+        FilesScanned:
+          description: Total number of files scanned.
+          format: uint64
+          type: integer
+        FilesSkipped:
+          description: Total number of files skipped.
+          format: uint64
+          type: integer
+        ID:
+          description: Share mapping Id.
+          type: string
+        IterationStatus:
+          description: Status of last n iterations.
+          items:
+            $ref: '#/components/schemas/IterationStatus'
+          type: array
+        LastCutoverError:
+          description: Error during last cutover.
+          type: string
+        NumIterations:
+          description: Number of iterations triggered.
+          format: uint64
+          type: integer
+        PausedStatus:
+          $ref: '#/components/schemas/EntityPausedStatus'
+        ReplicationType:
+          description: Replication of shares.
+          format: string
+          type: string
+        ScanData:
+          $ref: '#/components/schemas/ScanData'
+        SourcePath:
+          description: Source path.
+          type: string
+        SourceProtocol:
+          description: Source protocol(s) of source provider.
+          items:
+            type: string
+          type: array
+        State:
+          description: 'Files state [Uninitialized(0), Scheduled(1), DataSeeding(4), IncrementalDataSeeding(5), ReadyToCutover(6),
+            ReadyToCutoverWithFailedFiles(7),
+
+            PauseInProgress(8), Paused(9), CutoverLastSync(10), CutoverInProgress(11), Cleanup(12), Canceling(14), Canceled(15),
+            Discarded(16), Completed(17)
+
+            PartiallyCompleted(18), Failed(19), ManualSync(21), StartDataSeeding(22), ResumeInProgress(23), RetringFailedFiles(24)]
+
+            '
+          format: int64
+          type: integer
+        Status:
+          description: Files status [StatusUnknown(0), StatusInProgress(1), StatusFailed(2), StatusCompleted(3), StatusAborted(4),
+            StatusPaused(5), StatusAborting(6)]
+          format: int64
+          type: integer
+        SubEvents:
+          description: Subevents of a files subplan.
+          items:
+            $ref: '#/components/schemas/SubEvents'
+          type: array
+        TargetPath:
+          description: Target path.
+          type: string
+        TargetProtocol:
+          description: Target protocol(s) of target provider.
+          items:
+            type: string
+          type: array
+        UUID:
+          description: Share mapping UUID.
+          format: uuid
+          type: string
+        WarningMessage:
+          description: Warning message.
+          type: string
+      type: object
+    PlanEntitiesMetaData:
+      description: Plan metadata
+      properties:
+        CreationTime:
+          description: Plan creation time.
+          type: string
+        FilesStateCounts:
+          $ref: '#/components/schemas/FilesStateCounts'
+        Kind:
+          type: string
+        LastUpdateTime:
+          description: Plan last updated time.
+          type: string
+        MigratedDataInBytes:
+          description: The aggregate size of successfully migrated data, measured in bytes, for VMs and files within the listed
+            migration plans.
+          format: uint64
+          type: integer
+        Name:
+          description: Plan name
+          type: string
+        SpStateCounts:
+          $ref: '#/components/schemas/SpStateCounts'
+        SpecVersion:
+          description: Plan spec version
+          type: string
+        UUID:
+          description: Plan UUID
+          format: uuid
+          type: string
+        VMStateCounts:
+          $ref: '#/components/schemas/VMStateCounts'
+      type: object
+    AWSProviderAttrs:
+      description: AWS provider attributes.
+      properties:
+        AgentNetworkID:
+          description: AWS Move agent network.
+          type: string
+        AvailabilityZone:
+          description: AWS availability zone.
+          type: string
+        RegionID:
+          description: AWS region ID.
+          type: string
+      type: object
+    PlanReportEntity:
+      properties:
+        APIVersion:
+          description: Move API version.
+          type: string
+        MetaData:
+          $ref: '#/components/schemas/MigrationPlanReportSummary'
+        Type:
+          description: Type of workload in migration plan.
+          type: string
+      type: object
+    MigrationPlanReportSummary:
+      description: Summary of the migration plan.
+      properties:
+        Actions:
+          description: Available actions.
+          items:
+            type: string
+          type: array
+        CreatedTime:
+          description: Time of creation of the migration plan.
+          format: int64
+          type: integer
+        ElapsedTime:
+          $ref: '#/components/schemas/ElapsedTime'
+        EndTime:
+          description: Time of end of the migration plan.
+          format: int64
+          type: integer
+        ErrorReasons:
+          items:
+            description: Error message at the migration plan level.
+            type: string
+          type: array
+        FilesStateCounts:
+          $ref: '#/components/schemas/FilesStateCounts'
+        FilesStatus:
+          description: Status of individual file sub-plans that are a part of the migration plan.
+          items:
+            $ref: '#/components/schemas/FilesStatus'
+          type: array
+        MigratedDataInBytes:
+          description: Data migrated in bytes.
+          format: uint64
+          type: integer
+        Name:
+          description: Name of the migration plan.
+          type: string
+        NumEntities:
+          description: Number of entities in the migration plan.
+          format: int64
+          type: integer
+        Schedule:
+          $ref: '#/components/schemas/MSchedule'
+        SourceInfo:
+          $ref: '#/components/schemas/MigrationPlanProviderInfo'
+        StartTime:
+          description: Time of start of the migration plan.
+          format: int64
+          type: integer
+        State:
+          description: State of the migration plan.
+          format: int64
+          type: integer
+        StateString:
+          description: String representation of the state of the migration plan.
+          enum:
+          - MigrationPlanStateUninitialized
+          - MigrationPlanStateValidation
+          - MigrationPlanStateScheduled
+          - MigrationPlanStatePreparation
+          - MigrationPlanStateInProgress
+          - MigrationPlanStatePaused
+          - MigrationPlanStateCancelled
+          - MigrationPlanStateCompleted
+          - MigrationPlanStateFailed
+          - MigrationPlanStateValidationFailed
+          - MigrationPlanStateCancelling
+          - MigrationPlanStateDeleting
+          - MigrationPlanStateDeletionFailed
+          - MigrationPlanStateCreateShare
+          - MigrationPlanStateSavedAsDraft
+          - MigrationPlanStatePauseInProgress
+          - MigrationPlanStateStageValidation
+          - MigrationPlanStateStageValidationFailed
+          - MigrationPlanStateFederationInProgress
+          - MigrationPlanStateFederationCompleted
+          - MigrationPlanStateFederationFailed
+          type: string
+        Status:
+          description: Status of the migration plan.
+          format: int64
+          type: integer
+        StatusString:
+          description: Migration plan status string.
+          enum:
+          - StatusUnknown
+          - StatusInProgress
+          - StatusFailed
+          - StatusCompleted
+          - StatusCancelled
+          - StatusPaused
+          - StatusCancelling
+          - StatusQueued
+          - StatusCompletedWithErrors
+          type: string
+        TargetInfo:
+          $ref: '#/components/schemas/MigrationPlanProviderInfo'
+        UUID:
+          description: UUID of the migration plan.
+          format: uuid
+          type: string
+        ValidationWarnings:
+          description: Warnings during validating the migration plan.
+          items:
+            $ref: '#/components/schemas/ValidationWarning'
+          type: array
+        WarningMessages:
+          description: Warning messages at the migration plan level.
+          type: string
+      type: object
+    ElapsedTime:
+      properties:
+        Days:
+          description: Days Elapsed.
+          format: int64
+          type: integer
+        Hours:
+          description: Hours Elapsed.
+          format: int64
+          type: integer
+        Minutes:
+          description: Minutes Elapsed.
+          format: int64
+          type: integer
+        Seconds:
+          description: Seconds Elapsed.
+          format: int64
+          type: integer
+      type: object

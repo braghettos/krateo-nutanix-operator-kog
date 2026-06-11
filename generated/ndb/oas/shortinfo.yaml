@@ -1,0 +1,423 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /operations/short-info:
+    get:
+      description: 'Get NDB operations summary information. This is a lightweight version of the ''GET /operations'' API.
+
+        '
+      operationId: getEraOperationsShortInfo
+      parameters:
+      - description: ID of the Database Server. to fetch the related Operations.
+        in: query
+        name: dbserver-id
+        schema:
+          format: uuid
+          type: string
+      - description: This fetches operations related to the NDB server.
+        in: query
+        name: era-server
+        schema:
+          type: boolean
+      - description: IP address of the Database Server to fetch the related Operations.
+        in: query
+        name: ip
+        schema:
+          type: string
+      - description: Client ID of the Database Server to fetch the related Operations.
+        in: query
+        name: client-id
+        schema:
+          type: string
+      - description: Operation Status to filter the Operations.
+        in: query
+        name: status
+        schema:
+          enum:
+          - '0'
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+          - '6'
+          - '7'
+          - '8'
+          - '9'
+          - '10'
+          - '11'
+          - '12'
+          - '13'
+          - '14'
+          - '15'
+          - '16'
+          - '17'
+          type: string
+      - description: Operation type to filter the Operations.
+        in: query
+        name: type
+        schema:
+          enum:
+          - register_cluster
+          - update_access_key
+          - cleanup_host
+          - delete_dbserver_vm
+          - cleanup_database
+          - cleanup_sharded_database
+          - remove_linked_database
+          - configure_oob_software_profiles
+          - create_snapshot
+          - clone_time_machine
+          - refresh_clone
+          - restore_database
+          - extend_database_storage
+          - register_host
+          - generate_diagnostic_bundle
+          - generate_diagnostic_bundle_for_vm
+          - create_dbserver_vm
+          - download_bundle_from_portal
+          - register_database
+          - register_sharded_cluster
+          - register_config_server
+          - register_shard
+          - import_database_dump
+          - add_linked_database
+          - register_vm_and_application
+          - perform_log_catchup
+          - create_snapshot_and_catchup
+          - copy_era_logs
+          - perform_curation
+          - provision_database
+          - provision_sharded_database
+          - create_standby_database
+          - create_software_profile
+          - create_software_profile_version
+          - optimize_software_profile_version
+          - update_software_profile_version
+          - patch_dbserver
+          - upgrade_dbserver
+          - add_dbserver
+          - resize_staging_drive
+          - resize_log_drive
+          - era_resiliency_snapshot
+          - provision_nutanix_objects_store
+          - create_disaster_recovery_configuration
+          - delete_disaster_recovery_configuration
+          - perform_disaster_recovery
+          - initiate_disaster_recovery_drill
+          - complete_disaster_recovery_drill
+          - reinitialize_disaster_recovery_configuration
+          - perform_disaster_recovery_switchover
+          - era_agent_resiliency
+          - register_dbserver_physical_cluster
+          - provision_dbserver_physical_cluster
+          - remove_dbserver_cluster
+          - patch_dbserver_physical_cluster
+          - upgrade_dbserver_physical_cluster
+          - shrink_dbserver_cluster
+          - scaleup_dbserver_logical_cluster
+          - activate_time_machine
+          - refresh_stats
+          - era_server_upgrade
+          - era_agent_upgrade
+          - era_dbserver_agent_upgrade
+          - era_enable_ha
+          - era_enable_multi_cluster
+          - replicate_software_profile
+          - replicate_snapshot
+          - deregister_cluster
+          - change_cluster_affinity
+          - dbserver_vertical_scaling
+          - update_domain_profile
+          - update_time_machine_sla
+          - transition_time_machine_log_storage
+          - era_health_check
+          - era_generate_health_report
+          - update_credential
+          - refresh_debug_summary
+          - era_service_management
+          - era_perform_maintenance
+          - patch_dbserver_os
+          - patch_dbserver_physical_cluster_os
+          - migrate_archive
+          - enable_cte_interoperability
+          type: string
+      - description: Whether to exclude the Sub-operations from the response.
+        in: query
+        name: hide-subops
+        schema:
+          type: boolean
+      - description: Whether to include the system-triggered Operations such as Log Catchup, and so on.
+        in: query
+        name: system-triggered
+        schema:
+          type: boolean
+      - description: Whether to include the User-triggered Operations such as Log Catchup, and so on.
+        in: query
+        name: user-triggered
+        schema:
+          type: boolean
+      - description: Whether to include the scheduled Operations such as Log Catchup, and so on.
+        in: query
+        name: scheduled
+        schema:
+          type: boolean
+      - description: To fetch the Operations submitted after the given date/time.
+        in: query
+        name: date-submitted
+        schema:
+          type: string
+      - description: To fetch the Operations started after the given date/time.
+        in: query
+        name: from-time
+        schema:
+          type: string
+      - description: To fetch the Operations executed before the given date/time.
+        in: query
+        name: to-time
+        schema:
+          type: string
+      - description: To fetch the Operations finished after the given date/time.
+        in: query
+        name: finished-after-time
+        schema:
+          type: string
+      - description: To fetch the Operations submitted in the last 'n' days.
+        in: query
+        name: days
+        schema:
+          type: integer
+      - description: ID of an Entity (Database Server, Database, Time Machine, etc.) to fetch the related Operations.
+        in: query
+        name: entity-id
+        schema:
+          type: string
+      - description: Name of an Entity (Database Server, Database, Time Machine, etc.) to fetch the related Operations.
+        in: query
+        name: entity-name
+        schema:
+          type: string
+      - description: Type of an Entity (Database Server, Database, Time Machine, etc.) to fetch the related Operations.
+        in: query
+        name: entity-type
+        schema:
+          type: string
+      - description: The identifier used to convert timestamps in the request and response to the specified time zone.
+        in: query
+        name: time-zone
+        schema:
+          type: string
+      - description: Denotes the sort order of the operations response by start time/end time.
+        in: query
+        name: descending
+        schema:
+          type: boolean
+      - description: To fetch an Operation with specific ID.
+        in: query
+        name: operation-id
+        schema:
+          type: string
+      - description: To fetch the Operations submitted after the given date/time.
+        in: query
+        name: timestamp
+        schema:
+          type: string
+      - description: To fetch the Operations submitted by the given user id.
+        in: query
+        name: owner_id
+        schema:
+          type: string
+      - description: To fetch the Operations related to the Nutanix Cluster.
+        in: query
+        name: cluster_id
+        schema:
+          type: string
+      - description: To fetch the Operations containing the text in ID / Entity Name / Entity ID.
+        in: query
+        name: search-text
+        schema:
+          type: string
+      - description: Whether to include the Operations in Deprecated status in the response.
+        in: query
+        name: deprecated
+        schema:
+          type: boolean
+      - description: Whether to include the timeout value of an Operation as part of Operation body in the response.
+        in: query
+        name: timeout
+        schema:
+          type: boolean
+      - description: Whether to display the overall count summary of the Operations in the response.
+        in: query
+        name: count-summary
+        schema:
+          type: boolean
+      - description: Whether to display the operations (or) only count of operations for the given queries.
+        in: query
+        name: operations-count-only
+        schema:
+          type: boolean
+      - description: Determines the number of operations to be skipped while paginating.
+        in: query
+        name: skip
+        schema:
+          type: integer
+      - description: Denotes the column name to be sorted while fetching from the metadata.
+        in: query
+        name: orderby
+        schema:
+          type: string
+      - description: Determines the number of operations to be fetched while paginating.
+        in: query
+        name: limit
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EraOperationsSummaryInfoDTO'
+          description: Operation completed.
+      summary: Get NDB operations summary
+      tags:
+      - Operations
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/operations/short-info \\\n    --header 'Authorization: Basic\
+          \ <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/operations/short-info"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/operations/short-info\", headers=headers)\n\n\
+          res = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/operations/short-info\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err !=\
+          \ nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/operations/short-info\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/operations/short-info';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    EraOperationsSummaryDTO:
+      properties:
+        avgProgressOfRunningOperations:
+          format: double
+          type: number
+        eraServerTimestamp:
+          type: string
+        expiredCount:
+          format: int64
+          type: integer
+        failedCount:
+          format: int64
+          type: integer
+        runningCount:
+          format: int64
+          type: integer
+        successfulCount:
+          format: int64
+          type: integer
+        systemTriggered:
+          type: boolean
+        timezone:
+          type: string
+        totalCount:
+          format: int64
+          type: integer
+        unassignedCount:
+          format: int64
+          type: integer
+        userTriggered:
+          type: boolean
+      type: object
+    EraOperationShortInfo:
+      properties:
+        dateSubmitted:
+          type: string
+        dbserverId:
+          format: uuid
+          type: string
+        deferredBy:
+          type: string
+        endTime:
+          type: string
+        entityId:
+          format: uuid
+          type: string
+        entityName:
+          type: string
+        entityType:
+          type: string
+        id:
+          format: uuid
+          type: string
+        isInternal:
+          type: boolean
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        percentageComplete:
+          type: string
+        scheduleTime:
+          type: string
+        startTime:
+          type: string
+        status:
+          type: string
+        systemTriggered:
+          type: boolean
+        type:
+          type: string
+        userVisible:
+          type: boolean
+      type: object
+    EraOperationsSummaryInfoDTO:
+      properties:
+        operations:
+          items:
+            $ref: '#/components/schemas/EraOperationShortInfo'
+          type: array
+        summary:
+          $ref: '#/components/schemas/EraOperationsSummaryDTO'
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

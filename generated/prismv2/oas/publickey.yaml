@@ -1,0 +1,239 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /cluster/public_keys:
+    post:
+      summary: Add a Public Key.
+      description: Add a Public Key to the cluster.
+      tags:
+      - /cluster
+      operationId: post/cluster/public_keys/addPublicKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.appliance.configuration.ClusterDTO_PublicKeyDTO'
+        description: A Public Key instance
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.appliance.configuration.ClusterDTO_PublicKeyDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"key\": \"string\",\n    \"name\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"key\": \"string\",\n    \"name\": \"string\"\n}' \\\n    --output-document\
+          \ \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"key\": \"string\"\
+          ,\n    \"name\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/cluster/public_keys\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          key\": \"string\", \"name\": \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"\
+          application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"key\\\": \\\"string\\\", \\\"name\\\": \\\"string\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"key\": \"string\", \"name\": \"string\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      summary: Get the list of Public Keys.
+      description: Get the list of Public Keys configured in the cluster.
+      tags:
+      - /cluster
+      operationId: get/cluster/public_keys/getPublicKeys
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO_PublicKeyDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/cluster/public_keys\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+  /cluster/public_keys/{name}:
+    get:
+      summary: Get a Public Key.
+      description: Get a Public Key with the specified name.
+      tags:
+      - /cluster
+      operationId: get/cluster/public_keys/{name}/getPublicKey
+      parameters:
+      - name: name
+        in: path
+        description: Name of the Public Key
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO_PublicKeyDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\"\n\t \n\treq, err :=\
+          \ http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}';\nconst\
+          \ options = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n\
+          };\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    delete:
+      summary: Delete a Public Key.
+      description: Delete a Public Key with the specified name.
+      tags:
+      - /cluster
+      operationId: delete/cluster/public_keys/{name}/deletePublicKey
+      parameters:
+      - name: name
+        in: path
+        description: Name of the Public Key
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete.dto.PrimitiveDTO_java.lang.Boolean_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\"\n\t \n\treq, err :=\
+          \ http.NewRequest(\"DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\
+          \treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/cluster/public_keys/{name}';\nconst\
+          \ options = {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    create.dto.appliance.configuration.ClusterDTO_PublicKeyDTO:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+    delete.dto.PrimitiveDTO_java.lang.Boolean_:
+      type: object
+      properties:
+        value:
+          type: boolean
+    get.dto.appliance.configuration.ClusterDTO_PublicKeyDTO:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string

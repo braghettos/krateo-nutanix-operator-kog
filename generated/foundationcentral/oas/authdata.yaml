@@ -1,0 +1,286 @@
+openapi: 3.0.0
+info:
+  title: Foundation Central Service
+  description: '# Introduction
+
+
+    **Foundation Central** creates clusters from factory-imaged nodes and reimages existing nodes that are already registered
+    with Foundation Central, remotely from Prism Central. This provides benefits such as creating clusters on remote sites
+    (for example, ROBO), without arranging for a deployment personnel visit.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+    '
+  contact:
+    name: Foundation Central Developers
+    email: foundation@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: '1.0'
+servers:
+- url: /api/fc/v1
+security:
+- BasicAuth: []
+- CookieAuth: []
+paths:
+  /hardware_managers/{hardware_manager_uuid}/auth_data:
+    post:
+      description: Adds new authentication data for a hardware manager in Foundation Central. Foundation Central uses these
+        data to establish a connection with a hardware manager.
+      tags:
+      - hardware_manager_auth_data
+      summary: Add authentication data for a hardware manager
+      operationId: PostHwMgrAuthData
+      parameters:
+      - description: UUID of the hardware manager.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/auth_data_input'
+        required: true
+      responses:
+        '200':
+          description: Added authentication data for a hardware manager.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/hardware_manager_auth_details'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --data '{\n    \"api_key\": {\n        \"key_id\"\
+          : \"string\",\n        \"key_secret\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --body-data\
+          \ '{\n    \"api_key\": {\n        \"key_id\": \"string\",\n        \"key_secret\": \"string\"\n    }\n}' \\\n  \
+          \  --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"api_key\": {\n        \"key_id\": \"string\",\n \
+          \       \"key_secret\": \"string\"\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data\"\n\t\n\tpayload :=\
+          \  strings.NewReader(`{\"api_key\": {\"key_id\": \"string\", \"key_secret\": \"string\"}}`)\n\treq, err := http.NewRequest(\"\
+          POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\
+          \        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .setBody(\"{\\\"api_key\\\": {\\\"key_id\\\"\
+          : \\\"string\\\", \\\"key_secret\\\": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data';\nconst\
+          \ options = {\n  method: 'POST',\n  headers: {'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"api_key\"\
+          : {\"key_id\": \"string\", \"key_secret\": \"string\"}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}:
+    get:
+      description: Fetches authentication data of a hardware manager based on its authentication UUID.
+      tags:
+      - hardware_manager_auth_data
+      summary: Get authentication data of a hardware manager
+      operationId: GetHwMgrAuthData
+      parameters:
+      - description: UUID of the hardware manager.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - description: UUID of the authentication data.
+        name: auth_data_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Details of the authentication data.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/hardware_manager_auth_details'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\"\n\
+          \t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}';\n\
+          const options = {\n  method: 'GET',\n  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const\
+          \ response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error)\
+          \ {\n  console.error(error);\n}"
+    delete:
+      description: Deletes the authentication data added for a hardware manager based on its authentication UUID.
+      tags:
+      - hardware_manager_auth_data
+      summary: Delete an authentication data
+      operationId: DeleteHwMgrAuthData
+      parameters:
+      - description: UUID of the hardware manager.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - description: UUID of the authentication data.
+        name: auth_data_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Authentication data deleted from Foundation Central.
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\"\n\
+          \t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/auth_data/{auth_data_uuid}';\n\
+          const options = {\n  method: 'DELETE',\n  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      name: X-API-Key
+      in: header
+    APIKeyKubAuth:
+      type: apiKey
+      name: X-API-Key-Kub
+      in: header
+    BasicAuth:
+      type: http
+      scheme: basic
+    CookieAuth:
+      type: apiKey
+      name: Cookie
+      in: header
+    OpenIDAuth:
+      type: apiKey
+      name: code
+      in: query
+  schemas:
+    hardware_manager_auth_details:
+      description: Details of a hardware manager authentication data.
+      type: object
+      required:
+      - auth_data_uuid
+      - created_timestamp
+      - current_time
+      properties:
+        api_key:
+          $ref: '#/components/schemas/api_key_auth_details'
+        auth_data_uuid:
+          description: UUID of the authentication data.
+          type: string
+          format: uuid
+        created_timestamp:
+          description: Time when the authentication data was added in Foundation Central.
+          type: string
+          format: date-time
+        current_time:
+          description: Current time of Foundation Central.
+          type: string
+          format: date-time
+    auth_data_input:
+      description: Input parameters for adding a new authentication data of a hardware manager.
+      type: object
+      required:
+      - api_key
+      properties:
+        api_key:
+          $ref: '#/components/schemas/api_key_auth_input'
+    error_response:
+      type: object
+      properties:
+        code:
+          description: HTTP response code from the API.
+          type: integer
+          format: int32
+        message_list:
+          description: Error message in detail.
+          type: array
+          items:
+            type: string
+    api_key_auth_details:
+      description: Details of API key which was added for a hardware manager.
+      type: object
+      required:
+      - key_id
+      properties:
+        key_id:
+          description: API key ID of the API key.
+          type: string
+    api_key_auth_input:
+      description: Details of API key which need to be added as an authentication data for a hardware manager.
+      type: object
+      required:
+      - key_id
+      - key_secret
+      properties:
+        key_id:
+          description: API key Id to be added for the hardware manager.
+          type: string
+        key_secret:
+          description: API key secret to be added for the hardware manager.
+          type: string

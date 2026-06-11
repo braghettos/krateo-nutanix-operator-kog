@@ -1,0 +1,422 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /databases/register:
+    post:
+      description: "Register a source Database with NDB and create a Time Machine for it.\nBefore calling this API, make sure\
+        \ to gather the necessary information by doing the following actions:\n```\n1. Get the required input property list\
+        \ by calling '/app_types/{database_engine}/register/input-file'.\n2. Get the Cluster name / ID by calling '/clusters'.\n\
+        3. [Optional] Get the SLA name / ID by calling '/slas'. \n```\n"
+      operationId: pushRegisterDatabase
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/RegisterDatabaseModel'
+        description: Payload required for registering a Database.
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation completed.
+      summary: Register an existing Database
+      tags:
+      - Databases
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/databases/register \\\n    --header 'Authorization: Basic\
+          \ <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/databases/register"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/databases/register\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/databases/register\"\n\t \n\treq, err := http.NewRequest(\"POST\", url, nil)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/databases/register\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/databases/register';\nconst options = {\n  method: 'POST',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    EraWeeklySchedule:
+      properties:
+        dayOfWeek:
+          type: string
+        dayOfWeekValue:
+          enum:
+          - SUNDAY
+          - MONDAY
+          - TUESDAY
+          - WEDNESDAY
+          - THURSDAY
+          - FRIDAY
+          - SATURDAY
+          type: string
+        enabled:
+          type: boolean
+      type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    EraMonthlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+      type: object
+    EraQuarterlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+        startMonth:
+          type: string
+        startMonthValue:
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+          type: string
+      type: object
+    EraContinuousSchedule:
+      properties:
+        enabled:
+          type: boolean
+        logBackupInterval:
+          format: int32
+          type: integer
+        logBackupRepeatIntervalInMinutes:
+          format: int32
+          type: integer
+        snapshotRepeatIntervalInMinutes:
+          format: int32
+          type: integer
+        snapshotsPerDay:
+          format: int32
+          type: integer
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    TimeMachineInfo:
+      description: Time Machine Info.
+      properties:
+        autoTuneLogDrive:
+          type: boolean
+        backupNodeIds:
+          description: List of backup node IDs for the Time Machine
+          items:
+            type: string
+          type: array
+        description:
+          type: string
+        name:
+          type: string
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        slaId:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/Tags'
+          type: array
+      type: object
+    Schedule:
+      description: Schedule Model.
+      properties:
+        continuousSchedule:
+          $ref: '#/components/schemas/EraContinuousSchedule'
+        monthlySchedule:
+          $ref: '#/components/schemas/EraMonthlySchedule'
+        quartelySchedule:
+          $ref: '#/components/schemas/EraQuarterlySchedule'
+        snapshotTimeOfDay:
+          $ref: '#/components/schemas/SnapshotTimeOfDay'
+        weeklySchedule:
+          $ref: '#/components/schemas/EraWeeklySchedule'
+        yearlySchedule:
+          $ref: '#/components/schemas/EraYearlySchedule'
+      type: object
+    EraYearlySchedule:
+      properties:
+        dayOfMonth:
+          format: int32
+          type: integer
+        enabled:
+          type: boolean
+        month:
+          type: string
+        monthValue:
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+          type: string
+      type: object
+    RegisterDatabaseModel:
+      description: Register Database Model
+      properties:
+        actionArguments:
+          items:
+            $ref: '#/components/schemas/ActionArguments'
+          type: array
+        autoTuneStagingDrive:
+          type: boolean
+        category:
+          enum:
+          - DEFAULT
+          - DB_GROUP_DBSERVER
+          - DB_GROUP
+          - DB_GROUP_IMPLICIT
+          type: string
+        clustered:
+          type: boolean
+        databaseGroupingInfo:
+          $ref: '#/components/schemas/ERADatabaseGroupingInfo'
+        databaseName:
+          type: string
+        databaseType:
+          enum:
+          - oracle_database
+          - postgres_database
+          - sqlserver_database
+          - mariadb_database
+          - mysql_database
+          - mongodb_database
+          type: string
+        description:
+          type: string
+        forcedInstall:
+          type: boolean
+        nxClusterId:
+          type: string
+        resetDescriptionInNxCluster:
+          type: boolean
+        tags:
+          items:
+            $ref: '#/components/schemas/Tags'
+          type: array
+        timeMachineInfo:
+          $ref: '#/components/schemas/TimeMachineInfo'
+        vmDescription:
+          type: string
+        vmIp:
+          type: string
+        vmPassword:
+          type: string
+        vmSshkey:
+          type: string
+        vmUsername:
+          type: string
+        workingDirectory:
+          type: string
+      type: object
+    ERADatabasePropertiesInfo:
+      properties:
+        actionArguments:
+          items:
+            $ref: '#/components/schemas/ActionArguments'
+          type: array
+        databaseName:
+          type: string
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        ownerId:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    ERADatabaseGroupingInfo:
+      properties:
+        createNewGroup:
+          type: boolean
+        databaseGroupId:
+          type: string
+        databases:
+          items:
+            $ref: '#/components/schemas/ERADatabasePropertiesInfo'
+          type: array
+        groupAtDbserver:
+          type: boolean
+        newDatabaseGroupName:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+      type: object
+    Tags:
+      properties:
+        tagId:
+          type: string
+        value:
+          type: string
+      type: object
+    SnapshotTimeOfDay:
+      description: Time of the day to take a Snapshot.
+      properties:
+        hours:
+          format: int32
+          type: integer
+        minutes:
+          format: int32
+          type: integer
+        seconds:
+          format: int32
+          type: integer
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+    ActionArguments:
+      properties:
+        name:
+          type: string
+        value:
+          type: object
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

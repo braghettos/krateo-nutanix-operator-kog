@@ -1,0 +1,590 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /tms/{timemachine_id}/snapshots:
+    get:
+      description: Gets a list of Snapshots of the source Database.
+      operationId: getSnapshots
+      parameters:
+      - description: ID of the Time Machine.
+        in: path
+        name: timemachine_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: ID of the Database Server.
+        in: query
+        name: dbserver-id
+        schema:
+          format: uuid
+          type: string
+      - description: ID of the Nutanix Cluster.
+        in: query
+        name: nx-cluster-id
+        schema:
+          format: uuid
+          type: string
+      - description: Comma-separated list of Nutanix Cluster IDs to return Snapshots for.
+        in: query
+        name: nx-cluster-ids
+        schema:
+          type: string
+      - description: ID of the Protection Domain.
+        in: query
+        name: protection-domain-id
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: type
+        schema:
+          type: string
+      - description: Comma-separated list of Database IDs for which Snapshots are to be fetched.
+        in: query
+        name: database-ids
+        schema:
+          type: string
+      - description: Determines whether output should be a list or not.
+        in: query
+        name: list-output
+        schema:
+          type: boolean
+      - description: The time zone of the Snapshot timestamps returned.
+        in: query
+        name: time-zone
+        schema:
+          type: string
+      - description: Get entity(s) if it satisfies query criteria irrespective of status (including DELETED, etc).
+        in: query
+        name: any-status
+        schema:
+          type: boolean
+      - description: Indicates if response must contain Snapshots that are replicated.
+        in: query
+        name: load-replicated-snapshots
+        schema:
+          type: boolean
+      - description: Indicates if response must contain replicated child Snapshots.
+        in: query
+        name: load-replicated-child-snapshots
+        schema:
+          type: boolean
+      - description: Indicates if response must contain Snapshots that are sanitised.
+        in: query
+        name: load-sanitised-snapshots
+        schema:
+          type: boolean
+      - description: Indicates if response must contain sanitised child Snapshots.
+        in: query
+        name: load-sanitised-child-snapshots
+        schema:
+          type: boolean
+      - description: Indicates if response must only contain Snapshots that are sanitised.
+        in: query
+        name: load-only-sanitised-snapshots
+        schema:
+          type: boolean
+      - description: Indicates if response must contain Snapshots of type RESTORE.
+        in: query
+        name: load-restore-snapshot
+        schema:
+          type: boolean
+      - description: Indicates if response must contain Snapshots of type REPLICATION_ONLY.
+        in: query
+        name: load-replication-only-snapshots
+        schema:
+          type: boolean
+      - description: Specifies tag name to filter Snapshots returned in response.
+        in: query
+        name: tag-name
+        schema:
+          type: string
+      - description: Specifies tag value to filter Snapshots returned in response.
+        in: query
+        name: tag-value
+        schema:
+          type: string
+      - description: Get all snapshots without filtering on any entity id.
+        in: query
+        name: all
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/TMSnapsotDTO'
+                - items:
+                    $ref: '#/components/schemas/ERASnapshotDTO'
+                  type: array
+          description: Operation completed.
+      summary: Get Snapshots
+      tags:
+      - Time Machines
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/tms/{timemachine_id}/snapshots \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/tms/{timemachine_id}/snapshots"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/tms/{timemachine_id}/snapshots\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tms/{timemachine_id}/snapshots\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/tms/{timemachine_id}/snapshots\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tms/{timemachine_id}/snapshots';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      description: Creates a Snapshot of the source Database using a Time Machine.
+      operationId: pushSnapshotWork
+      parameters:
+      - in: path
+        name: timemachine_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/TakeSnapshotModel'
+        description: Payload required to take the Snapshot.
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfoSummary'
+          description: Operation completed.
+      summary: Create a Snapshot
+      tags:
+      - Time Machines
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/tms/{timemachine_id}/snapshots \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/tms/{timemachine_id}/snapshots"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/tms/{timemachine_id}/snapshots\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tms/{timemachine_id}/snapshots\"\n\t \n\treq, err := http.NewRequest(\"POST\", url, nil)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/tms/{timemachine_id}/snapshots\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tms/{timemachine_id}/snapshots';\nconst options = {\n  method: 'POST',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    EraLCMConfigInfoEraEntityExpiryPolicy:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/EraEntityExpiryPolicy'
+        postDeleteCommand:
+          $ref: '#/components/schemas/EraPostDeleteCommand'
+        preDeleteCommand:
+          $ref: '#/components/schemas/EraPreDeleteCommand'
+        refreshDetails:
+          $ref: '#/components/schemas/EraEntityRefreshPolicy'
+      type: object
+    TakeSnapshotModel:
+      description: Take a Snapshot Model.
+      properties:
+        lcmConfig:
+          $ref: '#/components/schemas/LcmConfig'
+        name:
+          type: string
+      type: object
+    ERASnapshotInfo:
+      properties:
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+      type: object
+    DeregisterInfo:
+      properties:
+        message:
+          type: string
+        operations:
+          items:
+            type: string
+          type: array
+      type: object
+    SnapshotLCMConfig:
+      properties:
+        expiryDetails:
+          $ref: '#/components/schemas/ExpiryDetails'
+      type: object
+    LcmConfig:
+      properties:
+        snapshotLCMConfig:
+          $ref: '#/components/schemas/SnapshotLCMConfig'
+      type: object
+    EraEntityExpiryPolicy:
+      properties:
+        effectiveTimestamp:
+          type: string
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+        expiryTimestamp:
+          type: string
+        remindBeforeInDays:
+          format: int32
+          type: integer
+        userCreated:
+          type: boolean
+      type: object
+    EraTagValueDTO:
+      properties:
+        entityId:
+          type: string
+        entityType:
+          enum:
+          - DATABASE
+          - TIME_MACHINE
+          - DATABASE_SERVER
+          - CLONE
+          type: string
+        tagId:
+          type: string
+        tagName:
+          type: string
+        value:
+          type: string
+      type: object
+    EraEntityRefreshPolicy:
+      properties:
+        lastRefreshDate:
+          type: string
+        nextRefreshDate:
+          type: string
+        refreshDateTimezone:
+          type: string
+        refreshInDays:
+          format: int32
+          type: integer
+        refreshInHours:
+          format: int32
+          type: integer
+        refreshInMonths:
+          format: int32
+          type: integer
+        refreshTime:
+          type: string
+      type: object
+    ERASnapshotMetadata:
+      properties:
+        deregisterInfo:
+          $ref: '#/components/schemas/DeregisterInfo'
+        fromTimeStamp:
+          type: string
+        info:
+          properties: {}
+          type: object
+        secureInfo:
+          properties: {}
+          type: object
+        toTimeStamp:
+          type: string
+      type: object
+    snapshotType:
+      description: he type of the snapshot (used to determine retention policies)
+      enum:
+      - CONTINUOUS
+      - NONE
+      - CONTINUOUS_EXTRA
+      - TRANSIENT
+      - CONTINUOUS_RETRY
+      - DISCRETE
+      - MANUAL
+      - HOURLY
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
+      type: string
+    EraPreDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    ERASnapshotDTO:
+      properties:
+        appInfoVersion:
+          type: string
+        applicableTypeFrequencies:
+          items:
+            $ref: '#/components/schemas/snapshotType'
+          type: array
+        applicableTypes:
+          items:
+            type: string
+          type: array
+        databaseNodeId:
+          format: uuid
+          type: string
+        databaseSnapshot:
+          type: boolean
+        dateCreated:
+          type: string
+        dateModified:
+          type: string
+        dbserverId:
+          format: uuid
+          type: string
+        dbserverIp:
+          format: ipv4
+          type: string
+        dbserverName:
+          type: string
+        description:
+          type: string
+        fromTimeStamp:
+          type: string
+        id:
+          format: uuid
+          type: string
+        info:
+          $ref: '#/components/schemas/ERASnapshotInfo'
+        lcmConfig:
+          $ref: '#/components/schemas/EraLCMConfigInfoEraEntityExpiryPolicy'
+        metadata:
+          $ref: '#/components/schemas/ERASnapshotMetadata'
+        name:
+          type: string
+        ownerId:
+          format: uuid
+          type: string
+        processed:
+          type: boolean
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        protectionDomainId:
+          format: uuid
+          type: string
+        queryCount:
+          type: integer
+        snapshotId:
+          format: uuid
+          type: string
+        snapshotSize:
+          type: string
+        snapshotTimeStamp:
+          type: string
+        snapshotUuid:
+          format: uuid
+          type: string
+        status:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/EraTagValueDTO'
+          type: array
+        timeMachineId:
+          format: uuid
+          type: string
+        timeZone:
+          type: string
+        toTimeStamp:
+          type: string
+        type:
+          type: string
+        typeFrequency:
+          $ref: '#/components/schemas/snapshotType'
+      type: object
+    TaskInfoSummary:
+      properties:
+        associatedOperations:
+          items:
+            $ref: '#/components/schemas/TaskInfoSummary'
+          type: array
+        dbserverId:
+          description: ID of the Database Server. associated with the NDB Operation.
+          format: uuid
+          type: string
+        dependencyReport:
+          $ref: '#/components/schemas/EraDependencyReport'
+        entityId:
+          description: ID of the entity associated with the NDB Operation. For example, Time Machine ID.
+          format: uuid
+          type: string
+        entityName:
+          description: Name of the entity associated with the NDB Operation. For example, Time Machine ID.
+          type: string
+        entityType:
+          type: string
+        message:
+          type: string
+        name:
+          description: Name of the Operation created in NDB.
+          type: string
+        operationId:
+          description: ID of the Operation entry created in NDB.
+          format: uuid
+          type: string
+        status:
+          description: Status of the NDB Operation.
+          type: string
+        workId:
+          description: ID of the work entry created in NDB.
+          format: uuid
+          type: string
+      type: object
+    TMSnapsotDTO:
+      properties:
+        clone:
+          description: Indicates if the Snapshot is of a clone.
+          type: boolean
+        databaseId:
+          description: The ID of the Database.
+          format: uuid
+          type: string
+        snapshotsPerNxCluster:
+          additionalProperties:
+            items:
+              properties:
+                snapshots:
+                  items:
+                    $ref: '#/components/schemas/ERASnapshotDTO'
+                  type: array
+                type:
+                  description: The type of the Snapshot.
+                  type: string
+              type: object
+            type: array
+          type: object
+        timeMachineId:
+          description: The ID of the Time Machine.
+          format: uuid
+          type: string
+        timeMachineName:
+          description: The name of the Time Machine.
+          type: string
+        timeZone:
+          description: The time zone of the Snapshot timestamp.
+          type: string
+      type: object
+    EraDependencyReport:
+      properties:
+        dependenciesSatisfied:
+          type: boolean
+        dependenciesVerified:
+          type: boolean
+        ipAddress:
+          type: string
+        missingConfigurations:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+        missingDependencies:
+          items:
+            $ref: '#/components/schemas/EraDependencyInfo'
+          type: array
+      type: object
+    ExpiryDetails:
+      properties:
+        expireInDays:
+          format: int32
+          type: integer
+        expiryDateTimezone:
+          type: string
+      type: object
+    EraPostDeleteCommand:
+      properties:
+        command:
+          type: string
+      type: object
+    EraDependencyInfo:
+      properties:
+        dependencyName:
+          type: string
+        description:
+          type: string
+        isPresent:
+          type: boolean
+        isSoftware:
+          type: boolean
+        name:
+          type: string
+        requiredAction:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

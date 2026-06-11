@@ -1,0 +1,175 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/plans/{id}/workloads/{wid}/refresh:
+    post:
+      description: Given a migration plan UUID and a valid workload UUID, this API selectively refreshes the source workload
+        details and updates the plan. <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/plans/867b4a4f-cb8c-4416-8d7e-26e033023aa4/workloads/91cea36d-c857-4092-b232-d46484ee3205/refresh
+      operationId: workloadSelectiveRefresh
+      parameters:
+      - description: Migration plan UUID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Workload UUID
+        in: path
+        name: wid
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkloadRefreshConfig'
+        description: Workload refresh configuration to control the sub-operations during a selective refresh of a workload.
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicResponse'
+      security:
+      - Bearer: []
+      summary: Trigger selective refresh for the selected source workload in the given plan.
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/refresh \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"forceUpdateTarget\": false\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"forceUpdateTarget\"\
+          : false\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/refresh"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"forceUpdateTarget\": false\n}\"\"\"\n\nconn.request(\"POST\",\"//move/v2/plans/{id}/workloads/{wid}/refresh\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/refresh\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          forceUpdateTarget\": false}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n \
+          \       req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/refresh\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"forceUpdateTarget\\\": false}\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/refresh';\nconst options = {\n \
+          \ method: 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"forceUpdateTarget\": false}`\n};\n\ntry {\n  const response = await fetch(url,\
+          \ options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    BasicResponse:
+      description: API basic response, with minimum details.
+      properties:
+        APIVersion:
+          description: Move API version
+          type: string
+        Data:
+          $ref: '#/components/schemas/BasicData'
+        MetaData:
+          $ref: '#/components/schemas/BasicMetaData'
+      type: object
+    BasicData:
+      properties:
+        Message:
+          description: Message as a response to the API call.
+          type: string
+        Status:
+          description: Status of the API call.
+          type: string
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    BasicMetaData:
+      description: Basic metadata, with minimum details.
+      properties:
+        Version:
+          description: Basic data version.
+          type: string
+      type: object
+    WorkloadRefreshConfig:
+      description: Configurations to control workload properties update during a selective refresh.
+      properties:
+        forceUpdateTarget:
+          description: Replicate the properties of the source to the target, regardless of workload's customize-type.
+          type: boolean
+      type: object

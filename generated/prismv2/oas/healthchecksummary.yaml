@@ -1,0 +1,252 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /volume_groups/health_check_summary:
+    get:
+      summary: Get the health check summary for the Volume Groups.
+      tags:
+      - /volume_groups
+      operationId: get/volume_groups/health_check_summary/getHealthCheckSummaryForVolumeGroups
+      parameters:
+      - name: filter_criteria
+        in: query
+        description: Filter criteria
+        required: false
+        schema:
+          type: string
+      - name: detailed_summary
+        in: query
+        description: Detailed summary
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.health.check.EntityTypeHealthCheckSummaryDTO'
+        '500':
+          description: Any internal exception while performing this operation
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/volume_groups/health_check_summary\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/volume_groups/health_check_summary"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/volume_groups/health_check_summary\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/volume_groups/health_check_summary\"\n\t \n\treq,\
+          \ err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/volume_groups/health_check_summary\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/volume_groups/health_check_summary';\n\
+          const options = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.dto.health.check.ErrorInfoDTO:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_uuid:
+          type: string
+        message:
+          type: string
+    get.dto.health.check.EntityTypeHealthCheckSummaryDTO:
+      type: object
+      properties:
+        checks_in_error:
+          additionalProperties:
+            $ref: '#/components/schemas/get.dto.health.check.HealthCheckErrorsDTO'
+          type: object
+        detailed_check_summary:
+          additionalProperties:
+            additionalProperties:
+              format: int32
+              type: integer
+            type: object
+          type: object
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filter_criteria:
+          type: string
+        health_summary:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+    get.dto.health.check.HealthCheckErrorsDTO:
+      type: object
+      properties:
+        cluster_level:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.ErrorInfoDTO'
+          type: array
+        node_level:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.ErrorInfoDTO'
+          type: array

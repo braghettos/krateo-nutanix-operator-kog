@@ -1,0 +1,708 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /disks/events:
+    get:
+      summary: Get the list of events generated on any Disk.
+      tags:
+      - /disks
+      operationId: get/disks/events/getDiskEvents
+      parameters:
+      - name: start_time_in_usecs
+        in: query
+        description: Start time in microseconds
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: end_time_in_usecs
+        in: query
+        description: End time in microseconds
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - name: count
+        in: query
+        description: Maximum number of events
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: acknowledged
+        in: query
+        description: Events which have been acknowledged
+        required: false
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.alerts.AlertDTO_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/disks/events \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/disks/events"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/disks/events\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/disks/events\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/disks/events\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/disks/events';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.dto.alerts.AlertDTO_MetricValueDetails:
+      type: object
+      properties:
+        metric_threshold_value:
+          type: string
+        metric_value:
+          type: string
+        state_change_time_stamp_in_usecs:
+          format: int64
+          type: integer
+    get.dto.alerts.AlertDTO_SeverityTrail:
+      type: object
+      properties:
+        severity:
+          type: string
+        severity_change_timestamp_in_usecs:
+          format: int64
+          type: integer
+    get.dto.ResultMetadata_Filter:
+      type: object
+      properties:
+        display_for_rhs:
+          type: string
+        lhs:
+          type: string
+        operator:
+          type: string
+        rhs:
+          type: string
+    get.dto.alerts.AlertDTO_AffectedEntity:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_type:
+          type: string
+        entity_type_display_name:
+          type: string
+        id:
+          type: string
+        uuid:
+          type: string
+    get.base.EntityCollection_get.dto.alerts.AlertDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    get.dto.alerts.AlertDTO_MetricDetails:
+      type: object
+      properties:
+        comparison_operator:
+          type: string
+        condition_type:
+          enum:
+          - STATIC_THRESHOLD
+          - ANOMALY
+          - SAFETY_ZONE
+          type: string
+        data_type:
+          enum:
+          - LONG
+          - DOUBLE
+          - BOOLEAN
+          - STRING
+          type: string
+        entity_id:
+          type: string
+        entity_type:
+          type: string
+        metric_category:
+          type: string
+        metric_display_name:
+          type: string
+        metric_name:
+          type: string
+        metric_value_details:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_MetricValueDetails'
+          type: array
+        unit:
+          type: string
+    get.dto.alerts.AlertCauseDTO:
+      type: object
+      properties:
+        actions:
+          type: string
+        additional_links:
+          type: string
+        alert_namespace:
+          type: string
+        cause:
+          type: string
+        chart_queries:
+          $ref: '#/components/schemas/get.base.EntityCollection_get.dto.ResultContentDescriptor_'
+        details:
+          type: string
+        has_global_details:
+          type: boolean
+        id:
+          type: string
+        num_resolved_count:
+          format: int64
+          type: integer
+        parent_cause_id:
+          type: string
+        title:
+          type: string
+        troubleshooting_steps:
+          type: string
+    get.dto.EntityMetadata:
+      type: object
+      properties:
+        additional_fields:
+          additionalProperties:
+            type: string
+          type: object
+        cluster_uuid:
+          type: string
+        context_hint_field:
+          type: string
+        context_hint_value:
+          type: string
+        entity_id:
+          type: string
+        entity_name:
+          type: string
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+    get.base.EntityCollection_get.dto.ResultContentDescriptor_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultContentDescriptor'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    get.dto.ResultContentDescriptor:
+      type: object
+      properties:
+        actions:
+          type: string
+        alerts:
+          type: string
+        cadmus:
+          type: string
+        entities:
+          type: string
+        help:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/get.dto.ResultMetadata'
+        perspectives:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultContentDescriptor_Perspective'
+          type: array
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.dto.ResultContentDescriptor_Perspective:
+      type: object
+      properties:
+        format:
+          enum:
+          - TABLE
+          - BAR_CHART
+          - PIE_CHART
+          - TIME_SERIES
+          - KEY_VALUE
+          - COUNT
+          - HEALTH_SUMMARY
+          - ALERT_INFO
+          - CAPACITY
+          - OTHER
+          type: string
+        metadata:
+          $ref: '#/components/schemas/get.dto.ResultMetadata'
+        query: {}
+        result: {}
+        type:
+          type: string
+    get.dto.alerts.AlertDTO:
+      type: object
+      properties:
+        acknowledged:
+          type: boolean
+        acknowledged_by_username:
+          type: string
+        acknowledged_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        affected_entities:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_AffectedEntity'
+          type: array
+        alert_details:
+          $ref: '#/components/schemas/get.dto.alerts.AlertDTO_AlertDetailsDTO'
+        alert_title:
+          type: string
+        alert_type_uuid:
+          type: string
+        auto_resolved:
+          type: boolean
+        categories:
+          items:
+            type: string
+          type: array
+        check_id:
+          type: string
+        classifications:
+          items:
+            type: string
+          type: array
+        cluster_uuid:
+          type: string
+        context_types:
+          items:
+            type: string
+          type: array
+        context_values:
+          items:
+            type: string
+          type: array
+        created_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        detailed_message:
+          type: string
+        entity_ids:
+          items:
+            type: string
+          type: array
+        entity_types:
+          items:
+            type: string
+          type: array
+        entity_uuids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        impact:
+          type: string
+        impact_types:
+          items:
+            type: string
+          type: array
+        last_occurrence_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        message:
+          type: string
+        node_uuid:
+          type: string
+        operation_type:
+          type: string
+        originating_cluster_uuid:
+          type: string
+        possible_causes:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertCauseDTO'
+          type: array
+        resolved:
+          type: boolean
+        resolved_by_username:
+          type: string
+        resolved_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        service_vmid:
+          type: string
+        severity:
+          type: string
+        user_defined:
+          type: boolean
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    get.dto.ResultMetadata:
+      type: object
+      properties:
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filters:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultMetadata_Filter'
+          type: array
+        instances:
+          items:
+            $ref: '#/components/schemas/get.dto.EntityMetadata'
+          type: array
+        title:
+          type: string
+    get.dto.alerts.AlertDTO_AlertDetailsDTO:
+      type: object
+      properties:
+        metric_details:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_MetricDetails'
+          type: array
+        severity_trails:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_SeverityTrail'
+          type: array

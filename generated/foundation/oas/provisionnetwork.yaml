@@ -1,0 +1,258 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: foundation@nutanix.com
+    name: Foundation Developers
+  description: '# Foundation
+
+
+    Foundation is a Nutanix provided tool used for bootstrapping, imaging, and deployment of Nutanix clusters. The imaging
+    process will install the desired version of the AOS software and the hypervisor of your choice. One of the ways to use
+    Foundation services is to make use of the APIs provided by Foundation.
+
+
+    Foundation provides seven categories of APIs, namely, General APIs, File Management APIs, Networking APIs, Imaging and
+    Cluster Creation APIs, UCS Managed Mode APIs, Foundation Upgrade APIs and Factory APIs.
+
+
+    However, most of these APIs find their use in internal scenarios. Some APIs that find most relevance in the customer scenario
+    are image_nodes, pre_check, reboot_to_phoenix, reboot_from_phoenix, progress, phoenix_network_status, abort_session, get_progress_sessions
+    among others.
+
+
+
+    - Foundation Version: 5.10
+
+
+
+    ## Terminology
+
+
+    Some of the acronyms frequently used in the API descriptions are listed below:
+
+
+    - **FVM** - Foundation Virtual Machine, A VM that has Foundation service running on it.
+
+    - **BMC** - Baseboard management controller.
+
+    - **IPMI** - Intelligent Platform Management Interface.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+
+    '
+  license:
+    name: 'Copyright Nutanix Inc. All rights reserved
+
+      '
+  title: Foundation REST API
+  version: '5.10'
+servers:
+- url: /foundation
+security: []
+paths:
+  /provision_network:
+    post:
+      description: 'Configures IP address on cvm and(or) host and dynamically change vlan
+
+        tag to move the nodes into a different vlan network. This operation
+
+        should be attempted only if standalone foundation has access to that
+
+        particular network. Else, nodes will not be reachable.
+
+        '
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/provision_network_params'
+        required: true
+      responses:
+        '200':
+          description: Success
+        '500':
+          description: Raised in case of any errors
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/http_error_500'
+      summary: Provision IP address on CVM or host and change vlan
+      tags:
+      - Networking APIs
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/foundation/provision_network \\\n    --data '{\n\
+          \    \"error\": \"string\",\n    \"nodes\": [\n        {\n            \"cvm_gateway\": \"192.168.0.1\",\n      \
+          \      \"cvm_ip\": \"192.168.0.1\",\n            \"cvm_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n            \"cvm_netmask\": \"192.168.0.1\",\n            \"cvm_vlan_id\": \"string\",\n            \"error\"\
+          : \"string\",\n            \"hypervisor_gateway\": \"192.168.0.1\",\n            \"hypervisor_hostname\": \"string\"\
+          ,\n            \"hypervisor_ip\": \"192.168.0.1\",\n            \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n            \"hypervisor_netmask\": \"192.168.0.1\",\n            \"ipmi_gateway\": \"192.168.0.1\",\n      \
+          \      \"ipmi_ip\": \"192.168.0.1\",\n            \"ipmi_netmask\": \"192.168.0.1\",\n            \"ipv6_address\"\
+          : \"string\",\n            \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\n        }\n  \
+          \  ]\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --body-data '{\n    \"error\": \"string\",\n    \"nodes\": [\n\
+          \        {\n            \"cvm_gateway\": \"192.168.0.1\",\n            \"cvm_ip\": \"192.168.0.1\",\n          \
+          \  \"cvm_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n            \"cvm_netmask\": \"192.168.0.1\"\
+          ,\n            \"cvm_vlan_id\": \"string\",\n            \"error\": \"string\",\n            \"hypervisor_gateway\"\
+          : \"192.168.0.1\",\n            \"hypervisor_hostname\": \"string\",\n            \"hypervisor_ip\": \"192.168.0.1\"\
+          ,\n            \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n            \"hypervisor_netmask\"\
+          : \"192.168.0.1\",\n            \"ipmi_gateway\": \"192.168.0.1\",\n            \"ipmi_ip\": \"192.168.0.1\",\n\
+          \            \"ipmi_netmask\": \"192.168.0.1\",\n            \"ipv6_address\": \"string\",\n            \"phoenix_ipv6_address\"\
+          : \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\n        }\n    ]\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/foundation/provision_network"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {}\n\npayload\
+          \ =  \"\"\"{\n    \"error\": \"string\",\n    \"nodes\": [\n        {\n            \"cvm_gateway\": \"192.168.0.1\"\
+          ,\n            \"cvm_ip\": \"192.168.0.1\",\n            \"cvm_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n            \"cvm_netmask\": \"192.168.0.1\",\n            \"cvm_vlan_id\": \"string\",\n            \"error\"\
+          : \"string\",\n            \"hypervisor_gateway\": \"192.168.0.1\",\n            \"hypervisor_hostname\": \"string\"\
+          ,\n            \"hypervisor_ip\": \"192.168.0.1\",\n            \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          ,\n            \"hypervisor_netmask\": \"192.168.0.1\",\n            \"ipmi_gateway\": \"192.168.0.1\",\n      \
+          \      \"ipmi_ip\": \"192.168.0.1\",\n            \"ipmi_netmask\": \"192.168.0.1\",\n            \"ipv6_address\"\
+          : \"string\",\n            \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\n        }\n  \
+          \  ]\n}\"\"\"\n\nconn.request(\"POST\",\"/foundation/provision_network\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/foundation/provision_network\"\n\t\n\tpayload :=  strings.NewReader(`{\"error\":\
+          \ \"string\", \"nodes\": [{\"cvm_gateway\": \"192.168.0.1\", \"cvm_ip\": \"192.168.0.1\", \"cvm_ipv6_address\":\
+          \ \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"cvm_netmask\": \"192.168.0.1\", \"cvm_vlan_id\": \"string\", \"\
+          error\": \"string\", \"hypervisor_gateway\": \"192.168.0.1\", \"hypervisor_hostname\": \"string\", \"hypervisor_ip\"\
+          : \"192.168.0.1\", \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"hypervisor_netmask\"\
+          : \"192.168.0.1\", \"ipmi_gateway\": \"192.168.0.1\", \"ipmi_ip\": \"192.168.0.1\", \"ipmi_netmask\": \"192.168.0.1\"\
+          , \"ipv6_address\": \"string\", \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"}]}`)\n\treq,\
+          \ err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/foundation/provision_network\"\
+          )\n  .setBody(\"{\\\"error\\\": \\\"string\\\", \\\"nodes\\\": [{\\\"cvm_gateway\\\": \\\"192.168.0.1\\\", \\\"\
+          cvm_ip\\\": \\\"192.168.0.1\\\", \\\"cvm_ipv6_address\\\": \\\"2001:0db8:85a3:0000:0000:8a2e:0370:7334\\\", \\\"\
+          cvm_netmask\\\": \\\"192.168.0.1\\\", \\\"cvm_vlan_id\\\": \\\"string\\\", \\\"error\\\": \\\"string\\\", \\\"hypervisor_gateway\\\
+          \": \\\"192.168.0.1\\\", \\\"hypervisor_hostname\\\": \\\"string\\\", \\\"hypervisor_ip\\\": \\\"192.168.0.1\\\"\
+          , \\\"hypervisor_ipv6_address\\\": \\\"2001:0db8:85a3:0000:0000:8a2e:0370:7334\\\", \\\"hypervisor_netmask\\\":\
+          \ \\\"192.168.0.1\\\", \\\"ipmi_gateway\\\": \\\"192.168.0.1\\\", \\\"ipmi_ip\\\": \\\"192.168.0.1\\\", \\\"ipmi_netmask\\\
+          \": \\\"192.168.0.1\\\", \\\"ipv6_address\\\": \\\"string\\\", \\\"phoenix_ipv6_address\\\": \\\"2001:0db8:85a3:0000:0000:8a2e:0370:7334\\\
+          \"}]}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/foundation/provision_network';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {},\n  body:  `{\"error\": \"string\", \"nodes\": [{\"cvm_gateway\": \"192.168.0.1\", \"cvm_ip\": \"\
+          192.168.0.1\", \"cvm_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\", \"cvm_netmask\": \"192.168.0.1\"\
+          , \"cvm_vlan_id\": \"string\", \"error\": \"string\", \"hypervisor_gateway\": \"192.168.0.1\", \"hypervisor_hostname\"\
+          : \"string\", \"hypervisor_ip\": \"192.168.0.1\", \"hypervisor_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          , \"hypervisor_netmask\": \"192.168.0.1\", \"ipmi_gateway\": \"192.168.0.1\", \"ipmi_ip\": \"192.168.0.1\", \"ipmi_netmask\"\
+          : \"192.168.0.1\", \"ipv6_address\": \"string\", \"phoenix_ipv6_address\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\"\
+          }]}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    provision_network_params:
+      description: Provision Networking on the node.
+      properties:
+        error:
+          description: 'Present when this API returns partial results.
+
+            See the `error` field at node level for more details.
+
+            '
+          type: string
+        nodes:
+          description: nodes array.
+          items:
+            $ref: '#/components/schemas/node_info_list'
+          type: array
+      required:
+      - nodes
+      type: object
+    http_error_500:
+      description: HTTP error 500 description.
+      properties:
+        error:
+          properties:
+            details:
+              description: Error details.
+              type: object
+            message:
+              description: Error message.
+              type: string
+            session_id:
+              description: Imaging session ID.
+              type: string
+          type: object
+      type: object
+    node_info_list:
+      description: Network parameters of the node.
+      properties:
+        cvm_gateway:
+          description: Gateway of CVM.
+          format: ipv4
+          type: string
+        cvm_ip:
+          description: CVM IP address.
+          format: ipv4
+          type: string
+        cvm_ipv6_address:
+          description: Global IPv6 address of CVM.
+          format: ipv6
+          type: string
+        cvm_netmask:
+          description: Netmask of CVM.
+          format: ipv4
+          type: string
+        cvm_vlan_id:
+          description: CVM VLAN tag.
+          type: string
+        error:
+          description: 'Only exists when failed to fetch node_info, with the reason of failure.
+
+            all other fields will be empty
+
+            '
+          type: string
+        hypervisor_gateway:
+          description: Gateway of the hypervisor.
+          format: ipv4
+          type: string
+        hypervisor_hostname:
+          description: Hypervisor hostname.
+          type: string
+        hypervisor_ip:
+          description: Hypervisor IP address.
+          format: ipv4
+          type: string
+        hypervisor_ipv6_address:
+          description: Global IPv6 address of hypervisor.
+          format: ipv6
+          type: string
+        hypervisor_netmask:
+          description: Netmask of the hypervisor.
+          format: ipv4
+          type: string
+        ipmi_gateway:
+          description: IPMI gateway.
+          format: ipv4
+          type: string
+        ipmi_ip:
+          description: IPMI IP address.
+          format: ipv4
+          type: string
+        ipmi_netmask:
+          description: IPMI netmask.
+          format: ipv4
+          type: string
+        ipv6_address:
+          description: IPv6 link local address.
+          type: string
+        phoenix_ipv6_address:
+          description: Global IPv6 address of Phoenix.
+          format: ipv6
+          type: string
+      type: object

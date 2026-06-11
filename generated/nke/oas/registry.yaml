@@ -1,0 +1,296 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries:
+    get:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: "List the private registries used by the Kubernetes cluster\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/k8s/clusters/cluster01/registries"
+      operationId: ListPrivateRegistryInK8s
+      parameters:
+      - description: The Kubernetes cluster name.
+        name: cluster_name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of private registries used by the Kubernetes cluster.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_registry_list'
+        '404':
+          description: The name of the Kubernetes cluster is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '501':
+          description: Functionality not implemented.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    post:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: "Add the private registry access to the Kubernetes cluster\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/k8s/clusters/cluster01/registries"
+      operationId: AddPrivateRegistryToK8s
+      parameters:
+      - description: The Kubernetes cluster name.
+        name: cluster_name
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1.1.0_cluster_registry_add_config'
+        required: true
+      responses:
+        '202':
+          description: Request to add private registry access to the Kubernetes cluster is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_add_registry_to_k8s_response'
+        '404':
+          description: The name of the Kubernetes cluster or the private registry is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '501':
+          description: Functionality not implemented.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"registry_name\": \"prod-user-registry\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"registry_name\": \"prod-user-registry\"\n}' \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"registry_name\"\
+          : \"prod-user-registry\"\n}\"\"\"\n\nconn.request(\"POST\",\"/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          registry_name\": \"prod-user-registry\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"\
+          application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"registry_name\\\": \\\"prod-user-registry\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"registry_name\": \"prod-user-registry\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+  /karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries/{registry_name}:
+    delete:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: "Remove the private registry access from the Kubernetes cluster\n\n **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/k8s/clusters/cluster01/registries/test-reg"
+      operationId: DeletePrivateRegistryFromK8s
+      parameters:
+      - description: The Kubernetes cluster name.
+        name: cluster_name
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Private registry name.
+        name: registry_name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Request to delete private registry access from the Kubernetes cluster is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_delete_registry_from_k8s_response'
+        '404':
+          description: The name of the Kubernetes cluster or the private registry is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '501':
+          description: Functionality not implemented.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries/{registry_name}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries/{registry_name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries/{registry_name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries/{registry_name}\"\n\t \n\
+          \treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries/{registry_name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{cluster_name}/registries/{registry_name}';\n\
+          const options = {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_delete_registry_from_k8s_response:
+      type: object
+      required:
+      - task_uuid
+      properties:
+        task_uuid:
+          description: The UUID of the task to delete private registry access from Kubernetes cluster.
+          type: string
+    v1.1.0_cluster_registry_add_config:
+      type: object
+      required:
+      - registry_name
+      properties:
+        registry_name:
+          description: The name of the private registry configuration.
+          type: string
+          maxLength: 40
+          minLength: 1
+          pattern: '[a-z0-9]([-a-z0-9]*[a-z0-9])?'
+    v1.1.0_registry:
+      type: object
+      required:
+      - uuid
+      - name
+      - endpoint
+      properties:
+        endpoint:
+          description: 'Endpoint of the private registry in format, <url:port>. (For example: prod-user-registry:5000).'
+          type: string
+        name:
+          description: The name of the private registry.
+          type: string
+        uuid:
+          description: The UUID of the private registry.
+          type: string
+    v1.1.0_add_registry_to_k8s_response:
+      type: object
+      required:
+      - task_uuid
+      properties:
+        task_uuid:
+          description: The UUID of the task to add private registry access to Kubernetes cluster.
+          type: string
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_registry_list:
+      type: array
+      items:
+        $ref: '#/components/schemas/v1.1.0_registry'

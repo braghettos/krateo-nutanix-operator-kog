@@ -1,0 +1,109 @@
+openapi: 3.0.0
+info:
+  title: Foundation Central Service
+  description: '# Introduction
+
+
+    **Foundation Central** creates clusters from factory-imaged nodes and reimages existing nodes that are already registered
+    with Foundation Central, remotely from Prism Central. This provides benefits such as creating clusters on remote sites
+    (for example, ROBO), without arranging for a deployment personnel visit.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+    '
+  contact:
+    name: Foundation Central Developers
+    email: foundation@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: '1.0'
+servers:
+- url: /api/fc/v1
+security:
+- BasicAuth: []
+- CookieAuth: []
+paths:
+  /imaged_nodes/{imaged_node_uuid}/refresh:
+    post:
+      description: Refreshes the details of the node imported from hardware manager.
+      tags:
+      - imaged_nodes
+      summary: Refresh node data in Foundation Central service
+      operationId: RefreshImagedNode
+      parameters:
+      - description: UUID of the node whose details needs to be refreshed.
+        name: imaged_node_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Refreshed the node details.
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/api/fc/v1/imaged_nodes/{imaged_node_uuid}/refresh\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/imaged_nodes/{imaged_node_uuid}/refresh"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{}\"\"\"\n\nconn.request(\"POST\",\"/api/fc/v1/imaged_nodes/{imaged_node_uuid}/refresh\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/imaged_nodes/{imaged_node_uuid}/refresh\"\n\t \n\treq, err := http.NewRequest(\"\
+          POST\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n   \
+          \     req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/api/fc/v1/imaged_nodes/{imaged_node_uuid}/refresh\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/imaged_nodes/{imaged_node_uuid}/refresh';\nconst options =\
+          \ {\n  method: 'POST',\n  headers: {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+components:
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      name: X-API-Key
+      in: header
+    APIKeyKubAuth:
+      type: apiKey
+      name: X-API-Key-Kub
+      in: header
+    BasicAuth:
+      type: http
+      scheme: basic
+    CookieAuth:
+      type: apiKey
+      name: Cookie
+      in: header
+    OpenIDAuth:
+      type: apiKey
+      name: code
+      in: query
+  schemas:
+    error_response:
+      type: object
+      properties:
+        code:
+          description: HTTP response code from the API.
+          type: integer
+          format: int32
+        message_list:
+          description: Error message in detail.
+          type: array
+          items:
+            type: string

@@ -1,0 +1,686 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/plans/{id}/prepare:
+    get:
+      description: Get the preparation details of the plan.
+      operationId: getPreperationDetails
+      parameters:
+      - description: Migration plan UUID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestOperationsEntity'
+      security:
+      - Bearer: []
+      summary: Get the preparation details of the plan
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev//move/v2/plans/{id}/prepare \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/plans/{id}/prepare"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n \nconn.request(\"GET\",\"//move/v2/plans/{id}/prepare\", headers=headers)\n\nres = conn.getresponse()\ndata\
+          \ = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/{id}/prepare\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\")\n   \
+          \     req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev//move/v2/plans/{id}/prepare\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/{id}/prepare';\nconst options = {\n  method: 'GET',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type': 'application/json'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    post:
+      description: Prepares the source VMs in a migration plan. For example- Install VirtIO drivers, retaining IP and so on.<br/>
+        If the preparation mode is set to 'manual', the API returns OS specific scripts that can be executed manually to prepare
+        the source VMs. <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/plans/867b4a4f-cb8c-4416-8d7e-26e033023aa4/prepare
+      operationId: preparePlan
+      parameters:
+      - description: Migration plan UUID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Uninstall guest tools flag.
+        in: query
+        name: UninstallGuestTools
+        schema:
+          type: boolean
+      - description: Skip IP retention flag.
+        in: query
+        name: SkipIPRetention
+        schema:
+          type: boolean
+      - description: Install NGT flag
+        in: query
+        name: InstallNGT
+        x-examples:
+          awsauto:
+            Spec:
+              CommonCredentials:
+                LinuxPassword: linux_password
+                LinuxUserName: linux_username
+                PemFile: ''
+                WindowsPassword: windows_password
+                WindowsUserName: windows_username
+              GuestPrepMode: auto
+              Region: ap-south-1
+              VMs:
+              - Password: vm_password
+                UUID: 00000000-0000-0000-2cf9-70aeef8c742c
+                UserName: vm_username
+          esxhyperv:
+            Spec:
+              CommonCredentials:
+                LinuxPassword: linux_password
+                LinuxUserName: linux_username
+              VMs:
+              - UUID: 5028e8e9-f521-895a-6798-c1018568de6e
+                VMId: vm-18954
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuestOperationsEntity'
+        description: Workload credentials to prepare the source environment.
+      responses:
+        '202':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepareWorkloadsResponse'
+            awsauto1: {}
+            awsauto2: {}
+            awsauto3: {}
+            awsmanual: {}
+            esxhyperv: {}
+      security:
+      - Bearer: []
+      summary: Prepare the source environment for migrations
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/plans/{id}/prepare \\\n    --header 'Accept:\
+          \ application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --data '{\n    \"APIVersion\": \"string\",\n    \"MetaData\": {\n        \"Count\":\
+          \ 0,\n        \"CreationTime\": \"string\",\n        \"Kind\": \"string\",\n        \"LastUpdateTime\": \"string\"\
+          ,\n        \"Name\": \"string\",\n        \"SpecVersion\": \"string\",\n        \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n    },\n    \"Spec\": {\n        \"CommonCredentials\": {\n            \"LinuxPassword\": \"string\",\n      \
+          \      \"LinuxUserName\": \"string\",\n            \"PemFile\": \"string\",\n            \"WindowsPassword\": \"\
+          string\",\n            \"WindowsUserName\": \"string\"\n        },\n        \"GuestPrepMode\": \"manual\",\n   \
+          \     \"RePrepareVMs\": true,\n        \"Region\": \"string\",\n        \"RunInBackground\": true,\n        \"VMs\"\
+          : [\n            {\n                \"GuestPrepMode\": \"manual\",\n                \"Password\": \"string\",\n\
+          \                \"PemFile\": \"string\",\n                \"SkipIpRetention\": true,\n                \"UUID\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n                \"UserName\": \"string\",\n                \"VMId\"\
+          : \"string\"\n            }\n        ]\n    },\n    \"Type\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"APIVersion\"\
+          : \"string\",\n    \"MetaData\": {\n        \"Count\": 0,\n        \"CreationTime\": \"string\",\n        \"Kind\"\
+          : \"string\",\n        \"LastUpdateTime\": \"string\",\n        \"Name\": \"string\",\n        \"SpecVersion\":\
+          \ \"string\",\n        \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n    },\n    \"Spec\": {\n        \"CommonCredentials\"\
+          : {\n            \"LinuxPassword\": \"string\",\n            \"LinuxUserName\": \"string\",\n            \"PemFile\"\
+          : \"string\",\n            \"WindowsPassword\": \"string\",\n            \"WindowsUserName\": \"string\"\n     \
+          \   },\n        \"GuestPrepMode\": \"manual\",\n        \"RePrepareVMs\": true,\n        \"Region\": \"string\"\
+          ,\n        \"RunInBackground\": true,\n        \"VMs\": [\n            {\n                \"GuestPrepMode\": \"\
+          manual\",\n                \"Password\": \"string\",\n                \"PemFile\": \"string\",\n               \
+          \ \"SkipIpRetention\": true,\n                \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n            \
+          \    \"UserName\": \"string\",\n                \"VMId\": \"string\"\n            }\n        ]\n    },\n    \"Type\"\
+          : \"string\"\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/plans/{id}/prepare"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"APIVersion\": \"string\",\n    \"MetaData\": {\n        \"Count\": 0,\n       \
+          \ \"CreationTime\": \"string\",\n        \"Kind\": \"string\",\n        \"LastUpdateTime\": \"string\",\n      \
+          \  \"Name\": \"string\",\n        \"SpecVersion\": \"string\",\n        \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n    },\n    \"Spec\": {\n        \"CommonCredentials\": {\n            \"LinuxPassword\": \"string\",\n      \
+          \      \"LinuxUserName\": \"string\",\n            \"PemFile\": \"string\",\n            \"WindowsPassword\": \"\
+          string\",\n            \"WindowsUserName\": \"string\"\n        },\n        \"GuestPrepMode\": \"manual\",\n   \
+          \     \"RePrepareVMs\": true,\n        \"Region\": \"string\",\n        \"RunInBackground\": true,\n        \"VMs\"\
+          : [\n            {\n                \"GuestPrepMode\": \"manual\",\n                \"Password\": \"string\",\n\
+          \                \"PemFile\": \"string\",\n                \"SkipIpRetention\": true,\n                \"UUID\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n                \"UserName\": \"string\",\n                \"VMId\"\
+          : \"string\"\n            }\n        ]\n    },\n    \"Type\": \"string\"\n}\"\"\"\n\nconn.request(\"POST\",\"//move/v2/plans/{id}/prepare\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/{id}/prepare\"\n\t\n\tpayload :=  strings.NewReader(`{\"APIVersion\"\
+          : \"string\", \"MetaData\": {\"Count\": 0, \"CreationTime\": \"string\", \"Kind\": \"string\", \"LastUpdateTime\"\
+          : \"string\", \"Name\": \"string\", \"SpecVersion\": \"string\", \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"Spec\": {\"CommonCredentials\": {\"LinuxPassword\": \"string\", \"LinuxUserName\": \"string\", \"PemFile\"\
+          : \"string\", \"WindowsPassword\": \"string\", \"WindowsUserName\": \"string\"}, \"GuestPrepMode\": \"manual\",\
+          \ \"RePrepareVMs\": true, \"Region\": \"string\", \"RunInBackground\": true, \"VMs\": [{\"GuestPrepMode\": \"manual\"\
+          , \"Password\": \"string\", \"PemFile\": \"string\", \"SkipIpRetention\": true, \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"UserName\": \"string\", \"VMId\": \"string\"}]}, \"Type\": \"string\"}`)\n\treq, err := http.NewRequest(\"POST\"\
+          , url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n     \
+          \   req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/plans/{id}/prepare\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"APIVersion\\\": \\\"string\\\", \\\"\
+          MetaData\\\": {\\\"Count\\\": 0, \\\"CreationTime\\\": \\\"string\\\", \\\"Kind\\\": \\\"string\\\", \\\"LastUpdateTime\\\
+          \": \\\"string\\\", \\\"Name\\\": \\\"string\\\", \\\"SpecVersion\\\": \\\"string\\\", \\\"UUID\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \"}, \\\"Spec\\\": {\\\"CommonCredentials\\\": {\\\"LinuxPassword\\\": \\\"string\\\", \\\"LinuxUserName\\\": \\\
+          \"string\\\", \\\"PemFile\\\": \\\"string\\\", \\\"WindowsPassword\\\": \\\"string\\\", \\\"WindowsUserName\\\"\
+          : \\\"string\\\"}, \\\"GuestPrepMode\\\": \\\"manual\\\", \\\"RePrepareVMs\\\": true, \\\"Region\\\": \\\"string\\\
+          \", \\\"RunInBackground\\\": true, \\\"VMs\\\": [{\\\"GuestPrepMode\\\": \\\"manual\\\", \\\"Password\\\": \\\"\
+          string\\\", \\\"PemFile\\\": \\\"string\\\", \\\"SkipIpRetention\\\": true, \\\"UUID\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \", \\\"UserName\\\": \\\"string\\\", \\\"VMId\\\": \\\"string\\\"}]}, \\\"Type\\\": \\\"string\\\"}\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/{id}/prepare';\nconst options = {\n  method: 'POST',\n\
+          \  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type': 'application/json'},\n\
+          \  body:  `{\"APIVersion\": \"string\", \"MetaData\": {\"Count\": 0, \"CreationTime\": \"string\", \"Kind\": \"\
+          string\", \"LastUpdateTime\": \"string\", \"Name\": \"string\", \"SpecVersion\": \"string\", \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          }, \"Spec\": {\"CommonCredentials\": {\"LinuxPassword\": \"string\", \"LinuxUserName\": \"string\", \"PemFile\"\
+          : \"string\", \"WindowsPassword\": \"string\", \"WindowsUserName\": \"string\"}, \"GuestPrepMode\": \"manual\",\
+          \ \"RePrepareVMs\": true, \"Region\": \"string\", \"RunInBackground\": true, \"VMs\": [{\"GuestPrepMode\": \"manual\"\
+          , \"Password\": \"string\", \"PemFile\": \"string\", \"SkipIpRetention\": true, \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"UserName\": \"string\", \"VMId\": \"string\"}]}, \"Type\": \"string\"}`\n};\n\ntry {\n  const response = await\
+          \ fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n\
+          }"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    VMResult:
+      description: VM information for readiness check results.
+      properties:
+        Message:
+          type: string
+        Status:
+          description: VM status.
+          type: string
+        VMId:
+          description: VM Id.
+          type: string
+        VMName:
+          description: VM name.
+          type: string
+      type: object
+    PrepareWorkloadsResponse:
+      description: Workload preparation status.
+      properties:
+        APIVersion:
+          description: Move API version.
+          type: string
+        MetaData:
+          $ref: '#/components/schemas/MetaData'
+        Spec:
+          $ref: '#/components/schemas/GuestOperationsInput'
+        Status:
+          $ref: '#/components/schemas/PrepareWorkloadsResultEntity'
+        TaskUUID:
+          description: Task UUID for the prepare plan.
+          format: uuid
+          type: string
+      type: object
+    VpcProps:
+      description: VPC-related properties of the source VM.
+      properties:
+        ID:
+          description: VPC identifier.
+          type: string
+        Name:
+          description: VPC name.
+          type: string
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    GuestOperationsInput:
+      properties:
+        CommonCredentials:
+          $ref: '#/components/schemas/Credentials'
+        GuestPrepMode:
+          enum:
+          - manual
+          - auto
+          type: string
+        RePrepareVMs:
+          description: Flag to indicate if all the VMs need to be re-prepared.
+          type: boolean
+        Region:
+          type: string
+        RunInBackground:
+          type: boolean
+        VMInventory:
+          additionalProperties:
+            $ref: '#/components/schemas/VMConversionEntity'
+          description: Mapping of VM UUIDs to VM entity for conversion plan.
+        VMs:
+          items:
+            $ref: '#/components/schemas/GuestCredentials'
+          type: array
+      type: object
+    VMConversionEntity:
+      description: VM conversion entity.
+      properties:
+        VMSpec:
+          $ref: '#/components/schemas/VMInventory'
+      type: object
+    NsxPolicyToFnsPolicyMinimal:
+      description: Minimal information about the NSX security policy  translated to the FNS policy.
+      properties:
+        FnsSplitPoliciesNames:
+          description: List of names of the split policies in FNS corresponding to given NSX policy.
+          items:
+            type: string
+          type: array
+        Nsx:
+          $ref: '#/components/schemas/NsxSecurityPolicy'
+      type: object
+    PrepareWorkloadsResultEntity:
+      description: Workloads preparation result.
+      properties:
+        AgentID:
+          description: Move Agent Id
+          type: string
+        Message:
+          description: Message
+          type: string
+        Result:
+          $ref: '#/components/schemas/PrepareWorkloadsResult'
+        State:
+          description: Migration plan state
+          type: string
+      type: object
+    NsxSecurityPolicy:
+      description: The NSX security policy info used during the translation of security policies.
+      properties:
+        PolicyName:
+          description: The NSX security policy name.
+          type: string
+        PolicyUuid:
+          description: The NSX security policy UUID.
+          type: string
+      type: object
+    GuestScript:
+      properties:
+        LinuxGuestCleanupScript:
+          description: Linux Guest Cleanup Script.
+          items:
+            type: string
+          type: array
+        LinuxGuestScript:
+          description: Linux Guest Script.
+          items:
+            type: string
+          type: array
+        Region:
+          type: string
+        WindowsGuestCleanupScript:
+          description: Windows Guest Cleanup Script.
+          items:
+            type: string
+          type: array
+        WindowsGuestScript:
+          description: Windows Guest Script.
+          items:
+            type: string
+          type: array
+      type: object
+    MetaData:
+      description: Metadata information
+      properties:
+        Count:
+          type: integer
+        CreationTime:
+          description: Token creation time.
+          type: string
+        Kind:
+          type: string
+        LastUpdateTime:
+          description: Last updated time.
+          type: string
+        Name:
+          description: User name
+          type: string
+        SpecVersion:
+          description: Specification version
+          type: string
+        UUID:
+          description: UUID
+          format: uuid
+          type: string
+      type: object
+    VMInventory:
+      description: VM Inventory information.
+      properties:
+        AdditionalProperties:
+          additionalProperties:
+            type: string
+          type: object
+        AssociatedCategories:
+          description: The list of categories associated with the Virtual Machine.
+          items:
+            type: string
+          type: array
+        AssociatedPolicies:
+          description: The list of NSX security policies associated with the Virtual Machine.
+          items:
+            $ref: '#/components/schemas/NsxPolicyToFnsPolicyMinimal'
+          type: array
+        Categories:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        ClusterName:
+          type: string
+        DatacenterName:
+          type: string
+        ErrorMessages:
+          items:
+            type: string
+          type: array
+        HostName:
+          type: string
+        HostUuid:
+          format: uuid
+          type: string
+        HypervisorType:
+          description: Type of hypervisor.
+          type: string
+        InternalUuid:
+          type: string
+        MemoryMB:
+          format: uint32
+          type: integer
+        MigrationSupportStatus:
+          format: uint64
+          type: integer
+        MigrationSupportWarningStatus:
+          format: uint64
+          type: integer
+        Networks:
+          items:
+            $ref: '#/components/schemas/NetworkInventory'
+          type: array
+        Nics:
+          properties:
+            NicsInfo:
+              items:
+                $ref: '#/components/schemas/VmNicInfo'
+              type: array
+          type: object
+        NumCDROMs:
+          format: uint32
+          type: integer
+        NumCPU:
+          format: uint32
+          type: integer
+        NumCoresPerSocket:
+          format: uint32
+          type: integer
+        NumEthernetCards:
+          format: uint32
+          type: integer
+        OSType:
+          type: string
+        OverallCpuDemandInMHz:
+          format: uint32
+          type: integer
+        PowerState:
+          type: string
+        RecID:
+          format: int64
+          type: integer
+        SourceUuid:
+          type: string
+        StorageAllocatedInBytes:
+          format: uint64
+          type: integer
+        StorageUsedInBytes:
+          format: uint64
+          type: integer
+        VMName:
+          type: string
+        VMUuid:
+          type: string
+        VmID:
+          type: string
+        WarningMessages:
+          items:
+            type: string
+          type: array
+      type: object
+    VmNicInfo:
+      description: Source VM's NIC related information such as network, device id, IP conf, MAC etc.
+      properties:
+        IpsConf:
+          items:
+            $ref: '#/components/schemas/VmIpConf'
+          type: array
+        Mac:
+          description: MAC address of the particular NIC.
+          type: string
+        NetworkName:
+          description: The name of the network connected to the particular NIC.
+          type: string
+      type: object
+    GuestOperationsEntity:
+      description: Object for guest operations such as user preparation scripts and so on.
+      properties:
+        APIVersion:
+          description: Move API version
+          type: string
+        MetaData:
+          $ref: '#/components/schemas/MetaData'
+        Spec:
+          $ref: '#/components/schemas/GuestOperationsInput'
+        Type:
+          description: Guest operation type.
+          type: string
+      type: object
+    Credentials:
+      description: Credentials for Windows and Linux login.
+      properties:
+        LinuxPassword:
+          description: Password for logging in to Linux VM.
+          type: string
+        LinuxUserName:
+          description: User name for logging in to Linux VM.
+          type: string
+        PemFile:
+          description: PEM file to login to VM.
+          type: string
+        WindowsPassword:
+          description: Password for logging in to Windows VM.
+          type: string
+        WindowsUserName:
+          description: User name for logging in to Windows VM.
+          type: string
+      type: object
+    PrepareWorkloadsResult:
+      description: Workloads preparation result.
+      properties:
+        Failed:
+          description: List of VMs where guest script installation failed.
+          items:
+            $ref: '#/components/schemas/VMResult'
+          type: array
+        GuestScript:
+          $ref: '#/components/schemas/GuestScript'
+        InstallationInProgress:
+          description: Whether guest script installation is in progress.
+          type: boolean
+        Passed:
+          description: List of VMs where guest script installation passed.
+          items:
+            $ref: '#/components/schemas/VMResult'
+          type: array
+      type: object
+    GuestCredentials:
+      properties:
+        GuestPrepMode:
+          description: Select migration preparation mode as manual or auto.
+          enum:
+          - manual
+          - auto
+          type: string
+        Password:
+          description: VM password.
+          type: string
+        PemFile:
+          description: Private file used to authenticate VM.
+          type: string
+        SkipIpRetention:
+          description: Flag to indicate if the IP address should be retained.
+          type: boolean
+        UUID:
+          description: VM UUID.
+          format: uuid
+          type: string
+        UserName:
+          description: VM username.
+          type: string
+        VMId:
+          description: VM ID.
+          type: string
+      type: object
+    NetworkInventory:
+      description: Network Inventory information.
+      properties:
+        Devices:
+          description: List of devices in the network.
+          items:
+            format: int32
+            type: integer
+          type: array
+        ID:
+          description: Network Id.
+          type: string
+        IpAddresses:
+          description: List of IP addresses of devices in this network.
+          items:
+            type: string
+          type: array
+        MacIDs:
+          description: List of MAC addresses of devices in this network.
+          items:
+            type: string
+          type: array
+        Name:
+          description: Network name.
+          type: string
+        VPC:
+          $ref: '#/components/schemas/VpcProps'
+      type: object
+    VmIpConf:
+      description: IP address information for the source VM NIC, such as IP address, netmask, gateway, and DNS.
+      properties:
+        DnsIps:
+          description: Comma separated DNS IPs, such as '8.8.8.8,8.8.4.4'
+          type: string
+        Gateway:
+          description: The gateway for the given IP address.
+          type: string
+        IpAddress:
+          description: The IP address in IPv4 notation.
+          type: string
+        PrefixLength:
+          description: The number denoting the subnet mask in CIDR notation for the given IP address, i.e.  for a CIDR notation
+            "10.10.10.10/24", "24" is the prefix length. Valid value x such that 0 <= x <= 32.
+          format: int32
+          maximum: 32
+          minimum: 0
+          type: integer
+      type: object

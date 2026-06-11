@@ -1,0 +1,225 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/configurations/appliance/sslcertificate:
+    get:
+      description: Gets the Move appliance SSL certificate.<br/> <b>Sample API syntax:</b> https://move.address/move/v2/configurations/appliance/sslcertificate
+      operationId: getSSLCertificateConfigurations
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SSLCertificateResponse'
+      summary: Get Move appliance SSL certificate configurations
+      tags:
+      - Application
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"//move/v2/configurations/appliance/sslcertificate\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate';\nconst options =\
+          \ {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry\
+          \ {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    put:
+      description: Update Move appliance SSL certificate configurations. <br/><br/><b>Sample API syntax:</b> https://move.address/move/v2/configurations/appliance/sslcertificate
+      operationId: updateSSLCertificateConfigurations
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                Action:
+                  description: Move appliance SSL certificate actions.
+                  type: string
+                  x-examples: regenerate
+                PrivateKey:
+                  description: The private key to be updated.
+                  type: string
+                  format: binary
+                  x-examples: move_private_key.pem
+                SSLCertificate:
+                  description: The SSL certificate to be updated.
+                  type: string
+                  format: binary
+                  x-examples: move_ssl_certificate.pem
+                SSLCertificateChain:
+                  description: The SSL certificate chain to be updated.
+                  type: string
+                  format: binary
+                  x-examples: move_ssl_certificate_chain.pem
+              required:
+              - Action
+        required: true
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SSLCertificateResponse'
+      security:
+      - Bearer: []
+      summary: Update Move appliance SSL certificate configurations
+      tags:
+      - Application
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n\
+          \    --header 'Content-Type: multipart/form-data' \\\n    --data '{\n    \"Action\": \"string\",\n    \"PrivateKey\"\
+          : null,\n    \"SSLCertificate\": null,\n    \"SSLCertificateChain\": null\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: multipart/form-data' \\\n    --body-data '{\n    \"\
+          Action\": \"string\",\n    \"PrivateKey\": null,\n    \"SSLCertificate\": null,\n    \"SSLCertificateChain\": null\n\
+          }' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"multipart/form-data\"\
+          \n}\n\npayload =  \"\"\"{\n    \"Action\": \"string\",\n    \"PrivateKey\": null,\n    \"SSLCertificate\": null,\n\
+          \    \"SSLCertificateChain\": null\n}\"\"\"\n\nconn.request(\"PUT\",\"//move/v2/configurations/appliance/sslcertificate\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          Action\": \"string\", \"PrivateKey\": null, \"SSLCertificate\": null, \"SSLCertificateChain\": null}`)\n\treq, err\
+          \ := http.NewRequest(\"PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\"\
+          , \"Bearer <your_access_token>\")\n        req.Header.Add(\"Content-Type\", \"multipart/form-data\")\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"multipart/form-data\")\n  .setBody(\"{\\\"Action\\\": \\\"string\\\", \\\"PrivateKey\\\
+          \": null, \\\"SSLCertificate\\\": null, \\\"SSLCertificateChain\\\": null}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/configurations/appliance/sslcertificate';\nconst options =\
+          \ {\n  method: 'PUT',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>',\
+          \ 'Content-Type': 'multipart/form-data'},\n  body:  `{\"Action\": \"string\", \"PrivateKey\": null, \"SSLCertificate\"\
+          : null, \"SSLCertificateChain\": null}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data\
+          \ = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    SSLCertificateResponse:
+      description: SSL certificate information.
+      properties:
+        Spec:
+          $ref: '#/components/schemas/SSLCertificateEntity'
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    SSLCertificateEntity:
+      description: Details of the applied SSL certificate.
+      properties:
+        CommonName:
+          type: string
+        Country:
+          type: string
+        Expiry:
+          type: string
+        KeyType:
+          type: string
+        Location:
+          type: string
+        Organization:
+          type: string
+        OrganizationUnit:
+          type: string
+        SigningAlgorithm:
+          type: string
+        State:
+          type: string
+        Warning:
+          type: string
+      type: object

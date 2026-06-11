@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-alpha.1/k8s/clusters/{name}/enable-audit-logs:
+    post:
+      description: Enable the audit log collection.
+      tags:
+      - NKE_API_Reference_Auditlog
+      summary: Enable the audit log collection
+      operationId: PostEnableAuditLogs
+      parameters:
+      - description: The Kubernetes cluster name.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully enabled the audit log collection.
+        '400':
+          description: Bad parameters specified in request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: The specified Kubernetes cluster is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/enable-audit-logs\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/enable-audit-logs"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{}\"\"\"\n\nconn.request(\"\
+          POST\",\"/karbon/v1-alpha.1/k8s/clusters/{name}/enable-audit-logs\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/enable-audit-logs\"\n\t \n\treq, err := http.NewRequest(\"\
+          POST\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n   \
+          \     req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/enable-audit-logs\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/enable-audit-logs';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object

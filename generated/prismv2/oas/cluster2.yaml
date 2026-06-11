@@ -1,0 +1,1825 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /clusters:
+    get:
+      summary: Get the list of clusters.
+      description: Get the list of clusters.
+      tags:
+      - /clusters
+      operationId: get/clusters/getClusters
+      parameters:
+      - name: count
+        in: query
+        description: Number of Clusters to retrieve
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: filter_criteria
+        in: query
+        description: Filter criteria
+        required: false
+        schema:
+          type: string
+      - name: sort_criteria
+        in: query
+        description: Sort criteria
+        required: false
+        schema:
+          type: string
+      - name: search_string
+        in: query
+        description: Search string
+        required: false
+        schema:
+          type: string
+      - name: search_attribute_list
+        in: query
+        description: Search attribute list
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Page number
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: projection
+        in: query
+        description: Projections on the attributes
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.appliance.configuration.ClusterDTO_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters \\\n  \
+          \  --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/clusters\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+  /clusters/{id}:
+    get:
+      summary: Get a Cluster.
+      description: Get a Cluster with the specified id.
+      tags:
+      - /clusters
+      operationId: get/clusters/{id}/getCluster
+      parameters:
+      - name: id
+        in: path
+        description: Id of the cluster
+        required: true
+        schema:
+          type: string
+      - name: projection
+        in: query
+        description: Projections on the attributes
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters/{id} \\\
+          \n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters/{id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/clusters/{id}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters/{id}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters/{id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/clusters/{id}';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.dto.appliance.configuration.ClusterResiliencyPreferenceDTO:
+      type: object
+      properties:
+        current_resiliency_preference:
+          enum:
+          - DELAYED
+          - IMMEDIATE
+          type: string
+        desired_resiliency_preference:
+          enum:
+          - DELAYED
+          - IMMEDIATE
+          type: string
+    get.dto.alerts.AlertSummaryDTO:
+      type: object
+      properties:
+        alert_summaries:
+          additionalProperties:
+            $ref: '#/components/schemas/get.base.EntityCollection_get.dto.alerts.AlertDTO_'
+          type: object
+        count:
+          format: int64
+          type: integer
+    sun.net.spi.nameservice.NameService:
+      type: object
+      properties: {}
+    java.util.Optional_unknown_:
+      type: object
+      properties:
+        empty:
+          $ref: '#/components/schemas/circular.reference.handler'
+        value: {}
+    java.lang.Class_unknown_:
+      type: object
+      properties:
+        all_perm_domain:
+          $ref: '#/components/schemas/circular.reference.handler'
+        annotation:
+          format: int32
+          type: integer
+        annotation_data:
+          $ref: '#/components/schemas/java.lang.Class_AnnotationData'
+        annotation_type:
+          $ref: '#/components/schemas/circular.reference.handler'
+        cached_constructor:
+          $ref: '#/components/schemas/circular.reference.handler'
+        class_redefined_count:
+          format: int32
+          type: integer
+        class_value_map:
+          $ref: '#/components/schemas/circular.reference.handler'
+        enum:
+          format: int32
+          type: integer
+        enum_constant_directory:
+          additionalProperties: {}
+          type: object
+        enum_constants: {}
+        generic_info:
+          $ref: '#/components/schemas/sun.reflect.generics.repository.ClassRepository'
+        initted:
+          type: boolean
+        name:
+          type: string
+        new_instance_caller_cache:
+          $ref: '#/components/schemas/circular.reference.handler'
+        reflection_data:
+          $ref: '#/components/schemas/java.lang.ref.SoftReference_java.lang.Class_ReflectionData_unknown_'
+        reflection_factory:
+          $ref: '#/components/schemas/circular.reference.handler'
+        serial_persistent_fields:
+          items:
+            $ref: '#/components/schemas/circular.reference.handler'
+          type: array
+        synthetic:
+          format: int32
+          type: integer
+        use_caches:
+          type: boolean
+    get.dto.alerts.AlertDTO_MetricDetails:
+      type: object
+      properties:
+        comparison_operator:
+          type: string
+        condition_type:
+          enum:
+          - STATIC_THRESHOLD
+          - ANOMALY
+          - SAFETY_ZONE
+          type: string
+        data_type:
+          enum:
+          - LONG
+          - DOUBLE
+          - BOOLEAN
+          - STRING
+          type: string
+        entity_id:
+          type: string
+        entity_type:
+          type: string
+        metric_category:
+          type: string
+        metric_display_name:
+          type: string
+        metric_name:
+          type: string
+        metric_value_details:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_MetricValueDetails'
+          type: array
+        unit:
+          type: string
+    java.lang.ref.SoftReference_java.lang.Class_ReflectionData_unknown_:
+      type: object
+      properties:
+        clock:
+          format: int64
+          type: integer
+        timestamp:
+          format: int64
+          type: integer
+    get.dto.appliance.configuration.ClusterDTO_SecurityComplianceConfigDTO:
+      type: object
+      properties:
+        enable_snmpv3_only:
+          type: boolean
+    java.net.InetAddress:
+      type: object
+      properties:
+        address_cache:
+          $ref: '#/components/schemas/circular.reference.handler'
+        address_cache_init:
+          type: boolean
+        cache_lock:
+          $ref: '#/components/schemas/java.lang.Object'
+        cache_time:
+          format: int64
+          type: integer
+        cached_local_host:
+          $ref: '#/components/schemas/circular.reference.handler'
+        canonical_host_name:
+          type: string
+        fields_offset:
+          format: int64
+          type: integer
+        holder:
+          $ref: '#/components/schemas/java.net.InetAddress_InetAddressHolder'
+        impl:
+          $ref: '#/components/schemas/java.net.InetAddressImpl'
+        ipv4:
+          format: int32
+          type: integer
+        ipv6:
+          format: int32
+          type: integer
+        lookup_table:
+          additionalProperties: {}
+          type: object
+        max_cache_time:
+          format: int64
+          type: integer
+        name_services:
+          items:
+            $ref: '#/components/schemas/sun.net.spi.nameservice.NameService'
+          type: array
+        negative_cache:
+          $ref: '#/components/schemas/circular.reference.handler'
+        prefer_ipv6_address:
+          type: boolean
+        serial_persistent_fields:
+          items:
+            $ref: '#/components/schemas/java.io.ObjectStreamField'
+          type: array
+        unknown_array:
+          items:
+            $ref: '#/components/schemas/circular.reference.handler'
+          type: array
+        unsafe:
+          $ref: '#/components/schemas/sun.misc.Unsafe'
+    java.lang.reflect.Type:
+      type: object
+      properties: {}
+    get.dto.health.check.EntityTypeHealthCheckSummaryDTO:
+      type: object
+      properties:
+        checks_in_error:
+          additionalProperties:
+            $ref: '#/components/schemas/get.dto.health.check.HealthCheckErrorsDTO'
+          type: object
+        detailed_check_summary:
+          additionalProperties:
+            additionalProperties:
+              format: int32
+              type: integer
+            type: object
+          type: object
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filter_criteria:
+          type: string
+        health_summary:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+    get.dto.ResultContentDescriptor:
+      type: object
+      properties:
+        actions:
+          type: string
+        alerts:
+          type: string
+        cadmus:
+          type: string
+        entities:
+          type: string
+        help:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/get.dto.ResultMetadata'
+        perspectives:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultContentDescriptor_Perspective'
+          type: array
+    get.dto.EntityMetadata:
+      type: object
+      properties:
+        additional_fields:
+          additionalProperties:
+            type: string
+          type: object
+        cluster_uuid:
+          type: string
+        context_hint_field:
+          type: string
+        context_hint_value:
+          type: string
+        entity_id:
+          type: string
+        entity_name:
+          type: string
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+    get.dto.appliance.configuration.ClusterDTO:
+      type: object
+      properties:
+        alert_summary:
+          $ref: '#/components/schemas/get.dto.alerts.AlertSummaryDTO'
+        all_hyperv_nodes_in_failover_cluster:
+          type: boolean
+        block_serials:
+          items:
+            type: string
+          type: array
+        cloudcluster:
+          type: boolean
+        cluster_arch:
+          type: string
+        cluster_data_state:
+          $ref: '#/components/schemas/get.dto.multicluster.ClusterDataStateDTO'
+        cluster_external_address:
+          items:
+            $ref: '#/components/schemas/get.common.Address'
+          type: array
+        cluster_external_data_services_address:
+          $ref: '#/components/schemas/get.common.Address'
+        cluster_external_data_services_ipaddress:
+          type: string
+        cluster_external_ipaddress:
+          type: string
+        cluster_fully_qualified_domain_name:
+          type: string
+        cluster_functions:
+          items:
+            enum:
+            - NDFS
+            - MULTICLUSTER
+            - CLOUDDATAGATEWAY
+            - MINERVA
+            - SINGLE_NODE
+            - TWO_NODE
+            - PLATFORM
+            type: string
+          type: array
+          uniqueItems: true
+        cluster_gpus:
+          items:
+            type: string
+          type: array
+        cluster_incarnation_id:
+          format: int64
+          type: integer
+        cluster_masquerading_address:
+          $ref: '#/components/schemas/get.common.Address'
+        cluster_masquerading_ipaddress:
+          type: string
+        cluster_masquerading_port:
+          format: int32
+          type: integer
+        cluster_redundancy_state:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterRedundancyStateDTO'
+        cluster_resiliency_preference:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterResiliencyPreferenceDTO'
+        cluster_usage_critical_alert_threshold_pct:
+          format: int32
+          type: integer
+        cluster_usage_warning_alert_threshold_pct:
+          format: int32
+          type: integer
+        cluster_uuid:
+          type: string
+        common_criteria_mode:
+          type: boolean
+        credential:
+          $ref: '#/components/schemas/get.dto.hyperv.CredentialDTO'
+        data_in_transit_encryption_dto:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.DataInTransitEncryptionDTO'
+        disable_degraded_node_monitoring:
+          type: boolean
+        domain:
+          type: string
+        enable_efficient_metric_sync:
+          type: boolean
+        enable_lock_down:
+          type: boolean
+        enable_on_disk_dedup:
+          type: boolean
+        enable_password_remote_login_to_cluster:
+          type: boolean
+        enable_rebuild_reservation:
+          type: boolean
+        enable_rf1_container:
+          type: boolean
+        enable_shadow_clones:
+          type: boolean
+        encrypted:
+          type: boolean
+        enforce_rackable_unit_aware_placement:
+          type: boolean
+        external_address:
+          items:
+            $ref: '#/components/schemas/get.common.Address'
+          type: array
+        external_subnet:
+          type: string
+        fault_tolerance_domain_type:
+          enum:
+          - RACK
+          - RACKABLE_UNIT
+          - NODE
+          - DISK
+          - CLUSTER
+          - CUSTOM
+          type: string
+        fingerprint_content_cache_percentage:
+          format: int32
+          type: integer
+        full_version:
+          type: string
+        global_nfs_white_list:
+          items:
+            type: string
+          type: array
+        global_nfs_white_list_address:
+          items:
+            $ref: '#/components/schemas/get.common.Address'
+          type: array
+        gpu_driver_version:
+          type: string
+        has_self_encrypting_drive:
+          type: boolean
+        health_summary:
+          $ref: '#/components/schemas/get.dto.health.check.HealthSummaryDTO'
+        http_proxies:
+          items:
+            $ref: '#/components/schemas/get.dto.appliance.configuration.HttpProxyDTO'
+          type: array
+        hypervisor_lldp_config:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO_HypervisorLldpConfigDTO'
+        hypervisor_security_compliance_config:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO_HypervisorSecurityComplianceConfigDTO'
+        hypervisor_types:
+          items:
+            enum:
+            - kVMware
+            - kXen
+            - kHyperv
+            - kKvm
+            - kAmazonWebServices
+            - kVCenter
+            - kAcropolis
+            - kSCVMM
+            - kNull
+            type: string
+          type: array
+          uniqueItems: true
+        id:
+          type: string
+        internal_address:
+          items:
+            $ref: '#/components/schemas/get.common.Address'
+          type: array
+        internal_subnet:
+          type: string
+        is_lts:
+          type: boolean
+        is_nsenabled:
+          type: boolean
+        is_registered_to_pc:
+          type: boolean
+        is_ssp_enabled:
+          type: boolean
+        is_upgrade_in_progress:
+          type: boolean
+        iscsi_config:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO_IscsiConfig'
+        management_servers:
+          items:
+            $ref: '#/components/schemas/get.dto.uhura.ManagementServerInfoDTO'
+          type: array
+        multicluster:
+          type: boolean
+        name:
+          type: string
+        name_servers:
+          items:
+            type: string
+          type: array
+        name_servers_list:
+          items:
+            $ref: '#/components/schemas/get.common.Address'
+          type: array
+        ncc_version:
+          type: string
+        nos_cluster_and_hosts_domain_joined:
+          type: boolean
+        ntp_servers:
+          items:
+            type: string
+          type: array
+        ntp_servers_list:
+          items:
+            $ref: '#/components/schemas/get.common.Address'
+          type: array
+        num_nodes:
+          format: int64
+          type: integer
+        operation_mode:
+          enum:
+          - NORMAL
+          - OVERRIDE
+          - READONLY
+          - STANDALONE
+          - SWITCH_TO_TWO_NODE
+          type: string
+        public_keys:
+          items:
+            $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO_PublicKeyDTO'
+          type: array
+        rackable_units:
+          items:
+            $ref: '#/components/schemas/get.dto.appliance.configuration.RackableUnitDTO'
+          type: array
+        recycle_bin_dto:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.RecycleBinDTO'
+        security_compliance_config:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO_SecurityComplianceConfigDTO'
+        segmented_iscsi_data_services_address:
+          items:
+            $ref: '#/components/schemas/get.common.Address'
+          type: array
+        segmented_iscsi_data_services_ipaddress:
+          type: string
+        service_centers:
+          items:
+            $ref: '#/components/schemas/get.dto.appliance.configuration.ServiceCenterDTO'
+          type: array
+        smtp_server:
+          $ref: '#/components/schemas/get.dto.appliance.configuration.SmtpServerDTO'
+        ssd_pinning_percentage_limit:
+          format: int32
+          type: integer
+        stats:
+          additionalProperties:
+            type: string
+          type: object
+        storage_type:
+          enum:
+          - ALL_FLASH
+          - MIXED
+          - ALL_HDD
+          type: string
+        support_verbosity_type:
+          enum:
+          - NOTHING
+          - BASIC
+          - BASIC_COREDUMP
+          type: string
+        target_version:
+          type: string
+        threshold_for_storage_thin_provision:
+          format: double
+          type: number
+        timezone:
+          type: string
+        usage_stats:
+          additionalProperties:
+            type: string
+          type: object
+        uuid:
+          type: string
+        version:
+          type: string
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    get.dto.ResultMetadata:
+      type: object
+      properties:
+        entity_type:
+          enum:
+          - PAGE
+          - CLUSTER
+          - HARDWARE
+          - STORAGE
+          - BACKUP
+          - DR
+          - LICENSE
+          - DISK
+          - STORAGE_TIER
+          - HOST
+          - NODE
+          - MANAGEMENT_SERVER
+          - MANAGEMENT_SERVER_INFO
+          - VM
+          - SERVICE_VM
+          - MH_VM
+          - NUCALM_CONSUMPTION
+          - VDISK
+          - VIRTUAL_DISK
+          - STORAGE_POOL
+          - CONTAINER
+          - STORAGE_CONTAINER
+          - VZONE
+          - SNAPSHOT
+          - FAST_CLONE
+          - RSYSLOG_SERVER
+          - KEY_MANAGEMENT_SERVER
+          - CERTIFICATE
+          - HTTP_PROXY
+          - SNMP_TRAP
+          - SNMP_USER
+          - REMOTE_SITE
+          - CLOUD_CREDENTIALS
+          - PROTECTION_DOMAIN
+          - CONSISTENCY_GROUP
+          - REPLICATION
+          - REPLICATION_LINK
+          - SYNC_REPLICATION
+          - VSTORE
+          - NETWORK_SWITCH_INTERFACE
+          - NETWORK_SWITCH
+          - VIRTUAL_NIC
+          - VMKERNEL_NIC
+          - HOST_NIC
+          - NIC_TEAM
+          - VIRTUAL_NETWORK
+          - VIRTUAL_SWITCH
+          - HOST_GPU
+          - VIRTUAL_GPU
+          - TAG
+          - COMMENT
+          - TASK
+          - IMAGE
+          - IMAGE_INFO
+          - ISCSI_CLIENT
+          - VOLUME_GROUP
+          - VOLUME_DISK
+          - VM_DISK
+          - FILE_SERVER
+          - FS_PARTNER_SERVER
+          - CVM
+          - NVM
+          - FILE_SERVER_SHARE
+          - ALERT_CAUSE
+          - ALERT_CHECK_SCHEMA
+          - ALERT_CHECK_SCHEMA_OVERRIDE
+          - AUDIT_EVENT_SCHEMA
+          - INTER_CLUSTER_DATA_TRANSFER_INDICATOR
+          - RACKABLE_UNIT
+          - DIRECTORY_CONFIG
+          - HEALTH_CHECK
+          - NETWORK_SNMP_PROFILE
+          - ALERT
+          - EVENT
+          - AUDIT
+          - SCHEDULE
+          - BANDWIDTH_POLICY
+          - FILE_GROUP
+          - NETWORK_MAPPING
+          - PROGRESS_MONITOR
+          - LCM_ENTITY
+          - LCM_AVAILABLE_VERSION
+          - CAPACITY_SCENARIO
+          - NCC_ERROR_CODES
+          - RESOURCE_CONSUMPTION
+          - REPORT_CONFIG
+          - REPORT_INSTANCE
+          - COMMON_REPORT_CONFIG
+          - REMOTE_CONNECTION
+          - CLOUD_TRUST
+          - DUMMY_API
+          - QOS_POLICY
+          - IDENTITY_PROVIDER
+          - NGT_POLICY
+          - PROTECTION_RULE
+          - ROLE
+          - CATEGORY
+          - ABAC_CATEGORY
+          - ABAC_CATEGORY_KEY
+          - ABAC_ENTITY_CAPABILITY
+          - NUCALM_APP_BLUEPRINT
+          - NUCALM_APPLICATION
+          - PROJECT
+          - AFFINITY_RULE
+          - MARKETPLACE_ITEM
+          - RECOVERY_PLAN
+          - RECOVERY_PLAN_JOB
+          - ABAC_USER_CAPABILITY
+          - AVAILABILITY_ZONE
+          - VM_RECOVERY_POINT
+          - NETWORK_SECURITY_RULE
+          - REMOTE_SYSLOG_SERVER
+          - REMOTE_SYSLOG_MODULE
+          - CITRIX_ADAPTER
+          - FAVORITE
+          - ANALYSIS_SESSION
+          - WIDGET
+          - SQL_SERVER
+          - QUERY
+          - DATABASE
+          - AVAILABILITY_GROUP
+          - FAILOVER_NODE
+          - EXTERNAL_ENTITY_CONFIG
+          - SUBNET
+          - ACTION_RULE
+          - POLICY_SCHEMA
+          - PRISM_NOTIFICATION_SERVICE_STATS
+          - VOLUME_GROUP_CONFIG
+          type: string
+        filters:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultMetadata_Filter'
+          type: array
+        instances:
+          items:
+            $ref: '#/components/schemas/get.dto.EntityMetadata'
+          type: array
+        title:
+          type: string
+    get.dto.appliance.configuration.SmtpServerDTO:
+      type: object
+      properties:
+        address:
+          type: string
+        email_status:
+          $ref: '#/components/schemas/get.dto.base.CommunicationStatusDTO'
+        from_email_address:
+          type: string
+        password:
+          type: string
+        port:
+          format: int32
+          type: integer
+        secure_mode:
+          enum:
+          - STARTTLS
+          - SSL
+          - NONE
+          type: string
+        server_address:
+          $ref: '#/components/schemas/get.common.Address'
+        username:
+          type: string
+    java.lang.Object:
+      type: object
+      properties: {}
+    get.dto.alerts.AlertDTO_SeverityTrail:
+      type: object
+      properties:
+        severity:
+          type: string
+        severity_change_timestamp_in_usecs:
+          format: int64
+          type: integer
+    get.base.EntityCollection_get.dto.appliance.configuration.ClusterDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.appliance.configuration.ClusterDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    get.dto.health.check.ErrorInfoDTO:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_uuid:
+          type: string
+        message:
+          type: string
+    get.dto.appliance.configuration.ClusterDTO_HypervisorSecurityComplianceConfigDTO:
+      type: object
+      properties: {}
+    get.dto.base.ParameterizedMessageDTO:
+      type: object
+      properties:
+        attributes:
+          additionalProperties:
+            type: string
+          type: object
+        message:
+          type: string
+    get.dto.uhura.ManagementServerInfoDTO:
+      type: object
+      properties:
+        drs_enabled:
+          type: boolean
+        drs_vm_behaviour:
+          enum:
+          - UNKNOWN
+          - FULL_ENABLED
+          - ONLY_PLACEMENT_ENABLED
+          - MANUAL
+          type: string
+        ha_enabled:
+          type: boolean
+        in_use:
+          type: boolean
+        ip_address:
+          type: string
+        management_server_type:
+          enum:
+          - VCENTER
+          type: string
+        registered:
+          type: boolean
+    get.dto.multicluster.ClusterDataStateDTO:
+      type: object
+      properties:
+        cluster_available:
+          type: boolean
+        cluster_data_available:
+          type: boolean
+        cluster_register_time_usecs:
+          format: int64
+          type: integer
+        cluster_uuid:
+          type: string
+        first_unavailable_time_usecs:
+          format: int64
+          type: integer
+        last_alerts_data_transferred_usecs:
+          format: int64
+          type: integer
+        last_arithmos_data_transferred_usecs:
+          format: int64
+          type: integer
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.dto.appliance.configuration.ServiceCenterDTO:
+      type: object
+      properties:
+        ip_address:
+          type: string
+        name:
+          type: string
+        port:
+          format: int32
+          maximum: 65536
+          minimum: 0
+          type: integer
+        username:
+          type: string
+    sun.misc.Unsafe:
+      type: object
+      properties:
+        address_size:
+          format: int32
+          type: integer
+        array_boolean_base_offset:
+          format: int32
+          type: integer
+        array_boolean_index_scale:
+          format: int32
+          type: integer
+        array_byte_base_offset:
+          format: int32
+          type: integer
+        array_byte_index_scale:
+          format: int32
+          type: integer
+        array_char_base_offset:
+          format: int32
+          type: integer
+        array_char_index_scale:
+          format: int32
+          type: integer
+        array_double_base_offset:
+          format: int32
+          type: integer
+        array_double_index_scale:
+          format: int32
+          type: integer
+        array_float_base_offset:
+          format: int32
+          type: integer
+        array_float_index_scale:
+          format: int32
+          type: integer
+        array_int_base_offset:
+          format: int32
+          type: integer
+        array_int_index_scale:
+          format: int32
+          type: integer
+        array_long_base_offset:
+          format: int32
+          type: integer
+        array_long_index_scale:
+          format: int32
+          type: integer
+        array_object_base_offset:
+          format: int32
+          type: integer
+        array_object_index_scale:
+          format: int32
+          type: integer
+        array_short_base_offset:
+          format: int32
+          type: integer
+        array_short_index_scale:
+          format: int32
+          type: integer
+        invalid_field_offset:
+          format: int32
+          type: integer
+        the_unsafe:
+          $ref: '#/components/schemas/circular.reference.handler'
+    get.dto.appliance.configuration.ClusterDTO_IscsiConfig:
+      type: object
+      properties:
+        external_client_enabled:
+          type: boolean
+    get.dto.appliance.configuration.ClusterRedundancyStateDTO:
+      type: object
+      properties:
+        current_redundancy_factor:
+          format: int32
+          type: integer
+        desired_redundancy_factor:
+          format: int32
+          type: integer
+        redundancy_status:
+          additionalProperties:
+            type: boolean
+          type: object
+    get.dto.appliance.configuration.RecycleBinDTO:
+      type: object
+      properties:
+        delete_intent_set:
+          type: boolean
+        recycle_bin_disabled_reason:
+          enum:
+          - SPACE_THRESHOLD_EXCEEDED
+          - USER_TRIGGERED_PURGE
+          - UNKNOWN
+          type: string
+        recycle_bin_disabled_timestamp_secs:
+          format: int64
+          type: integer
+        recycle_bin_ttlsecs:
+          format: int32
+          maximum: 604800
+          minimum: 0
+          type: integer
+    get.dto.health.check.HealthSummaryDTO:
+      type: object
+      properties:
+        entity_type_summaries:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.EntityTypeHealthCheckSummaryDTO'
+          type: array
+        health_check_summaries:
+          additionalProperties:
+            $ref: '#/components/schemas/get.dto.health.check.HealthCheckSummaryDTO'
+          type: object
+        health_status:
+          enum:
+          - Critical
+          - Warning
+          - Good
+          - Unknown
+          - Error
+          type: string
+    get.dto.alerts.AlertDTO_AlertDetailsDTO:
+      type: object
+      properties:
+        metric_details:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_MetricDetails'
+          type: array
+        severity_trails:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_SeverityTrail'
+          type: array
+    get.dto.alerts.AlertDTO_MetricValueDetails:
+      type: object
+      properties:
+        metric_threshold_value:
+          type: string
+        metric_value:
+          type: string
+        state_change_time_stamp_in_usecs:
+          format: int64
+          type: integer
+    java.lang.Class_AnnotationData:
+      type: object
+      properties:
+        annotations:
+          additionalProperties:
+            $ref: '#/components/schemas/java.lang.annotation.Annotation'
+          type: object
+        declared_annotations:
+          additionalProperties:
+            $ref: '#/components/schemas/java.lang.annotation.Annotation'
+          type: object
+        redefined_count:
+          format: int32
+          type: integer
+    get.dto.appliance.configuration.HttpProxyDTO:
+      type: object
+      description: http-proxy
+      properties:
+        address:
+          type: string
+        address_value:
+          $ref: '#/components/schemas/get.common.Address'
+        name:
+          type: string
+        password:
+          type: string
+        port:
+          format: int32
+          maximum: 65536
+          minimum: 0
+          type: integer
+        proxy_types:
+          items:
+            enum:
+            - HTTP
+            - HTTPS
+            - SOCKS
+            type: string
+          type: array
+        username:
+          type: string
+    java.io.ObjectStreamField:
+      type: object
+      properties:
+        field:
+          $ref: '#/components/schemas/circular.reference.handler'
+        name:
+          type: string
+        offset:
+          format: int32
+          type: integer
+        signature:
+          type: string
+        type:
+          $ref: '#/components/schemas/java.lang.Class_unknown_'
+        unshared:
+          type: boolean
+    get.dto.alerts.AlertDTO_AffectedEntity:
+      type: object
+      properties:
+        entity_name:
+          type: string
+        entity_type:
+          type: string
+        entity_type_display_name:
+          type: string
+        id:
+          type: string
+        uuid:
+          type: string
+    sun.reflect.generics.repository.ClassRepository:
+      type: object
+      properties:
+        none:
+          $ref: '#/components/schemas/circular.reference.handler'
+        super_interfaces:
+          items:
+            $ref: '#/components/schemas/java.lang.reflect.Type'
+          type: array
+        superclass:
+          $ref: '#/components/schemas/java.lang.reflect.Type'
+    get.base.EntityCollection_get.dto.alerts.AlertDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    circular.reference.handler:
+      type: string
+    java.net.InetAddress_InetAddressHolder:
+      type: object
+      properties:
+        address:
+          format: int32
+          type: integer
+        family:
+          format: int32
+          type: integer
+        host_name:
+          type: string
+        original_host_name:
+          type: string
+    java.net.InetAddressImpl:
+      type: object
+      properties: {}
+    java.lang.annotation.Annotation:
+      type: object
+      properties: {}
+    get.dto.health.check.HealthCheckSummaryDTO:
+      type: object
+      properties:
+        attribute_map:
+          additionalProperties:
+            type: string
+          type: object
+        executed_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        health_status:
+          enum:
+          - Critical
+          - Warning
+          - Good
+          - Unknown
+          - Error
+          type: string
+        id:
+          type: string
+        score:
+          format: int64
+          type: integer
+    get.dto.health.check.HealthCheckErrorsDTO:
+      type: object
+      properties:
+        cluster_level:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.ErrorInfoDTO'
+          type: array
+        node_level:
+          items:
+            $ref: '#/components/schemas/get.dto.health.check.ErrorInfoDTO'
+          type: array
+    get.common.Address:
+      type: object
+      properties:
+        hostname:
+          type: string
+        inet_address:
+          $ref: '#/components/schemas/java.util.Optional_java.net.InetAddress_'
+        ipv4:
+          type: string
+        ipv6:
+          type: string
+        log:
+          $ref: '#/components/schemas/org.slf4j.Logger'
+        port:
+          format: int32
+          type: integer
+        raw_string:
+          type: string
+        subnet:
+          type: string
+        subnet_sep:
+          type: string
+    get.dto.hyperv.CredentialDTO:
+      type: object
+      properties:
+        logon_name:
+          type: string
+        password:
+          type: string
+    get.dto.ResultMetadata_Filter:
+      type: object
+      properties:
+        display_for_rhs:
+          type: string
+        lhs:
+          type: string
+        operator:
+          type: string
+        rhs:
+          type: string
+    get.dto.appliance.configuration.RackableUnitDTO:
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
+        model:
+          type: string
+        model_name:
+          type: string
+        node_uuids:
+          items:
+            type: string
+          type: array
+        nodes:
+          items:
+            format: int64
+            type: integer
+          type: array
+        positions:
+          items:
+            type: string
+          type: array
+        rackable_unit_uuid:
+          type: string
+        serial:
+          type: string
+    get.dto.alerts.AlertCauseDTO:
+      type: object
+      properties:
+        actions:
+          type: string
+        additional_links:
+          type: string
+        alert_namespace:
+          type: string
+        cause:
+          type: string
+        chart_queries:
+          $ref: '#/components/schemas/get.base.EntityCollection_get.dto.ResultContentDescriptor_'
+        details:
+          type: string
+        has_global_details:
+          type: boolean
+        id:
+          type: string
+        num_resolved_count:
+          format: int64
+          type: integer
+        parent_cause_id:
+          type: string
+        title:
+          type: string
+        troubleshooting_steps:
+          type: string
+    get.dto.base.CommunicationStatusDTO:
+      type: object
+      properties:
+        last_changed_time_stamp_usecs:
+          format: int64
+          type: integer
+        last_checked_time_stamp_usecs:
+          format: int64
+          type: integer
+        last_successful_transmission_time_stamp_usecs:
+          format: int64
+          type: integer
+        message:
+          $ref: '#/components/schemas/get.dto.base.ParameterizedMessageDTO'
+        status:
+          enum:
+          - SUCCESS
+          - FAILED
+          - RETRYING
+          - UNKNOWN
+          - DISABLED
+          type: string
+    get.dto.appliance.configuration.ClusterDTO_PublicKeyDTO:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+    get.base.EntityCollection_get.dto.ResultContentDescriptor_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.ResultContentDescriptor'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    java.util.Optional_java.net.InetAddress_:
+      type: object
+      properties:
+        empty:
+          $ref: '#/components/schemas/java.util.Optional_unknown_'
+        value:
+          $ref: '#/components/schemas/java.net.InetAddress'
+    get.dto.alerts.AlertDTO:
+      type: object
+      properties:
+        acknowledged:
+          type: boolean
+        acknowledged_by_username:
+          type: string
+        acknowledged_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        affected_entities:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertDTO_AffectedEntity'
+          type: array
+        alert_details:
+          $ref: '#/components/schemas/get.dto.alerts.AlertDTO_AlertDetailsDTO'
+        alert_title:
+          type: string
+        alert_type_uuid:
+          type: string
+        auto_resolved:
+          type: boolean
+        categories:
+          items:
+            type: string
+          type: array
+        check_id:
+          type: string
+        classifications:
+          items:
+            type: string
+          type: array
+        cluster_uuid:
+          type: string
+        context_types:
+          items:
+            type: string
+          type: array
+        context_values:
+          items:
+            type: string
+          type: array
+        created_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        detailed_message:
+          type: string
+        entity_ids:
+          items:
+            type: string
+          type: array
+        entity_types:
+          items:
+            type: string
+          type: array
+        entity_uuids:
+          items:
+            type: string
+          type: array
+        id:
+          type: string
+        impact:
+          type: string
+        impact_types:
+          items:
+            type: string
+          type: array
+        last_occurrence_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        message:
+          type: string
+        node_uuid:
+          type: string
+        operation_type:
+          type: string
+        originating_cluster_uuid:
+          type: string
+        possible_causes:
+          items:
+            $ref: '#/components/schemas/get.dto.alerts.AlertCauseDTO'
+          type: array
+        resolved:
+          type: boolean
+        resolved_by_username:
+          type: string
+        resolved_time_stamp_in_usecs:
+          format: int64
+          type: integer
+        service_vmid:
+          type: string
+        severity:
+          type: string
+        user_defined:
+          type: boolean
+    get.dto.ResultContentDescriptor_Perspective:
+      type: object
+      properties:
+        format:
+          enum:
+          - TABLE
+          - BAR_CHART
+          - PIE_CHART
+          - TIME_SERIES
+          - KEY_VALUE
+          - COUNT
+          - HEALTH_SUMMARY
+          - ALERT_INFO
+          - CAPACITY
+          - OTHER
+          type: string
+        metadata:
+          $ref: '#/components/schemas/get.dto.ResultMetadata'
+        query: {}
+        result: {}
+        type:
+          type: string
+    get.dto.appliance.configuration.ClusterDTO_HypervisorLldpConfigDTO:
+      type: object
+      properties: {}
+    org.slf4j.Logger:
+      type: object
+      properties:
+        root_logger_name:
+          type: string
+    get.dto.appliance.configuration.DataInTransitEncryptionDTO:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        last_disabled_timestamp_secs:
+          format: int64
+          type: integer
+        last_enabled_timestamp_secs:
+          format: int64
+          type: integer

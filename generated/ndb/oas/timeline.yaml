@@ -1,0 +1,297 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /tms/{timemachine_id}/timeline:
+    get:
+      description: 'Get Timeline for a Sharded Cluster Time Machine denoting its capability across all Nutanix Clusters for
+        the specified duration
+
+        '
+      operationId: getTMCombinedTimeline
+      parameters:
+      - description: ID of the Time Machine.
+        in: path
+        name: timemachine_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The start time in user's timezone to compute the timeline summary from; default is (current time - 24
+          hours).
+        in: query
+        name: start_time
+        schema:
+          format: date-time
+          type: string
+      - description: The end time in user's timezone to compute the timeline summary till; default is current time.
+        in: query
+        name: end_time
+        schema:
+          format: date-time
+          type: string
+      - description: The user's timezone to compute the timeline in; default is UTC.
+        in: query
+        name: timezone
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TmTimeline'
+          description: Operation completed.
+      summary: Get Timeline for a Sharded Cluster Time Machine across all associated Nutanix Clusters
+      tags:
+      - Time Machines
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/tms/{timemachine_id}/timeline \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/tms/{timemachine_id}/timeline"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/tms/{timemachine_id}/timeline\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/tms/{timemachine_id}/timeline\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/tms/{timemachine_id}/timeline\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/tms/{timemachine_id}/timeline';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    logCapability:
+      description: The continuous (PITR) capability for a contiguous period of time
+      properties:
+        logHoles:
+          description: Gaps in PITR Recoverability for the time machine
+          items:
+            $ref: '#/components/schemas/logHole'
+            type: object
+          type: array
+        logs:
+          description: Available PITR Recoverability for the time machine
+          items:
+            $ref: '#/components/schemas/log'
+            type: object
+          type: array
+      type: object
+    snapshotCapability:
+      properties:
+        delayedSnaps:
+          description: Indicates any misses to the schedule (i.e. snapshot was scheduled for 10am but failed or was delayed
+            beyond 1h)
+          items:
+            $ref: '#/components/schemas/snapshotHole'
+            type: object
+          type: array
+        failedSnaps:
+          description: Indicates any failed snapshot operations
+          items:
+            $ref: '#/components/schemas/snapshotHole'
+            type: object
+          type: array
+        snapshots:
+          description: The snapshots available for restore
+          items:
+            $ref: '#/components/schemas/snapshot'
+            type: object
+          type: array
+      type: object
+    logHole:
+      properties:
+        fromTime:
+          description: The time from which PITR recoverability is not available
+          type: string
+        operationId:
+          description: The operation that caused the gap in log capability, if available.
+          type: string
+        toTime:
+          description: The time to which PITR recoverability is not available
+          type: string
+      type: object
+    TmTimeline:
+      properties:
+        capability:
+          $ref: '#/components/schemas/TmCapability'
+        databaseIds:
+          description: ID(s) of the individual database(s) the timeline is computed for.
+          items:
+            format: uuid
+            type: string
+          type: array
+        endTime:
+          description: The end time the timeline is computed till.
+          format: date-time
+          type: string
+        nxClusterIds:
+          description: ID(s) of the Nutanix cluster(s) timeline is computed across.
+          items:
+            format: uuid
+            type: string
+          type: array
+        startTime:
+          description: The start time the timeline is computed from.
+          format: date-time
+          type: string
+        timeMachineId:
+          description: ID of the Time Machine.
+          format: uuid
+          type: string
+        timezone:
+          description: The timezone the timeline is computed in.
+          type: string
+      type: object
+    snapshot:
+      description: Indicates a point in time where snapshot backups are available
+      properties:
+        dateCreated:
+          description: Date on which the snapshot was created
+          type: string
+        id:
+          description: Unique NDB Identifier for the Snapshot
+          type: string
+        name:
+          description: Name of the snapshot (provided at creation time or auto-generated)
+          type: string
+        ownerId:
+          description: UUID of the user who owns the snapshot
+          type: string
+        sanitised:
+          description: Indicates whether this is a sanitized snaphost
+          type: boolean
+        status:
+          $ref: '#/components/schemas/snapshotStatus'
+        timestamp:
+          description: The time the snapshot was taken. This may differ from `dateCreated` in case of sanitized snapshots
+            (both when created synchronously or asynchronously)
+          type: string
+        type:
+          $ref: '#/components/schemas/snapshotType'
+      type: object
+    snapshotHole:
+      description: Indicates a gap in snapshot capability
+      properties:
+        operationId:
+          description: The operation that caused the gap in snapshot capability, if available.
+          type: string
+        timestamp:
+          description: The time of the incident
+          type: string
+      type: object
+    snapshotType:
+      description: he type of the snapshot (used to determine retention policies)
+      enum:
+      - CONTINUOUS
+      - NONE
+      - CONTINUOUS_EXTRA
+      - TRANSIENT
+      - CONTINUOUS_RETRY
+      - DISCRETE
+      - MANUAL
+      - HOURLY
+      - DAILY
+      - WEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
+      type: string
+    log:
+      properties:
+        fromTime:
+          description: The time from which PITR recoverability is available
+          type: string
+        retentionDays:
+          description: The number of days this log will be retained for
+          format: int32
+          type: integer
+        toTime:
+          description: The time to which PITR recoverability is available
+          type: string
+      type: object
+    pauseSummary:
+      description: Defines a period of time when the time machine was paused
+      properties:
+        fromTime:
+          description: The time from which time machine was paused
+          type: string
+        toTime:
+          description: The time to which time machine was paused
+          type: string
+        type:
+          $ref: '#/components/schemas/TimeMachinePauseType'
+      type: object
+    TmCapability:
+      description: The capability of the time machine.
+      properties:
+        continuousCapability:
+          description: The continuous (PITR) capability of the time machine.
+          items:
+            $ref: '#/components/schemas/logCapability'
+          type: array
+        pauses:
+          description: The pauses in the time machine.
+          items:
+            $ref: '#/components/schemas/pauseSummary'
+          type: array
+        snapshotCapability:
+          description: The snapshot capability of the time machine
+          items:
+            $ref: '#/components/schemas/snapshotCapability'
+          type: array
+      type: object
+    TimeMachinePauseType:
+      description: The reason the time machine, or the time machine - cluster association, has been paused.
+      enum:
+      - MANUAL
+      - DATABASE_OPERATION
+      - CONSECUTIVE_BACKUP_FAILURE
+      - STORAGE_LIMIT_EXHAUSTED
+      - DB_PROP_UPDATE
+      type: string
+    snapshotStatus:
+      description: The status of the snapshot
+      enum:
+      - ACTIVE
+      - PENDING
+      - DELETED
+      type: string
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

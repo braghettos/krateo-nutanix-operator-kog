@@ -1,0 +1,434 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/sources/{id}/regions/{regionId}/poweronvms:
+    post:
+      description: Powers on selected VMs during migration - if they are powered off. This API is for internal use only and
+        is specific to AWS source provider. <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/sources/6b45ca9f-71a6-23b5-bd0c-bf917b95e7a5/regions/us-south-1/poweronvms
+      operationId: powerOnVMs
+      parameters:
+      - description: Source UUID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Region identifier.
+        in: path
+        name: regionId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PowerOnVMsEntity'
+        description: List of VM IDs in the migration plan that need to be powered On.
+        x-examples:
+          application/json:
+            vms:
+            - VMName: rhel-74
+            - UUID: 00000000-0000-0000-0ec3-48dc23e6ee4d
+            - VmID: my_vm_id
+            - RetainMacAddress: false
+            - RetainUserData: false
+            - PowerOffForpRDMtovRDMConversion: true
+            - MigrationSupportWarningStatus: 1
+            - AdditionalProperties:
+                InstanceStoreDisk: 'false'
+                NetworkFileSystemMounted: 'false'
+                guestid: rhel6Guest
+                instance_type: t2.micro
+                is_aws_agent_running: 'false'
+                key_pair: test-keypair
+                osfamily: linuxGuest
+                private_ip: my_ip_address
+            - PowerState: 'Off'
+            - DatacenterName: us-south-1
+            - VMStatus: Pending
+            - GuestPrepMode: manual
+            - message: ''
+            - Networks:
+              - Devices:
+                - 0
+                ID: eni-0498a84c716467386
+                MacIDs:
+                - aa:bb:cc:dd:ee:ff
+                Name: Xtract-lite-VPC
+            - VMReference:
+                UUID: 00000000-0000-0000-0ec3-48dc26e6f40d
+                VMID: my_vm_id
+            - TimeZone: default
+      responses:
+        '200':
+          description: Operation completed.
+      security:
+      - Bearer: []
+      summary: Power on the VMs that are part of a migration plan in the region specified
+      tags:
+      - Source
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/sources/{id}/regions/{regionId}/poweronvms\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n\
+          \    --header 'Content-Type: application/json' \\\n    --data '{\n    \"APIVersion\": \"string\",\n    \"Spec\"\
+          : {\n        \"VMs\": [\n            {\n                \"AllowUVMOps\": true,\n                \"CategoriesMapping\"\
+          : {\n                    \"property1\": [\n                        \"string\"\n                    ],\n        \
+          \            \"property2\": [\n                        \"string\"\n                    ]\n                },\n \
+          \               \"CreatePublicIpAddress\": true,\n                \"DiskConfig\": {\n                    \"AddCdrom\"\
+          : true\n                },\n                \"EnableMemoryOvercommit\": true,\n                \"GuestPrepMode\"\
+          : \"manual\",\n                \"ID\": \"string\",\n                \"InstallNGT\": true,\n                \"Owner\"\
+          : \"string\",\n                \"Password\": \"string\",\n                \"PemFile\": \"string\",\n           \
+          \     \"PowerOffForpRDMtovRDMConversion\": true,\n                \"RetainMacAddress\": true,\n                \"\
+          RetainUserData\": true,\n                \"Runbooks\": [\n                    {\n                        \"UUID\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n                        \"Variables\": [\n                        \
+          \    {}\n                        ]\n                    }\n                ],\n                \"SkipCdrom\": true,\n\
+          \                \"SkipIPRetention\": true,\n                \"TimeZone\": \"string\",\n                \"UUID\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n                \"UninstallGuestTools\": true,\n                \"\
+          UserName\": \"string\",\n                \"VMCustomizationConfig\": {\n                    \"AWSVMConfig\": {\n\
+          \                        \"AMIID\": \"string\",\n                        \"InstanceType\": \"string\"\n        \
+          \            },\n                    \"AzureVMConfig\": {\n                        \"DiskCategory\": \"string\"\
+          ,\n                        \"VMSize\": \"string\"\n                    }\n                },\n                \"\
+          VMCustomizeType\": \"replicate\",\n                \"VMPriority\": \"High\"\n            }\n        ]\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"APIVersion\"\
+          : \"string\",\n    \"Spec\": {\n        \"VMs\": [\n            {\n                \"AllowUVMOps\": true,\n    \
+          \            \"CategoriesMapping\": {\n                    \"property1\": [\n                        \"string\"\n\
+          \                    ],\n                    \"property2\": [\n                        \"string\"\n            \
+          \        ]\n                },\n                \"CreatePublicIpAddress\": true,\n                \"DiskConfig\"\
+          : {\n                    \"AddCdrom\": true\n                },\n                \"EnableMemoryOvercommit\": true,\n\
+          \                \"GuestPrepMode\": \"manual\",\n                \"ID\": \"string\",\n                \"InstallNGT\"\
+          : true,\n                \"Owner\": \"string\",\n                \"Password\": \"string\",\n                \"PemFile\"\
+          : \"string\",\n                \"PowerOffForpRDMtovRDMConversion\": true,\n                \"RetainMacAddress\"\
+          : true,\n                \"RetainUserData\": true,\n                \"Runbooks\": [\n                    {\n   \
+          \                     \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n                        \"Variables\"\
+          : [\n                            {}\n                        ]\n                    }\n                ],\n    \
+          \            \"SkipCdrom\": true,\n                \"SkipIPRetention\": true,\n                \"TimeZone\": \"\
+          string\",\n                \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n                \"UninstallGuestTools\"\
+          : true,\n                \"UserName\": \"string\",\n                \"VMCustomizationConfig\": {\n             \
+          \       \"AWSVMConfig\": {\n                        \"AMIID\": \"string\",\n                        \"InstanceType\"\
+          : \"string\"\n                    },\n                    \"AzureVMConfig\": {\n                        \"DiskCategory\"\
+          : \"string\",\n                        \"VMSize\": \"string\"\n                    }\n                },\n     \
+          \           \"VMCustomizeType\": \"replicate\",\n                \"VMPriority\": \"High\"\n            }\n     \
+          \   ]\n    }\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/sources/{id}/regions/{regionId}/poweronvms"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"APIVersion\": \"string\",\n    \"Spec\": {\n        \"VMs\": [\n            {\n\
+          \                \"AllowUVMOps\": true,\n                \"CategoriesMapping\": {\n                    \"property1\"\
+          : [\n                        \"string\"\n                    ],\n                    \"property2\": [\n        \
+          \                \"string\"\n                    ]\n                },\n                \"CreatePublicIpAddress\"\
+          : true,\n                \"DiskConfig\": {\n                    \"AddCdrom\": true\n                },\n       \
+          \         \"EnableMemoryOvercommit\": true,\n                \"GuestPrepMode\": \"manual\",\n                \"\
+          ID\": \"string\",\n                \"InstallNGT\": true,\n                \"Owner\": \"string\",\n             \
+          \   \"Password\": \"string\",\n                \"PemFile\": \"string\",\n                \"PowerOffForpRDMtovRDMConversion\"\
+          : true,\n                \"RetainMacAddress\": true,\n                \"RetainUserData\": true,\n              \
+          \  \"Runbooks\": [\n                    {\n                        \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n                        \"Variables\": [\n                            {}\n                        ]\n       \
+          \             }\n                ],\n                \"SkipCdrom\": true,\n                \"SkipIPRetention\":\
+          \ true,\n                \"TimeZone\": \"string\",\n                \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n                \"UninstallGuestTools\": true,\n                \"UserName\": \"string\",\n                \"\
+          VMCustomizationConfig\": {\n                    \"AWSVMConfig\": {\n                        \"AMIID\": \"string\"\
+          ,\n                        \"InstanceType\": \"string\"\n                    },\n                    \"AzureVMConfig\"\
+          : {\n                        \"DiskCategory\": \"string\",\n                        \"VMSize\": \"string\"\n   \
+          \                 }\n                },\n                \"VMCustomizeType\": \"replicate\",\n                \"\
+          VMPriority\": \"High\"\n            }\n        ]\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"//move/v2/sources/{id}/regions/{regionId}/poweronvms\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/sources/{id}/regions/{regionId}/poweronvms\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          APIVersion\": \"string\", \"Spec\": {\"VMs\": [{\"AllowUVMOps\": true, \"CategoriesMapping\": {\"property1\": [\"\
+          string\"], \"property2\": [\"string\"]}, \"CreatePublicIpAddress\": true, \"DiskConfig\": {\"AddCdrom\": true},\
+          \ \"EnableMemoryOvercommit\": true, \"GuestPrepMode\": \"manual\", \"ID\": \"string\", \"InstallNGT\": true, \"\
+          Owner\": \"string\", \"Password\": \"string\", \"PemFile\": \"string\", \"PowerOffForpRDMtovRDMConversion\": true,\
+          \ \"RetainMacAddress\": true, \"RetainUserData\": true, \"Runbooks\": [{\"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          , \"Variables\": [{}]}], \"SkipCdrom\": true, \"SkipIPRetention\": true, \"TimeZone\": \"string\", \"UUID\": \"\
+          b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"UninstallGuestTools\": true, \"UserName\": \"string\", \"VMCustomizationConfig\"\
+          : {\"AWSVMConfig\": {\"AMIID\": \"string\", \"InstanceType\": \"string\"}, \"AzureVMConfig\": {\"DiskCategory\"\
+          : \"string\", \"VMSize\": \"string\"}}, \"VMCustomizeType\": \"replicate\", \"VMPriority\": \"High\"}]}}`)\n\treq,\
+          \ err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\"\
+          , \"Bearer <your_access_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/sources/{id}/regions/{regionId}/poweronvms\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"APIVersion\\\": \\\"string\\\", \\\"\
+          Spec\\\": {\\\"VMs\\\": [{\\\"AllowUVMOps\\\": true, \\\"CategoriesMapping\\\": {\\\"property1\\\": [\\\"string\\\
+          \"], \\\"property2\\\": [\\\"string\\\"]}, \\\"CreatePublicIpAddress\\\": true, \\\"DiskConfig\\\": {\\\"AddCdrom\\\
+          \": true}, \\\"EnableMemoryOvercommit\\\": true, \\\"GuestPrepMode\\\": \\\"manual\\\", \\\"ID\\\": \\\"string\\\
+          \", \\\"InstallNGT\\\": true, \\\"Owner\\\": \\\"string\\\", \\\"Password\\\": \\\"string\\\", \\\"PemFile\\\":\
+          \ \\\"string\\\", \\\"PowerOffForpRDMtovRDMConversion\\\": true, \\\"RetainMacAddress\\\": true, \\\"RetainUserData\\\
+          \": true, \\\"Runbooks\\\": [{\\\"UUID\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"Variables\\\": [{}]}],\
+          \ \\\"SkipCdrom\\\": true, \\\"SkipIPRetention\\\": true, \\\"TimeZone\\\": \\\"string\\\", \\\"UUID\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\
+          \", \\\"UninstallGuestTools\\\": true, \\\"UserName\\\": \\\"string\\\", \\\"VMCustomizationConfig\\\": {\\\"AWSVMConfig\\\
+          \": {\\\"AMIID\\\": \\\"string\\\", \\\"InstanceType\\\": \\\"string\\\"}, \\\"AzureVMConfig\\\": {\\\"DiskCategory\\\
+          \": \\\"string\\\", \\\"VMSize\\\": \\\"string\\\"}}, \\\"VMCustomizeType\\\": \\\"replicate\\\", \\\"VMPriority\\\
+          \": \\\"High\\\"}]}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\
+          \nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/sources/{id}/regions/{regionId}/poweronvms';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>',\
+          \ 'Content-Type': 'application/json'},\n  body:  `{\"APIVersion\": \"string\", \"Spec\": {\"VMs\": [{\"AllowUVMOps\"\
+          : true, \"CategoriesMapping\": {\"property1\": [\"string\"], \"property2\": [\"string\"]}, \"CreatePublicIpAddress\"\
+          : true, \"DiskConfig\": {\"AddCdrom\": true}, \"EnableMemoryOvercommit\": true, \"GuestPrepMode\": \"manual\", \"\
+          ID\": \"string\", \"InstallNGT\": true, \"Owner\": \"string\", \"Password\": \"string\", \"PemFile\": \"string\"\
+          , \"PowerOffForpRDMtovRDMConversion\": true, \"RetainMacAddress\": true, \"RetainUserData\": true, \"Runbooks\"\
+          : [{\"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"Variables\": [{}]}], \"SkipCdrom\": true, \"SkipIPRetention\"\
+          : true, \"TimeZone\": \"string\", \"UUID\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"UninstallGuestTools\": true,\
+          \ \"UserName\": \"string\", \"VMCustomizationConfig\": {\"AWSVMConfig\": {\"AMIID\": \"string\", \"InstanceType\"\
+          : \"string\"}, \"AzureVMConfig\": {\"DiskCategory\": \"string\", \"VMSize\": \"string\"}}, \"VMCustomizeType\":\
+          \ \"replicate\", \"VMPriority\": \"High\"}]}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const\
+          \ data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    VMCustomizeType:
+      description: Defines the way customizable properties are synchronized on the target side. The default value is "static".
+        When set to the "replicate" value, the customizable properties of the target VM would be the same as those of the
+        source at the time of the cutover. When set to "static", the value remains as set by the user.
+      enum:
+      - replicate
+      - static
+      type: string
+    VMCustomizationConfig:
+      description: Configuration for customizing the target VM.
+      properties:
+        AWSVMConfig:
+          $ref: '#/components/schemas/AWSVMConfig'
+        AzureVMConfig:
+          $ref: '#/components/schemas/AzureVMConfig'
+      type: object
+    AzureVMConfig:
+      description: Custom VM instance properties.
+      properties:
+        DiskCategory:
+          type: string
+        VMSize:
+          type: string
+      type: object
+    AWSVMConfig:
+      description: Custom EC2 instance properties.
+      properties:
+        AMIID:
+          type: string
+        InstanceType:
+          type: string
+      type: object
+    VMRunbookInput:
+      description: Input for the runbooks to be executed on a target VM after migration.
+      properties:
+        UUID:
+          description: UUID of the runbook.
+          format: uuid
+          type: string
+        Variables:
+          description: Runbook variables information and input.
+          items:
+            properties:
+              IsSecret:
+                description: Flag indicating if a variable is secret.
+                type: boolean
+              UUID:
+                description: Runbook variable UUID.
+                format: uuid
+                type: string
+              Value:
+                description: Runbook variable input. For multi-value (array) input, separate the elements of the array using
+                  comma (,).
+                type: string
+            required:
+            - UUID
+            type: object
+          type: array
+      required:
+      - UUID
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    PowerOnVMsEntity:
+      properties:
+        APIVersion:
+          type: string
+        Spec:
+          $ref: '#/components/schemas/VMToMigrate'
+      type: object
+    VMToMigrate:
+      description: VM information.
+      properties:
+        VMs:
+          description: List of VMs to power on and migrate.
+          items:
+            $ref: '#/components/schemas/VM'
+          type: array
+      type: object
+    VM:
+      description: Details of the VM including login information, UUID, timezone and so on.
+      properties:
+        AllowUVMOps:
+          description: Flag to indicate if the user VM operations are allowed. Example- VirtIO installation, static IP retention
+            and so on.
+          type: boolean
+        CategoriesMapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: Categories mapping that will be assigned to the target VM
+          type: object
+        CreatePublicIpAddress:
+          description: Indicates whether the migrated VM should have a public IP address. This flag is only valid for Azure
+            and AWS target providers. The valid values are true and false.
+          type: boolean
+        DiskConfig:
+          $ref: '#/components/schemas/DiskConfig'
+        EnableMemoryOvercommit:
+          description: Flag to denote whether the migrated VM will have memory overcommit enabled. The valid values are true
+            and false.
+          type: boolean
+        GuestPrepMode:
+          description: Select the migration preparation mode. The vaild values are manual and auto.
+          enum:
+          - manual
+          - auto
+          type: string
+        ID:
+          description: VM Id
+          type: string
+        InstallNGT:
+          description: Install NGT on the target VM.
+          type: boolean
+        Owner:
+          description: Owner of the target VM. Only applicable if a project is assigned to the VM.
+          type: string
+        Password:
+          description: Password to login to VM.
+          type: string
+        PemFile:
+          description: PEM file to login to VM.
+          type: string
+        PowerOffForpRDMtovRDMConversion:
+          description: Flag to determine whether to automatically power off the VM to convert PRDM disks to vRDM when migrating
+            from ESXi.
+          type: boolean
+        RetainMacAddress:
+          description: Flag to denote whether the migrated VM has the same MAC Address. The valid values are true and false.
+          type: boolean
+        RetainUserData:
+          description: Flag to denote whether the migrated VM has the same user data string. The valid values are true and
+            false.
+          type: boolean
+        Runbooks:
+          description: Runbooks that will be executed on the target VM after migration. Only one runbook is allowed to be
+            executed per VM. This is only applicable if a project is assigned to the VM.
+          items:
+            $ref: '#/components/schemas/VMRunbookInput'
+          type: array
+        SkipCdrom:
+          description: Flag to denote whether the migrated VM will skip the CD-ROM addition. The options SkipCdrom and AddCdrom
+            cannot be true simultaneously. The valid values are true and false.
+          type: boolean
+        SkipIPRetention:
+          description: Flag to indicate if the static IP should be retained in the user VM. Set 'AllowUVMOps' flag as 'false'
+            to override this flag entry. This field is deprecated, instead, refer 'NicConfigMode'.
+          type: boolean
+        TimeZone:
+          description: Time zone configuration for the VM hardware clock.
+          type: string
+        UUID:
+          description: VM UUID
+          format: uuid
+          type: string
+        UninstallGuestTools:
+          description: Flag to denote if the guest tools will be uninstalled in the migrated VM. Examples of the guest tools
+            are - VMware Tools, Open VM Tools, etc.
+          type: boolean
+        UserName:
+          description: User name to login to VM.
+          type: string
+        VMCustomizationConfig:
+          $ref: '#/components/schemas/VMCustomizationConfig'
+        VMCustomizeType:
+          $ref: '#/components/schemas/VMCustomizeType'
+        VMPriority:
+          description: The VM priority to be used for scheduling/QoS.
+          enum:
+          - High
+          - Medium
+          - Low
+          type: string
+      type: object
+    DiskConfig:
+      description: Details of disk-related properties.
+      properties:
+        AddCdrom:
+          description: Flag to denote whether to add CD-ROM on the migrated VM if it is not in the source VM. The options
+            SkipCdrom and AddCdrom cannot be true simulataneously. The valid values are true and false.
+          type: boolean
+      type: object

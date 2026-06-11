@@ -1,0 +1,167 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-alpha.1/k8s/cluster-registrations/{id}/metrics:
+    post:
+      description: Update Kubernetes cluster metrics with the provided information.
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Update Kubernetes cluster metrics.
+      operationId: UpdateK8sClusterRegistrationMetrics
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1.1.0_k8s_update_cluster_registration_metrics_request'
+        required: true
+      responses:
+        '200':
+          description: Kubernetes cluster update metrics request is successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_update_cluster_registration_metrics_response'
+        '400':
+          description: Bad parameters specified in request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Invalid reference supplied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}/metrics\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"cluster_metrics\": {}\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"cluster_metrics\": {}\n}' \\\n    --output-document \\\n    -\
+          \ https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}/metrics"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"cluster_metrics\"\
+          : {}\n}\"\"\"\n\nconn.request(\"POST\",\"/karbon/v1-alpha.1/k8s/cluster-registrations/{id}/metrics\", payload, headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}/metrics\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          cluster_metrics\": {}}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n \
+          \       req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}/metrics\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"cluster_metrics\\\": {}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n \
+          \ .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/cluster-registrations/{id}/metrics';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"cluster_metrics\": {}}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_k8s_update_cluster_registration_metrics_request:
+      type: object
+      required:
+      - cluster_metrics
+      properties:
+        cluster_metrics:
+          $ref: '#/components/schemas/v1.1.0_k8s_cluster_metrics'
+    v1.1.0_k8s_cluster_resource:
+      type: object
+      properties:
+        ChildResource:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/v1.1.0_k8s_cluster_resource_list'
+        Metadata:
+          type: object
+          additionalProperties:
+            type: string
+        Name:
+          type: string
+        UUID:
+          type: string
+    v1.1.0_k8s_update_cluster_registration_metrics_response:
+      type: object
+      properties:
+        cluster_name:
+          type: string
+        cluster_uuid:
+          type: string
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_k8s_cluster_metrics:
+      description: Metrics information for this k8s cluster.
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/v1.1.0_k8s_cluster_resource_list'
+    v1.1.0_k8s_cluster_resource_list:
+      type: array
+      items:
+        $ref: '#/components/schemas/v1.1.0_k8s_cluster_resource'

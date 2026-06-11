@@ -1,0 +1,240 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/plans/{id}/workloads/{wid}/customips:
+    get:
+      description: Fetches the custom-view IP configuration details of the workload for the specified migration plan UUID
+        and workload UUID. <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/plans/867b4a4f-cb8c-4416-8d7e-26e033023aa4/workloads/91cea36d-c857-4092-b232-d46484ee3205/customips
+      operationId: getWorkloadCustomIPsDetail
+      parameters:
+      - description: Migration plan UUID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Workload UUID
+        in: path
+        name: wid
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VMCustomizedNicsInfoResponse'
+      security:
+      - Bearer: []
+      summary: Get the custom-view details of a workload's IP configuration
+      tags:
+      - Plan
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/customips \\\
+          \n    --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n      \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/customips"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n \nconn.request(\"GET\",\"//move/v2/plans/{id}/workloads/{wid}/customips\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/customips\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/customips\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/plans/{id}/workloads/{wid}/customips';\nconst options = {\n\
+          \  method: 'GET',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    VMCustomizedNicsInfo:
+      description: VM's customized IP configurations for all NICs. If its field "MetaInfo.ConfigMode" is "custom", then its
+        field "NicsInfo" is mandatory.
+      properties:
+        MetaInfo:
+          $ref: '#/components/schemas/VMCustomizedNicsMetaInfo'
+        NicsInfo:
+          items:
+            $ref: '#/components/schemas/VMCustomizedNicInfo'
+          type: array
+      required:
+      - MetaInfo
+      type: object
+    NicConfigMode:
+      description: VM's NICs configuration mode at VM level. Denotes how the IPs are to be configured for the target, "retain"
+        means to keep as in source, "dhcp" means to use DHCP protocol to get IP, and "custom" means to set static IP values
+        as provided manually. This value takes precedence over the value of 'SkipIPRetention' and 'PlanLevelNicConfigMode'.
+      enum:
+      - retain
+      - dhcp
+      - custom
+      type: string
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    BasicMetaData:
+      description: Basic metadata, with minimum details.
+      properties:
+        Version:
+          description: Basic data version.
+          type: string
+      type: object
+    VMCustomizedNicsInfoResponse:
+      description: Response for VM's customized IP configurations for all NICs.
+      properties:
+        APIVersion:
+          description: Move API version
+          type: string
+        Data:
+          $ref: '#/components/schemas/VMCustomizedNicsInfo'
+        MetaData:
+          $ref: '#/components/schemas/BasicMetaData'
+      type: object
+    VMCustomizedNicInfo:
+      description: VM's NIC related information such as network, device id, IP conf, MAC etc.
+      properties:
+        IpsInfo:
+          items:
+            $ref: '#/components/schemas/VmCustomizedIpInfo'
+          type: array
+        Mac:
+          description: MAC address of the particular NIC
+          type: string
+        NetworkName:
+          description: The name of the network connected to the particular NIC
+          type: string
+      required:
+      - IpsInfo
+      - Mac
+      - NetworkName
+      type: object
+    VmCustomizedIpInfo:
+      description: VM-NIC's IP-related information such as IP-address, netmask, gateway, and DNS.
+      properties:
+        DnsIps:
+          description: Comma separated DNS IPs, such as '8.8.8.8,8.8.4.4'
+          type: string
+        Gateway:
+          description: The gateway to be used in the target VM for the specific network interface. The user should provide
+            only one gateway for a network interface. If the network interface has multiple IP addresses then only the first
+            IPInfo is expected to have the gateway.
+          type: string
+        PrefixLength:
+          description: The number denoting the subnet mask in CIDR notation for the target IP address, i.e.  for a CIDR notation
+            "10.10.10.10/24", "24" is the prefix length.
+          format: int32
+          maximum: 32
+          minimum: 0
+          type: integer
+        SourceIpAddress:
+          description: The IP address, in IPv4 notation, in the source VM.
+          type: string
+        TargetIpAddress:
+          description: The IP address, in IPv4 notation, in the target VM.
+          type: string
+      required:
+      - SourceIpAddress
+      - TargetIpAddress
+      - PrefixLength
+      type: object
+    VMCustomizedNicsMetaInfo:
+      description: Meta info on a VM's NICs such as its mode, configured explicitly etc. Note that as part of the request
+        body, the client can avoid "VmUuid" and "IsConfigured" as they will be ignored by the server.
+      properties:
+        AssignIpViaAPI:
+          description: Flag to indicate whether to assign IP to a VM via API of Prism Central while retaining/customising
+            IP on the Target VPC networks. This is false by default and user can turn it off by overriding vm setting in VM
+            Prep Stage.
+          type: boolean
+        ConfigMode:
+          $ref: '#/components/schemas/NicConfigMode'
+        IsConfigured:
+          description: Denotes if the mode and details were explicitly configured by user.
+          type: boolean
+        VmUuid:
+          description: VM UUID in Move.
+          type: string
+      required:
+      - ConfigMode
+      type: object

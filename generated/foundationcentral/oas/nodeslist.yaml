@@ -1,0 +1,294 @@
+openapi: 3.0.0
+info:
+  title: Foundation Central Service
+  description: '# Introduction
+
+
+    **Foundation Central** creates clusters from factory-imaged nodes and reimages existing nodes that are already registered
+    with Foundation Central, remotely from Prism Central. This provides benefits such as creating clusters on remote sites
+    (for example, ROBO), without arranging for a deployment personnel visit.
+
+
+    **[Contact Us by Email](mailto:foundation@nutanix.com)**
+
+
+    **License: Copyright Nutanix Inc. All rights reserved**
+
+    '
+  contact:
+    name: Foundation Central Developers
+    email: foundation@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: '1.0'
+servers:
+- url: /api/fc/v1
+security:
+- BasicAuth: []
+- CookieAuth: []
+paths:
+  /hardware_managers/{hardware_manager_uuid}/nodes/list:
+    post:
+      description: Discovers the servers which are part of the hardware manager and have an active connection with the hardware
+        manager. The nodes associated with a server profile will not be discovered for hardware manager type as intersight.
+      tags:
+      - hardware_managers
+      summary: Discover nodes that are part of a hardware manager
+      operationId: HardwareManagerNodesDiscovery
+      parameters:
+      - description: UUID of the hardware manager from which the nodes have to be discovered.
+        name: hardware_manager_uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/hardware_manager_nodes_list_input'
+        required: true
+      responses:
+        '200':
+          description: List of nodes that are discovered for the requested hardware manager.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/hardware_manager_node_list_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/nodes/list\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --data '{\n    \"filters\": {\n        \"hardware_manager_data\"\
+          : {\n            \"intersight_data\": {\n                \"classification\": \"NUTANIX\",\n                \"management_mode\"\
+          : \"ISM\"\n            }\n        }\n    },\n    \"length\": 0,\n    \"offset\": 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --body-data\
+          \ '{\n    \"filters\": {\n        \"hardware_manager_data\": {\n            \"intersight_data\": {\n           \
+          \     \"classification\": \"NUTANIX\",\n                \"management_mode\": \"ISM\"\n            }\n        }\n\
+          \    },\n    \"length\": 0,\n    \"offset\": 0\n}' \\\n    --output-document \\\n    - https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/nodes/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Authorization\"\
+          : \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"filters\": {\n        \"hardware_manager_data\":\
+          \ {\n            \"intersight_data\": {\n                \"classification\": \"NUTANIX\",\n                \"management_mode\"\
+          : \"ISM\"\n            }\n        }\n    },\n    \"length\": 0,\n    \"offset\": 0\n}\"\"\"\n\nconn.request(\"POST\"\
+          ,\"/api/fc/v1/hardware_managers/{hardware_manager_uuid}/nodes/list\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/nodes/list\"\n\t\n\tpayload :=\
+          \  strings.NewReader(`{\"filters\": {\"hardware_manager_data\": {\"intersight_data\": {\"classification\": \"NUTANIX\"\
+          , \"management_mode\": \"ISM\"}}}, \"length\": 0, \"offset\": 0}`)\n\treq, err := http.NewRequest(\"POST\", url,\
+          \ payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/nodes/list\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .setBody(\"{\\\"filters\\\": {\\\"hardware_manager_data\\\
+          \": {\\\"intersight_data\\\": {\\\"classification\\\": \\\"NUTANIX\\\", \\\"management_mode\\\": \\\"ISM\\\"}}},\
+          \ \\\"length\\\": 0, \\\"offset\\\": 0}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/api/fc/v1/hardware_managers/{hardware_manager_uuid}/nodes/list';\nconst\
+          \ options = {\n  method: 'POST',\n  headers: {'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"filters\"\
+          : {\"hardware_manager_data\": {\"intersight_data\": {\"classification\": \"NUTANIX\", \"management_mode\": \"ISM\"\
+          }}}, \"length\": 0, \"offset\": 0}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data =\
+          \ await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      name: X-API-Key
+      in: header
+    APIKeyKubAuth:
+      type: apiKey
+      name: X-API-Key-Kub
+      in: header
+    BasicAuth:
+      type: http
+      scheme: basic
+    CookieAuth:
+      type: apiKey
+      name: Cookie
+      in: header
+    OpenIDAuth:
+      type: apiKey
+      name: code
+      in: query
+  schemas:
+    intersight_node_data_filters:
+      description: Intersight specific node filter fields.
+      type: object
+      properties:
+        intersight_data:
+          $ref: '#/components/schemas/intersight_data_node_filter_fields'
+    error_response:
+      type: object
+      properties:
+        code:
+          description: HTTP response code from the API.
+          type: integer
+          format: int32
+        message_list:
+          description: Error message in detail.
+          type: array
+          items:
+            type: string
+    list_metadata_output:
+      description: List metadata output for all the list APIs.
+      type: object
+      required:
+      - length
+      properties:
+        length:
+          description: The number of records retrieved.
+          type: integer
+        offset:
+          description: Offset from the start of the object list.
+          type: integer
+        total_matches:
+          description: Total matches found.
+          type: integer
+    hardware_manager_node_list_response:
+      description: Response with node details for the given hardware manager as a list.
+      type: object
+      required:
+      - nodes
+      properties:
+        metadata:
+          $ref: '#/components/schemas/list_metadata_output'
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/hardware_manager_node_details'
+    hardware_manager_type:
+      description: Type of the hardware manager.
+      type: string
+      enum:
+      - INTERSIGHT
+      - NOT_APPLICABLE
+    hardware_manager_nodes_list_input:
+      description: Input needed for discovering all the nodes from hardware manager.
+      type: object
+      properties:
+        filters:
+          $ref: '#/components/schemas/hardware_manager_nodes_list_filter_fields'
+        length:
+          description: The number of records to retrieve.
+          type: integer
+        offset:
+          description: Offset from the start of the object list. If omitted, the default value is 0.
+          type: integer
+          minimum: 0
+    hardware_manager_node_data:
+      description: Node details for given hardware manager instance.
+      type: object
+      properties:
+        intersight_data:
+          $ref: '#/components/schemas/intersight_data'
+    intersight_data:
+      description: Details pertaining to Intersight specific hardware manager.
+      type: object
+      required:
+      - classification
+      - organizations
+      - tags
+      - node_name
+      - management_mode
+      properties:
+        classification:
+          description: Denotes whether the type of node is Nutanix or not.
+          type: string
+          enum:
+          - NUTANIX
+          - UNKNOWN
+        domain:
+          description: Name of the UCS Domain to which the node belongs. For standalone servers, this field is empty.
+          type: string
+        management_mode:
+          $ref: '#/components/schemas/management_mode_intersight'
+        node_name:
+          description: Name of the node in Intersight.
+          type: string
+        organizations:
+          description: List of names of organizations in Intersight to which the node belongs.
+          type: array
+          items:
+            description: Name of the organization in Intersight.
+            type: string
+        tags:
+          $ref: '#/components/schemas/intersight_tags'
+    hardware_manager_nodes_list_filter_fields:
+      description: Supported fields for filtering the discovered nodes.
+      type: object
+      properties:
+        hardware_manager_data:
+          $ref: '#/components/schemas/intersight_node_data_filters'
+    management_mode_intersight:
+      description: Management mode of the node in Intersight.
+      type: string
+      enum:
+      - ISM
+      - IMM
+    intersight_tags:
+      description: List of tags of the UCS server.
+      type: array
+      items:
+        description: UCS server tags.
+        type: object
+        properties:
+          key:
+            description: Key of the tag.
+            type: string
+          value:
+            description: Value of the tag.
+            type: string
+    intersight_data_node_filter_fields:
+      description: Details pertaining to Intersight specific hardware manager.
+      type: object
+      properties:
+        classification:
+          description: Denotes whether the type of node is Nutanix or not.
+          type: string
+          enum:
+          - NUTANIX
+          - UNKNOWN
+        management_mode:
+          $ref: '#/components/schemas/management_mode_intersight'
+    hardware_manager_node_details:
+      description: Node details discovered from hardware manager.
+      type: object
+      required:
+      - hardware_manager_uuid
+      - node_serial
+      - block_serial
+      - model
+      - hardware_manager_data
+      - hardware_manager_type
+      properties:
+        block_serial:
+          description: Serial number of the block to which the node belongs.
+          type: string
+        cpu_core_count:
+          description: Number of CPU cores in the node.
+          type: integer
+        hardware_manager_data:
+          $ref: '#/components/schemas/hardware_manager_node_data'
+        hardware_manager_type:
+          $ref: '#/components/schemas/hardware_manager_type'
+        hardware_manager_uuid:
+          description: UUID of the hardware manager for which nodes have been discovered.
+          type: string
+          format: uuid
+        memory_gb:
+          description: Memory of the node in GB.
+          type: number
+          format: float
+        model:
+          description: Model number of the node.
+          type: string
+        node_serial:
+          description: Serial number of the node.
+          type: string

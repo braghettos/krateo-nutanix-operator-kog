@@ -1,0 +1,762 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-beta.1/k8s/clusters/{uuid}/addons:
+    get:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: List all the addons installed on the kubernetes cluster
+      operationId: ListK8sClusterAddons
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Details of the Kubernetes cluster addons.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_addons_config_list'
+        '400':
+          description: Invalid cluster UUID passed in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster with the specified UUID is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons';\nconst options = {\n \
+          \ method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n\
+          \  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch\
+          \ (error) {\n  console.error(error);\n}"
+    put:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Update a specific addon on kubernetes cluster
+      operationId: UpdateK8sClusterAddon
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/v1.1.0_k8s_cluster_addons_config'
+      responses:
+        '202':
+          description: Request to update existing kubernetes cluster addon submitted sucessfully.
+        '400':
+          description: Invalid cluster UUID passed in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster with the specified UUID or cluster addon with the specified name is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '409':
+          description: Conflict with the existing cluster addon's configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n \
+          \   \"metadata\": {},\n    \"spec\": {\n        \"chartName\": \"string\",\n        \"clusterSelector\": {\n   \
+          \         \"matchExpressions\": [\n                {}\n            ],\n            \"matchLabels\": {\n        \
+          \        \"property1\": \"string\",\n                \"property2\": \"string\"\n            }\n        },\n    \
+          \    \"namespace\": \"string\",\n        \"options\": {\n            \"atomic\": true,\n            \"dependencyUpdate\"\
+          : true,\n            \"disableHooks\": true,\n            \"disableOpenAPIValidation\": true,\n            \"install\"\
+          : {\n                \"createNamespace\": true,\n                \"includeCRDs\": true\n            },\n       \
+          \     \"options\": true,\n            \"skipCRDs\": true,\n            \"timeout\": \"string\",\n            \"\
+          uninstall\": {\n                \"description\": \"string\",\n                \"keepHistory\": true\n          \
+          \  },\n            \"upgrade\": {\n                \"cleanupOnFail\": true,\n                \"force\": true,\n\
+          \                \"maxHistory\": 0,\n                \"recreate\": true,\n                \"resetValues\": true,\n\
+          \                \"reuseValues\": true\n            },\n            \"wait\": true,\n            \"waitForJobs\"\
+          : true\n        },\n        \"releaseName\": \"string\",\n        \"repoURL\": \"string\",\n        \"valuesTemplate\"\
+          : \"string\",\n        \"version\": \"string\"\n    },\n    \"status\": {\n        \"conditions\": [\n         \
+          \   {}\n        ],\n        \"revision\": 0,\n        \"status\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"metadata\": {},\n    \"spec\": {\n        \"chartName\": \"string\"\
+          ,\n        \"clusterSelector\": {\n            \"matchExpressions\": [\n                {}\n            ],\n   \
+          \         \"matchLabels\": {\n                \"property1\": \"string\",\n                \"property2\": \"string\"\
+          \n            }\n        },\n        \"namespace\": \"string\",\n        \"options\": {\n            \"atomic\"\
+          : true,\n            \"dependencyUpdate\": true,\n            \"disableHooks\": true,\n            \"disableOpenAPIValidation\"\
+          : true,\n            \"install\": {\n                \"createNamespace\": true,\n                \"includeCRDs\"\
+          : true\n            },\n            \"options\": true,\n            \"skipCRDs\": true,\n            \"timeout\"\
+          : \"string\",\n            \"uninstall\": {\n                \"description\": \"string\",\n                \"keepHistory\"\
+          : true\n            },\n            \"upgrade\": {\n                \"cleanupOnFail\": true,\n                \"\
+          force\": true,\n                \"maxHistory\": 0,\n                \"recreate\": true,\n                \"resetValues\"\
+          : true,\n                \"reuseValues\": true\n            },\n            \"wait\": true,\n            \"waitForJobs\"\
+          : true\n        },\n        \"releaseName\": \"string\",\n        \"repoURL\": \"string\",\n        \"valuesTemplate\"\
+          : \"string\",\n        \"version\": \"string\"\n    },\n    \"status\": {\n        \"conditions\": [\n         \
+          \   {}\n        ],\n        \"revision\": 0,\n        \"status\": \"string\"\n    }\n}' \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"metadata\":\
+          \ {},\n    \"spec\": {\n        \"chartName\": \"string\",\n        \"clusterSelector\": {\n            \"matchExpressions\"\
+          : [\n                {}\n            ],\n            \"matchLabels\": {\n                \"property1\": \"string\"\
+          ,\n                \"property2\": \"string\"\n            }\n        },\n        \"namespace\": \"string\",\n  \
+          \      \"options\": {\n            \"atomic\": true,\n            \"dependencyUpdate\": true,\n            \"disableHooks\"\
+          : true,\n            \"disableOpenAPIValidation\": true,\n            \"install\": {\n                \"createNamespace\"\
+          : true,\n                \"includeCRDs\": true\n            },\n            \"options\": true,\n            \"skipCRDs\"\
+          : true,\n            \"timeout\": \"string\",\n            \"uninstall\": {\n                \"description\": \"\
+          string\",\n                \"keepHistory\": true\n            },\n            \"upgrade\": {\n                \"\
+          cleanupOnFail\": true,\n                \"force\": true,\n                \"maxHistory\": 0,\n                \"\
+          recreate\": true,\n                \"resetValues\": true,\n                \"reuseValues\": true\n            },\n\
+          \            \"wait\": true,\n            \"waitForJobs\": true\n        },\n        \"releaseName\": \"string\"\
+          ,\n        \"repoURL\": \"string\",\n        \"valuesTemplate\": \"string\",\n        \"version\": \"string\"\n\
+          \    },\n    \"status\": {\n        \"conditions\": [\n            {}\n        ],\n        \"revision\": 0,\n  \
+          \      \"status\": \"string\"\n    }\n}\"\"\"\n\nconn.request(\"PUT\",\"/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          metadata\": {}, \"spec\": {\"chartName\": \"string\", \"clusterSelector\": {\"matchExpressions\": [{}], \"matchLabels\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}}, \"namespace\": \"string\", \"options\": {\"atomic\":\
+          \ true, \"dependencyUpdate\": true, \"disableHooks\": true, \"disableOpenAPIValidation\": true, \"install\": {\"\
+          createNamespace\": true, \"includeCRDs\": true}, \"options\": true, \"skipCRDs\": true, \"timeout\": \"string\"\
+          , \"uninstall\": {\"description\": \"string\", \"keepHistory\": true}, \"upgrade\": {\"cleanupOnFail\": true, \"\
+          force\": true, \"maxHistory\": 0, \"recreate\": true, \"resetValues\": true, \"reuseValues\": true}, \"wait\": true,\
+          \ \"waitForJobs\": true}, \"releaseName\": \"string\", \"repoURL\": \"string\", \"valuesTemplate\": \"string\",\
+          \ \"version\": \"string\"}, \"status\": {\"conditions\": [{}], \"revision\": 0, \"status\": \"string\"}}`)\n\treq,\
+          \ err := http.NewRequest(\"PUT\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"metadata\\\": {}, \\\"spec\\\": {\\\"chartName\\\": \\\"string\\\", \\\"clusterSelector\\\": {\\\"matchExpressions\\\
+          \": [{}], \\\"matchLabels\\\": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}}, \\\"namespace\\\
+          \": \\\"string\\\", \\\"options\\\": {\\\"atomic\\\": true, \\\"dependencyUpdate\\\": true, \\\"disableHooks\\\"\
+          : true, \\\"disableOpenAPIValidation\\\": true, \\\"install\\\": {\\\"createNamespace\\\": true, \\\"includeCRDs\\\
+          \": true}, \\\"options\\\": true, \\\"skipCRDs\\\": true, \\\"timeout\\\": \\\"string\\\", \\\"uninstall\\\": {\\\
+          \"description\\\": \\\"string\\\", \\\"keepHistory\\\": true}, \\\"upgrade\\\": {\\\"cleanupOnFail\\\": true, \\\
+          \"force\\\": true, \\\"maxHistory\\\": 0, \\\"recreate\\\": true, \\\"resetValues\\\": true, \\\"reuseValues\\\"\
+          : true}, \\\"wait\\\": true, \\\"waitForJobs\\\": true}, \\\"releaseName\\\": \\\"string\\\", \\\"repoURL\\\": \\\
+          \"string\\\", \\\"valuesTemplate\\\": \\\"string\\\", \\\"version\\\": \\\"string\\\"}, \\\"status\\\": {\\\"conditions\\\
+          \": [{}], \\\"revision\\\": 0, \\\"status\\\": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons';\nconst options = {\n \
+          \ method: 'PUT',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"\
+          metadata\": {}, \"spec\": {\"chartName\": \"string\", \"clusterSelector\": {\"matchExpressions\": [{}], \"matchLabels\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}}, \"namespace\": \"string\", \"options\": {\"atomic\":\
+          \ true, \"dependencyUpdate\": true, \"disableHooks\": true, \"disableOpenAPIValidation\": true, \"install\": {\"\
+          createNamespace\": true, \"includeCRDs\": true}, \"options\": true, \"skipCRDs\": true, \"timeout\": \"string\"\
+          , \"uninstall\": {\"description\": \"string\", \"keepHistory\": true}, \"upgrade\": {\"cleanupOnFail\": true, \"\
+          force\": true, \"maxHistory\": 0, \"recreate\": true, \"resetValues\": true, \"reuseValues\": true}, \"wait\": true,\
+          \ \"waitForJobs\": true}, \"releaseName\": \"string\", \"repoURL\": \"string\", \"valuesTemplate\": \"string\",\
+          \ \"version\": \"string\"}, \"status\": {\"conditions\": [{}], \"revision\": 0, \"status\": \"string\"}}`\n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    post:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Install a specific addon on kubernetes cluster
+      operationId: CreateK8sClusterAddon
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/v1.1.0_k8s_cluster_addons_config'
+      responses:
+        '202':
+          description: Request to install kubernetes cluster addon submitted sucessfully.
+        '400':
+          description: Invalid cluster UUID passed in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster with the specified UUID is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '409':
+          description: Conflict with existing resource state(cluster addon already exists).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n \
+          \   \"metadata\": {},\n    \"spec\": {\n        \"chartName\": \"string\",\n        \"clusterSelector\": {\n   \
+          \         \"matchExpressions\": [\n                {}\n            ],\n            \"matchLabels\": {\n        \
+          \        \"property1\": \"string\",\n                \"property2\": \"string\"\n            }\n        },\n    \
+          \    \"namespace\": \"string\",\n        \"options\": {\n            \"atomic\": true,\n            \"dependencyUpdate\"\
+          : true,\n            \"disableHooks\": true,\n            \"disableOpenAPIValidation\": true,\n            \"install\"\
+          : {\n                \"createNamespace\": true,\n                \"includeCRDs\": true\n            },\n       \
+          \     \"options\": true,\n            \"skipCRDs\": true,\n            \"timeout\": \"string\",\n            \"\
+          uninstall\": {\n                \"description\": \"string\",\n                \"keepHistory\": true\n          \
+          \  },\n            \"upgrade\": {\n                \"cleanupOnFail\": true,\n                \"force\": true,\n\
+          \                \"maxHistory\": 0,\n                \"recreate\": true,\n                \"resetValues\": true,\n\
+          \                \"reuseValues\": true\n            },\n            \"wait\": true,\n            \"waitForJobs\"\
+          : true\n        },\n        \"releaseName\": \"string\",\n        \"repoURL\": \"string\",\n        \"valuesTemplate\"\
+          : \"string\",\n        \"version\": \"string\"\n    },\n    \"status\": {\n        \"conditions\": [\n         \
+          \   {}\n        ],\n        \"revision\": 0,\n        \"status\": \"string\"\n    }\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"metadata\": {},\n    \"spec\": {\n        \"chartName\": \"string\"\
+          ,\n        \"clusterSelector\": {\n            \"matchExpressions\": [\n                {}\n            ],\n   \
+          \         \"matchLabels\": {\n                \"property1\": \"string\",\n                \"property2\": \"string\"\
+          \n            }\n        },\n        \"namespace\": \"string\",\n        \"options\": {\n            \"atomic\"\
+          : true,\n            \"dependencyUpdate\": true,\n            \"disableHooks\": true,\n            \"disableOpenAPIValidation\"\
+          : true,\n            \"install\": {\n                \"createNamespace\": true,\n                \"includeCRDs\"\
+          : true\n            },\n            \"options\": true,\n            \"skipCRDs\": true,\n            \"timeout\"\
+          : \"string\",\n            \"uninstall\": {\n                \"description\": \"string\",\n                \"keepHistory\"\
+          : true\n            },\n            \"upgrade\": {\n                \"cleanupOnFail\": true,\n                \"\
+          force\": true,\n                \"maxHistory\": 0,\n                \"recreate\": true,\n                \"resetValues\"\
+          : true,\n                \"reuseValues\": true\n            },\n            \"wait\": true,\n            \"waitForJobs\"\
+          : true\n        },\n        \"releaseName\": \"string\",\n        \"repoURL\": \"string\",\n        \"valuesTemplate\"\
+          : \"string\",\n        \"version\": \"string\"\n    },\n    \"status\": {\n        \"conditions\": [\n         \
+          \   {}\n        ],\n        \"revision\": 0,\n        \"status\": \"string\"\n    }\n}' \\\n    --output-document\
+          \ \\\n    - https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"metadata\":\
+          \ {},\n    \"spec\": {\n        \"chartName\": \"string\",\n        \"clusterSelector\": {\n            \"matchExpressions\"\
+          : [\n                {}\n            ],\n            \"matchLabels\": {\n                \"property1\": \"string\"\
+          ,\n                \"property2\": \"string\"\n            }\n        },\n        \"namespace\": \"string\",\n  \
+          \      \"options\": {\n            \"atomic\": true,\n            \"dependencyUpdate\": true,\n            \"disableHooks\"\
+          : true,\n            \"disableOpenAPIValidation\": true,\n            \"install\": {\n                \"createNamespace\"\
+          : true,\n                \"includeCRDs\": true\n            },\n            \"options\": true,\n            \"skipCRDs\"\
+          : true,\n            \"timeout\": \"string\",\n            \"uninstall\": {\n                \"description\": \"\
+          string\",\n                \"keepHistory\": true\n            },\n            \"upgrade\": {\n                \"\
+          cleanupOnFail\": true,\n                \"force\": true,\n                \"maxHistory\": 0,\n                \"\
+          recreate\": true,\n                \"resetValues\": true,\n                \"reuseValues\": true\n            },\n\
+          \            \"wait\": true,\n            \"waitForJobs\": true\n        },\n        \"releaseName\": \"string\"\
+          ,\n        \"repoURL\": \"string\",\n        \"valuesTemplate\": \"string\",\n        \"version\": \"string\"\n\
+          \    },\n    \"status\": {\n        \"conditions\": [\n            {}\n        ],\n        \"revision\": 0,\n  \
+          \      \"status\": \"string\"\n    }\n}\"\"\"\n\nconn.request(\"POST\",\"/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          metadata\": {}, \"spec\": {\"chartName\": \"string\", \"clusterSelector\": {\"matchExpressions\": [{}], \"matchLabels\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}}, \"namespace\": \"string\", \"options\": {\"atomic\":\
+          \ true, \"dependencyUpdate\": true, \"disableHooks\": true, \"disableOpenAPIValidation\": true, \"install\": {\"\
+          createNamespace\": true, \"includeCRDs\": true}, \"options\": true, \"skipCRDs\": true, \"timeout\": \"string\"\
+          , \"uninstall\": {\"description\": \"string\", \"keepHistory\": true}, \"upgrade\": {\"cleanupOnFail\": true, \"\
+          force\": true, \"maxHistory\": 0, \"recreate\": true, \"resetValues\": true, \"reuseValues\": true}, \"wait\": true,\
+          \ \"waitForJobs\": true}, \"releaseName\": \"string\", \"repoURL\": \"string\", \"valuesTemplate\": \"string\",\
+          \ \"version\": \"string\"}, \"status\": {\"conditions\": [{}], \"revision\": 0, \"status\": \"string\"}}`)\n\treq,\
+          \ err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\"\
+          , \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error\
+          \ creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\t\
+          if err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"metadata\\\": {}, \\\"spec\\\": {\\\"chartName\\\": \\\"string\\\", \\\"clusterSelector\\\": {\\\"matchExpressions\\\
+          \": [{}], \\\"matchLabels\\\": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"string\\\"}}, \\\"namespace\\\
+          \": \\\"string\\\", \\\"options\\\": {\\\"atomic\\\": true, \\\"dependencyUpdate\\\": true, \\\"disableHooks\\\"\
+          : true, \\\"disableOpenAPIValidation\\\": true, \\\"install\\\": {\\\"createNamespace\\\": true, \\\"includeCRDs\\\
+          \": true}, \\\"options\\\": true, \\\"skipCRDs\\\": true, \\\"timeout\\\": \\\"string\\\", \\\"uninstall\\\": {\\\
+          \"description\\\": \\\"string\\\", \\\"keepHistory\\\": true}, \\\"upgrade\\\": {\\\"cleanupOnFail\\\": true, \\\
+          \"force\\\": true, \\\"maxHistory\\\": 0, \\\"recreate\\\": true, \\\"resetValues\\\": true, \\\"reuseValues\\\"\
+          : true}, \\\"wait\\\": true, \\\"waitForJobs\\\": true}, \\\"releaseName\\\": \\\"string\\\", \\\"repoURL\\\": \\\
+          \"string\\\", \\\"valuesTemplate\\\": \\\"string\\\", \\\"version\\\": \\\"string\\\"}, \\\"status\\\": {\\\"conditions\\\
+          \": [{}], \\\"revision\\\": 0, \\\"status\\\": \\\"string\\\"}}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons';\nconst options = {\n \
+          \ method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"\
+          metadata\": {}, \"spec\": {\"chartName\": \"string\", \"clusterSelector\": {\"matchExpressions\": [{}], \"matchLabels\"\
+          : {\"property1\": \"string\", \"property2\": \"string\"}}, \"namespace\": \"string\", \"options\": {\"atomic\":\
+          \ true, \"dependencyUpdate\": true, \"disableHooks\": true, \"disableOpenAPIValidation\": true, \"install\": {\"\
+          createNamespace\": true, \"includeCRDs\": true}, \"options\": true, \"skipCRDs\": true, \"timeout\": \"string\"\
+          , \"uninstall\": {\"description\": \"string\", \"keepHistory\": true}, \"upgrade\": {\"cleanupOnFail\": true, \"\
+          force\": true, \"maxHistory\": 0, \"recreate\": true, \"resetValues\": true, \"reuseValues\": true}, \"wait\": true,\
+          \ \"waitForJobs\": true}, \"releaseName\": \"string\", \"repoURL\": \"string\", \"valuesTemplate\": \"string\",\
+          \ \"version\": \"string\"}, \"status\": {\"conditions\": [{}], \"revision\": 0, \"status\": \"string\"}}`\n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+  /karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}:
+    get:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Get information of a specified addon installed on the kubernetes cluster.
+      operationId: GetK8sClusterAddon
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Name of the kubernetes cluster addon. e.g. cilium, fluentbit, etc.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Details of the kubernetes cluster addon.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_k8s_cluster_addons_config'
+        '400':
+          description: Invalid cluster UUID or addon name passed in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster with the specified UUID or cluster addon with the specified name is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}';\nconst options\
+          \ = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    delete:
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Delete a specific addon installed on the kubernetes cluster
+      operationId: DeleteK8sClusterAddon
+      parameters:
+      - description: Kubernetes cluster UUID.
+        name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Name of the kubernetes cluster addon. e.g. cilium, fluentbit, etc.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Force delete cluster addon even if it's a system default addon.
+        name: force
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '202':
+          description: Request to delete kubernetes cluster addon submitted sucessfully.
+        '400':
+          description: Invalid cluster UUID or addon name passed in the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: Kubernetes cluster with the specified UUID or cluster addon with a specified name is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-beta.1/k8s/clusters/{uuid}/addons/{name}';\nconst options\
+          \ = {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\
+          \ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  requestBodies:
+    v1.1.0_k8s_cluster_addons_config:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v1.1.0_k8s_cluster_addons_config'
+      required: true
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_k8s_cluster_addons_config:
+      description: Kubernetes cluster addons config.
+      type: object
+      properties:
+        metadata:
+          type: object
+        spec:
+          description: Spec defines the desired state of the cluster addon.
+          type: object
+          required:
+          - chartName
+          - repoURL
+          properties:
+            chartName:
+              description: 'ChartName is the name of the Helm chart in the repository. e.g. chart-path oci://repo-url/chart-name
+                as chartName: chart-name and https://repo-url/chart-name as chartName: chart-name'
+              type: string
+            clusterSelector:
+              description: ClusterSelector selects Clusters in the same namespace with a label that matches the specified
+                label selector. The Helm chart will be installed on all selected Clusters. If a Cluster is no longer selected,
+                the Helm release will be uninstalled.
+              type: object
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
+                  type: array
+                  items:
+                    description: A label selector requirement is a selector that contains values, a key, and an operator that
+                      relates the key and values.
+                    type: object
+                    required:
+                    - key
+                    - operator
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a set of values. Valid operators are In,
+                          NotIn, Exists and DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator is In or NotIn, the values array
+                          must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This
+                          array is replaced during a strategic merge patch.
+                        type: array
+                        items:
+                          type: string
+                matchLabels:
+                  description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent
+                    to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array
+                    contains only "value". The requirements are ANDed.
+                  type: object
+                  additionalProperties:
+                    type: string
+              x-kubernetes-map-type: atomic
+            namespace:
+              description: ReleaseNamespace is the namespace the Helm release will be installed on each selected Cluster.
+                If it is not specified, it will be set to the default namespace.
+              type: string
+            options:
+              description: Options represents CLI flags passed to Helm operations (i.e. install, upgrade, delete) and include
+                options such as wait, skipCRDs, timeout, waitForJobs, etc.
+              type: object
+              properties:
+                atomic:
+                  description: Atomic indicates the installation/upgrade process to delete the installation or rollback on
+                    failure. If 'Atomic' is set, wait will be enabled automatically during helm install/upgrade operation.
+                  type: boolean
+                dependencyUpdate:
+                  description: DependencyUpdate indicates the Helm install/upgrade action to get missing dependencies.
+                  type: boolean
+                disableHooks:
+                  description: DisableHooks prevents hooks from running during the Helm install action.
+                  type: boolean
+                disableOpenAPIValidation:
+                  description: DisableOpenAPIValidation controls whether OpenAPI validation is enforced.
+                  type: boolean
+                install:
+                  description: Install represents CLI flags passed to Helm install operation which can be used to control
+                    behaviour of helm Install operations via options like wait, skipCrds, timeout, waitForJobs, etc.
+                  type: object
+                  properties:
+                    createNamespace:
+                      description: CreateNamespace indicates the Helm install/upgrade action to create the HelmChartProxySpec.ReleaseNamespace
+                        if it does not exist yet. On uninstall, the namespace will not be garbage collected. If it is not
+                        specified by user, will be set to default 'true'.
+                      type: boolean
+                    includeCRDs:
+                      description: IncludeCRDs determines whether CRDs stored as a part of helm templates directory should
+                        be installed.
+                      type: boolean
+                options:
+                  description: SubNotes determines whether sub-notes should be rendered in the chart.
+                  type: boolean
+                skipCRDs:
+                  description: SkipCRDs controls whether CRDs should be installed during install/upgrade operation. By default,
+                    CRDs are installed if not already present. If set, no CRDs will be installed.
+                  type: boolean
+                timeout:
+                  description: Timeout is the time to wait for any individual Kubernetes operation (like resource creation,
+                    Jobs for hooks, etc.) during the performance of a Helm install action. Defaults to '10 min'.
+                  type: string
+                uninstall:
+                  description: Uninstall represents CLI flags passed to Helm uninstall operation which can be used to control
+                    behaviour of helm Uninstall operation via options like wait, timeout, etc.
+                  type: object
+                  properties:
+                    description:
+                      description: Description represents human readable information to be shown on release uninstall.
+                      type: string
+                    keepHistory:
+                      description: KeepHistory defines whether historical revisions of a release should be saved. If it's
+                        set, helm uninstall operation will not delete the history of the release. The helm storage backend
+                        (secret, configmap, etc) will be retained in the cluster.
+                      type: boolean
+                upgrade:
+                  description: Upgrade represents CLI flags passed to Helm upgrade operation which can be used to control
+                    behaviour of helm Upgrade operations via options like wait, skipCrds, timeout, waitForJobs, etc.
+                  type: object
+                  properties:
+                    cleanupOnFail:
+                      description: CleanupOnFail indicates the upgrade action to delete newly-created resources on a failed
+                        update operation.
+                      type: boolean
+                    force:
+                      description: Force indicates to ignore certain warnings and perform the helm release upgrade anyway.
+                        This should be used with caution.
+                      type: boolean
+                    maxHistory:
+                      description: MaxHistory limits the maximum number of revisions saved per release
+                      type: integer
+                    recreate:
+                      description: Recreate will (if true) recreate pods after a rollback.
+                      type: boolean
+                    resetValues:
+                      description: ResetValues will reset the values to the chart's built-ins rather than merging with existing.
+                      type: boolean
+                    reuseValues:
+                      description: ReuseValues will re-use the user's last supplied values.
+                      type: boolean
+                wait:
+                  description: Wait enables the waiting for resources to be ready after a Helm install/upgrade has been performed.
+                  type: boolean
+                waitForJobs:
+                  description: WaitForJobs enables waiting for jobs to complete after a Helm install/upgrade has been performed.
+                  type: boolean
+            releaseName:
+              description: ReleaseName is the release name of the installed Helm chart. If it is not specified, a name will
+                be generated.
+              type: string
+            repoURL:
+              description: 'RepoURL is the URL of the Helm chart repository. e.g. chart-path oci://repo-url/chart-name as
+                repoURL: oci://repo-url and https://repo-url/chart-name as repoURL: https://repo-url'
+              type: string
+            valuesTemplate:
+              description: ValuesTemplate is an inline YAML representing the values for the Helm chart. This YAML supports
+                Go templating to reference fields from each selected workload Cluster and programatically create and set values.
+              type: string
+            version:
+              description: Version is the version of the Helm chart. If it is not specified, the chart will use and be kept
+                up to date with the latest version.
+              type: string
+        status:
+          description: Status defines the observed state of cluster addon.
+          type: object
+          properties:
+            conditions:
+              description: Conditions defines current state of the cluster addon.
+              type: array
+              items:
+                description: Condition defines an observation of a Cluster API resource operational state.
+                type: object
+                required:
+                - lastTransitionTime
+                - status
+                - type
+                properties:
+                  lastTransitionTime:
+                    description: Last time the condition transitioned from one status to another. This should be when the
+                      underlying condition changed. If that is not known, then using the time when the API field changed is
+                      acceptable.
+                    type: string
+                    format: date-time
+                  message:
+                    description: A human readable message indicating details about the transition. This field may be empty.
+                    type: string
+                  reason:
+                    description: The reason for the condition's last transition in CamelCase. The specific API may choose
+                      whether or not this field is considered a guaranteed API. This field may not be empty.
+                    type: string
+                  severity:
+                    description: Severity provides an explicit classification of Reason code, so the users or machines can
+                      immediately understand the current situation and act accordingly. The Severity field MUST be set only
+                      when Status=False.
+                    type: string
+                  status:
+                    description: Status of the condition, one of True, False, Unknown.
+                    type: string
+                  type:
+                    description: Type of condition in CamelCase or in foo.example.com/CamelCase. Many .condition.type values
+                      are consistent across resources like Available, but because arbitrary conditions can be useful (see
+                      .node.status.conditions), the ability to deconflict is important.
+                    type: string
+            revision:
+              description: Revision is the current revision of the Helm release.
+              type: integer
+            status:
+              description: Status is the current status of the Helm release.
+              type: string
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_k8s_cluster_addons_config_list:
+      description: 'Kubernetes cluster addons list '
+      type: array
+      items:
+        $ref: '#/components/schemas/v1.1.0_k8s_cluster_addons_config'

@@ -1,0 +1,1241 @@
+openapi: 3.0.0
+info:
+  description: "# Introduction\n\n**Nutanix Move (Move)** is a cross-hypervisor mobility solution to move VMs with minimal\
+    \ downtime. Move helps streamline 'lift-and-shift' virtual machine (VM) migrations to a Nutanix Enterprise Cloud. Move\
+    \ provides:\n\n- Streamlined migrations with one-click simplicity\n- Near-zero downtime with full cutover control\n- Simple\
+    \ test migrations and roll-back capabilities\n- Cost efficiency included with all Nutanix software editions. \n\nThis\
+    \ document covers APIs that are available in Move-6.2.0.\n\nRefer to the [Move user guide](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Move:Nutanix-Move)\
+    \ for more information related to the supported source to target migration details.\n\n> Note: Since the infrastructure\
+    \ underneath is completely different, a small downtime is incurred during cutover from any of the above sources to targets.\n\
+    \n\n# Authentication\n\n**Move uses JWT token based bearer authentication.**\n\nThe user provides username and password\
+    \ once to generate an authentication token (using the login API).\nThis authentication token is added as an HTTP Authorization\
+    \ header every time a request is sent.\n\n## Best Practice\n\nIt is advised that the user revoke the authentication token\
+    \ using the Revoke API after completing required tasks.\n\n**Error codes**\n\nList of HTTP Status codes returned by Move\
+    \ application:\n\n|Error codes    |       Messages    |\n| :-----------: | :----- |\n| 200 |   Successful operation  \
+    \  |\n| 201       |  Created|\n| 202    | Accepted |\n| 204    | No Content  |\n| 401    | Unauthorized  |\n| 403    |\
+    \ Forbidden  |\n| 404    | Not Found   |\n| 409    | Conflict  |\n| 422    | Unprocessable Entity  |\n| 500    | Internal\
+    \ Server Error  |\n| 501    | Not Implemented  |\n| 503    |      Service unavailable |\n\n# Workflow\n\nThis documentation\
+    \ helps in familiarizing with **Nutanix Move V2 API workflow**. The API's need to be executed in the following sequence\
+    \ to successfully migrate a VM using the Move application.\n\n**Authentication:**\n\n- [Login](#tag/User/operation/loginUser)-\
+    \ User has to login and obtain an authentication token. This token is used for authorization in all APIs.\n\n**Inventory:**\n\
+    \n- [Add the source and target provider](#tag/Provider/operation/createProvider) for migration.\n- [Fetch provider Inventory](#tag/Provider/operation/getProvider)\
+    \ to obtain provider networks and VMs information.\n\n**Migration:**\n\n- [Create a Migration plan](#tag/Plan/operation/createPlan)\
+    \ by providing source information, target information, network mappings, schedule settings, and workload.\n\n- [Prepare\
+    \ the VMs for Migration](#tag/Plan/operation/preparePlan)\u2013 in manual or automatic mode. If the preparation mode is\
+    \ set to 'manual', OS specific scripts are to be executed manually to prepare the source VMs.\n\n- [Perform readiness\
+    \ checks](#tag/Plan/operation/checkReadiness) to confirm if that particular migration plan is ready to start.\n\n- [Start\
+    \ the Migration plan](#tag/Plan/operation/startPlan) and wait for VMs to reach the cutover state. User can[ view workload\
+    \ details](#tag/Workload/operation/getAllWorkloads) for a migration plan and the list of actions that can be performed\
+    \ on the current VM.\n\n- [Perform cutover](#tag/Plan/operation/workloadAction). The cutover process begins immediately\
+    \ and takes a few minutes. Once the cutover is complete, the VM is ready for use in the target provider.\n\n**Application:**\n\
+    \n- [View the application information](#tag/Application/operation/getAppInfo).\n\n- [Check if an upgrade ](#tag/Upgrade/operation/checkUpgrade)\
+    \ is available and [initiate an upgrade](#tag/Upgrade/operation/initUpgrade) Users can also upload files to do an [offline\
+    \ upgrade](#tag/Upgrade/operation/getUploadedUpgradeInfo) of the Move application.\n\n- In case of issues, the[ support\
+    \ bundle can be downloaded ](#tag/Application/operation/getSupportBundle) to provide logs and information about the current\
+    \ state of the VM.\n"
+  title: Nutanix Move REST APIs
+  version: 2.4.0
+servers:
+- url: /
+security: []
+paths:
+  /move/v2/providers/{id}/workloads/list:
+    post:
+      description: Gets inventory of the provider. Inventory collection gathers information about the VMs in a provider. The
+        information retrieved includes:</br> <ul><li>Cluster name</li> <li>Data center name</li> <li>Network details</li>
+        <li>OS type</li> <li>Number of CPUs</li> <li>VM names</li> <li>VM UUIDs</li></ul> <b>Note:</b> the refresh inventory
+        flag can be used to refresh the inventory for the provider, if set to true. <br/><br/><b>Sample API Syntax:</b> https://move.address/move/v2/81b0a14d-c937-4872-b792-d46484ee8905/workloads/list
+      operationId: getInventory
+      parameters:
+      - description: UUID of the provider.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: The UUID of target security policy provider to fetch customized "AssociatedCategories" for each workload.
+        in: query
+        name: targetSpProvider
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchFilter'
+        description: Workload search filter object to filter the required VM information.
+        x-examples:
+          aws:
+            Filter:
+              Cluster:
+              - ap-south-1a
+            Limit: 1
+            Query: rhel
+            RefreshInventory: false
+            ShowVMS: all
+            SortBy: VMName
+            SortOrderDesc: true
+          azure:
+            Filter:
+              Datacenter:
+              - westus
+            Limit: 1
+            Query: centos
+            RefreshInventory: true
+            ShowVMS: all
+            SortBy: VMName
+            SortOrderDesc: true
+          esx:
+            Filter:
+              Cluster:
+              - NM-RC-51
+            Limit: 1
+            Query: ESX
+            RefreshInventory: true
+            ShowVMS: all
+            SortBy: VMName
+            SortOrderDesc: true
+          hyperv:
+            Filter:
+              Powerstate: 'On'
+            Limit: 1
+            Query: test
+            RefreshInventory: false
+            ShowVMS: all
+            SortBy: OS
+            SortOrderDesc: true
+      responses:
+        '202':
+          description: Operation completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Entity'
+            aws: {}
+            azure: {}
+            esx: {}
+            hyperv: {}
+      security:
+      - Bearer: []
+      summary: Fetch provider inventory information
+      tags:
+      - Provider
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev//move/v2/providers/{id}/workloads/list \\\n   \
+          \ --header 'Accept: application/json' \\\n    --header 'Authorization: Bearer <your_access_token>' \\\n    --header\
+          \ 'Content-Type: application/json' \\\n    --data '{\n    \"AfterOffset\": 0,\n    \"BeforeOffset\": 0,\n    \"\
+          Fields\": [\n        \"string\"\n    ],\n    \"Filter\": {\n        \"Categories\": {\n            \"property1\"\
+          : [\n                \"string\"\n            ],\n            \"property2\": [\n                \"string\"\n    \
+          \        ]\n        },\n        \"Cluster\": [\n            \"string\"\n        ],\n        \"Datacenter\": [\n\
+          \            \"string\"\n        ],\n        \"Host\": [\n            \"string\"\n        ],\n        \"ShareUuids\"\
+          : [\n            \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        ],\n        \"TargetType\": \"string\",\n   \
+          \     \"VMUuids\": [\n            \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        ]\n    },\n    \"Limit\": 0,\n\
+          \    \"Query\": \"string\",\n    \"RefreshInventory\": false,\n    \"ShowVMS\": \"all\",\n    \"SortBy\": \"VMName\"\
+          ,\n    \"SortOrderDesc\": true,\n    \"UpdateInventoryToPlans\": true\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Bearer <your_access_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"AfterOffset\"\
+          : 0,\n    \"BeforeOffset\": 0,\n    \"Fields\": [\n        \"string\"\n    ],\n    \"Filter\": {\n        \"Categories\"\
+          : {\n            \"property1\": [\n                \"string\"\n            ],\n            \"property2\": [\n  \
+          \              \"string\"\n            ]\n        },\n        \"Cluster\": [\n            \"string\"\n        ],\n\
+          \        \"Datacenter\": [\n            \"string\"\n        ],\n        \"Host\": [\n            \"string\"\n  \
+          \      ],\n        \"ShareUuids\": [\n            \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n        ],\n       \
+          \ \"TargetType\": \"string\",\n        \"VMUuids\": [\n            \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\n  \
+          \      ]\n    },\n    \"Limit\": 0,\n    \"Query\": \"string\",\n    \"RefreshInventory\": false,\n    \"ShowVMS\"\
+          : \"all\",\n    \"SortBy\": \"VMName\",\n    \"SortOrderDesc\": true,\n    \"UpdateInventoryToPlans\": true\n}'\
+          \ \\\n    --output-document \\\n    - https://www.nutanix.dev//move/v2/providers/{id}/workloads/list"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Bearer <your_access_token>\",\n    \"Content-Type\": \"application/json\"\
+          \n}\n\npayload =  \"\"\"{\n    \"AfterOffset\": 0,\n    \"BeforeOffset\": 0,\n    \"Fields\": [\n        \"string\"\
+          \n    ],\n    \"Filter\": {\n        \"Categories\": {\n            \"property1\": [\n                \"string\"\
+          \n            ],\n            \"property2\": [\n                \"string\"\n            ]\n        },\n        \"\
+          Cluster\": [\n            \"string\"\n        ],\n        \"Datacenter\": [\n            \"string\"\n        ],\n\
+          \        \"Host\": [\n            \"string\"\n        ],\n        \"ShareUuids\": [\n            \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n        ],\n        \"TargetType\": \"string\",\n        \"VMUuids\": [\n            \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          \n        ]\n    },\n    \"Limit\": 0,\n    \"Query\": \"string\",\n    \"RefreshInventory\": false,\n    \"ShowVMS\"\
+          : \"all\",\n    \"SortBy\": \"VMName\",\n    \"SortOrderDesc\": true,\n    \"UpdateInventoryToPlans\": true\n}\"\
+          \"\"\n\nconn.request(\"POST\",\"//move/v2/providers/{id}/workloads/list\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev//move/v2/providers/{id}/workloads/list\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          AfterOffset\": 0, \"BeforeOffset\": 0, \"Fields\": [\"string\"], \"Filter\": {\"Categories\": {\"property1\": [\"\
+          string\"], \"property2\": [\"string\"]}, \"Cluster\": [\"string\"], \"Datacenter\": [\"string\"], \"Host\": [\"\
+          string\"], \"ShareUuids\": [\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"], \"TargetType\": \"string\", \"VMUuids\":\
+          \ [\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"]}, \"Limit\": 0, \"Query\": \"string\", \"RefreshInventory\": false,\
+          \ \"ShowVMS\": \"all\", \"SortBy\": \"VMName\", \"SortOrderDesc\": true, \"UpdateInventoryToPlans\": true}`)\n\t\
+          req, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\"\
+          , \"Bearer <your_access_token>\")\n        req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres,\
+          \ err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev//move/v2/providers/{id}/workloads/list\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Bearer <your_access_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"AfterOffset\\\": 0, \\\"BeforeOffset\\\
+          \": 0, \\\"Fields\\\": [\\\"string\\\"], \\\"Filter\\\": {\\\"Categories\\\": {\\\"property1\\\": [\\\"string\\\"\
+          ], \\\"property2\\\": [\\\"string\\\"]}, \\\"Cluster\\\": [\\\"string\\\"], \\\"Datacenter\\\": [\\\"string\\\"\
+          ], \\\"Host\\\": [\\\"string\\\"], \\\"ShareUuids\\\": [\\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"], \\\"TargetType\\\
+          \": \\\"string\\\", \\\"VMUuids\\\": [\\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\"]}, \\\"Limit\\\": 0, \\\"Query\\\
+          \": \\\"string\\\", \\\"RefreshInventory\\\": false, \\\"ShowVMS\\\": \\\"all\\\", \\\"SortBy\\\": \\\"VMName\\\"\
+          , \\\"SortOrderDesc\\\": true, \\\"UpdateInventoryToPlans\\\": true}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev//move/v2/providers/{id}/workloads/list';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Authorization': 'Bearer <your_access_token>', 'Content-Type':\
+          \ 'application/json'},\n  body:  `{\"AfterOffset\": 0, \"BeforeOffset\": 0, \"Fields\": [\"string\"], \"Filter\"\
+          : {\"Categories\": {\"property1\": [\"string\"], \"property2\": [\"string\"]}, \"Cluster\": [\"string\"], \"Datacenter\"\
+          : [\"string\"], \"Host\": [\"string\"], \"ShareUuids\": [\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"], \"TargetType\"\
+          : \"string\", \"VMUuids\": [\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"]}, \"Limit\": 0, \"Query\": \"string\", \"\
+          RefreshInventory\": false, \"ShowVMS\": \"all\", \"SortBy\": \"VMName\", \"SortOrderDesc\": true, \"UpdateInventoryToPlans\"\
+          : true}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    Bearer:
+      in: header
+      name: Authorization
+      type: apiKey
+  schemas:
+    VpcProps:
+      description: VPC-related properties of the source VM.
+      properties:
+        ID:
+          description: VPC identifier.
+          type: string
+        Name:
+          description: VPC name.
+          type: string
+      type: object
+    Error:
+      description: Error information
+      properties:
+        ApiVersion:
+          description: Move API version.
+          type: string
+        Code:
+          description: Error Code.
+          format: uint64
+          type: integer
+        Kind:
+          description: Error kind.
+          type: string
+        Message:
+          description: Error Message.
+          type: string
+        State:
+          description: Error State.
+          type: string
+      required:
+      - Message
+      type: object
+    SecurityPolicyEntity:
+      description: Security policy entity information.
+      properties:
+        Entities:
+          description: It can be id if it is an object such as Address Group or Category, or it can be an IP address if it
+            is a single Raw IpAddress, such as 10.10.1/24 or 10.10.10.10
+          items:
+            type: string
+          type: array
+        EntitySubType:
+          description: The sub type of the entity.
+          enum:
+          - Category
+          - Address Group
+          - Raw IpAddress
+          type: string
+        EntityType:
+          description: The type of the entity.
+          enum:
+          - VM
+          - Network Address
+          type: string
+      type: object
+    ShareInventory:
+      description: Share inventory information.
+      properties:
+        AdditionalProperties:
+          additionalProperties:
+            type: string
+          type: object
+        ProtocolTypes:
+          description: Protocol types supported by the share.
+          items:
+            type: string
+          type: array
+        RecID:
+          description: Database index.
+          format: int64
+          type: integer
+        ShareName:
+          description: Name of the share.
+          type: string
+        SharePath:
+          description: Path of the share.
+          type: string
+        ShareUuid:
+          description: UUID of share.
+          type: string
+        SourceUuid:
+          description: UUID of source provider.
+          type: string
+      type: object
+    NsxPolicyToFnsPolicyMinimal:
+      description: Minimal information about the NSX security policy  translated to the FNS policy.
+      properties:
+        FnsSplitPoliciesNames:
+          description: List of names of the split policies in FNS corresponding to given NSX policy.
+          items:
+            type: string
+          type: array
+        Nsx:
+          $ref: '#/components/schemas/NsxSecurityPolicy'
+      type: object
+    Category:
+      description: This is the category collected from Prism Central.
+      properties:
+        Description:
+          description: Description of the Category.
+          type: string
+        Id:
+          description: ID of the category.
+          type: string
+        Key:
+          description: Key of the category
+          type: string
+        ProviderUuid:
+          description: UUID of provider.
+          type: string
+        RecId:
+          description: Index of the record in the Database.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the entity (Category).
+          type: string
+        Type:
+          description: created by user or system
+          type: string
+        Value:
+          description: value of the category
+          type: string
+      type: object
+    NsService:
+      description: NsService information.
+      properties:
+        CreateUser:
+          description: ID of the user who created.
+          type: string
+        DefaultService:
+          description: Boolean denoting if the service is present by default.
+          type: boolean
+        Description:
+          description: Description of the NsService.
+          type: string
+        Id:
+          description: ID of NsService.
+          type: string
+        Name:
+          description: Name of the NsService.
+          type: string
+        ProviderUuid:
+          description: UUID of provider.
+          type: string
+        RecId:
+          description: Index of the record in the Database.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the NSX entity.
+          type: string
+        ServiceElements:
+          description: Additional info of the service, specific to the service type.
+          items:
+            $ref: '#/components/schemas/ServiceEntry'
+          type: array
+        SystemOwned:
+          description: Boolean denoting if the service is system owned.
+          type: boolean
+      type: object
+    AddressGroup:
+      description: This is the address group collected from Prism Central.
+      properties:
+        Description:
+          description: Description of the address group.
+          type: string
+        Id:
+          description: ID of address group.
+          type: string
+        IpRanges:
+          description: List of IP ranges.
+          items:
+            $ref: '#/components/schemas/IpRange'
+          type: array
+        Ipv4Addresses:
+          description: List of IPv4 addresses.
+          items:
+            $ref: '#/components/schemas/Ipv4Address'
+          type: array
+        Name:
+          description: Name of the address group.
+          type: string
+        ProviderUuid:
+          description: UUID of provider.
+          type: string
+        RecId:
+          description: Index of the record in the Database.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the address group entity.
+          type: string
+      type: object
+    SecurityPolicyInventoryMetadata:
+      description: Security policy inventory metadata.
+      properties:
+        AddressGroups:
+          $ref: '#/components/schemas/InventoryMetadata'
+        Categories:
+          $ref: '#/components/schemas/InventoryMetadata'
+        NsGroups:
+          $ref: '#/components/schemas/InventoryMetadata'
+        NsServices:
+          $ref: '#/components/schemas/InventoryMetadata'
+        NsVirtualMachines:
+          $ref: '#/components/schemas/InventoryMetadata'
+        NsVpcs:
+          $ref: '#/components/schemas/InventoryMetadata'
+        SecurityPolicies:
+          $ref: '#/components/schemas/InventoryMetadata'
+      type: object
+    NsGroupEffectiveMembers:
+      description: Group of different effective members of the NsGroup.
+      properties:
+        IpAddresses:
+          description: List of effective IP addresses of the NsGroup.
+          items:
+            type: string
+          type: array
+        VirtualMachineIds:
+          description: List of IDs of effective virtual machines of the NsGroup.
+          items:
+            type: string
+          type: array
+      type: object
+    SecurityPolicy:
+      description: Security policy information.
+      properties:
+        Category:
+          description: Category of the security policy.
+          type: string
+        CreateUser:
+          description: ID of the user who created the policy.
+          type: string
+        Id:
+          description: ID of security policy.
+          type: string
+        Name:
+          description: Name of the security policy.
+          type: string
+        ProviderUuid:
+          description: UUID of provider.
+          type: string
+        RecId:
+          description: Index of the record in the Database.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the NSX entity.
+          type: string
+        RuleCount:
+          description: Count of all rules in the security policy.
+          format: int64
+          type: integer
+        Rules:
+          items:
+            $ref: '#/components/schemas/SecurityPolicyRule'
+          type: array
+        SecuredEntity:
+          $ref: '#/components/schemas/SecuredEntity'
+        SequenceNumber:
+          description: Sequence number of the security policy.
+          format: int64
+          type: integer
+        UniqueId:
+          description: UniqueId of the security policy.
+          type: string
+      type: object
+    NsxSecurityPolicy:
+      description: The NSX security policy info used during the translation of security policies.
+      properties:
+        PolicyName:
+          description: The NSX security policy name.
+          type: string
+        PolicyUuid:
+          description: The NSX security policy UUID.
+          type: string
+      type: object
+    IpRange:
+      description: This is the IP range collected from Prism Central.
+      properties:
+        EndIp:
+          description: End IP of the range.
+          type: string
+        ResourceType:
+          description: Resource type of the entity (IP Range).
+          type: string
+        StartIp:
+          description: Start IP of the range.
+          type: string
+      type: object
+    ServiceEntry:
+      description: Additional details of a service such as type, protocol, port etc.
+      properties:
+        DestinationPorts:
+          description: List of destination ports of the service.
+          items:
+            type: string
+          type: array
+        IcmpCode:
+          description: The ICMP code of the service.
+          format: int64
+          type: integer
+        IcmpType:
+          description: The ICMP type of the service.
+          format: int64
+          type: integer
+        MarkedForDelete:
+          description: Denotes if the service is deleted locally.
+          type: boolean
+        Overridden:
+          description: Denotes if the service is overridden locally.
+          type: boolean
+        Protocol:
+          description: The protocol of the service, such as TCP or UDP, or ICMPv4.
+          type: string
+        ResourceType:
+          description: Type of the service entry.
+          enum:
+          - L4PortSetServiceEntryType
+          - ICMPTypeServiceEntryType
+          type: string
+        SourcePorts:
+          description: List of source ports of the service.
+          items:
+            type: string
+          type: array
+      type: object
+    SearchFilter:
+      description: Filter to select and view specific VMs from a workload.
+      properties:
+        AfterOffset:
+          format: int64
+          type: integer
+        BeforeOffset:
+          format: int64
+          type: integer
+        Fields:
+          items:
+            type: string
+          type: array
+        Filter:
+          $ref: '#/components/schemas/Filters'
+        Limit:
+          format: int64
+          type: integer
+        Query:
+          type: string
+        RefreshInventory:
+          description: Refresh Provider Inventory.
+          type: boolean
+        ShowVMS:
+          enum:
+          - all
+          - ineligiblevms
+          - eligiblevms
+          type: string
+        SortBy:
+          $ref: '#/components/schemas/SortColumn'
+        SortOrderDesc:
+          type: boolean
+        UpdateInventoryToPlans:
+          description: Update refreshed inventory details to all available plans which have the provider as the source. This
+            flag is honored only if 'RefreshInventory' is also 'true'.
+          type: boolean
+      type: object
+    NsGroup:
+      description: NsGroup information.
+      properties:
+        CreateUser:
+          description: ID of the user who created.
+          type: string
+        Description:
+          description: Description of the NsGroup.
+          type: string
+        EffectiveMembers:
+          $ref: '#/components/schemas/NsGroupEffectiveMembers'
+        Id:
+          description: ID of NsGroup.
+          type: string
+        IsNestedGroup:
+          description: Denotes if the NsGroup is a nested group or not.
+          type: boolean
+        MemberCount:
+          description: Member count of the NsGroup. Valid only for static membership.
+          format: int64
+          type: integer
+        Name:
+          description: Name of the NsGroup.
+          type: string
+        ProviderUuid:
+          description: UUID of provider.
+          type: string
+        RecId:
+          description: Index of the record in the Database.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the NSX entity.
+          type: string
+        SystemOwned:
+          description: Denotes if the NsGroup is system owned or not
+          type: boolean
+      type: object
+    Filters:
+      properties:
+        Categories:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        Cluster:
+          description: Cluster filter.
+          items:
+            type: string
+          type: array
+        Datacenter:
+          description: Data center filter.
+          items:
+            type: string
+          type: array
+        Host:
+          description: Host filter.
+          items:
+            type: string
+          type: array
+        ShareUuids:
+          description: Share UUIDs filter.
+          items:
+            format: uuid
+            type: string
+          type: array
+        TargetType:
+          description: Target type filter.
+          type: string
+        VMUuids:
+          description: VM UUIDs filter.
+          items:
+            format: uuid
+            type: string
+          type: array
+      type: object
+    Ipv4Address:
+      description: This is the IPv4 address collected from Prism Central.
+      properties:
+        PrefixLength:
+          description: Prefix length of the IPv4 address.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the entity (Ipv4Address).
+          type: string
+        Value:
+          description: IPv4 address.
+          type: string
+      type: object
+    BoundEntity:
+      description: The entity with which the traffic of Secured Entity is controlled. It can be an inbound or outbound operation.
+      properties:
+        Addressgroups:
+          $ref: '#/components/schemas/SecurityPolicyEntity'
+        Categories:
+          $ref: '#/components/schemas/SecurityPolicyEntity'
+        RawIpAddresses:
+          $ref: '#/components/schemas/SecurityPolicyEntity'
+      type: object
+    SortColumn:
+      description: The column based on which the filter output are sorted. The permissible list of values- VMName, Cluster,
+        Datacenter, OS, HostName, PowerState, VCPU, Memory, Storage, ShareName, SharePath.
+      enum:
+      - VMName
+      - Cluster
+      - Datacenter
+      - OS
+      - HostName
+      - PowerState
+      - VCPU
+      - Memory
+      - Storage
+      - ShareName
+      - SharePath
+      - sequence_number
+      type: string
+    VMInventory:
+      description: VM Inventory information.
+      properties:
+        AdditionalProperties:
+          additionalProperties:
+            type: string
+          type: object
+        AssociatedCategories:
+          description: The list of categories associated with the Virtual Machine.
+          items:
+            type: string
+          type: array
+        AssociatedPolicies:
+          description: The list of NSX security policies associated with the Virtual Machine.
+          items:
+            $ref: '#/components/schemas/NsxPolicyToFnsPolicyMinimal'
+          type: array
+        Categories:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        ClusterName:
+          type: string
+        DatacenterName:
+          type: string
+        ErrorMessages:
+          items:
+            type: string
+          type: array
+        HostName:
+          type: string
+        HostUuid:
+          format: uuid
+          type: string
+        HypervisorType:
+          description: Type of hypervisor.
+          type: string
+        InternalUuid:
+          type: string
+        MemoryMB:
+          format: uint32
+          type: integer
+        MigrationSupportStatus:
+          format: uint64
+          type: integer
+        MigrationSupportWarningStatus:
+          format: uint64
+          type: integer
+        Networks:
+          items:
+            $ref: '#/components/schemas/NetworkInventory'
+          type: array
+        Nics:
+          properties:
+            NicsInfo:
+              items:
+                $ref: '#/components/schemas/VmNicInfo'
+              type: array
+          type: object
+        NumCDROMs:
+          format: uint32
+          type: integer
+        NumCPU:
+          format: uint32
+          type: integer
+        NumCoresPerSocket:
+          format: uint32
+          type: integer
+        NumEthernetCards:
+          format: uint32
+          type: integer
+        OSType:
+          type: string
+        OverallCpuDemandInMHz:
+          format: uint32
+          type: integer
+        PowerState:
+          type: string
+        RecID:
+          format: int64
+          type: integer
+        SourceUuid:
+          type: string
+        StorageAllocatedInBytes:
+          format: uint64
+          type: integer
+        StorageUsedInBytes:
+          format: uint64
+          type: integer
+        VMName:
+          type: string
+        VMUuid:
+          type: string
+        VmID:
+          type: string
+        WarningMessages:
+          items:
+            type: string
+          type: array
+      type: object
+    InventoryMetaData:
+      properties:
+        AfterOffset:
+          format: int64
+          type: integer
+        BeforeOffset:
+          format: int64
+          type: integer
+        Count:
+          format: int64
+          type: integer
+        CreationTime:
+          type: string
+        Kind:
+          type: string
+        LastUpdateTime:
+          type: string
+        Limit:
+          format: int64
+          type: integer
+        Name:
+          type: string
+        NumDiscoveredWorkloads:
+          format: int64
+          type: integer
+        NumMigratedWorkloads:
+          format: int64
+          type: integer
+        SortBy:
+          type: string
+        SortOrderDesc:
+          type: boolean
+        SpecVersion:
+          type: string
+        UUID:
+          type: string
+        WorkloadsFilters:
+          properties:
+            Categories:
+              $ref: '#/components/schemas/MapFilter'
+            Clusters:
+              $ref: '#/components/schemas/SourceVMFilter'
+            Datacenters:
+              $ref: '#/components/schemas/SourceVMFilter'
+            Hosts:
+              $ref: '#/components/schemas/SourceVMFilter'
+            Networks:
+              $ref: '#/components/schemas/SourceVMFilter'
+            OSTypes:
+              $ref: '#/components/schemas/SourceVMFilter'
+            PowerStates:
+              $ref: '#/components/schemas/SourceVMFilter'
+          type: object
+      type: object
+    VmNicInfo:
+      description: Source VM's NIC related information such as network, device id, IP conf, MAC etc.
+      properties:
+        IpsConf:
+          items:
+            $ref: '#/components/schemas/VmIpConf'
+          type: array
+        Mac:
+          description: MAC address of the particular NIC.
+          type: string
+        NetworkName:
+          description: The name of the network connected to the particular NIC.
+          type: string
+      type: object
+    SourceVMFilter:
+      description: Source VM Filters.
+      properties:
+        FilterName:
+          description: Filter name.
+          type: string
+        Items:
+          description: Array of filter.
+          items:
+            type: string
+          type: array
+      type: object
+    Entity:
+      description: Entity information.
+      properties:
+        APIVersion:
+          description: Move API version
+          type: string
+        Entities:
+          items:
+            $ref: '#/components/schemas/VMInventory'
+          type: array
+        MetaData:
+          $ref: '#/components/schemas/InventoryMetaData'
+        Nodes:
+          $ref: '#/components/schemas/NodeInventory'
+        SecurityPolicyData:
+          $ref: '#/components/schemas/SecurityPolicyInventory'
+        Shares:
+          items:
+            $ref: '#/components/schemas/ShareInventory'
+          type: array
+      type: object
+    NodeEntity:
+      description: Node inventory details.
+      properties:
+        AdditionalProperties:
+          additionalProperties:
+            type: string
+          type: object
+        CpuCapacityInHz:
+          description: CPU capacity in Hz.
+          format: int64
+          type: integer
+        HypervisorType:
+          description: Hypervisor type.
+          type: string
+        HypervisorVersion:
+          description: Hypervisor version.
+          type: string
+        MemoryCapacityInBytes:
+          description: Memory in bytes.
+          format: int64
+          type: integer
+        NodeName:
+          description: Node name.
+          type: string
+        NodeUuid:
+          description: Node UUID.
+          format: uuid
+          type: string
+        NumCpuCores:
+          description: Number of CPU cores.
+          type: integer
+        NumCpuSockets:
+          description: Number of CPU sockets.
+          type: integer
+        NumCpuThreads:
+          description: Number of CPU threads.
+          type: integer
+        NumVms:
+          description: Number of VMs managed by the node.
+          type: integer
+        RecID:
+          description: Record ID.
+          format: int64
+          type: integer
+        ServiceVmIp:
+          description: Service VM IP.
+          type: string
+        SourceUuid:
+          description: Source UUID.
+          format: uuid
+          type: string
+        StorageCapacityInBytes:
+          description: Storage in bytes.
+          format: int64
+          type: integer
+        UsedStorageInBytes:
+          description: Used storage in bytes.
+          format: int64
+          type: integer
+      type: object
+    NsVirtualMachine:
+      description: Network Security VirtualMachine information.
+      properties:
+        InternalUuid:
+          description: ID of NsVirtualMachine.
+          type: string
+        Name:
+          description: Name of the NsVirtualMachine.
+          type: string
+        ProviderUuid:
+          description: UUID of provider.
+          type: string
+        RecId:
+          description: Index of the record in the Database.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the entity.
+          type: string
+      type: object
+    NsVpc:
+      description: VPC information.
+      properties:
+        AssociatedCategories:
+          description: List of associated categories for the VPC.
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+        Id:
+          description: Identifier of the VPC.
+          type: string
+        Name:
+          description: Name of the VPC.
+          type: string
+      type: object
+    SecurityPolicyRule:
+      description: Security policy rule information.
+      properties:
+        Action:
+          description: Action of the rule.
+          type: string
+        BoundDirection:
+          description: Denotes the direction of traffic with respect to SecuredEntities in the rule, classifying the BoundEntities
+            as either Inbound or Outbound.
+          enum:
+          - In
+          - Out
+          type: string
+        BoundEntity:
+          $ref: '#/components/schemas/BoundEntity'
+        CreateUser:
+          description: ID of the user who created the rule.
+          type: string
+        Description:
+          description: Description of the rule.
+          type: string
+        DestinationGroups:
+          description: List of IDs of destination groups of the rule.
+          items:
+            type: string
+          type: array
+        DestinationIps:
+          description: List of raw destination IPs of the rule.
+          items:
+            type: string
+          type: array
+        Direction:
+          description: Direction of the rule.
+          type: string
+        Disabled:
+          description: Disabled status of the rule.
+          type: boolean
+        Id:
+          description: ID of the rule.
+          type: string
+        IpProtocol:
+          description: IP protocol of the rule.
+          type: string
+        IsDestinationGroupsNegated:
+          description: Negate selection status of destination groups in the rule.
+          type: boolean
+        IsSourceGroupsNegated:
+          description: Negate selection status of source groups in the rule.
+          type: boolean
+        Name:
+          description: Display name of the rule.
+          type: string
+        PolicyId:
+          description: Policy ID of the rule.
+          type: string
+        ProviderUuid:
+          description: Provider UUID of the rule.
+          type: string
+        RecId:
+          description: Index of the record in the Database.
+          format: int64
+          type: integer
+        ResourceType:
+          description: Resource type of the NSX entity.
+          type: string
+        RuleId:
+          description: Rule ID of the rule.
+          format: int64
+          type: integer
+        SecuredEntity:
+          $ref: '#/components/schemas/SecuredEntity'
+        SecuredGroupAction:
+          description: Action of the secured group.
+          type: string
+        SequenceNumber:
+          description: Sequence number of the rule.
+          format: int64
+          type: integer
+        ServiceEntries:
+          description: List of service entries, such as the list of raw protocol & port, of the rule.
+          items:
+            $ref: '#/components/schemas/ServiceEntry'
+          type: array
+        Services:
+          description: List of IDs of services of the rule.
+          items:
+            type: string
+          type: array
+        SourceGroups:
+          description: List of IDs of source groups of the rule.
+          items:
+            type: string
+          type: array
+        SourceIps:
+          description: List of raw source IPs of the rule.
+          items:
+            type: string
+          type: array
+        Type:
+          description: Type of the rule.
+          type: string
+        UniqueId:
+          description: Unique ID of the rule.
+          type: string
+      type: object
+    InventoryMetadata:
+      description: Workload Inventory metadata.
+      properties:
+        Count:
+          description: Count of VMs in current workload.
+          format: int64
+          type: integer
+        CurrOffset:
+          description: Current page offset.
+          format: int64
+          type: integer
+        NextOffset:
+          description: Next page offset.
+          format: int64
+          type: integer
+        NumDiscoveredWorkloads:
+          description: Number of discovered workloads.
+          format: int64
+          type: integer
+        NumMigratedWorkloads:
+          description: Number of migrated workloads.
+          format: int64
+          type: integer
+        OrderedWorkloads:
+          description: List of a unique property such as ID, of the inventory workload which will provide the order for the
+            workloads. For situation where order is important for the given workload (such as security policy), refer this
+            list to get the order.
+          items:
+            type: string
+          type: array
+        PrevOffset:
+          description: Previous page offset.
+          format: int64
+          type: integer
+        TotalCount:
+          description: Total number of VMs.
+          format: int64
+          type: integer
+      type: object
+    NodeInventory:
+      description: Node inventory details.
+      properties:
+        Entities:
+          items:
+            $ref: '#/components/schemas/NodeEntity'
+          type: array
+        MetaData:
+          $ref: '#/components/schemas/InventoryMetaData'
+      type: object
+    MapFilter:
+      description: Filters represented as a map.
+      properties:
+        FilterName:
+          description: Filter name.
+          type: string
+        Items:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: Map object.
+          type: object
+      type: object
+    SecurityPolicyInventory:
+      description: Security policy inventory information. The primary object of inventory being security policy.
+      properties:
+        AddressGroups:
+          additionalProperties:
+            $ref: '#/components/schemas/AddressGroup'
+          type: object
+        Categories:
+          additionalProperties:
+            $ref: '#/components/schemas/Category'
+          type: object
+        Metadata:
+          $ref: '#/components/schemas/SecurityPolicyInventoryMetadata'
+        NsGroups:
+          additionalProperties:
+            $ref: '#/components/schemas/NsGroup'
+          type: object
+        NsServices:
+          additionalProperties:
+            $ref: '#/components/schemas/NsService'
+          type: object
+        NsVirtualMachines:
+          additionalProperties:
+            $ref: '#/components/schemas/NsVirtualMachine'
+          type: object
+        SecurityPolicies:
+          additionalProperties:
+            $ref: '#/components/schemas/SecurityPolicy'
+          type: object
+        Vpcs:
+          additionalProperties:
+            $ref: '#/components/schemas/NsVpc'
+          type: object
+      type: object
+    SecuredEntity:
+      description: The entity which is being protected by the Flow security policy
+      properties:
+        Categories:
+          $ref: '#/components/schemas/SecurityPolicyEntity'
+      type: object
+    NetworkInventory:
+      description: Network Inventory information.
+      properties:
+        Devices:
+          description: List of devices in the network.
+          items:
+            format: int32
+            type: integer
+          type: array
+        ID:
+          description: Network Id.
+          type: string
+        IpAddresses:
+          description: List of IP addresses of devices in this network.
+          items:
+            type: string
+          type: array
+        MacIDs:
+          description: List of MAC addresses of devices in this network.
+          items:
+            type: string
+          type: array
+        Name:
+          description: Network name.
+          type: string
+        VPC:
+          $ref: '#/components/schemas/VpcProps'
+      type: object
+    VmIpConf:
+      description: IP address information for the source VM NIC, such as IP address, netmask, gateway, and DNS.
+      properties:
+        DnsIps:
+          description: Comma separated DNS IPs, such as '8.8.8.8,8.8.4.4'
+          type: string
+        Gateway:
+          description: The gateway for the given IP address.
+          type: string
+        IpAddress:
+          description: The IP address in IPv4 notation.
+          type: string
+        PrefixLength:
+          description: The number denoting the subnet mask in CIDR notation for the given IP address, i.e.  for a CIDR notation
+            "10.10.10.10/24", "24" is the prefix length. Valid value x such that 0 <= x <= 32.
+          format: int32
+          maximum: 32
+          minimum: 0
+          type: integer
+      type: object

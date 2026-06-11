@@ -1,0 +1,249 @@
+openapi: 3.0.0
+info:
+  title: NCM Self-Service
+  description: "# Introduction \n**NCM Self-Service** allows you to seamlessly select, provision, and manage your business\
+    \ applications across infrastructures for both, private and public clouds.\n\nSelf-Service provides application lifecycle,\
+    \ monitoring, and remediation to manage heterogeneous infrastructure. For example, VMs or bare-metal servers. Self-Service\
+    \ supports multiple platforms through its single self-service and automation interface to manage all your infrastructure.\n\
+    \n# Authentication\n- **Basic Authentication** : The user provides user ID and password every time a request is sent as\
+    \ the auth-header.\n\n- **Session Authentication** : The user credentials are stored in a cookie. \n\n"
+  version: 3.1.0
+servers:
+- url: https://pc-host-ip:9440/api/nutanix/v3
+security:
+- basicAuth: []
+paths:
+  /apps/{uuid}/actions/{action_name}/variables:
+    get:
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/action_variables_get_response'
+        '404':
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/app_status'
+      parameters:
+      - $ref: '#/components/parameters/uuid'
+      - required: true
+        description: Action name whose variables are to be fetched
+        in: path
+        name: action_name
+        schema:
+          type: string
+      tags:
+      - Apps
+      x-private: false
+      x-doc-hide: false
+      summary: Get app action variables
+      x-ntnx-operations:
+      - view
+      x-ntnx-kind: app
+      description: 'Retrieves variables defined on the specified application action.
+
+        '
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://pc-host-ip:9440/api/nutanix/v3/apps/{uuid}/actions/{action_name}/variables\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n  \
+          \   "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n      \\\n    --output-document \\\n    - https://pc-host-ip:9440/api/nutanix/v3/apps/{uuid}/actions/{action_name}/variables"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"pc-host-ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Authorization\": \"Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/api/nutanix/v3/apps/{uuid}/actions/{action_name}/variables\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://pc-host-ip:9440/api/nutanix/v3/apps/{uuid}/actions/{action_name}/variables\"\n\t \n\treq, err :=\
+          \ http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://pc-host-ip:9440/api/nutanix/v3/apps/{uuid}/actions/{action_name}/variables\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://pc-host-ip:9440/api/nutanix/v3/apps/{uuid}/actions/{action_name}/variables';\nconst\
+          \ options = {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Authorization': 'Basic <basic_auth_token>'}\
+          \ \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  parameters:
+    uuid:
+      description: The UUID of the entity.
+      required: true
+      in: path
+      name: uuid
+      schema:
+        type: string
+        format: UUID
+        pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    api_version:
+      readOnly: true
+      type: string
+      description: API Version of the Nutanix v3 API framework.
+      title: API Version
+    app_status:
+      description: 'The status of a REST API call. Only used when there is a failure to
+
+        report.
+
+        '
+      type: object
+      properties:
+        kind:
+          readOnly: true
+          type: string
+          description: The kind name
+          x-ntnx-enum:
+          - app
+        code:
+          readOnly: true
+          type: integer
+          description: The HTTP error code.
+        message_list:
+          items:
+            $ref: '#/components/schemas/message_resource'
+          readOnly: true
+          type: array
+        state:
+          readOnly: true
+          type: string
+        api_version:
+          $ref: '#/components/schemas/api_version'
+      title: Response Kind
+    app_actionrun_args:
+      description: Argument format for action run
+      type: object
+      properties:
+        task_uuid:
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+          type: string
+          description: Value of the task uuid
+          format: UUID
+        name:
+          type: string
+          description: Name of the Argument field.
+          maxLength: 64
+        value:
+          type: string
+          description: Value of the Argument field.
+      title: Argument format for action run
+    message_resource:
+      description: message.
+      required:
+      - message
+      - reason
+      type: object
+      properties:
+        message:
+          type: string
+          description: If state is ERROR, a message describing the error.
+        reason:
+          x-ntnx-enum:
+          - ACCESS_DENIED
+          - ACCESS_FORBIDDEN
+          - ACTION_NOT_SUPPORTED
+          - AUTHENTICATION_REQUIRED
+          - BEARER_TOKEN_EXPIRED
+          - BEARER_TOKEN_BAD_SIGNATURE
+          - CANNOT_MODIFY_PRE_CONFIGURED_REPORT
+          - CATEGORY_NAME_VALUE_MISMATCH
+          - CONFIGURATION_INCOMPLETE
+          - CONCURRENT_REQUESTS_NOT_ALLOWED
+          - DEFAULT_PROJECT_UNAVAILABLE
+          - DESERIALIZATION_FAILED
+          - DIRECTORY_SERVICE_CONNECTION_FAILED
+          - ENTITY_ALREADY_EXISTS
+          - ENTITY_DELETION_FAILED
+          - ENTITY_IS_READONLY
+          - ENTITY_NAME_UUID_MISMATCH
+          - ENTITY_NOT_CONFIGURED
+          - ENTITY_NOT_FOUND
+          - ENTITY_SAVE_ERROR
+          - ENTITY_UPDATE_FAILED
+          - IDEMPOTENCE_UUID_CREATION_FAILED
+          - IDP_NOT_REACHABLE
+          - INTERNAL_ERROR
+          - INVALID_ARGUMENT
+          - INVALID_AZ_NAME
+          - INVALID_CONTENT_TYPE
+          - INVALID_DATA_FORMAT
+          - INVALID_PORTAL_CONFIGURATION
+          - INVALID_REQUEST
+          - INVALID_UUID
+          - INVALID_OWNER_REFERENCE
+          - INTERNAL_AZ_PROXY_SETUP_ERROR
+          - INTERNAL_ERROR_REMOTE_REQUEST
+          - INTERNAL_ROLE_ACCESS_DENIED
+          - INCORRECT_EVENTS_FILTER
+          - MISSING_ATTRIBUTE
+          - MISSING_CURRENT_USER_METADATA
+          - NAME_NOT_IN_DOMAIN
+          - NO_RESPONSE_RECEIVED_FROM_PORTAL
+          - PE_NOT_PAIRED_WITH_PC
+          - PC_NOT_PAIRED_WITH_XI_PORTAL
+          - REFERENCE_ERROR
+          - RESERVED_ROLE_ACCESS_DENIED
+          - REQUEST_NOT_SUPPORTED
+          - REMOTE_CLUSTER_IP_FETCH_FAILED
+          - REMOTE_CLUSTER_NOT_CONNECTED
+          - REMOTE_CONNECTION_EXISTS
+          - REMOTE_CONNECTION_NOT_FOUND
+          - REPORT_CONFIG_NOT_FOUND
+          - REPORTING_RESOURCE_NOT_FOUND
+          - REPORTING_INTERNAL_ERROR
+          - SERVICE_UNAVAILABLE
+          - SEARCH_RESULT_PROCESSING_ERROR
+          - TOO_MANY_REQUESTS
+          - UNCONFIGURED_API_KEY
+          - UNCONFIGURED_PORTAL_CONNECTION
+          - UNSPECIFIED_EVENTS_FILTER
+          - UNSUPPORTED_AZ_PROXY_API
+          - UNSUPPORTED_MEDIA_TYPE_ERROR
+          - UPLOAD_TO_S3_FAILED
+          - VALIDATION_ERROR
+          - INVALID_SSL_CERTIFICATE
+          - ERROR_ATTACHING_FILE_TO_CASE
+          - SPEC_UPDATE_ERROR
+          - SPEC_INCOMPATIBLE_ERROR
+          - CLOUD_UNREACHABLE_ERROR
+          - INVALID_CLOUD_CREDENTIALS
+          - IDP_PORTAL_UNREACHABLE
+          - SELF_PAIRING_NOT_ALLOWED
+          - PAIRING_FAILED
+          - PAIRING_NOT_ALLOWED
+          - PAIRING_INITIATING_NOT_ALLOWED
+          - CLOUD_TRUST_EXISTS
+          - DUPLICATE_CLOUD_TRUST
+          - DUPLICATE_CLOUD_TRUST_ON_REMOTE
+          type: string
+          description: If state is ERROR, a machine-readable snake-cased string.
+        details:
+          additionalProperties:
+            type: string
+          readOnly: true
+          type: object
+          description: Custom key-value details relevant to the status.
+      title: Message.
+    action_variables_get_response:
+      items:
+        $ref: '#/components/schemas/app_actionrun_args'
+      type: array
+      description: Response object for GET on action variables
+      title: Response object for GET on action variables

@@ -1,0 +1,854 @@
+openapi: 3.0.0
+info:
+  version: v2.0
+  title: Nutanix Prism API Reference
+  description: "# Introduction\n\nThe Nutanix REST APIs allow you to create scripts that run system administration commands\
+    \ against the Nutanix cluster. The API enables the use of HTTP requests to get information about the cluster as well as\
+    \ make changes to the configuration. Output from the API calls are returned in JSON format.\n\nAll API users should have\
+    \ valid Prism login credentials to send API calls to the Prism server. APIs on nutanix.dev portal are publicly available\
+    \ to all valid users without special permissions for viewing purposes.\n\nThe v2 API is an update of the v1 API. Users\
+    \ of the v1 API are encouraged to migrate to v2. \n\n[Nutanix API versions \u2013 What are they and what does each one\
+    \ do?](https://www.nutanix.dev/api-versions/)"
+  contact:
+    name: Nutanix, Inc.
+    url: http://www.nutanix.com
+  license:
+    name: EULA
+    url: http://www.nutanix.com/eula
+servers:
+- url: https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0
+security: []
+paths:
+  /snapshots:
+    post:
+      summary: Create Virtual Machine snapshots.
+      description: Create Virtual Machine snapshots. If a UUID is specified for the snapshot, this operation will be idempotent.
+        If multiple VMs are specified, all of their configurations and disks will fall into the same consistency group. Since
+        this operation requires the coordination of multiple resources, it should not be abused by specifying more than several
+        VMs at a time. Snapshots are crash-consistent. They do not include the VM s current memory image, only the VM configuration
+        and its disk contents. The snapshot is taken atomically across all of a VM s configuration and disks to ensure consistency.
+        This is also an asynchronous operation that results in the creation of a task object. The UUID of this task object
+        is returned as the response of this operation. This task can be monitored by using the /tasks/poll API.
+      tags:
+      - /snapshots
+      operationId: post/snapshots/createSnapshot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create.dto.acropolis.SnapshotCreateDTO'
+        description: Create a snapshot
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/create.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots \\\n\
+          \    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n \
+          \   \"snapshot_specs\": [\n        {\n            \"snapshot_name\": \"string\",\n            \"uuid\": \"string\"\
+          ,\n            \"vm_logical_timestamp\": 0,\n            \"vm_uuid\": \"string\"\n        }\n    ]\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"snapshot_specs\": [\n        {\n            \"snapshot_name\"\
+          : \"string\",\n            \"uuid\": \"string\",\n            \"vm_logical_timestamp\": 0,\n            \"vm_uuid\"\
+          : \"string\"\n        }\n    ]\n}' \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"snapshot_specs\"\
+          : [\n        {\n            \"snapshot_name\": \"string\",\n            \"uuid\": \"string\",\n            \"vm_logical_timestamp\"\
+          : 0,\n            \"vm_uuid\": \"string\"\n        }\n    ]\n}\"\"\"\n\nconn.request(\"POST\",\"/PrismGateway/services/rest/v2.0/snapshots\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          snapshot_specs\": [{\"snapshot_name\": \"string\", \"uuid\": \"string\", \"vm_logical_timestamp\": 0, \"vm_uuid\"\
+          : \"string\"}]}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n \
+          \       req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"snapshot_specs\\\": [{\\\"snapshot_name\\\": \\\"string\\\", \\\"uuid\\\": \\\"string\\\", \\\"vm_logical_timestamp\\\
+          \": 0, \\\"vm_uuid\\\": \\\"string\\\"}]}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots';\nconst options = {\n  method:\
+          \ 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:  `{\"snapshot_specs\"\
+          : [{\"snapshot_name\": \"string\", \"uuid\": \"string\", \"vm_logical_timestamp\": 0, \"vm_uuid\": \"string\"}]}`\n\
+          };\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    get:
+      summary: Get a list of snapshots in a cluster.
+      description: Get a list of snapshots in a cluster.
+      tags:
+      - /snapshots
+      operationId: get/snapshots/getSnapshots
+      parameters:
+      - name: vm_uuid
+        in: query
+        description: Uuid of the vm
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.base.EntityCollection_get.dto.acropolis.SnapshotInfoDTO_'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots \\\n \
+          \   --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/snapshots\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots';\nconst options = {\n  method:\
+          \ 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+  /snapshots/{uuid}:
+    get:
+      summary: Get details of a specified snapshot.
+      description: Get details of a specified snapshot.
+      tags:
+      - /snapshots
+      operationId: get/snapshots/{uuid}/getSnapshot
+      parameters:
+      - name: uuid
+        in: path
+        description: Id of the Snapshot
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/get.dto.acropolis.SnapshotInfoDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"GET\",\"/PrismGateway/services/rest/v2.0/snapshots/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n    \
+          \    req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}';\nconst options =\
+          \ {\n  method: 'GET',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\ntry\
+          \ {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+    delete:
+      summary: Delete a snapshot.
+      description: Delete a snapshot. This operation is idempotent. The logical timestamp can optionally be provided for consistency.
+        If a logical timestamp is specified, then this operation will be rejected if the logical timestamp specified is not
+        the value of the snapshot logical timestamp. This is also an asynchronous operation that results in the creation of
+        a task object. The UUID of this task object is returned as the response of this operation. This task can be monitored
+        by using the /tasks/poll API.
+      tags:
+      - /snapshots
+      operationId: delete/snapshots/{uuid}/deleteSnapshot
+      parameters:
+      - name: uuid
+        in: path
+        description: Id of the Snapshot
+        required: true
+        schema:
+          type: string
+      - name: logical_timestamp
+        in: query
+        description: Logical timestamp
+        required: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delete.dto.acropolis.ReturnValueDTO_TaskIdDTO'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n      \\\n    --output-document \\\n    - https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"any_cvm_ip:9440\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n \nconn.request(\"DELETE\",\"/PrismGateway/services/rest/v2.0/snapshots/{uuid}\"\
+          , headers=headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}\"\n\t \n\treq, err := http.NewRequest(\"\
+          DELETE\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n \
+          \       req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"Content-Type\", \"application/json\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \"https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .execute()\n\
+          \  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://any_cvm_ip:9440/PrismGateway/services/rest/v2.0/snapshots/{uuid}';\nconst options =\
+          \ {\n  method: 'DELETE',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'} \n};\n\n\
+          try {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    get.dto.uhura.VmDiskCloneDTO:
+      type: object
+      properties:
+        disk_address:
+          $ref: '#/components/schemas/get.dto.acropolis.VMDiskAddressDTO'
+        minimum_size:
+          format: int64
+          type: integer
+        snapshot_group_uuid:
+          type: string
+        storage_container_uuid:
+          type: string
+    get.dto.uhura.VmDiskPassthruExternalDTO:
+      type: object
+      properties:
+        external_disk_url:
+          type: string
+        storage_container_uuid:
+          type: string
+    get.base.EntityCollection_get.dto.acropolis.SnapshotInfoDTO_:
+      type: object
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/get.dto.acropolis.SnapshotInfoDTO'
+          type: array
+        error_info:
+          $ref: '#/components/schemas/get.base.ErrorInfo'
+        metadata:
+          $ref: '#/components/schemas/get.base.Metadata'
+    get.base.ErrorInfo:
+      type: object
+      properties:
+        count:
+          format: int64
+          type: integer
+        entity_list:
+          items:
+            type: string
+          type: array
+        message:
+          type: string
+    get.dto.acropolis.VMNicSpecDTO:
+      type: object
+      properties:
+        adapter_type:
+          enum:
+          - E1000
+          - E1000e
+          - PCNet32
+          - Vmxnet
+          - Vmxnet2
+          - Vmxnet3
+          - Unsupported
+          type: string
+        ip_address:
+          type: string
+        ip_addresses:
+          items:
+            type: string
+          type: array
+        is_connected:
+          type: boolean
+        mac_address:
+          type: string
+        model:
+          type: string
+        network_uuid:
+          type: string
+        nic_uuid:
+          type: string
+        port_id:
+          type: string
+        request_ip:
+          type: boolean
+        requested_ip_address:
+          type: string
+        vlan_mode:
+          enum:
+          - Access
+          - Trunked
+          - Untagged
+          type: string
+    create.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    get.dto.acropolis.VMDiskSpecCloneDTO:
+      type: object
+      properties:
+        container_uuid:
+          type: string
+        image_path:
+          type: string
+        minimum_size:
+          format: int64
+          type: integer
+        minimum_size_mb:
+          format: int64
+          type: integer
+        ndfs_filepath:
+          type: string
+        snapshot_group_id:
+          type: string
+        vm_disk_uuid:
+          type: string
+        vmdisk_uuid:
+          type: string
+    get.base.Metadata:
+      type: object
+      properties:
+        count:
+          format: int32
+          type: integer
+        end_index:
+          format: int32
+          type: integer
+        filter_criteria:
+          type: string
+        grand_total_entities:
+          format: int32
+          type: integer
+        next_cursor:
+          type: string
+        page:
+          format: int32
+          type: integer
+        previous_cursor:
+          type: string
+        search_string:
+          type: string
+        sort_criteria:
+          type: string
+        start_index:
+          format: int32
+          type: integer
+        total_entities:
+          format: int32
+          type: integer
+    get.dto.uhura.SerialPortConfigDTO:
+      type: object
+      properties:
+        index:
+          format: int32
+          type: integer
+        type:
+          enum:
+          - 'NULL'
+          - SERVER
+          type: string
+    get.dto.uhura.VmDiskInfoDTO:
+      type: object
+      properties:
+        datasource_uuid:
+          type: string
+        disk_address:
+          $ref: '#/components/schemas/get.dto.acropolis.VMDiskAddressDTO'
+        flash_mode_enabled:
+          type: boolean
+        is_cdrom:
+          type: boolean
+        is_empty:
+          type: boolean
+        is_hot_remove_enabled:
+          type: boolean
+        is_scsi_passthrough:
+          type: boolean
+        is_thin_provisioned:
+          type: boolean
+        shared:
+          type: boolean
+        size:
+          format: int64
+          type: integer
+        source_disk_address:
+          $ref: '#/components/schemas/get.dto.acropolis.VMDiskAddressDTO'
+        storage_container_uuid:
+          type: string
+    get.dto.acropolis.BootConfigDTO:
+      type: object
+      properties:
+        boot_device_order:
+          items:
+            enum:
+            - CDROM
+            - DISK
+            - NIC
+            type: string
+          type: array
+        boot_device_type:
+          enum:
+          - CDROM
+          - DISK
+          - NIC
+          type: string
+        disk_address:
+          $ref: '#/components/schemas/get.dto.acropolis.VMDiskAddressDTO'
+        hardware_virtualization:
+          type: boolean
+        mac_addr:
+          type: string
+        secure_boot:
+          type: boolean
+        uefi_boot:
+          type: boolean
+    get.dto.acropolis.VMDiskAddressDTO:
+      type: object
+      properties:
+        device_bus:
+          enum:
+          - SCSI
+          - IDE
+          - PCI
+          - SATA
+          - SPAPR
+          - NVME
+          type: string
+        device_index:
+          format: int32
+          type: integer
+        device_uuid:
+          type: string
+        disk_label:
+          type: string
+        is_cdrom:
+          type: boolean
+        ndfs_filepath:
+          type: string
+        vmdisk_uuid:
+          type: string
+        volume_group_uuid:
+          type: string
+    get.dto.acropolis.VMCustomizationConfigDTO:
+      type: object
+      properties:
+        datasource_type:
+          enum:
+          - CONFIG_DRIVE_V2
+          type: string
+        files_to_inject_list:
+          items:
+            $ref: '#/components/schemas/get.dto.acropolis.FileToInjectDTO'
+          type: array
+        fresh_install:
+          type: boolean
+        userdata:
+          type: string
+        userdata_path:
+          type: string
+    get.dto.uhura.VmConfigDTO:
+      type: object
+      properties:
+        allow_live_migrate:
+          type: boolean
+        boot:
+          $ref: '#/components/schemas/get.dto.acropolis.BootConfigDTO'
+        cbr_not_capable_reason:
+          type: string
+        clear_affinity:
+          type: boolean
+        description:
+          type: string
+        gpus_assigned:
+          type: boolean
+        guest_driver_version:
+          type: string
+        guest_os:
+          type: string
+        ha_priority:
+          format: int64
+          type: integer
+        host_uuid:
+          type: string
+        machine_type:
+          enum:
+          - PC
+          - PSERIES
+          - Q35
+          type: string
+        memory_mb:
+          format: int64
+          type: integer
+        memory_reservation_mb:
+          format: int64
+          type: integer
+        name:
+          type: string
+        num_cores_per_vcpu:
+          format: int32
+          type: integer
+        num_vcpus:
+          format: int32
+          type: integer
+        power_state:
+          enum:
+          - UNKNOWN
+          - 'OFF'
+          - POWERING_ON
+          - 'ON'
+          - SHUTTING_DOWN
+          - POWERING_OFF
+          - PAUSING
+          - PAUSED
+          - SUSPENDING
+          - SUSPENDED
+          - RESUMING
+          - RESETTING
+          - MIGRATING
+          type: string
+        serial_ports:
+          items:
+            $ref: '#/components/schemas/get.dto.uhura.SerialPortConfigDTO'
+          type: array
+        storage_container_uuid:
+          type: string
+        timezone:
+          type: string
+        tools_installer_mounted:
+          type: boolean
+        tools_running_status:
+          enum:
+          - UNKNOWN
+          - GUEST_TOOLS_EXECUTING_SCRIPTS
+          - GUEST_TOOLS_NOT_RUNNING
+          - GUEST_TOOLS_RUNNING
+          type: string
+        uuid:
+          type: string
+        vcpu_reservation_hz:
+          format: int64
+          type: integer
+        vm_customization_config:
+          $ref: '#/components/schemas/get.dto.acropolis.VMCustomizationConfigDTO'
+        vm_disk_info:
+          items:
+            $ref: '#/components/schemas/get.dto.uhura.VmDiskInfoDTO'
+          type: array
+        vm_disks:
+          items:
+            $ref: '#/components/schemas/get.dto.uhura.VMDiskDTO'
+          type: array
+        vm_features:
+          additionalProperties:
+            type: boolean
+          type: object
+        vm_gpus:
+          items:
+            $ref: '#/components/schemas/get.dto.uhura.GPUConfigDTO'
+          type: array
+        vm_logical_timestamp:
+          format: int64
+          type: integer
+        vm_nics:
+          items:
+            $ref: '#/components/schemas/get.dto.acropolis.VMNicSpecDTO'
+          type: array
+    create.dto.acropolis.SnapshotCreateDTO:
+      type: object
+      properties:
+        snapshot_specs:
+          items:
+            $ref: '#/components/schemas/create.dto.acropolis.SnapshotSpecDTO'
+          type: array
+    get.dto.acropolis.VmDiskSpecCreateDTO:
+      type: object
+      properties:
+        container_id:
+          format: int64
+          type: integer
+        container_name:
+          type: string
+        container_uuid:
+          type: string
+        size:
+          format: int64
+          type: integer
+        size_mb:
+          format: int64
+          type: integer
+    get.dto.uhura.GPUConfigDTO:
+      type: object
+      properties:
+        assignable:
+          type: boolean
+        device_id:
+          format: int32
+          type: integer
+        device_name:
+          type: string
+        fraction:
+          format: int32
+          type: integer
+        frame_buffer_size_bytes:
+          format: int64
+          type: integer
+        gpu_mode:
+          enum:
+          - UNUSED
+          - USED_FOR_PASSTHROUGH
+          - USED_FOR_VIRTUAL
+          type: string
+        gpu_profile:
+          type: string
+        gpu_type:
+          enum:
+          - PASS_THROUGH_GRAPHICS
+          - PASS_THROUGH_COMPUTE
+          - VIRTUAL
+          type: string
+        gpu_vendor:
+          enum:
+          - NVIDIA
+          - INTEL
+          - AMD
+          type: string
+        guest_driver_version:
+          type: string
+        in_use:
+          type: boolean
+        licenses:
+          items:
+            type: string
+          type: array
+        max_instances_per_vm:
+          format: int32
+          type: integer
+        max_resolution:
+          type: string
+        num_virtual_display_heads:
+          format: int32
+          type: integer
+        numa_node:
+          format: int32
+          type: integer
+        sbdf:
+          type: string
+        vm_uuids:
+          items:
+            type: string
+          type: array
+    delete.dto.acropolis.ReturnValueDTO_TaskIdDTO:
+      type: object
+      properties:
+        task_uuid:
+          type: string
+    get.dto.acropolis.VMCreateDTO:
+      type: object
+      properties:
+        boot_config:
+          $ref: '#/components/schemas/get.dto.acropolis.BootConfigDTO'
+        container_uuid:
+          type: string
+        description:
+          type: string
+        ha_priority:
+          format: int64
+          type: integer
+        host_id:
+          type: string
+        hypervisor_type:
+          enum:
+          - ACROPOLIS
+          - 'NULL'
+          - AHV
+          - HYPERV
+          - VMWARE
+          - XEN
+          - ESX
+          - KVM
+          type: string
+        memory_mb:
+          format: int64
+          type: integer
+        memory_reservation_mb:
+          format: int64
+          type: integer
+        name:
+          type: string
+        num_cores_per_vcpu:
+          format: int64
+          type: integer
+        num_vcpus:
+          format: int64
+          type: integer
+        timezone:
+          type: string
+        uuid:
+          type: string
+        vcpu_reservation_hz:
+          format: int64
+          type: integer
+        vm_customization_config:
+          $ref: '#/components/schemas/get.dto.acropolis.VMCustomizationConfigDTO'
+        vm_disks:
+          items:
+            $ref: '#/components/schemas/get.dto.acropolis.VMDiskDTO'
+          type: array
+        vm_gpus:
+          items:
+            $ref: '#/components/schemas/get.dto.uhura.GPUConfigDTO'
+          type: array
+        vm_nics:
+          items:
+            $ref: '#/components/schemas/get.dto.acropolis.VMNicSpecDTO'
+          type: array
+    create.dto.acropolis.SnapshotSpecDTO:
+      type: object
+      properties:
+        snapshot_name:
+          type: string
+        uuid:
+          type: string
+        vm_logical_timestamp:
+          format: int64
+          type: integer
+        vm_uuid:
+          type: string
+    get.dto.uhura.VmDiskCreateDTO:
+      type: object
+      properties:
+        size:
+          format: int64
+          type: integer
+        storage_container_uuid:
+          type: string
+    get.dto.acropolis.SnapshotInfoDTO:
+      type: object
+      properties:
+        created_time:
+          format: int64
+          type: integer
+        deleted:
+          type: boolean
+        group_uuid:
+          type: string
+        logical_timestamp:
+          format: int64
+          type: integer
+        snapshot_name:
+          type: string
+        uuid:
+          type: string
+        vm_create_spec:
+          $ref: '#/components/schemas/get.dto.uhura.VmConfigDTO'
+        vm_create_specification:
+          $ref: '#/components/schemas/get.dto.acropolis.VMCreateDTO'
+        vm_uuid:
+          type: string
+    get.dto.acropolis.FileToInjectDTO:
+      type: object
+      properties:
+        destination_path:
+          type: string
+        source_path:
+          type: string
+    get.dto.acropolis.VMDiskDTO:
+      type: object
+      properties:
+        disk_address:
+          $ref: '#/components/schemas/get.dto.acropolis.VMDiskAddressDTO'
+        is_cdrom:
+          type: boolean
+        is_empty:
+          type: boolean
+        is_scsi_pass_through:
+          type: boolean
+        is_thin_provisioned:
+          type: boolean
+        vm_disk_clone:
+          $ref: '#/components/schemas/get.dto.acropolis.VMDiskSpecCloneDTO'
+        vm_disk_create:
+          $ref: '#/components/schemas/get.dto.acropolis.VmDiskSpecCreateDTO'
+    get.dto.uhura.VMDiskDTO:
+      type: object
+      properties:
+        disk_address:
+          $ref: '#/components/schemas/get.dto.acropolis.VMDiskAddressDTO'
+        flash_mode_enabled:
+          type: boolean
+        is_cdrom:
+          type: boolean
+        is_empty:
+          type: boolean
+        is_scsi_pass_through:
+          type: boolean
+        is_thin_provisioned:
+          type: boolean
+        vm_disk_clone:
+          $ref: '#/components/schemas/get.dto.uhura.VmDiskCloneDTO'
+        vm_disk_clone_external:
+          $ref: '#/components/schemas/get.dto.uhura.VmDiskCloneExternalDTO'
+        vm_disk_create:
+          $ref: '#/components/schemas/get.dto.uhura.VmDiskCreateDTO'
+        vm_disk_passthru_external:
+          $ref: '#/components/schemas/get.dto.uhura.VmDiskPassthruExternalDTO'
+    get.dto.uhura.VmDiskCloneExternalDTO:
+      type: object
+      properties:
+        external_disk_url:
+          type: string
+        size:
+          format: int64
+          type: integer
+        storage_container_uuid:
+          type: string

@@ -1,0 +1,138 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /storage/overview:
+    get:
+      description: 'Get the storage consumption overview of Time Machines, Databases and Clones across the Clusters and Object
+        stores.
+
+        '
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageConsumptionOverview'
+          description: Operation completed.
+        '400':
+          description: Input error.
+        '403':
+          description: Permission denied.
+        '404':
+          description: Not Found.
+        '500':
+          description: Internal server error.
+      summary: Get complete storage consumption overview
+      tags:
+      - Storage Consumption
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/storage/overview \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/storage/overview"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/storage/overview\", headers=headers)\n\nres =\
+          \ conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/storage/overview\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\
+          \t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\",\
+          \ \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/storage/overview\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/storage/overview';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ObjectStorageExtendedSummary:
+      properties:
+        objectStoreId:
+          description: The ID of the object store.
+          format: uuid
+          type: string
+        objectStoreName:
+          description: The name of the object store.
+          type: string
+        objectStoreStorageByEntityTypes:
+          additionalProperties:
+            type: integer
+          description: A map of storage used by different entity types in MB.
+          type: object
+        totalCapacityMB:
+          description: The total storage capacity of the object store in MB.
+          type: integer
+        usedSizeMB:
+          description: The used size of the object store in MB.
+          type: integer
+      type: object
+    ClusterStorageExtendedSummary:
+      properties:
+        clusterId:
+          description: The ID of the cluster.
+          format: uuid
+          type: string
+        clusterName:
+          description: The name of the cluster.
+          type: string
+        clusterStorageByEntityTypes:
+          additionalProperties:
+            type: integer
+          description: A map of storage used by different entity types in MB.
+          type: object
+        othersSizeMB:
+          description: The storage used by other entities in MB.
+          type: integer
+        totalCapacityMB:
+          description: The total storage capacity of the cluster in MB.
+          type: integer
+        usedSizeMB:
+          description: The used size of the cluster in MB.
+          type: integer
+      type: object
+    StorageConsumptionOverview:
+      properties:
+        clusters:
+          items:
+            $ref: '#/components/schemas/ClusterStorageExtendedSummary'
+          type: array
+        objectStores:
+          items:
+            $ref: '#/components/schemas/ObjectStorageExtendedSummary'
+          type: array
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

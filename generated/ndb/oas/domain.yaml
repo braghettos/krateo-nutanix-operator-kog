@@ -1,0 +1,482 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /domains:
+    get:
+      operationId: getDomains
+      parameters:
+      - description: The number of results to return.
+        in: query
+        name: limit
+        schema:
+          type: integer
+      - description: The number of Domains skipped before selecting the next set of results.
+        in: query
+        name: offset
+        schema:
+          type: integer
+      - description: Specifies the type of identifier provided in the 'value' parameter.
+        in: query
+        name: value-type
+        schema:
+          enum:
+          - name
+          - ipAddress
+          - status
+          type: string
+      - description: "It holds a corresponding value for the value-type. \nFor 'name' and 'ipAddress' use comma-separated\
+          \ values. \nFor status use 'UP', 'DOWN', or 'DELETED'.\n"
+        in: query
+        name: value
+        schema:
+          type: string
+      - description: Based on the registered PE clusters, gets the domains that are available to be registered with NDB.
+        in: query
+        name: available-to-register
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DomainDTO'
+                type: array
+          description: Operation completed.
+      summary: Get a list of Domains registered with NDB
+      tags:
+      - Domains
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/domains \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/domains"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/domains\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/domains\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/domains\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/domains';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization': 'Basic\
+          \ <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      operationId: registerDomain
+      parameters:
+      - description: Skips Domain version check (this is not recommended as NDB may not be compatible with the Domain version).
+        in: query
+        name: skip-version-check
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainDTO'
+        description: Payload required to create a Domain.
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainDTO'
+          description: Operation completed.
+      summary: Register a Prism Central as a Domain in NDB
+      tags:
+      - Domains
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/domains \\\n    --header 'Accept: application/json' \\\n \
+          \   --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n  \
+          \  --data '{\n    \"description\": \"This is the description for PrismCentral1\",\n    \"ipAddress\": \"12.123.12.12\"\
+          ,\n    \"name\": \"PrismCentral1\",\n    \"password\": \"Password.123\",\n    \"port\": 9440,\n    \"username\"\
+          : \"username.123\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"description\"\
+          : \"This is the description for PrismCentral1\",\n    \"ipAddress\": \"12.123.12.12\",\n    \"name\": \"PrismCentral1\"\
+          ,\n    \"password\": \"Password.123\",\n    \"port\": 9440,\n    \"username\": \"username.123\"\n}' \\\n    --output-document\
+          \ \\\n    - :///era/v0.9/domains"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"description\": \"This is the description for PrismCentral1\",\n    \"ipAddress\": \"12.123.12.12\"\
+          ,\n    \"name\": \"PrismCentral1\",\n    \"password\": \"Password.123\",\n    \"port\": 9440,\n    \"username\"\
+          : \"username.123\"\n}\"\"\"\n\nconn.request(\"POST\",\"/era/v0.9/domains\", payload, headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/domains\"\n\t\n\tpayload :=  strings.NewReader(`{\"description\": \"This is the description\
+          \ for PrismCentral1\", \"ipAddress\": \"12.123.12.12\", \"name\": \"PrismCentral1\", \"password\": \"Password.123\"\
+          , \"port\": 9440, \"username\": \"username.123\"}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/domains\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"description\\\": \\\"This is the description\
+          \ for PrismCentral1\\\", \\\"ipAddress\\\": \\\"12.123.12.12\\\", \\\"name\\\": \\\"PrismCentral1\\\", \\\"password\\\
+          \": \\\"Password.123\\\", \\\"port\\\": 9440, \\\"username\\\": \\\"username.123\\\"}\")\n  .execute()\n  .toCompletableFuture()\n\
+          \  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/domains';\nconst options = {\n  method: 'POST',\n  headers: {'Accept': 'application/json',\
+          \ 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:  `{\"description\"\
+          : \"This is the description for PrismCentral1\", \"ipAddress\": \"12.123.12.12\", \"name\": \"PrismCentral1\", \"\
+          password\": \"Password.123\", \"port\": 9440, \"username\": \"username.123\"}`\n};\n\ntry {\n  const response =\
+          \ await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n \
+          \ console.error(error);\n}"
+  /domains/{domain-id}:
+    delete:
+      description: 'Delete the given Domain.
+
+        '
+      operationId: deregisterDomain
+      parameters:
+      - in: path
+        name: domain-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                type: object
+          description: Operation completed.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request. - This Prism Central Instance is currently in use. Disassociate Prism Central with all
+            entities before removing it.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden. - Not owner and the user has no privilege to delete domain.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not found. - domain-id not found.
+      summary: Disconnect a Domain from NDB
+      tags:
+      - Domains
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/domains/{domain-id} \\\n    --header 'Authorization: Basic\
+          \ <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/domains/{domain-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/domains/{domain-id}\", headers=headers)\n\n\
+          res = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/domains/{domain-id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif err !=\
+          \ nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/domains/{domain-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/domains/{domain-id}';\nconst options = {\n  method: 'DELETE',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      operationId: getDomainById
+      parameters:
+      - in: path
+        name: domain-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainDTO'
+          description: Operation completed.
+      summary: Get a registered Domain in NDB
+      tags:
+      - Domains
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/domains/{domain-id} \\\n    --header 'Authorization: Basic\
+          \ <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/domains/{domain-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/domains/{domain-id}\", headers=headers)\n\nres\
+          \ = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/domains/{domain-id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/domains/{domain-id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/domains/{domain-id}';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    patch:
+      operationId: patchDomain
+      parameters:
+      - in: path
+        name: domain-id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Skips Domain credential validation by allowing for updating of ip address, port, username, and password
+          without validation.
+        in: query
+        name: skip-credential-validation
+        required: false
+        schema:
+          type: boolean
+      - description: Skips Domain version check (this is not recommended as NDB may not be compatible with the Domain version).
+        in: query
+        name: skip-version-check
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DomainDTO'
+        required: true
+      responses:
+        '200':
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DomainDTO'
+          description: Operation completed.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request. - DomainDTO is null or domain is empty. - Invalid domain name format. - Updated domain
+            name is already registered with NDB. - This Prism Central Instance is currently in use. Disassociate Prism Central
+            with all entities before updating it. - Please ensure ipAddress, username, and password are all specified, if
+            you'd like to update any of these entries - Port cannot be updated without ipAddress, username, and password -
+            Updated IP, username, password is not reachable. - Domain version is not compatible with NDB.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden. - Not owner and the user has no privilege to update domain. - Updated PC domain user does
+            not have the required privileges to perform operations.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not found. - domain-id not found.
+      summary: Patch a Domain
+      tags:
+      - Domains
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PATCH \\\n    --url :///era/v0.9/domains/{domain-id} \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --data '{\n    \"description\": \"This is the\
+          \ description for PrismCentral1\",\n    \"ipAddress\": \"12.123.12.12\",\n    \"name\": \"PrismCentral1\",\n   \
+          \ \"password\": \"Password.123\",\n    \"port\": 9440,\n    \"username\": \"username.123\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PATCH \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --body-data '{\n    \"description\": \"This is the description for PrismCentral1\"\
+          ,\n    \"ipAddress\": \"12.123.12.12\",\n    \"name\": \"PrismCentral1\",\n    \"password\": \"Password.123\",\n\
+          \    \"port\": 9440,\n    \"username\": \"username.123\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/domains/{domain-id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\"\n}\n\npayload =  \"\"\"{\n    \"description\": \"This is\
+          \ the description for PrismCentral1\",\n    \"ipAddress\": \"12.123.12.12\",\n    \"name\": \"PrismCentral1\",\n\
+          \    \"password\": \"Password.123\",\n    \"port\": 9440,\n    \"username\": \"username.123\"\n}\"\"\"\n\nconn.request(\"\
+          PATCH\",\"/era/v0.9/domains/{domain-id}\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\n\
+          print(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/domains/{domain-id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"description\": \"This is the\
+          \ description for PrismCentral1\", \"ipAddress\": \"12.123.12.12\", \"name\": \"PrismCentral1\", \"password\": \"\
+          Password.123\", \"port\": 9440, \"username\": \"username.123\"}`)\n\treq, err := http.NewRequest(\"PATCH\", url,\
+          \ payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n    \n\
+          \tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\
+          \t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PATCH\", \":///era/v0.9/domains/{domain-id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setBody(\"{\\\"description\\\": \\\"This is the description for PrismCentral1\\\", \\\"ipAddress\\\": \\\"\
+          12.123.12.12\\\", \\\"name\\\": \\\"PrismCentral1\\\", \\\"password\\\": \\\"Password.123\\\", \\\"port\\\": 9440,\
+          \ \\\"username\\\": \\\"username.123\\\"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/domains/{domain-id}';\nconst options = {\n  method: 'PATCH',\n  headers: {'Accept':\
+          \ 'application/json', 'Authorization': 'Basic <basic_auth_token>'},\n  body:  `{\"description\": \"This is the description\
+          \ for PrismCentral1\", \"ipAddress\": \"12.123.12.12\", \"name\": \"PrismCentral1\", \"password\": \"Password.123\"\
+          , \"port\": 9440, \"username\": \"username.123\"}`\n};\n\ntry {\n  const response = await fetch(url, options);\n\
+          \  const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    DomainDTO:
+      properties:
+        cloudType:
+          readOnly: true
+          type: string
+        dateCreated:
+          readOnly: true
+          type: string
+        dateModified:
+          readOnly: true
+          type: string
+        description:
+          type: string
+        domainExtId:
+          format: uuid
+          readOnly: true
+          type: string
+        id:
+          format: uuid
+          readOnly: true
+          type: string
+        ipAddress:
+          type: string
+        name:
+          type: string
+        ownerId:
+          readOnly: true
+          type: string
+        password:
+          type: string
+        port:
+          type: integer
+        queryCount:
+          readOnly: true
+          type: integer
+        status:
+          enum:
+          - UP
+          - DOWN
+          - DELETED
+          readOnly: true
+          type: string
+        username:
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

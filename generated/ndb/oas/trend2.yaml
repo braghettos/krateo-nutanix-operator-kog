@@ -1,0 +1,147 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /storage/clusters/{clusterId}/trend:
+    get:
+      parameters:
+      - description: The ID of the cluster.
+        in: path
+        name: clusterId
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The number of days to the historic data for. To also include the future trends in the response, minimum
+          value required is 15.
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ClusterStorageTrend'
+                type: array
+          description: Operation completed.
+        '400':
+          description: Input error.
+        '403':
+          description: Permission denied.
+        '404':
+          description: Not Found.
+        '500':
+          description: Internal server error.
+      summary: Get storage trend for a cluster
+      tags:
+      - Storage Consumption
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/storage/clusters/{clusterId}/trend \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/storage/clusters/{clusterId}/trend"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/storage/clusters/{clusterId}/trend\", headers=headers)\n\
+          \nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/storage/clusters/{clusterId}/trend\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Authorization\", \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err\
+          \ := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t\
+          }\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/storage/clusters/{clusterId}/trend\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/storage/clusters/{clusterId}/trend';\nconst options = {\n  method: 'GET',\n  headers:\
+          \ {'Authorization': 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n \
+          \ const data = await response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+components:
+  schemas:
+    ClusterStorageTrend:
+      properties:
+        clonesMB:
+          description: The storage used by clones in MB.
+          type: integer
+        clusterId:
+          description: The ID of the cluster.
+          format: uuid
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/ClusterStoragePerDay'
+          type: array
+        databaseSourcesMB:
+          description: The storage used by Database sources in MB.
+          type: integer
+        lastRefreshedTime:
+          description: The last time the data was refreshed.
+          format: date-time
+          type: string
+        othersMB:
+          description: The storage used by other entities in MB.
+          type: integer
+        timeMachinesMB:
+          description: The storage used by Time Machines in MB.
+          type: integer
+        totalStorageCapacityMB:
+          description: The total storage capacity of the cluster in MB.
+          type: integer
+        usedStorageMB:
+          description: The total used storage in MB.
+          type: integer
+      type: object
+    ClusterStoragePerDay:
+      properties:
+        clonesMB:
+          description: The storage used by clones in MB.
+          type: integer
+        sourcesMB:
+          description: The storage used by sources in MB.
+          type: integer
+        timeMachinesMB:
+          description: The storage used by Time Machines in MB.
+          type: integer
+        timeStamp:
+          description: The timestamp for the storage data.
+          format: date-time
+          type: string
+        usedMB:
+          description: The total used storage in MB.
+          type: integer
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey

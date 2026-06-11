@@ -1,0 +1,259 @@
+openapi: 3.0.0
+info:
+  title: Karbon
+  description: '# Introduction
+
+    **Nutanix Kubernetes Engine** (NKE) is a curated turnkey offering that provides simplified provisioning and operations
+    of Kubernetes clusters. Kubernetes is an open source container orchestration system for deploying and managing container-based
+    applications.
+
+
+    NKE uses the CentOS Linux-based operating systems for NKE-enabled Kubernetes cluster creation. Linux containers provide
+    the flexibility to deploy applications in different environments with consistent results.
+
+
+    NKE streamlines the deployment and management of Kubernetes clusters with a simple GUI integrated into Prism Central (PC).
+    Kibana, the built-in add-on, lets you filter and parse logs for systems, pods, and nodes. Prometheus, another add-on,
+    provides a monitoring mechanism that triggers alerts on your cluster. NKE also uses Pulse, Prism health-monitoring system,
+    which interacts with Nutanix Support to expedite cluster issue resolutions.
+
+
+    For more information about NKE and its offerings, refer to [NKE Documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Engine:Nutanix-Kubernetes-Engine).
+
+
+    # Authentication
+
+    **NKE uses basic authentication**: The user provides user ID and password every time a request is sent as the authentication
+    header.
+
+    '
+  contact:
+    name: NKE Developers
+    email: karbon-team@nutanix.com
+  license:
+    name: Copyright Nutanix Inc. All rights reserved
+  version: v1.1.0
+servers:
+- url: /karbon
+security: []
+paths:
+  /karbon/v1-alpha.1/k8s/clusters/{name}/add-node-pool:
+    post:
+      description: "Add a node pool to a Kubernetes cluster. The scope is restricted to a worker node pool currently.\n\n\
+        \ **API format**- https://server.nutanix.com:9440/karbon/v1-alpha.1/k8s/clusters/cluster01/add-node-pool."
+      tags:
+      - NKE_API_Reference_Cluster
+      summary: Add a node pool to a Kubernetes cluster
+      operationId: AddK8sClusterNodePool
+      parameters:
+      - description: The Kubernetes cluster name.
+        name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1.1.0_node_pool_config'
+        required: true
+      responses:
+        '202':
+          description: Add node pool operation is accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_add_node_pool_response'
+        '400':
+          description: Bad parameters specified in request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '401':
+          description: Invalid client credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '404':
+          description: The Kubernetes cluster is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '409':
+          description: Conflicting operation on the Kubernetes cluster.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+        '412':
+          description: Pre-checks for adding a node pool failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v1.1.0_error_response'
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/add-node-pool\
+          \ \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n\
+          \    \"ahv_config\": {\n        \"cpu\": 2,\n        \"disk_mib\": 40960,\n        \"iscsi_network_name\": \"string\"\
+          ,\n        \"iscsi_network_uuid\": \"string\",\n        \"memory_mib\": 8192,\n        \"network_name\": \"string\"\
+          ,\n        \"network_uuid\": \"string\",\n        \"prism_element_cluster_uuid\": \"string\"\n    },\n    \"gpu_config_list\"\
+          : [\n        {\n            \"count\": 1,\n            \"name\": \"string\"\n        }\n    ],\n    \"labels\":\
+          \ {\n        \"property1\": \"string\",\n        \"property2\": \"string\"\n    },\n    \"name\": \"etcd-node-pool\"\
+          ,\n    \"node_os_version\": \"string\",\n    \"num_instances\": 0\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Content-Type:\
+          \ application/json' \\\n    --body-data '{\n    \"ahv_config\": {\n        \"cpu\": 2,\n        \"disk_mib\": 40960,\n\
+          \        \"iscsi_network_name\": \"string\",\n        \"iscsi_network_uuid\": \"string\",\n        \"memory_mib\"\
+          : 8192,\n        \"network_name\": \"string\",\n        \"network_uuid\": \"string\",\n        \"prism_element_cluster_uuid\"\
+          : \"string\"\n    },\n    \"gpu_config_list\": [\n        {\n            \"count\": 1,\n            \"name\": \"\
+          string\"\n        }\n    ],\n    \"labels\": {\n        \"property1\": \"string\",\n        \"property2\": \"string\"\
+          \n    },\n    \"name\": \"etcd-node-pool\",\n    \"node_os_version\": \"string\",\n    \"num_instances\": 0\n}'\
+          \ \\\n    --output-document \\\n    - https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/add-node-pool"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"www.nutanix.dev\")\n\nheaders = {\n    \"Accept\"\
+          : \"application/json\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload =  \"\"\"{\n    \"ahv_config\"\
+          : {\n        \"cpu\": 2,\n        \"disk_mib\": 40960,\n        \"iscsi_network_name\": \"string\",\n        \"\
+          iscsi_network_uuid\": \"string\",\n        \"memory_mib\": 8192,\n        \"network_name\": \"string\",\n      \
+          \  \"network_uuid\": \"string\",\n        \"prism_element_cluster_uuid\": \"string\"\n    },\n    \"gpu_config_list\"\
+          : [\n        {\n            \"count\": 1,\n            \"name\": \"string\"\n        }\n    ],\n    \"labels\":\
+          \ {\n        \"property1\": \"string\",\n        \"property2\": \"string\"\n    },\n    \"name\": \"etcd-node-pool\"\
+          ,\n    \"node_os_version\": \"string\",\n    \"num_instances\": 0\n}\"\"\"\n\nconn.request(\"POST\",\"/karbon/v1-alpha.1/k8s/clusters/{name}/add-node-pool\"\
+          , payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/add-node-pool\"\n\t\n\tpayload :=  strings.NewReader(`{\"\
+          ahv_config\": {\"cpu\": 2, \"disk_mib\": 40960, \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\": \"string\"\
+          , \"memory_mib\": 8192, \"network_name\": \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\"\
+          : \"string\"}, \"gpu_config_list\": [{\"count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\"\
+          , \"property2\": \"string\"}, \"name\": \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\":\
+          \ 0}`)\n\treq, err := http.NewRequest(\"POST\", url, payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating\
+          \ request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Accept\", \"application/json\")\n        req.Header.Add(\"\
+          Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \"https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/add-node-pool\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"\
+          {\\\"ahv_config\\\": {\\\"cpu\\\": 2, \\\"disk_mib\\\": 40960, \\\"iscsi_network_name\\\": \\\"string\\\", \\\"\
+          iscsi_network_uuid\\\": \\\"string\\\", \\\"memory_mib\\\": 8192, \\\"network_name\\\": \\\"string\\\", \\\"network_uuid\\\
+          \": \\\"string\\\", \\\"prism_element_cluster_uuid\\\": \\\"string\\\"}, \\\"gpu_config_list\\\": [{\\\"count\\\"\
+          : 1, \\\"name\\\": \\\"string\\\"}], \\\"labels\\\": {\\\"property1\\\": \\\"string\\\", \\\"property2\\\": \\\"\
+          string\\\"}, \\\"name\\\": \\\"etcd-node-pool\\\", \\\"node_os_version\\\": \\\"string\\\", \\\"num_instances\\\"\
+          : 0}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = 'https://www.nutanix.dev/karbon/v1-alpha.1/k8s/clusters/{name}/add-node-pool';\nconst options\
+          \ = {\n  method: 'POST',\n  headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},\n  body:\
+          \  `{\"ahv_config\": {\"cpu\": 2, \"disk_mib\": 40960, \"iscsi_network_name\": \"string\", \"iscsi_network_uuid\"\
+          : \"string\", \"memory_mib\": 8192, \"network_name\": \"string\", \"network_uuid\": \"string\", \"prism_element_cluster_uuid\"\
+          : \"string\"}, \"gpu_config_list\": [{\"count\": 1, \"name\": \"string\"}], \"labels\": {\"property1\": \"string\"\
+          , \"property2\": \"string\"}, \"name\": \"etcd-node-pool\", \"node_os_version\": \"string\", \"num_instances\":\
+          \ 0}`\n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n\
+          } catch (error) {\n  console.error(error);\n}"
+components:
+  securitySchemes:
+    v1.1.0_basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    v1.1.0_ahv_config:
+      type: object
+      required:
+      - cpu
+      - memory_mib
+      - disk_mib
+      properties:
+        cpu:
+          description: The number of VCPUs allocated for each VM on the PE cluster.
+          type: integer
+          minimum: 1
+        disk_mib:
+          description: Size of the local storage for each VM on the PE cluster in MiB.
+          type: integer
+          minimum: 40960
+        iscsi_network_name:
+          description: VM network name for isolating iSCSI data traffic.
+          type: string
+          maxLength: 256
+        iscsi_network_uuid:
+          description: VM network UUID for isolating iSCSI data traffic.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        memory_mib:
+          description: Memory allocated for each VM on the PE cluster in MiB.
+          type: integer
+          minimum: 4096
+        network_name:
+          description: The network name for the VMs deployed with this resource configuration.
+          type: string
+          maxLength: 256
+        network_uuid:
+          description: The UUID of the network for the VMs deployed with this resource configuration.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+        prism_element_cluster_uuid:
+          description: The UUID of the Prism Element cluster used to deploy VMs for this node pool.
+          type: string
+          pattern: ^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$
+    v1.1.0_node_pool_config:
+      type: object
+      required:
+      - name
+      properties:
+        ahv_config:
+          $ref: '#/components/schemas/v1.1.0_ahv_config'
+        gpu_config_list:
+          description: List of GPU configurations that can be assigned to the nodes of the node pool.
+          type: array
+          items:
+            $ref: '#/components/schemas/v1.1.0_gpu_config'
+        labels:
+          description: Map of user-provided labels for the nodes in the node pool.
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 63
+            pattern: ^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$
+        name:
+          description: Unique name of the node pool.
+          type: string
+          maxLength: 128
+          minLength: 1
+          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+        node_os_version:
+          description: The version of the node OS image.
+          type: string
+        num_instances:
+          description: Number of nodes in the node pool.
+          type: integer
+    v1.1.0_error_response:
+      type: object
+      properties:
+        message_info:
+          description: '{} with the key as the error type and the value as the error message'
+          type: object
+    v1.1.0_gpu_config:
+      type: object
+      required:
+      - name
+      properties:
+        count:
+          description: Count of assignable GPUs to be added to each node.
+          type: integer
+          minimum: 1
+        name:
+          description: The name of the GPU, such as Quadro RTX 6000/8000, Nvidia A100, Tesla P100.
+          type: string
+    v1.1.0_add_node_pool_response:
+      type: object
+      required:
+      - task_uuid
+      properties:
+        task_uuid:
+          description: The UUID of the task tracking the addition of a node pool.
+          type: string

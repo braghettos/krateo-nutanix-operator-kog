@@ -1,0 +1,525 @@
+openapi: 3.0.1
+info:
+  description: "**Nutanix Database Service** (NDB) is a database as a service (DBaaS) that automates and simplifies database\
+    \ administration, brings one-click simplicity and invisible operations to database provisioning and life-cycle management.\
+    \ NDB enables database administrators to provision, clone, and refresh the databases at any point in time. NDB allows\
+    \ administrators to define standards for their database provisioning needs with end-state driven functionality that includes\
+    \ High Availability (HA) database deployments. NDB automates and simplifies the operations such as provisioning of databases\
+    \ and copy data management. \n\n\n# Notes\n\nWhile making Nutanix API requests to the NDB services by using the default\
+    \ self-signed certificates, the request needs to be configured to ignore SSL certificate verification requests. For example,\
+    \ in case of a cURL, use _- - insecure_ flag to ensure that the SSL certificate used to encrypt the request should not\
+    \ be verified."
+  title: Nutanix NDB
+  version: '0.9'
+servers:
+- url: /era/v0.9
+security:
+- era_token: []
+- era_auth: []
+paths:
+  /users:
+    get:
+      description: Lists all internal and external Users.
+      operationId: getAllUsers
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ERAUser'
+                type: array
+          description: Returns a list of Users.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Retrieve all users
+      tags:
+      - Users
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/users \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/users"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/users\", headers=headers)\n\nres = conn.getresponse()\n\
+          data = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/users\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\"\
+          , err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\t\
+          fmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\
+          \n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/users\")\n\
+          \  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/users';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization': 'Basic\
+          \ <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await response.json();\n\
+          \  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    post:
+      description: Adds a new user to the system.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ERAUser'
+        description: Payload to create a user.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAUser'
+          description: Returns the created user.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Create a User
+      tags:
+      - Users
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request POST \\\n    --url :///era/v0.9/users \\\n    --header 'Accept: application/json' \\\n   \
+          \ --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --data\
+          \ '{\n    \"customerId\": \"string\",\n    \"directoryId\": \"string\",\n    \"email\": \"string\",\n    \"encrypted\"\
+          : false,\n    \"eulaAccepted\": false,\n    \"groups\": [\n        \"string\"\n    ],\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\"\
+          ,\n    \"internalUser\": false,\n    \"isExternalAuth\": false,\n    \"password\": \"string\",\n    \"passwordExpired\"\
+          : false,\n    \"passwordHint\": \"string\",\n    \"privilegeEndpoints\": [\n        \"string\"\n    ],\n    \"properties\"\
+          : {\n        \"notificationProps\": {\n            \"notifyAlerts\": false,\n            \"notifyOnOpComplete\"\
+          : false,\n            \"notifyOnOpFailure\": false\n        },\n        \"uiTheme\": \"string\",\n        \"uiTimeZone\"\
+          : \"string\",\n        \"uiTimeout\": null\n    },\n    \"resetProfile\": false,\n    \"roles\": [\n        \"string\"\
+          \n    ],\n    \"rolesGroupMapping\": {\n        \"property1\": [\n            \"string\"\n        ],\n        \"\
+          property2\": [\n            \"string\"\n        ]\n    },\n    \"state\": \"string\",\n    \"unresetProfile\": false,\n\
+          \    \"username\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method POST \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"customerId\"\
+          : \"string\",\n    \"directoryId\": \"string\",\n    \"email\": \"string\",\n    \"encrypted\": false,\n    \"eulaAccepted\"\
+          : false,\n    \"groups\": [\n        \"string\"\n    ],\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n\
+          \    \"internalUser\": false,\n    \"isExternalAuth\": false,\n    \"password\": \"string\",\n    \"passwordExpired\"\
+          : false,\n    \"passwordHint\": \"string\",\n    \"privilegeEndpoints\": [\n        \"string\"\n    ],\n    \"properties\"\
+          : {\n        \"notificationProps\": {\n            \"notifyAlerts\": false,\n            \"notifyOnOpComplete\"\
+          : false,\n            \"notifyOnOpFailure\": false\n        },\n        \"uiTheme\": \"string\",\n        \"uiTimeZone\"\
+          : \"string\",\n        \"uiTimeout\": null\n    },\n    \"resetProfile\": false,\n    \"roles\": [\n        \"string\"\
+          \n    ],\n    \"rolesGroupMapping\": {\n        \"property1\": [\n            \"string\"\n        ],\n        \"\
+          property2\": [\n            \"string\"\n        ]\n    },\n    \"state\": \"string\",\n    \"unresetProfile\": false,\n\
+          \    \"username\": \"string\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/users"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"customerId\": \"string\",\n    \"directoryId\": \"string\",\n    \"email\": \"string\",\n  \
+          \  \"encrypted\": false,\n    \"eulaAccepted\": false,\n    \"groups\": [\n        \"string\"\n    ],\n    \"id\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"internalUser\": false,\n    \"isExternalAuth\": false,\n    \"\
+          password\": \"string\",\n    \"passwordExpired\": false,\n    \"passwordHint\": \"string\",\n    \"privilegeEndpoints\"\
+          : [\n        \"string\"\n    ],\n    \"properties\": {\n        \"notificationProps\": {\n            \"notifyAlerts\"\
+          : false,\n            \"notifyOnOpComplete\": false,\n            \"notifyOnOpFailure\": false\n        },\n   \
+          \     \"uiTheme\": \"string\",\n        \"uiTimeZone\": \"string\",\n        \"uiTimeout\": null\n    },\n    \"\
+          resetProfile\": false,\n    \"roles\": [\n        \"string\"\n    ],\n    \"rolesGroupMapping\": {\n        \"property1\"\
+          : [\n            \"string\"\n        ],\n        \"property2\": [\n            \"string\"\n        ]\n    },\n \
+          \   \"state\": \"string\",\n    \"unresetProfile\": false,\n    \"username\": \"string\"\n}\"\"\"\n\nconn.request(\"\
+          POST\",\"/era/v0.9/users\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"\
+          utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/users\"\n\t\n\tpayload :=  strings.NewReader(`{\"customerId\": \"string\", \"directoryId\":\
+          \ \"string\", \"email\": \"string\", \"encrypted\": false, \"eulaAccepted\": false, \"groups\": [\"string\"], \"\
+          id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"internalUser\": false, \"isExternalAuth\": false, \"password\"\
+          : \"string\", \"passwordExpired\": false, \"passwordHint\": \"string\", \"privilegeEndpoints\": [\"string\"], \"\
+          properties\": {\"notificationProps\": {\"notifyAlerts\": false, \"notifyOnOpComplete\": false, \"notifyOnOpFailure\"\
+          : false}, \"uiTheme\": \"string\", \"uiTimeZone\": \"string\", \"uiTimeout\": null}, \"resetProfile\": false, \"\
+          roles\": [\"string\"], \"rolesGroupMapping\": {\"property1\": [\"string\"], \"property2\": [\"string\"]}, \"state\"\
+          : \"string\", \"unresetProfile\": false, \"username\": \"string\"}`)\n\treq, err := http.NewRequest(\"POST\", url,\
+          \ payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"POST\", \":///era/v0.9/users\")\n\
+          \  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n\
+          \  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"customerId\\\": \\\"string\\\", \\\"directoryId\\\
+          \": \\\"string\\\", \\\"email\\\": \\\"string\\\", \\\"encrypted\\\": false, \\\"eulaAccepted\\\": false, \\\"groups\\\
+          \": [\\\"string\\\"], \\\"id\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"internalUser\\\": false, \\\"\
+          isExternalAuth\\\": false, \\\"password\\\": \\\"string\\\", \\\"passwordExpired\\\": false, \\\"passwordHint\\\"\
+          : \\\"string\\\", \\\"privilegeEndpoints\\\": [\\\"string\\\"], \\\"properties\\\": {\\\"notificationProps\\\":\
+          \ {\\\"notifyAlerts\\\": false, \\\"notifyOnOpComplete\\\": false, \\\"notifyOnOpFailure\\\": false}, \\\"uiTheme\\\
+          \": \\\"string\\\", \\\"uiTimeZone\\\": \\\"string\\\", \\\"uiTimeout\\\": null}, \\\"resetProfile\\\": false, \\\
+          \"roles\\\": [\\\"string\\\"], \\\"rolesGroupMapping\\\": {\\\"property1\\\": [\\\"string\\\"], \\\"property2\\\"\
+          : [\\\"string\\\"]}, \\\"state\\\": \\\"string\\\", \\\"unresetProfile\\\": false, \\\"username\\\": \\\"string\\\
+          \"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/users';\nconst options = {\n  method: 'POST',\n  headers: {'Accept': 'application/json',\
+          \ 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:  `{\"customerId\":\
+          \ \"string\", \"directoryId\": \"string\", \"email\": \"string\", \"encrypted\": false, \"eulaAccepted\": false,\
+          \ \"groups\": [\"string\"], \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"internalUser\": false, \"isExternalAuth\"\
+          : false, \"password\": \"string\", \"passwordExpired\": false, \"passwordHint\": \"string\", \"privilegeEndpoints\"\
+          : [\"string\"], \"properties\": {\"notificationProps\": {\"notifyAlerts\": false, \"notifyOnOpComplete\": false,\
+          \ \"notifyOnOpFailure\": false}, \"uiTheme\": \"string\", \"uiTimeZone\": \"string\", \"uiTimeout\": null}, \"resetProfile\"\
+          : false, \"roles\": [\"string\"], \"rolesGroupMapping\": {\"property1\": [\"string\"], \"property2\": [\"string\"\
+          ]}, \"state\": \"string\", \"unresetProfile\": false, \"username\": \"string\"}`\n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+  /users/{user_id}:
+    delete:
+      description: Removes a user from the system based on the user ID provided.
+      operationId: deleteUser
+      parameters:
+      - description: Specifies the user ID to transfer resources to before deletion.
+        in: query
+        name: transferToUser
+        schema:
+          type: string
+      - description: The unique identifier of the user to delete.
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAUser'
+          description: User has been deleted successfully.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized client error.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Delete a user
+      tags:
+      - Users
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request DELETE \\\n    --url :///era/v0.9/users/{user_id} \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method DELETE \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    \
+          \  \\\n    --output-document \\\n    - :///era/v0.9/users/{user_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"DELETE\",\"/era/v0.9/users/{user_id}\", headers=headers)\n\nres\
+          \ = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/users/{user_id}\"\n\t \n\treq, err := http.NewRequest(\"DELETE\", url, nil)\n\tif err != nil\
+          \ {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\"\
+          , \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"DELETE\", \":///era/v0.9/users/{user_id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/users/{user_id}';\nconst options = {\n  method: 'DELETE',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    get:
+      description: Fetches a user with the specified ID.
+      operationId: getUserById
+      parameters:
+      - description: The unique identifier of the user to retrieve.
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAUser'
+          description: Returns the user with the given ID.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Retrieve user by ID
+      tags:
+      - Users
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request GET \\\n    --url :///era/v0.9/users/{user_id} \\\n    --header 'Authorization: Basic <basic_auth_token>'\
+          \ \\\n     "
+      - lang: Wget
+        source: "wget --quiet \\\n    --method GET \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n      \\\
+          \n    --output-document \\\n    - :///era/v0.9/users/{user_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Authorization\": \"\
+          Basic <basic_auth_token>\"\n}\n \nconn.request(\"GET\",\"/era/v0.9/users/{user_id}\", headers=headers)\n\nres =\
+          \ conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/users/{user_id}\"\n\t \n\treq, err := http.NewRequest(\"GET\", url, nil)\n\tif err != nil {\n\
+          \t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"Authorization\",\
+          \ \"Basic <basic_auth_token>\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif err != nil {\n\t\tfmt.Println(\"\
+          Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\tbody, err := io.ReadAll(res.Body)\n\
+          \tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(res)\n\t\
+          fmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"GET\", \":///era/v0.9/users/{user_id}\"\
+          )\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n\
+          \  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/users/{user_id}';\nconst options = {\n  method: 'GET',\n  headers: {'Authorization':\
+          \ 'Basic <basic_auth_token>'} \n};\n\ntry {\n  const response = await fetch(url, options);\n  const data = await\
+          \ response.json();\n  console.log(data);\n} catch (error) {\n  console.error(error);\n}"
+    put:
+      description: Updates details for a specified user.
+      operationId: updateUser
+      parameters:
+      - description: The unique identifier of the user to update.
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ERAUser'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERAUser'
+          description: Returns the updated user.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Unauthorized client error.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Server Error.
+      summary: Update user details
+      tags:
+      - Users
+      x-codeSamples:
+      - lang: cURL
+        source: "curl --request PUT \\\n    --url :///era/v0.9/users/{user_id} \\\n    --header 'Accept: application/json'\
+          \ \\\n    --header 'Authorization: Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\
+          \n    --data '{\n    \"customerId\": \"string\",\n    \"directoryId\": \"string\",\n    \"email\": \"string\",\n\
+          \    \"encrypted\": false,\n    \"eulaAccepted\": false,\n    \"groups\": [\n        \"string\"\n    ],\n    \"\
+          id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"internalUser\": false,\n    \"isExternalAuth\": false,\n\
+          \    \"password\": \"string\",\n    \"passwordExpired\": false,\n    \"passwordHint\": \"string\",\n    \"privilegeEndpoints\"\
+          : [\n        \"string\"\n    ],\n    \"properties\": {\n        \"notificationProps\": {\n            \"notifyAlerts\"\
+          : false,\n            \"notifyOnOpComplete\": false,\n            \"notifyOnOpFailure\": false\n        },\n   \
+          \     \"uiTheme\": \"string\",\n        \"uiTimeZone\": \"string\",\n        \"uiTimeout\": null\n    },\n    \"\
+          resetProfile\": false,\n    \"roles\": [\n        \"string\"\n    ],\n    \"rolesGroupMapping\": {\n        \"property1\"\
+          : [\n            \"string\"\n        ],\n        \"property2\": [\n            \"string\"\n        ]\n    },\n \
+          \   \"state\": \"string\",\n    \"unresetProfile\": false,\n    \"username\": \"string\"\n}'"
+      - lang: Wget
+        source: "wget --quiet \\\n    --method PUT \\\n    --header 'Accept: application/json' \\\n    --header 'Authorization:\
+          \ Basic <basic_auth_token>' \\\n    --header 'Content-Type: application/json' \\\n    --body-data '{\n    \"customerId\"\
+          : \"string\",\n    \"directoryId\": \"string\",\n    \"email\": \"string\",\n    \"encrypted\": false,\n    \"eulaAccepted\"\
+          : false,\n    \"groups\": [\n        \"string\"\n    ],\n    \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n\
+          \    \"internalUser\": false,\n    \"isExternalAuth\": false,\n    \"password\": \"string\",\n    \"passwordExpired\"\
+          : false,\n    \"passwordHint\": \"string\",\n    \"privilegeEndpoints\": [\n        \"string\"\n    ],\n    \"properties\"\
+          : {\n        \"notificationProps\": {\n            \"notifyAlerts\": false,\n            \"notifyOnOpComplete\"\
+          : false,\n            \"notifyOnOpFailure\": false\n        },\n        \"uiTheme\": \"string\",\n        \"uiTimeZone\"\
+          : \"string\",\n        \"uiTimeout\": null\n    },\n    \"resetProfile\": false,\n    \"roles\": [\n        \"string\"\
+          \n    ],\n    \"rolesGroupMapping\": {\n        \"property1\": [\n            \"string\"\n        ],\n        \"\
+          property2\": [\n            \"string\"\n        ]\n    },\n    \"state\": \"string\",\n    \"unresetProfile\": false,\n\
+          \    \"username\": \"string\"\n}' \\\n    --output-document \\\n    - :///era/v0.9/users/{user_id}"
+      - lang: Python
+        source: "import http.client\n\nconn = http.client.HTTPSConnection(\"\")\n\nheaders = {\n    \"Accept\": \"application/json\"\
+          ,\n    \"Authorization\": \"Basic <basic_auth_token>\",\n    \"Content-Type\": \"application/json\"\n}\n\npayload\
+          \ =  \"\"\"{\n    \"customerId\": \"string\",\n    \"directoryId\": \"string\",\n    \"email\": \"string\",\n  \
+          \  \"encrypted\": false,\n    \"eulaAccepted\": false,\n    \"groups\": [\n        \"string\"\n    ],\n    \"id\"\
+          : \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\",\n    \"internalUser\": false,\n    \"isExternalAuth\": false,\n    \"\
+          password\": \"string\",\n    \"passwordExpired\": false,\n    \"passwordHint\": \"string\",\n    \"privilegeEndpoints\"\
+          : [\n        \"string\"\n    ],\n    \"properties\": {\n        \"notificationProps\": {\n            \"notifyAlerts\"\
+          : false,\n            \"notifyOnOpComplete\": false,\n            \"notifyOnOpFailure\": false\n        },\n   \
+          \     \"uiTheme\": \"string\",\n        \"uiTimeZone\": \"string\",\n        \"uiTimeout\": null\n    },\n    \"\
+          resetProfile\": false,\n    \"roles\": [\n        \"string\"\n    ],\n    \"rolesGroupMapping\": {\n        \"property1\"\
+          : [\n            \"string\"\n        ],\n        \"property2\": [\n            \"string\"\n        ]\n    },\n \
+          \   \"state\": \"string\",\n    \"unresetProfile\": false,\n    \"username\": \"string\"\n}\"\"\"\n\nconn.request(\"\
+          PUT\",\"/era/v0.9/users/{user_id}\", payload, headers)\n\nres = conn.getresponse()\ndata = res.read()\n\nprint(data.decode(\"\
+          utf-8\"))"
+      - lang: Go
+        source: "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"net/http\"\n\t\"io\"\n)\n\nfunc main() {\n\n\turl\
+          \ := \":///era/v0.9/users/{user_id}\"\n\t\n\tpayload :=  strings.NewReader(`{\"customerId\": \"string\", \"directoryId\"\
+          : \"string\", \"email\": \"string\", \"encrypted\": false, \"eulaAccepted\": false, \"groups\": [\"string\"], \"\
+          id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"internalUser\": false, \"isExternalAuth\": false, \"password\"\
+          : \"string\", \"passwordExpired\": false, \"passwordHint\": \"string\", \"privilegeEndpoints\": [\"string\"], \"\
+          properties\": {\"notificationProps\": {\"notifyAlerts\": false, \"notifyOnOpComplete\": false, \"notifyOnOpFailure\"\
+          : false}, \"uiTheme\": \"string\", \"uiTimeZone\": \"string\", \"uiTimeout\": null}, \"resetProfile\": false, \"\
+          roles\": [\"string\"], \"rolesGroupMapping\": {\"property1\": [\"string\"], \"property2\": [\"string\"]}, \"state\"\
+          : \"string\", \"unresetProfile\": false, \"username\": \"string\"}`)\n\treq, err := http.NewRequest(\"PUT\", url,\
+          \ payload)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n        req.Header.Add(\"\
+          Accept\", \"application/json\")\n        req.Header.Add(\"Authorization\", \"Basic <basic_auth_token>\")\n     \
+          \   req.Header.Add(\"Content-Type\", \"application/json\")\n    \n\tres, err := http.DefaultClient.Do(req)\n\tif\
+          \ err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\treturn\n\t}\n\n\tdefer res.Body.Close()\n\
+          \tbody, err := io.ReadAll(res.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Error creating request:\", err)\n\t\t\
+          return\n\t}\n\n\tfmt.Println(res)\n\tfmt.Println(string(body))\n\n}"
+      - lang: Java
+        source: "AsyncHttpClient client = new DefaultAsyncHttpClient();\nclient.prepare(\"PUT\", \":///era/v0.9/users/{user_id}\"\
+          )\n  .setHeader(\"Accept\", \"application/json\")\n  .setHeader(\"Authorization\", \"Basic <basic_auth_token>\"\
+          )\n  .setHeader(\"Content-Type\", \"application/json\")\n  .setBody(\"{\\\"customerId\\\": \\\"string\\\", \\\"\
+          directoryId\\\": \\\"string\\\", \\\"email\\\": \\\"string\\\", \\\"encrypted\\\": false, \\\"eulaAccepted\\\":\
+          \ false, \\\"groups\\\": [\\\"string\\\"], \\\"id\\\": \\\"b4d15375-1097-4c96-a4c4-4cb5809b05bb\\\", \\\"internalUser\\\
+          \": false, \\\"isExternalAuth\\\": false, \\\"password\\\": \\\"string\\\", \\\"passwordExpired\\\": false, \\\"\
+          passwordHint\\\": \\\"string\\\", \\\"privilegeEndpoints\\\": [\\\"string\\\"], \\\"properties\\\": {\\\"notificationProps\\\
+          \": {\\\"notifyAlerts\\\": false, \\\"notifyOnOpComplete\\\": false, \\\"notifyOnOpFailure\\\": false}, \\\"uiTheme\\\
+          \": \\\"string\\\", \\\"uiTimeZone\\\": \\\"string\\\", \\\"uiTimeout\\\": null}, \\\"resetProfile\\\": false, \\\
+          \"roles\\\": [\\\"string\\\"], \\\"rolesGroupMapping\\\": {\\\"property1\\\": [\\\"string\\\"], \\\"property2\\\"\
+          : [\\\"string\\\"]}, \\\"state\\\": \\\"string\\\", \\\"unresetProfile\\\": false, \\\"username\\\": \\\"string\\\
+          \"}\")\n  .execute()\n  .toCompletableFuture()\n  .thenAccept(System.out::println)\n  .join();\n\nclient.close();"
+      - lang: JavaScript
+        source: "const url = ':///era/v0.9/users/{user_id}';\nconst options = {\n  method: 'PUT',\n  headers: {'Accept': 'application/json',\
+          \ 'Authorization': 'Basic <basic_auth_token>', 'Content-Type': 'application/json'},\n  body:  `{\"customerId\":\
+          \ \"string\", \"directoryId\": \"string\", \"email\": \"string\", \"encrypted\": false, \"eulaAccepted\": false,\
+          \ \"groups\": [\"string\"], \"id\": \"b4d15375-1097-4c96-a4c4-4cb5809b05bb\", \"internalUser\": false, \"isExternalAuth\"\
+          : false, \"password\": \"string\", \"passwordExpired\": false, \"passwordHint\": \"string\", \"privilegeEndpoints\"\
+          : [\"string\"], \"properties\": {\"notificationProps\": {\"notifyAlerts\": false, \"notifyOnOpComplete\": false,\
+          \ \"notifyOnOpFailure\": false}, \"uiTheme\": \"string\", \"uiTimeZone\": \"string\", \"uiTimeout\": null}, \"resetProfile\"\
+          : false, \"roles\": [\"string\"], \"rolesGroupMapping\": {\"property1\": [\"string\"], \"property2\": [\"string\"\
+          ]}, \"state\": \"string\", \"unresetProfile\": false, \"username\": \"string\"}`\n};\n\ntry {\n  const response\
+          \ = await fetch(url, options);\n  const data = await response.json();\n  console.log(data);\n} catch (error) {\n\
+          \  console.error(error);\n}"
+components:
+  schemas:
+    ERAPropertyValue:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        ref_id:
+          type: string
+        secure:
+          type: boolean
+        value:
+          type: string
+      type: object
+    ERAEntity:
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        properties:
+          items:
+            $ref: '#/components/schemas/ERAPropertyValue'
+          type: array
+        type:
+          type: string
+      type: object
+    ERAUser:
+      properties:
+        customerId:
+          type: string
+        directoryId:
+          type: string
+        email:
+          type: string
+        encrypted:
+          type: boolean
+        eulaAccepted:
+          type: boolean
+        groups:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        internalUser:
+          type: boolean
+        isExternalAuth:
+          type: boolean
+        password:
+          type: string
+        passwordExpired:
+          type: boolean
+        passwordHint:
+          type: string
+        privilegeEndpoints:
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        properties: {}
+        resetProfile:
+          type: boolean
+        roles:
+          items:
+            type: string
+          type: array
+        rolesGroupMapping:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+            uniqueItems: true
+          type: object
+        state:
+          type: string
+        unresetProfile:
+          type: boolean
+        username:
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        dependentEntities:
+          items:
+            $ref: '#/components/schemas/ERAEntity'
+          type: array
+        errorCode:
+          type: string
+        message:
+          type: string
+        reason:
+          type: string
+        remedy:
+          type: string
+      type: object
+  securitySchemes:
+    era_auth:
+      description: NDB username and password.
+      scheme: basic
+      type: http
+    era_token:
+      description: NDB API token.
+      in: header
+      name: Authorization
+      type: apiKey
