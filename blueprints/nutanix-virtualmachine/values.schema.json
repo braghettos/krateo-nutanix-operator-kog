@@ -1,0 +1,205 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "title": "Nutanix VirtualMachine",
+  "description": "Provisions a complete Nutanix AHV virtual machine — with its disks, NICs and serial ports declared inline on the VM — as a single KOG Vm resource. The blueprint also renders the VmConfiguration that holds the Prism Central credentials.",
+  "required": [
+    "vm"
+  ],
+  "properties": {
+    "configuration": {
+      "type": "object",
+      "title": "KOG Configuration",
+      "description": "The KOG Configuration (VmConfiguration) that holds the Prism Central credentials used to provision the VM.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Configuration name",
+          "description": "Name of the VmConfiguration resource.",
+          "default": "nutanix-pc"
+        },
+        "namespace": {
+          "type": "string",
+          "title": "Configuration namespace",
+          "description": "Namespace for the VmConfiguration and the Vm resource.",
+          "default": "nutanix-system"
+        },
+        "authSecret": {
+          "type": "object",
+          "title": "Auth secret",
+          "description": "Secret holding the Prism Central credentials (keys: username, password).",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Auth secret name",
+              "description": "Name of the Secret with the Prism Central username/password.",
+              "default": "nutanix-pc-auth"
+            },
+            "namespace": {
+              "type": "string",
+              "title": "Auth secret namespace",
+              "description": "Namespace of the auth Secret.",
+              "default": "nutanix-system"
+            }
+          }
+        }
+      }
+    },
+    "vm": {
+      "type": "object",
+      "title": "Virtual machine",
+      "description": "Core Nutanix AHV virtual machine inputs.",
+      "required": [
+        "clusterExtId"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "VM name",
+          "description": "Name of the virtual machine (also used as the Vm resource name).",
+          "default": "krateo-bp-vm"
+        },
+        "description": {
+          "type": "string",
+          "title": "VM description",
+          "description": "Free-text description of the virtual machine.",
+          "default": "Provisioned by the Krateo nutanix-virtualmachine blueprint"
+        },
+        "numSockets": {
+          "type": "integer",
+          "title": "Number of sockets",
+          "description": "Number of vCPU sockets.",
+          "minimum": 1,
+          "default": 1
+        },
+        "numCoresPerSocket": {
+          "type": "integer",
+          "title": "Cores per socket",
+          "description": "Number of cores per vCPU socket.",
+          "minimum": 1,
+          "default": 1
+        },
+        "memorySizeBytes": {
+          "type": "integer",
+          "title": "Memory size (bytes)",
+          "description": "Memory size in bytes (e.g. 2147483648 = 2 GiB).",
+          "minimum": 1,
+          "default": 2147483648
+        },
+        "clusterExtId": {
+          "type": "string",
+          "title": "Cluster extId",
+          "description": "REQUIRED: extId of the registered Prism Element (PE) cluster that will host the VM.",
+          "default": ""
+        },
+        "categories": {
+          "type": "array",
+          "title": "Category extIds",
+          "description": "Optional list of Nutanix category extIds to associate with the VM.",
+          "default": [],
+          "items": {
+            "type": "string",
+            "title": "Category extId",
+            "description": "extId of a Nutanix category."
+          }
+        }
+      }
+    },
+    "disks": {
+      "type": "array",
+      "title": "Inline disks",
+      "description": "Inline disks. Each entry becomes an entry in the VM's spec.disks (no separate child resource).",
+      "default": [],
+      "items": {
+        "type": "object",
+        "title": "Disk",
+        "description": "A single inline VM disk.",
+        "properties": {
+          "sizeBytes": {
+            "type": "integer",
+            "title": "Disk size (bytes)",
+            "description": "Disk size in bytes (e.g. 21474836480 = 20 GiB).",
+            "minimum": 1,
+            "default": 21474836480
+          },
+          "busType": {
+            "type": "string",
+            "title": "Bus type",
+            "description": "Disk bus type.",
+            "enum": [
+              "SCSI",
+              "IDE",
+              "PCI",
+              "SATA",
+              "SPAPR"
+            ],
+            "default": "SCSI"
+          },
+          "storageContainerExtId": {
+            "type": "string",
+            "title": "Storage container extId",
+            "description": "Optional extId of the storage container; Prism Central picks a default container if empty.",
+            "default": ""
+          }
+        }
+      }
+    },
+    "nics": {
+      "type": "array",
+      "title": "Inline NICs",
+      "description": "Inline NICs. Each entry becomes an entry in the VM's spec.nics.",
+      "default": [],
+      "items": {
+        "type": "object",
+        "title": "NIC",
+        "description": "A single inline VM network interface.",
+        "properties": {
+          "subnetExtId": {
+            "type": "string",
+            "title": "Subnet extId",
+            "description": "extId of the subnet to attach the NIC to.",
+            "default": ""
+          },
+          "nicType": {
+            "type": "string",
+            "title": "NIC type",
+            "description": "Type of the network interface.",
+            "enum": [
+              "NORMAL_NIC",
+              "DIRECT_NIC",
+              "NETWORK_FUNCTION_NIC",
+              "SPAN_DESTINATION_NIC"
+            ],
+            "default": "NORMAL_NIC"
+          }
+        }
+      }
+    },
+    "serialPorts": {
+      "type": "array",
+      "title": "Inline serial ports",
+      "description": "Inline serial ports. Each entry becomes an entry in the VM's spec.serialPorts.",
+      "default": [],
+      "items": {
+        "type": "object",
+        "title": "Serial port",
+        "description": "A single inline VM serial port.",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "title": "Index",
+            "description": "Index of the serial port.",
+            "minimum": 0,
+            "default": 0
+          },
+          "isConnected": {
+            "type": "boolean",
+            "title": "Is connected",
+            "description": "Whether the serial port is connected.",
+            "default": false
+          }
+        }
+      }
+    }
+  }
+}
