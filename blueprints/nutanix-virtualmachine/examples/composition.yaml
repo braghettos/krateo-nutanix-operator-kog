@@ -1,0 +1,34 @@
+# Example Composition for the nutanix-virtualmachine blueprint.
+# Apply once the chart is published and the CompositionDefinition is registered:
+#   kubectl apply -f examples/composition.yaml
+#
+# This provisions a single Nutanix AHV VM (VmConfiguration + Vm KOG resources) with
+# its disks/NICs/serial ports declared inline. Per-resource KOG CRs (the underlying
+# Vm / VmConfiguration) are rendered by the chart's templates.
+---
+apiVersion: composition.krateo.io/v0-1-0
+kind: NutanixVirtualmachine
+metadata:
+  name: nutanix-virtualmachine
+  namespace: krateo-system
+spec:
+  configuration:
+    name: nutanix-pc
+    namespace: nutanix-system
+    authSecret:
+      name: nutanix-pc-auth
+      namespace: nutanix-system
+  vm:
+    name: krateo-bp-vm
+    description: "Provisioned by the Krateo nutanix-virtualmachine blueprint"
+    numSockets: 1
+    numCoresPerSocket: 1
+    memorySizeBytes: 2147483648
+    clusterExtId: "<registered-PE-cluster-extId>"
+    categories: []
+  disks:
+    - sizeBytes: 21474836480
+      busType: SCSI
+      storageContainerExtId: ""
+  nics: []
+  serialPorts: []
