@@ -34,7 +34,7 @@ The operator-created VM in Prism Central — note the **Description: _"Created b
                                                            └────────────────────────┘   /api/vmm/...
 ```
 
-The middleware performs **5 translations** so the generic controller can speak Nutanix v4:
+The middleware performs **7 translations** so the generic controller can speak Nutanix v4:
 
 | # | Translation | Why |
 |---|---|---|
@@ -43,6 +43,8 @@ The middleware performs **5 translations** so the generic controller can speak N
 | 3 | inject `NTNX-Request-Id: <uuid>` on POST/PUT/DELETE | required idempotency header |
 | 4 | resolve async `202 → task → SUCCEEDED → real resource` and return `200` | controller expects the resource in the create response, not a task |
 | 5 | add `If-Match` ETag on PUT/DELETE (GET first to capture it) | v4 optimistic concurrency |
+| 6 | unwrap the single-object `{data: {…}}` envelope on a successful response | so the controller reads the identifier / `additionalStatusFields` (e.g. `extId`) at the body root → `status.extId` |
+| 7 | stringify integer values in observe (GET) responses | large ints (e.g. `memorySizeBytes` `2147483648`) otherwise decode as Go `float64` → `"2.147483648e+09"`, never match the int spec → endless `PUT`, `Ready` never latches. Strings round-trip cleanly |
 
 It is **resource-agnostic**: the `$objectType` is *derived from the request path* (e.g. `/vmm/v4.0/ahv/config/vms` → `vmm.v4.ahv.config.Vm`, `/storage/v4.0.a3/config/volume-groups` → `storage.v4.r0.a3.config.VolumeGroup`), so one proxy serves every Nutanix v4 RestDefinition. Irregular cases can be pinned via the `OBJECTTYPE_OVERRIDES` env. Stdlib-only (no deps).
 
@@ -93,6 +95,15 @@ kubectl -n nutanix-system wait restdefinition/nutanix-vmm-vm --for=condition=Rea
 # generates the Vm + VmConfiguration CRDs and a controller:
 kubectl get crd vms.vmm.nutanix.krateo.io vmconfigurations.vmm.nutanix.krateo.io
 ```
+
+> **⚠️ The `Vm` CR must not set `extId`, and the generated CRD must not *require* it.** `extId` is discovered by the controller — the RD's `excludedSpecFields` must include it (as in the repo RD) so it's kept out of the CRD `spec`. If you applied an **older RD** whose `excludedSpecFields` lacked `extId`, the CRD will *require* it, forcing you to set a bogus value; the controller then does a `GET /vms/<bogus-extId>` → Prism `400` (`observe failed: unexpected status: 400`). `excludedSpecFields` is **immutable**, so fix it by recreating the RD — or patch the live CRD:
+>
+> ```bash
+> kubectl patch crd vms.vmm.nutanix.krateo.io --type=json \
+>   -p '[{"op":"replace","path":"/spec/versions/0/schema/openAPIV3Schema/properties/spec/required","value":["configurationRef"]}]'
+> ```
+>
+> Then create the `Vm` **without** `extId` (Step 4).
 
 ## 3. Credentials + endpoint
 
@@ -166,7 +177,7 @@ kubectl -n nutanix-system delete vms.vmm.nutanix.krateo.io quickstart-vm
 
 ## Notes & current limitations
 
-- **What works end-to-end:** RD → generated CRDs + controller, `VmConfiguration` auth, and **create** (`Synced=True`) — the VM is created on Prism Central via the middleware, as shown in the screenshots.
-- **Status mapping:** `rest-dynamic-controller` 0.8.0 reliably populates `status.extId`/`Ready=True` via the *get-by-id* path; from a cold create its list-style findby doesn't always lift the `{data}`-enveloped `extId` into status. The middleware's `?name→$filter` translation addresses the discovery; full `Ready` wiring is a controller-side detail tracked separately.
+- **What works end-to-end:** RD → generated CRDs + controller, `VmConfiguration` auth, **create** *and* steady-state reconcile — the `Vm` reaches **`Synced=True` and `Ready=True/Available`**, and the VM is created on Prism Central via the middleware (see screenshots).
+- **Status & readiness:** `status.extId` is lifted from the `{data}` envelope by translation #6 (get-by-id path). Reaching **`Ready=True`** additionally needs the observed resource to compare *equal* to the spec — and `rest-dynamic-controller` 0.8.0 decodes JSON numbers as Go `float64`, so a large int such as `memorySizeBytes` returned as `2.147483648e+09` and never matched the int spec → the controller re-`PUT`s on every reconcile and `Ready` stays `Creating`. **Translation #7** (stringify ints in observe responses) fixes the round-trip, so `isUpToDate` holds and the controller sets `Available`. No controller change required (0.8.0 is the current release).
 - **Generic, not VM-specific:** the middleware keys `$objectType` by path, so the same proxy works for other Nutanix v4 RestDefinitions (categories, subnets, … and a future NDB/database RD) — the controller/middleware layer is foundational, solved once.
 - These findings (range-code handling, required-header params, `{data}` envelope, OData filter quoting) are the same RD-level items documented in `GA_V4_FULL_CRUD.md` §6.
