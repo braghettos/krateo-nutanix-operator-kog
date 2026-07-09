@@ -34,7 +34,7 @@ The operator-created VM in Prism Central — note the **Description: _"Created b
                                                            └────────────────────────┘   /api/vmm/...
 ```
 
-The middleware performs **7 translations** so the generic controller can speak Nutanix v4:
+The middleware performs **8 translations** so the generic controller can speak Nutanix v4:
 
 | # | Translation | Why |
 |---|---|---|
@@ -45,6 +45,7 @@ The middleware performs **7 translations** so the generic controller can speak N
 | 5 | add `If-Match` ETag on PUT/DELETE (GET first to capture it) | v4 optimistic concurrency |
 | 6 | unwrap the single-object `{data: {…}}` envelope on a successful response | so the controller reads the identifier / `additionalStatusFields` (e.g. `extId`) at the body root → `status.extId` |
 | 7 | stringify integer values in observe (GET) responses | large ints (e.g. `memorySizeBytes` `2147483648`) otherwise decode as Go `float64` → `"2.147483648e+09"`, never match the int spec → endless `PUT`, `Ready` never latches. Strings round-trip cleanly |
+| 8 | **read-modify-write on `PUT`**: GET the current full resource and deep-merge the controller's changed fields onto it before forwarding | the v4 update is a *full-replace* that rejects a partial body (`VMM-30102 "createTime EMPTY"`) — merging preserves server-managed fields (`createTime`, `extId`, …) so day-2 spec changes actually apply |
 
 It is **resource-agnostic**: the `$objectType` is *derived from the request path* (e.g. `/vmm/v4.0/ahv/config/vms` → `vmm.v4.ahv.config.Vm`, `/storage/v4.0.a3/config/volume-groups` → `storage.v4.r0.a3.config.VolumeGroup`), so one proxy serves every Nutanix v4 RestDefinition. Irregular cases can be pinned via the `OBJECTTYPE_OVERRIDES` env. Stdlib-only (no deps).
 
@@ -179,5 +180,6 @@ kubectl -n nutanix-system delete vms.vmm.nutanix.krateo.io quickstart-vm
 
 - **What works end-to-end:** RD → generated CRDs + controller, `VmConfiguration` auth, **create** *and* steady-state reconcile — the `Vm` reaches **`Synced=True` and `Ready=True/Available`**, and the VM is created on Prism Central via the middleware (see screenshots).
 - **Status & readiness:** `status.extId` is lifted from the `{data}` envelope by translation #6 (get-by-id path). Reaching **`Ready=True`** additionally needs the observed resource to compare *equal* to the spec — and `rest-dynamic-controller` 0.8.0 decodes JSON numbers as Go `float64`, so a large int such as `memorySizeBytes` returned as `2.147483648e+09` and never matched the int spec → the controller re-`PUT`s on every reconcile and `Ready` stays `Creating`. **Translation #7** (stringify ints in observe responses) fixes the round-trip, so `isUpToDate` holds and the controller sets `Available`. No controller change required (0.8.0 is the current release).
+- **Day-2 updates:** changing a `Vm` spec field (e.g. `memorySizeBytes`) propagates to Prism Central. The v4 `PUT` is a *full-replace* that rejects a partial body (`VMM-30102 "invalid argument with key 'createTime' and value 'EMPTY'"`); **translation #8** does a read-modify-write — GET the current VM, merge the controller's changed fields onto the full object (preserving `createTime`/`extId`/…), then `PUT` — so the update applies and the task succeeds. A genuinely failed task is still surfaced (translation #4) as `502`/`504` rather than looped.
 - **Generic, not VM-specific:** the middleware keys `$objectType` by path, so the same proxy works for other Nutanix v4 RestDefinitions (categories, subnets, … and a future NDB/database RD) — the controller/middleware layer is foundational, solved once.
 - These findings (range-code handling, required-header params, `{data}` envelope, OData filter quoting) are the same RD-level items documented in `GA_V4_FULL_CRUD.md` §6.
