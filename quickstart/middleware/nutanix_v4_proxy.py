@@ -20,6 +20,10 @@ adaptations the Nutanix v4 API requires but a generic OpenAPI client does not do
   6. data unwrap    : unwrap the `{data: {...}}` envelope on a successful single-object
                       response so the controller's status mapping (which reads fields at the
                       body root) populates status.extId / Ready=True. Lists are left intact.
+  7. int stringify  : in observe (GET) responses, render integer values as strings so large
+                      ints (e.g. memorySizeBytes) survive the controller's JSON->float64
+                      round-trip and its isUpToDate comparison matches — otherwise it sees a
+                      perpetual diff (int vs "2.14e+09"), re-PUTs forever and never goes Ready.
 
 It is resource-agnostic: every translation is generic, so the same proxy serves
 all Nutanix v4 RestDefinitions (vmm, clustermgmt, prism, networking, storage, ...).
@@ -47,7 +51,7 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 PC_BASE = os.environ["PC_BASE"].rstrip("/")
 PORT = int(os.environ.get("PORT", "8080"))
@@ -130,6 +134,28 @@ def forward(method, path, headers, body):
         return r.status, dict(r.headers), r.read()
     except urllib.error.HTTPError as e:
         return e.code, dict(e.headers), e.read()
+
+
+def _stringify_ints(o):
+    """Render integer-valued numbers as strings so they survive the controller's
+    JSON->float64 round-trip. rest-dynamic-controller decodes JSON numbers as Go
+    float64; a large int like memorySizeBytes 2147483648 then formats back as
+    "2.147483648e+09", and its InferType comparator can't turn that scientific form
+    into an int — so spec(int) != observed(float) on every reconcile: perpetual
+    update + Ready never becomes True. Strings round-trip cleanly (InferType keeps
+    "2147483648" an int). Small ints (e.g. 1) are unaffected either way; this just
+    makes the big ones safe."""
+    if isinstance(o, bool):
+        return o                                  # bool is a subclass of int — keep as-is
+    if isinstance(o, int):
+        return str(o)
+    if isinstance(o, float):
+        return str(int(o)) if o.is_integer() else o
+    if isinstance(o, dict):
+        return {k: _stringify_ints(v) for k, v in o.items()}
+    if isinstance(o, list):
+        return [_stringify_ints(v) for v in o]
+    return o
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -289,11 +315,26 @@ class Handler(http.server.BaseHTTPRequestHandler):
         # and Ready=True on the create/get paths. Only unwrap a single-object `data`; leave
         # list responses (`{data: [...]}`, findby) for the controller's item-extraction +
         # paginator to handle.
+        # (7) on observe (GET) responses, stringify integer values so large ints
+        # (e.g. memorySizeBytes 2147483648) survive the controller's float64/InferType
+        # round-trip and its isUpToDate comparison matches — otherwise the controller
+        # sees a perpetual diff (int vs "2.14e+09"), re-PUTs forever and never goes Ready.
+        # For findby list envelopes we only touch the resources under `data`, leaving the
+        # envelope metadata (counts, flags) numeric for the controller's paginator.
         if 200 <= st < 300 and rb:
             try:
                 obj = json.loads(rb)
-                if isinstance(obj, dict) and isinstance(obj.get("data"), dict):
-                    rb = json.dumps(obj["data"]).encode()
+                unwrapped = isinstance(obj, dict) and isinstance(obj.get("data"), dict)
+                if unwrapped:
+                    obj = obj["data"]                         # (6) unwrap single-object {data:{}} envelope
+                if method == "GET":
+                    if isinstance(obj, dict) and isinstance(obj.get("data"), list):
+                        obj["data"] = _stringify_ints(obj["data"])   # findby list: only the resources
+                    else:
+                        obj = _stringify_ints(obj)            # single resource
+                    rb = json.dumps(obj).encode()
+                elif unwrapped:
+                    rb = json.dumps(obj).encode()
             except ValueError:
                 pass
 
