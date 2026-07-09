@@ -27,6 +27,11 @@ adaptations the Nutanix v4 API requires but a generic OpenAPI client does not do
                       ints (e.g. memorySizeBytes) survive the controller's JSON->float64
                       round-trip and its isUpToDate comparison matches — otherwise it sees a
                       perpetual diff (int vs "2.14e+09"), re-PUTs forever and never goes Ready.
+  8. read-modify-write: the Nutanix v4 update (PUT) is a full-replace that rejects a partial
+                      body (VMM-30102 "createTime EMPTY") — it wants server-managed fields
+                      echoed back. On PUT, GET the current full resource (reusing the ETag GET)
+                      and deep-merge the controller's fields onto it, so createTime/extId/...
+                      survive while the controller's changes win — so day-2 updates actually apply.
 
 It is resource-agnostic: every translation is generic, so the same proxy serves
 all Nutanix v4 RestDefinitions (vmm, clustermgmt, prism, networking, storage, ...).
@@ -54,7 +59,7 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 PC_BASE = os.environ["PC_BASE"].rstrip("/")
 PORT = int(os.environ.get("PORT", "8080"))
@@ -161,6 +166,27 @@ def _stringify_ints(o):
     return o
 
 
+def _rmw_merge(base, over):
+    """Overlay the controller's desired fields (`over`) onto the current full resource
+    (`base`) for a Nutanix v4 full-replace PUT, recursively, so server-managed fields
+    present only in `base` survive while the controller's values win on the leaves it sets.
+    Two shapes merge structurally:
+      - dicts: overlaid key-by-key, so server-only keys (createTime, extId, links, ...) survive;
+      - equal-length lists: merged element-wise by index, so a sub-resource the controller
+        re-sends without its server-assigned identity (e.g. a disk whose real
+        backingInfo.storageContainer / extId lives only on the server) keeps it from `base`.
+    Anything else (scalars, or lists whose shape changed) takes the controller's value.
+    Without this the partial body is rejected — VMM-30102 'createTime'/'Container UUID' EMPTY."""
+    if isinstance(base, dict) and isinstance(over, dict):
+        out = dict(base)
+        for k, v in over.items():
+            out[k] = _rmw_merge(out[k], v) if k in out else v
+        return out
+    if isinstance(base, list) and isinstance(over, list) and len(base) == len(over):
+        return [_rmw_merge(b, o) for b, o in zip(base, over)]
+    return over
+
+
 class Handler(http.server.BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     server_version = "nutanix-v4-proxy"
@@ -260,6 +286,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         body = self._read_body()
         hdrs = self._auth()
         name = None
+        obj = None                                            # parsed POST/PUT request body
 
         if method == "GET":
             path = self._shape_query(path)
@@ -274,7 +301,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
                         ot = object_type_for(path)
                         if ot:
                             obj["$objectType"] = ot
-                    body = json.dumps(obj).encode()
                 except ValueError:
                     log("WARN", "non-JSON %s body to %s" % (method, path))
             hdrs["Content-Type"] = "application/json"
@@ -282,14 +308,35 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if method in ("POST", "PUT", "DELETE"):
             hdrs["NTNX-Request-Id"] = str(uuid.uuid4())       # (3)
 
-        if method in ("PUT", "DELETE"):                       # (5)
-            if self.headers.get("If-Match"):
-                hdrs["If-Match"] = self.headers["If-Match"]
-            else:
-                _, gh, _ = forward("GET", path.split("?")[0], self._auth(), None)
-                etag = gh.get("Etag") or gh.get("ETag")
-                if etag:
-                    hdrs["If-Match"] = etag
+        if method in ("PUT", "DELETE"):                       # (5) ETag + (8) read-modify-write
+            etag = self.headers.get("If-Match")
+            base = None
+            if etag is None or method == "PUT":
+                # PUT always needs the current resource as the RMW base; PUT/DELETE without a
+                # client-supplied If-Match also need it for the ETag. One GET serves both.
+                gs, gh, gb = forward("GET", path.split("?")[0], self._auth(), None)
+                if etag is None:
+                    etag = gh.get("Etag") or gh.get("ETag")
+                if method == "PUT" and gs == 200 and gb:
+                    try:
+                        gj = json.loads(gb)
+                        base = gj["data"] if isinstance(gj, dict) and isinstance(gj.get("data"), dict) else gj
+                    except ValueError:
+                        base = None
+            if etag:
+                hdrs["If-Match"] = etag
+            # (8) read-modify-write: the Nutanix v4 PUT is a full-replace that rejects a partial
+            # body (VMM-30102 "createTime EMPTY") — it wants server-managed fields echoed back.
+            # Merge the controller's desired fields onto the current full resource so those
+            # fields (createTime, extId, links, ...) survive while the controller's changes win.
+            if method == "PUT" and isinstance(base, dict) and isinstance(obj, dict):
+                added = [k for k in base if k not in obj]
+                obj = _rmw_merge(base, obj)
+                log("INFO", "RMW PUT %s: preserved %d server field(s) %s"
+                    % (path.split("?")[0], len(added), added[:8]))
+
+        if obj is not None:                                   # (re)serialize the POST/PUT body
+            body = json.dumps(obj).encode()
 
         st, rh, rb = forward(method, path, hdrs, body or None)
         log("DEBUG", "%s %s -> %s" % (method, path, st))
