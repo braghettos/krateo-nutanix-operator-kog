@@ -33,12 +33,12 @@ jobs:
           tags: nutanix-v4-proxy:ci
       - name: Smoke test /healthz
         run: |
-          docker run -d --name p -e PC_BASE=https://example.invalid:9440/api -p 18080:8080 nutanix-v4-proxy:ci
+          docker run -d --name mw -e PC_BASE=https://example.invalid:9440/api -p 18080:8080 nutanix-v4-proxy:ci
           for i in $(seq 1 10); do
             [ "$(curl -s -m 2 http://127.0.0.1:18080/healthz || true)" = "ok" ] && ok=1 && break
             sleep 1
           done
-          docker rm -f p
+          docker rm -f mw
           test "${ok:-0}" = "1"
 
   chart-lint:
