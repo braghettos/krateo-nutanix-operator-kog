@@ -11,7 +11,10 @@ adaptations the Nutanix v4 API requires but a generic OpenAPI client does not do
                       generically from the request path (+ optional overrides).
   3. NTNX-Request-Id: inject a fresh UUID on POST/PUT/DELETE (idempotency).
   4. async tasks    : when the API returns 202 + a TaskReference, poll the task to
-                      completion and return the real resource as a synchronous 200.
+                      completion and return the real resource as a synchronous 200 — or, if
+                      the task FAILS/CANCELS/times out, surface it as a 502/504 carrying the
+                      task error (instead of masking a failed create/update as a success,
+                      which would leave the controller silently retrying forever).
   5. ETag/If-Match  : on PUT/DELETE without If-Match, GET the resource first to
                       capture its ETag and add the header.
   5b. parent If-Match: on a child create (POST .../parent/{id}/children) that the API
@@ -51,7 +54,7 @@ import urllib.parse
 import urllib.request
 import urllib.error
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 PC_BASE = os.environ["PC_BASE"].rstrip("/")
 PORT = int(os.environ.get("PORT", "8080"))
@@ -206,7 +209,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             out.append(("$filter", " and ".join(idents)))
         return base + ("?" + urllib.parse.urlencode(out) if out else "")
 
-    # (4) drive an async task to completion, return the resulting resource extId
+    # (4) drive an async task to completion. Returns (status, extId, error):
+    #   status = SUCCEEDED | FAILED | CANCELED | TIMEOUT
+    #   extId  = the resulting resource's extId (SUCCEEDED only)
+    #   error  = the task's failure detail (FAILED/CANCELED) so the caller can surface it
+    #            instead of silently masking a failed create/update as a success.
     def _resolve_task(self, task_id, name, collection_path):
         tp = "/prism/v4.0/config/tasks/" + urllib.parse.quote(task_id, safe="")
         deadline = time.time() + TASK_TIMEOUT_S
@@ -217,29 +224,36 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except ValueError:
                 d = {}
             status = d.get("status")
-            if status in ("SUCCEEDED", "FAILED", "CANCELED"):
-                log("INFO", "task %s -> %s" % (task_id, status))
-                if status != "SUCCEEDED":
-                    return None
+            if status in ("FAILED", "CANCELED"):
+                err = d.get("errorMessages") or d.get("legacyErrorMessage") or d.get("completionDetails")
+                log("WARN", "task %s -> %s: %s" % (task_id, status, json.dumps(err)[:1000]))
+                return status, None, err
+            if status == "SUCCEEDED":
+                log("INFO", "task %s -> SUCCEEDED" % task_id)
+                ext = None
                 if name:                                  # robust: re-find by name
                     fp = collection_path + "?$filter=" + urllib.parse.quote("name eq '%s'" % name)
                     _, _, frb = forward("GET", fp, self._auth(), None)
                     try:
                         data = json.loads(frb).get("data") or []
                         if data:
-                            return data[0].get("extId")
+                            ext = data[0].get("extId")
                     except ValueError:
                         pass
-                aff = [e.get("extId") for e in (d.get("entitiesAffected") or []) if e.get("extId")]
-                # a child create affects both parent and child; the parent's extId is in the
-                # collection path, so prefer the entity that is NOT the parent (the new child).
-                for eid in aff:
-                    if eid not in collection_path:
-                        return eid
-                return aff[0] if aff else None
+                if ext is None:
+                    aff = [e.get("extId") for e in (d.get("entitiesAffected") or []) if e.get("extId")]
+                    # a child create affects both parent and child; the parent's extId is in the
+                    # collection path, so prefer the entity that is NOT the parent (the new child).
+                    for eid in aff:
+                        if eid not in collection_path:
+                            ext = eid
+                            break
+                    if ext is None and aff:
+                        ext = aff[0]
+                return "SUCCEEDED", ext, None
             time.sleep(2)
         log("WARN", "task %s timed out" % task_id)
-        return None
+        return "TIMEOUT", None, None
 
     def _proxy(self, method):
         path = self.path
@@ -301,8 +315,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
             coll = path.split("?")[0].rstrip("/")
             if method != "POST":
                 coll = coll.rsplit("/", 1)[0]
-            ext = self._resolve_task(task, name, coll) if task else None
-            if method == "POST" and ext:
+            tstatus, ext, terr = self._resolve_task(task, name, coll) if task else ("NO_TASK", None, None)
+            if tstatus != "SUCCEEDED":
+                # the async task did NOT succeed — surface it as an error status instead of
+                # masking it as 200. Otherwise the controller thinks the create/update
+                # succeeded, re-observes, sees no change, and retries forever (silent loop).
+                st = 504 if tstatus == "TIMEOUT" else 502
+                rb = json.dumps({"error": "nutanix async task %s" % tstatus,
+                                 "taskStatus": tstatus, "detail": terr}).encode()
+                rh = {"Content-Type": "application/json"}
+                log("WARN", "%s %s: async task %s -> %s" % (method, path, task, tstatus))
+            elif method == "POST" and ext:
                 st, rh, rb = forward("GET", coll + "/" + urllib.parse.quote(ext, safe=""), self._auth(), None)
             elif method == "DELETE":
                 st, rb = 204, b""

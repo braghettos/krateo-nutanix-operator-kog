@@ -41,7 +41,7 @@ The middleware performs **7 translations** so the generic controller can speak N
 | 1 | quote OData `$filter` values, and turn `?name=X` into `$filter=name eq 'X'` | Nutanix rejects unquoted filter values (`500`); the controller doesn't build OData |
 | 2 | inject `$objectType` discriminator into create/update bodies | required by v4, derived from the path |
 | 3 | inject `NTNX-Request-Id: <uuid>` on POST/PUT/DELETE | required idempotency header |
-| 4 | resolve async `202 → task → SUCCEEDED → real resource` and return `200` | controller expects the resource in the create response, not a task |
+| 4 | resolve async `202 → task → SUCCEEDED → real resource` and return `200`; on a `FAILED`/`CANCELED`/timed-out task, surface a `502`/`504` with the task error | controller expects the resource in the create response, not a task — and must see failures instead of a masked `200` (else it retries a silently-failed update forever) |
 | 5 | add `If-Match` ETag on PUT/DELETE (GET first to capture it) | v4 optimistic concurrency |
 | 6 | unwrap the single-object `{data: {…}}` envelope on a successful response | so the controller reads the identifier / `additionalStatusFields` (e.g. `extId`) at the body root → `status.extId` |
 | 7 | stringify integer values in observe (GET) responses | large ints (e.g. `memorySizeBytes` `2147483648`) otherwise decode as Go `float64` → `"2.147483648e+09"`, never match the int spec → endless `PUT`, `Ready` never latches. Strings round-trip cleanly |
