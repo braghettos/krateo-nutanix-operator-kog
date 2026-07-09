@@ -1,6 +1,7 @@
 {{- if not .Values.vm.clusterExtId }}
 {{- fail "vm.clusterExtId is required (a registered PE cluster extId)" }}
 {{- end }}
+{{- if .Values.configuration.create }}
 apiVersion: vmm.nutanix.krateo.io/v1alpha1
 kind: VmConfiguration
 metadata:
@@ -18,6 +19,7 @@ spec:
         namespace: {{ .Values.configuration.authSecret.namespace }}
         key: password
 ---
+{{- end }}
 apiVersion: vmm.nutanix.krateo.io/v1alpha1
 kind: Vm
 metadata:
@@ -29,9 +31,12 @@ spec:
     namespace: {{ .Values.configuration.namespace }}
   name: {{ .Values.vm.name }}
   description: {{ .Values.vm.description | quote }}
-  numSockets: {{ .Values.vm.numSockets }}
-  numCoresPerSocket: {{ .Values.vm.numCoresPerSocket }}
-  memorySizeBytes: {{ .Values.vm.memorySizeBytes }}
+  # NOTE: no extId (discovered by the controller) and no powerState (rejected on create).
+  # Large integers are rendered via `int64`/`int` so Helm doesn't emit scientific
+  # notation (e.g. 2147483648 -> "2.147483648e+09"), which would break the integer fields.
+  numSockets: {{ .Values.vm.numSockets | int }}
+  numCoresPerSocket: {{ .Values.vm.numCoresPerSocket | int }}
+  memorySizeBytes: {{ .Values.vm.memorySizeBytes | int64 }}
   cluster:
     extId: {{ .Values.vm.clusterExtId | quote }}
   {{- with .Values.vm.categories }}
@@ -42,17 +47,21 @@ spec:
   {{- end }}
   {{- with .Values.disks }}
   disks:
-    {{- range $i, $d := . }}
+    {{- $busIndex := dict }}
+    {{- range $d := . }}
+    {{- $bus := $d.busType | default "SCSI" }}
+    {{- $n := int (index $busIndex $bus | default 0) }}
     - backingInfo:
         $objectType: vmm.v4.ahv.config.VmDisk
-        diskSizeBytes: {{ $d.sizeBytes }}
+        diskSizeBytes: {{ $d.sizeBytes | int64 }}
         {{- with $d.storageContainerExtId }}
         storageContainer:
           extId: {{ . | quote }}
         {{- end }}
       diskAddress:
-        busType: {{ $d.busType | default "SCSI" }}
-        index: {{ $i }}
+        busType: {{ $bus }}
+        index: {{ $n }}
+    {{- $_ := set $busIndex $bus (add $n 1) }}
     {{- end }}
   {{- end }}
   {{- with .Values.nics }}
@@ -67,7 +76,7 @@ spec:
   {{- with .Values.serialPorts }}
   serialPorts:
     {{- range . }}
-    - index: {{ .index }}
+    - index: {{ .index | int }}
       isConnected: {{ .isConnected | default false }}
     {{- end }}
   {{- end }}
