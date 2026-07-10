@@ -58,6 +58,12 @@ apply a `NutanixVirtualmachine` composition (see `examples/composition.yaml`) �
 composition-dynamic-controller renders this same chart. Verified end-to-end on a live PC:
 composition → `Vm` `Synced=True, Ready=True/Available` with an inline disk + serial port.
 
+The chart depends on **[`portal-composition-page-generic`](https://marketplace.krateo.io)**
+(Krateo Marketplace), so a full Krateo install also renders an opinionated **Composition page**
+in the portal — Events, managed-resource Status, and a Values form — for each
+`NutanixVirtualmachine`. Its composition identity (`global.*`) is injected by the
+composition-dynamic-controller at install, so no extra wiring is needed.
+
 | value | purpose |
 |---|---|
 | `vm.clusterExtId` | **required** — registered PE cluster extId |
