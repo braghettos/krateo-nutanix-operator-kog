@@ -42,7 +42,7 @@ Point your RestDefinition OAS slices' `servers[0].url` at the in-cluster service
 
 | key | default | purpose |
 |---|---|---|
-| `image.repository` / `image.tag` | `ghcr.io/braghettos/nutanix-v4-proxy` / `0.2.0` | image; set `image.digest` to pin |
+| `image.repository` / `image.tag` | `ghcr.io/krateo-blueprints/nutanix-v4-proxy` / `0.2.0` | image; set `image.digest` to pin |
 | `config.pcBase` | `""` (**required**) | Prism Central API base, ending in `/api` |
 | `config.tlsVerify` | `false` | verify the PC TLS cert (PC often uses a private CA) |
 | `config.xClusterId` | `""` | default `X-Cluster-Id` for cluster-scoped endpoints |
@@ -57,7 +57,7 @@ Runs hardened by default: non-root (`65532`), read-only rootfs, all caps dropped
 
 ```bash
 docker build --build-arg VERSION=0.2.0 \
-  -t ghcr.io/braghettos/nutanix-v4-proxy:0.2.0 quickstart/middleware
+  -t ghcr.io/krateo-blueprints/nutanix-v4-proxy:0.2.0 quickstart/middleware
 ```
 
 The base image is pinned by digest for reproducible builds. For a registry-free trial, the
