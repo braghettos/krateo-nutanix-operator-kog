@@ -7,7 +7,7 @@ ARG VERSION=0.3.0
 LABEL org.opencontainers.image.title="nutanix-v4-proxy" \
       org.opencontainers.image.description="Translating proxy that lets Krateo rest-dynamic-controller drive the Nutanix Prism Central v4 API" \
       org.opencontainers.image.version="${VERSION}" \
-      org.opencontainers.image.source="https://github.com/braghettos/krateo-nutanix-operator-kog" \
+      org.opencontainers.image.source="https://github.com/krateo-blueprints/krateo-nutanix-operator-kog" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 WORKDIR /app
