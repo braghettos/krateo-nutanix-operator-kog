@@ -18,7 +18,7 @@ From the published OCI registry (image + chart are pushed by CI on each `v*.*.*`
 see `.github/workflows/release.yml`):
 
 ```bash
-helm install nutanix-mw oci://ghcr.io/braghettos/charts/nutanix-v4-proxy --version 0.2.0 \
+helm install nutanix-mw oci://ghcr.io/krateo-blueprints/charts/nutanix-v4-proxy --version 0.2.0 \
   -n nutanix-system --create-namespace \
   --set config.pcBase=https://<PC-HOST>:9440/api \
   --set config.xClusterId=<registered-PE-cluster-extId>      # optional
