@@ -5,112 +5,92 @@
   </picture>
 </p>
 
-# Krateo RestDefinitions for Nutanix Prism Central v4
+# Krateo RestDefinitions & Blueprints for Nutanix Prism Central v4
 
 Manage **Nutanix Prism Central (GA v4.0)** resources as native Kubernetes objects with
-**Krateo** and the **Operator Generator (KOG / `oasgen-provider`)**. Each `RestDefinition`
-points at an OpenAPI slice and maps the resource's verbs onto the Nutanix v4 REST API;
-KOG then generates a CRD + a `rest-dynamic-controller` that reconciles the real resource —
-**no per-resource controller code**.
+**Krateo** and the **Operator Generator** (KOG / `oasgen-provider`).
 
-This repo contains:
+## What is this
 
-- **189 RestDefinitions** across all 19 Nutanix v4 namespaces (`generated/`), generated 1:1
-  from the official OpenAPI specs (`oas/_official/`).
-- A small, resource-agnostic **Nutanix v4 proxy** that lets the generic controller speak the
-  v4 dialect (`quickstart/middleware/`).
-- **Operator quickstarts** that create real resources on a live PC (`quickstart/`).
-- A **per-RD live-test matrix** and an API-level validation report.
+A family of Krateo charts and generated assets for Nutanix Prism Central v4:
 
-## Why a proxy?
+- **189 `RestDefinition`s** (`generated/`), one per Nutanix v4 resource across all 19 PC
+  namespaces. KOG turns each into a CRD + a `rest-dynamic-controller` that reconciles the
+  real resource — no per-resource controller code.
+- **`charts/nutanix-v4-proxy`** — a small translating proxy that lets the generic
+  controller speak the v4 dialect (`$objectType` discriminator, async task resolution,
+  ETag/`If-Match`, OData `$filter` quoting, optional `X-Cluster-Id`).
+- **`blueprints/nutanix-virtualmachine`** — a Krateo blueprint that provisions a complete
+  AHV VM (disks, NICs and serial ports declared inline) as a single KOG `Vm` resource,
+  with a Krateo portal Composition page.
+- **`blueprints/nutanix-chain-lookup`** — a demo blueprint coupling a day-2 child to a
+  parent's runtime `status.extId` via Helm `lookup`.
 
-The Nutanix v4 API has conventions a generic OpenAPI controller doesn't handle. The proxy
-([`quickstart/middleware/nutanix_v4_proxy.py`](quickstart/middleware/nutanix_v4_proxy.py),
-stdlib-only) sits between the controller and Prism Central and performs five runtime
-translations — it injects the `$objectType` discriminator (derived from the request path),
-adds the `NTNX-Request-Id` idempotency header, resolves the async `202 → task → resource`
-flow into a synchronous `200`, handles `If-Match` ETags, and quotes OData `$filter` values.
+Validated against a live `pc.2024.3.1.13`: **89 / 189 RDs proven end-to-end**,
+**182 / 189 routes confirmed live** (see `GA_V4_FULL_CRUD.md` / `LIVE_TEST_MATRIX.md`).
 
-Each RD's OpenAPI slice also needs three generic codegen fixes (applied by
-[`scripts/patch_slice.py`](scripts/patch_slice.py)): expand range response codes
-(`4XX`/`5XX` → explicit) and add `200/201/202`; drop the *required* `NTNX-Request-Id`/`If-Match`
-params (the proxy injects them); add a findby filter param. These belong upstream in the
-oasgen-provider templates.
+Full documentation is in [`docs/`](docs/index.md).
 
-## Quickstarts
+## Install
 
-Start with **`Category`** (synchronous, no parent — the cleanest end-to-end test):
+Prerequisites: **KOG** (`oasgen-provider`) and, for the blueprints, a full **Krateo**
+install (`core-provider` + `composition-dynamic-controller`).
 
-- [`quickstart/README.md`](quickstart/README.md) — **VM**, the full walkthrough (with Prism UI screenshots)
-- [`quickstart/category/`](quickstart/category) — Category (sync)
-- [`quickstart/volumegroup/`](quickstart/volumegroup) — VolumeGroup (async)
-- [`quickstart/addressgroup/`](quickstart/addressgroup) — AddressGroup (async)
+Deploy the v4 proxy (`config.pcBase` is required):
 
-The minimal shape of every quickstart resource:
-
-```yaml
-apiVersion: <ns>.nutanix.krateo.io/v1alpha1
-kind: <Kind>
-metadata:
-  name: example
-  namespace: nutanix-system
-spec:
-  configurationRef:
-    name: nutanix-pc
-    namespace: nutanix-system
-  # ... resource fields (see each quickstart)
+```bash
+helm install nutanix-mw oci://ghcr.io/krateo-blueprints/charts/nutanix-v4-proxy --version 0.6.0 \
+  -n nutanix-system --create-namespace \
+  --set config.pcBase=https://<PC-HOST>:9440/api
 ```
 
-## Layout
+Apply the RestDefinitions (point their OAS slices at the proxy Service first):
 
-```
-generated/                 # 189 RestDefinitions + their OAS slices, by namespace
-  <ns>/restdefinitions/*.restdefinition.yaml
-  <ns>/oas/*.yaml
-  README.md  ANALYSIS.md     # inventory of every resource (verbs, sync/async)
-oas/_official/             # official Nutanix v4 OpenAPI specs (19 namespaces)
-quickstart/                # operator quickstarts (VM, Category, VolumeGroup, AddressGroup)
-  middleware/              # the Nutanix v4 proxy (code, Dockerfile, deploy.yaml)
-scripts/
-  patch_slice.py           # apply the 3 generic slice-fixes to any OAS slice
-  live_test.py             # serialized live-tester for read-observe RDs
-  generate_restdefinitions.py
-LIVE_TEST_MATRIX.md        # per-RD: how each can be live-tested (or why it's blocked)
-GA_V4_FULL_CRUD.md         # API-level validation of all 189 RDs against a live PC
+```bash
+kubectl apply -k generated/
+kubectl get restdefinitions -n nutanix-system    # READY -> True
 ```
 
-## Coverage
+See [`docs/usage.md`](docs/usage.md) for the full walkthrough.
 
-Validated against a live `pc.2024.3.1.13`: **89 / 189 RDs proven end-to-end**
-(30 full-CRUD + 59 read), **182 / 189 routes confirmed live**. See
-[`GA_V4_FULL_CRUD.md`](GA_V4_FULL_CRUD.md) for the per-RD verdicts and
-[`LIVE_TEST_MATRIX.md`](LIVE_TEST_MATRIX.md) for the per-RD live-test method.
-The rest are blocked by undeployed PC services (Files, Licensing, Objects) or
-features that need external infra (LDAP/SAML, AWS cloud connectivity).
+## Configure
 
-> The Nutanix v4 conventions and operational notes (e.g. serialize controllers — a concurrent
-> storm can lock the shared PC admin account) are documented in the quickstarts.
+Every chart is configured via Helm values:
 
-### Update 2026-06-11 — Small-PC rebuild unlocked Atlas / Flow Virtual Networking
+- `charts/nutanix-v4-proxy/values.yaml` — `config.pcBase` (**required**, ends in `/api`),
+  `config.tlsVerify`, `config.xClusterId`, `config.taskTimeoutSeconds`, `config.logLevel`.
+- `blueprints/nutanix-virtualmachine/values.yaml` — `vm.clusterExtId` (**required**), VM
+  sizing, and inline `disks[]`/`nics[]`/`serialPorts[]`; typed by `values.schema.json`.
+- `blueprints/nutanix-chain-lookup/values.yaml` — parent `vm.*` + `child.serialPortIndex`.
 
-The numbers above were taken on a STARTER / x-small PC where Flow Virtual Networking
-(Atlas) was undeployed. The PC has since been rebuilt to **size Small** with **CMSP**
-and the **Network Controller (Atlas)** enabled, and the PE registered to it — which
-lifts the single biggest block:
+The full surface is documented in [`docs/configuration.md`](docs/configuration.md).
 
-- **Atlas is live.** Re-probed 2026-06-11: **17 / 30 `networking` RDs are
-  route-reachable (HTTP 200)** — up from 9 — including `vpc2`, `subnet2`,
-  `floatingip`, `gateway`, `routingpolicy`, `vpnconnection`, `bgpsession`,
-  `layer2stretch`, `loadbalancersession`, `routetable`, `ipfixexporter`,
-  `trafficmirror`, `virtualswitch`, `vpcvirtualswitchmapping`, `uplinkbond`,
-  `controller`, `capability2`. The remaining 13 are parent-scoped children (need a
-  parent `extId` in the path) or `/networking/v4.0/aws/*` (no AWS cloud
-  connectivity configured) — **not** Atlas-gated.
-- **Write-CRUD proven through the operator** on Atlas: a `vpc2` create→delete
-  round-trip plus a per-RD Atlas CRUD sweep (5 RDs FULL_PASS). The `N — Atlas`
-  verdicts in [`LIVE_TEST_MATRIX.md`](LIVE_TEST_MATRIX.md) are superseded for the
-  Flow-VN tier.
+## Examples
 
-Also generated this round (RDs live in a separate working tree, not committed here):
-**NDB** (105), **NKE** (46), plus Foundation / Foundation Central / Move / Self-Service /
-NC2 / Prism v3 / Prism v2 — ~1165 RDs across 28 product namespaces.
+- [`examples/nutanix-virtualmachine`](examples/nutanix-virtualmachine/README.md) —
+  provision a complete Nutanix AHV VM as a single KOG `Vm`, standalone or as a
+  `NutanixVirtualmachine` Krateo composition.
+
+More in the repo: `blueprints/nutanix-chain-lookup/` (day-2 lookup demo) and
+`quickstart/` (live-PC operator quickstarts: `category`, `volumegroup`, `addressgroup`,
+plus the full VM walkthrough). Index: [`docs/examples.md`](docs/examples.md).
+
+## Docs
+
+- [Index](docs/index.md) · [Overview](docs/overview.md) · [Usage](docs/usage.md) ·
+  [Configuration](docs/configuration.md) · [API](docs/api.md) ·
+  [Examples](docs/examples.md) · [Release](docs/release.md) · [Log](docs/log.md)
+- [`docs/llms.txt`](docs/llms.txt) — the LLM doc index.
+
+## Develop & release
+
+- `generated/` is regenerated by `scripts/generate_restdefinitions.py` from the official
+  specs in `oas/_official/`; keep the hand-maintained `generated/README.md` /
+  `generated/ANALYSIS.md`.
+- **`ci.yml`** builds the proxy image (no push), smoke-tests `/healthz`, and lints/renders
+  the proxy chart (asserting it refuses to render without `config.pcBase`).
+- **`security.yml`** runs the shared Krateo security scan; **`lint.yaml`** runs the shared
+  docs-standard linter (`lint-docs`).
+- Releases: the proxy image + chart ship on a `v`-prefixed tag (`release.yml`); the
+  VirtualMachine blueprint chart ships on a plain-semver tag (`release-chart.yaml`). Full
+  runbook in [`docs/release.md`](docs/release.md).
