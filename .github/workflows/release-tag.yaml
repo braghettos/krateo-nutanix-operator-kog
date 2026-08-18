@@ -104,6 +104,11 @@ jobs:
 
             # CHART_VERSION placeholder is substituted from the tag; never hand-maintained.
             sed -i "s/CHART_VERSION/${VERSION}/g" "$cf"
+            # values.yaml too: the proxy chart pins its own image tag there, and a
+            # hand-maintained tag is how it came to reference a version that did not exist.
+            if [ -f "$dir/values.yaml" ]; then
+              sed -i "s/CHART_VERSION/${VERSION}/g" "$dir/values.yaml"
+            fi
             helm dependency build "$dir" 2>/dev/null || helm dependency update "$dir" 2>/dev/null || true
             helm package "$dir" --version "${VERSION}" --destination /tmp/pkg
             helm push "/tmp/pkg/${name}-${VERSION}.tgz" "${OCI_REPO}"
