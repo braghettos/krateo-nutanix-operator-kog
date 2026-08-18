@@ -56,7 +56,13 @@ jobs:
           set -euo pipefail
           # The image exists to serve one endpoint. A build that pushes something which
           # cannot answer /healthz is worse than a failed build: it fails at provisioning.
-          docker run -d --name proxy -p 8080:8080 "${IMAGE}:${VERSION}"
+          #
+          # PC_BASE is the proxy's ONE mandatory setting: it is read with os.environ[...] at
+          # import time, so without it the process dies on a KeyError before binding. The
+          # value here is deliberately a dead address and never dialled -- /healthz is
+          # answered in do_GET before any Prism call -- so this stays a self-contained check
+          # of "does it import, bind, and serve", with no Nutanix endpoint required in CI.
+          docker run -d --name proxy -p 8080:8080 -e PC_BASE=https://127.0.0.1:9440 "${IMAGE}:${VERSION}"
           for i in $(seq 1 20); do
             if [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/healthz || true)" = "200" ]; then
               echo "healthz OK"; docker rm -f proxy; exit 0
