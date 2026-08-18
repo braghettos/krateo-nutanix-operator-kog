@@ -1,0 +1,78 @@
+# Build and publish ghcr.io/<owner>/nutanix-v4-proxy from quickstart/middleware.
+#
+# WHY THIS EXISTS. The proxy image previously existed ONLY in the old braghettos org, built
+# by hand — this repo had the Dockerfile and the source but no pipeline. So when the repo
+# moved, the chart was retargeted to ghcr.io/krateo-blueprints/nutanix-v4-proxy while the
+# image was never published there, leaving the chart broken on install and the old org
+# holding the only copy.
+#
+# Fires on the SAME bare-semver tag as the chart release, so chart version, appVersion and
+# image tag are one number by construction. That is deliberate: this repo previously carried
+# five different versions for the same artifact (Dockerfile comment 0.2.0, ARG 0.3.0, chart
+# appVersion 0.6.0, values tag 0.4.0, published image 0.6.0). Every hand-maintained one of
+# those is a future dangling reference.
+
+name: release-image
+
+on:
+  push:
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve version
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          else
+            echo "VERSION=0.0.0-dev" >> "$GITHUB_ENV"
+          fi
+          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/nutanix-v4-proxy" >> "$GITHUB_ENV"
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: quickstart/middleware
+          push: true
+          tags: ${{ env.IMAGE }}:${{ env.VERSION }}
+          build-args: VERSION=${{ env.VERSION }}
+          provenance: false
+      - name: Verify it runs and answers /healthz
+        run: |
+          set -euo pipefail
+          # The image exists to serve one endpoint. A build that pushes something which
+          # cannot answer /healthz is worse than a failed build: it fails at provisioning.
+          docker run -d --name proxy -p 8080:8080 "${IMAGE}:${VERSION}"
+          for i in $(seq 1 20); do
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/healthz || true)" = "200" ]; then
+              echo "healthz OK"; docker rm -f proxy; exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::image did not answer /healthz"; docker logs proxy; docker rm -f proxy; exit 1
+      - name: Verify anonymous pullability
+        run: |
+          set -uo pipefail
+          # New GHCR packages default to PRIVATE and do not inherit visibility. The chart
+          # pulls this anonymously in-cluster, so a private package fails provisioning.
+          repo="${GITHUB_REPOSITORY_OWNER,,}/nutanix-v4-proxy"
+          tok=$(curl -s "https://ghcr.io/token?scope=repository:${repo}:pull" \
+                | python3 -c 'import sys,json;print(json.load(sys.stdin).get("token",""))')
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${tok}" \
+                 -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
+                 "https://ghcr.io/v2/${repo}/manifests/${VERSION}")
+          [ "$code" = "200" ] && echo "public" || echo "::warning::NOT anonymously pullable (HTTP ${code}) — set the package public"
