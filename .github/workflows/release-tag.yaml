@@ -109,6 +109,13 @@ jobs:
             if [ -f "$dir/values.yaml" ]; then
               sed -i "s/CHART_VERSION/${VERSION}/g" "$dir/values.yaml"
             fi
+            # ...and the CompositionDefinition, which pins the version of THIS chart. Left by
+            # hand it said 0.3.0 while the published versions were 0.1.0 and 0.6.x -- a
+            # registration pointing at a chart that never existed, which core-provider
+            # surfaces only as a failed pull long after install.
+            if [ -f "$dir/compositiondefinition.yaml" ]; then
+              sed -i "s/CHART_VERSION/${VERSION}/g" "$dir/compositiondefinition.yaml"
+            fi
             helm dependency build "$dir" 2>/dev/null || helm dependency update "$dir" 2>/dev/null || true
             helm package "$dir" --version "${VERSION}" --destination /tmp/pkg
             helm push "/tmp/pkg/${name}-${VERSION}.tgz" "${OCI_REPO}"
